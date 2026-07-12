@@ -30,13 +30,18 @@ import type {
   CreateAirlineDto,
   CreateAirportDto,
   CreateFlightDto,
+  CreateFlightMarketingDto,
   CreatePostDto,
   FlightDto,
+  FlightMarketingDto,
+  GetOperatingFlightByMarketingParams,
+  ListFlightMarketingParams,
   MeResponseDto,
   PostDto,
   UpdateAirlineDto,
   UpdateAirportDto,
-  UpdateFlightDto
+  UpdateFlightDto,
+  UpdateFlightMarketingDto
 } from './models';
 
 import { customFetch } from '../mutator';
@@ -1891,6 +1896,611 @@ export const useDeleteFlight = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteFlightMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List marketing flights
+ */
+export type listFlightMarketingResponse200 = {
+  data: FlightMarketingDto[]
+  status: 200
+}
+    
+export type listFlightMarketingResponseSuccess = (listFlightMarketingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listFlightMarketingResponse = (listFlightMarketingResponseSuccess)
+
+export const getListFlightMarketingUrl = (params?: ListFlightMarketingParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/flight-marketing?${stringifiedParams}` : `/api/flight-marketing`
+}
+
+export const listFlightMarketing = async (params?: ListFlightMarketingParams, options?: RequestInit): Promise<listFlightMarketingResponse> => {
+  
+  return customFetch<listFlightMarketingResponse>(getListFlightMarketingUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListFlightMarketingQueryKey = (params?: ListFlightMarketingParams,) => {
+    return [
+    `/api/flight-marketing`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListFlightMarketingQueryOptions = <TData = Awaited<ReturnType<typeof listFlightMarketing>>, TError = unknown>(params?: ListFlightMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlightMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFlightMarketingQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFlightMarketing>>> = ({ signal }) => listFlightMarketing(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFlightMarketing>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListFlightMarketingQueryResult = NonNullable<Awaited<ReturnType<typeof listFlightMarketing>>>
+export type ListFlightMarketingQueryError = unknown
+
+
+export function useListFlightMarketing<TData = Awaited<ReturnType<typeof listFlightMarketing>>, TError = unknown>(
+ params: undefined |  ListFlightMarketingParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlightMarketing>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFlightMarketing>>,
+          TError,
+          Awaited<ReturnType<typeof listFlightMarketing>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListFlightMarketing<TData = Awaited<ReturnType<typeof listFlightMarketing>>, TError = unknown>(
+ params?: ListFlightMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlightMarketing>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFlightMarketing>>,
+          TError,
+          Awaited<ReturnType<typeof listFlightMarketing>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListFlightMarketing<TData = Awaited<ReturnType<typeof listFlightMarketing>>, TError = unknown>(
+ params?: ListFlightMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlightMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List marketing flights
+ */
+
+export function useListFlightMarketing<TData = Awaited<ReturnType<typeof listFlightMarketing>>, TError = unknown>(
+ params?: ListFlightMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlightMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListFlightMarketingQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a marketing flight
+ */
+export type createFlightMarketingResponse201 = {
+  data: FlightMarketingDto
+  status: 201
+}
+    
+export type createFlightMarketingResponseSuccess = (createFlightMarketingResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createFlightMarketingResponse = (createFlightMarketingResponseSuccess)
+
+export const getCreateFlightMarketingUrl = () => {
+
+
+  
+
+  return `/api/flight-marketing`
+}
+
+export const createFlightMarketing = async (createFlightMarketingDto: CreateFlightMarketingDto, options?: RequestInit): Promise<createFlightMarketingResponse> => {
+  
+  return customFetch<createFlightMarketingResponse>(getCreateFlightMarketingUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createFlightMarketingDto,)
+  }
+);}
+
+
+
+
+export const getCreateFlightMarketingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFlightMarketing>>, TError,{data: CreateFlightMarketingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFlightMarketing>>, TError,{data: CreateFlightMarketingDto}, TContext> => {
+
+const mutationKey = ['createFlightMarketing'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFlightMarketing>>, {data: CreateFlightMarketingDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFlightMarketing(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFlightMarketingMutationResult = NonNullable<Awaited<ReturnType<typeof createFlightMarketing>>>
+    export type CreateFlightMarketingMutationBody = CreateFlightMarketingDto
+    export type CreateFlightMarketingMutationError = unknown
+
+    /**
+ * @summary Create a marketing flight
+ */
+export const useCreateFlightMarketing = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFlightMarketing>>, TError,{data: CreateFlightMarketingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createFlightMarketing>>,
+        TError,
+        {data: CreateFlightMarketingDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateFlightMarketingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Resolve a marketing flight to its operating flight
+ */
+export type getOperatingFlightByMarketingResponse200 = {
+  data: FlightDto
+  status: 200
+}
+    
+export type getOperatingFlightByMarketingResponseSuccess = (getOperatingFlightByMarketingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getOperatingFlightByMarketingResponse = (getOperatingFlightByMarketingResponseSuccess)
+
+export const getGetOperatingFlightByMarketingUrl = (params: GetOperatingFlightByMarketingParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/flight-marketing/resolve?${stringifiedParams}` : `/api/flight-marketing/resolve`
+}
+
+export const getOperatingFlightByMarketing = async (params: GetOperatingFlightByMarketingParams, options?: RequestInit): Promise<getOperatingFlightByMarketingResponse> => {
+  
+  return customFetch<getOperatingFlightByMarketingResponse>(getGetOperatingFlightByMarketingUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetOperatingFlightByMarketingQueryKey = (params?: GetOperatingFlightByMarketingParams,) => {
+    return [
+    `/api/flight-marketing/resolve`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getGetOperatingFlightByMarketingQueryOptions = <TData = Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError = unknown>(params: GetOperatingFlightByMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOperatingFlightByMarketingQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>> = ({ signal }) => getOperatingFlightByMarketing(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetOperatingFlightByMarketingQueryResult = NonNullable<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>>
+export type GetOperatingFlightByMarketingQueryError = unknown
+
+
+export function useGetOperatingFlightByMarketing<TData = Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError = unknown>(
+ params: GetOperatingFlightByMarketingParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOperatingFlightByMarketing>>,
+          TError,
+          Awaited<ReturnType<typeof getOperatingFlightByMarketing>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOperatingFlightByMarketing<TData = Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError = unknown>(
+ params: GetOperatingFlightByMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOperatingFlightByMarketing>>,
+          TError,
+          Awaited<ReturnType<typeof getOperatingFlightByMarketing>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOperatingFlightByMarketing<TData = Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError = unknown>(
+ params: GetOperatingFlightByMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Resolve a marketing flight to its operating flight
+ */
+
+export function useGetOperatingFlightByMarketing<TData = Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError = unknown>(
+ params: GetOperatingFlightByMarketingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOperatingFlightByMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetOperatingFlightByMarketingQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Get a marketing flight
+ */
+export type getFlightMarketingResponse200 = {
+  data: FlightMarketingDto
+  status: 200
+}
+    
+export type getFlightMarketingResponseSuccess = (getFlightMarketingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getFlightMarketingResponse = (getFlightMarketingResponseSuccess)
+
+export const getGetFlightMarketingUrl = (id: string,) => {
+
+
+  
+
+  return `/api/flight-marketing/${id}`
+}
+
+export const getFlightMarketing = async (id: string, options?: RequestInit): Promise<getFlightMarketingResponse> => {
+  
+  return customFetch<getFlightMarketingResponse>(getGetFlightMarketingUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetFlightMarketingQueryKey = (id?: string,) => {
+    return [
+    `/api/flight-marketing/${id}`
+    ] as const;
+    }
+
+    
+export const getGetFlightMarketingQueryOptions = <TData = Awaited<ReturnType<typeof getFlightMarketing>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlightMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFlightMarketingQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFlightMarketing>>> = ({ signal }) => getFlightMarketing(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFlightMarketing>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetFlightMarketingQueryResult = NonNullable<Awaited<ReturnType<typeof getFlightMarketing>>>
+export type GetFlightMarketingQueryError = unknown
+
+
+export function useGetFlightMarketing<TData = Awaited<ReturnType<typeof getFlightMarketing>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlightMarketing>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFlightMarketing>>,
+          TError,
+          Awaited<ReturnType<typeof getFlightMarketing>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFlightMarketing<TData = Awaited<ReturnType<typeof getFlightMarketing>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlightMarketing>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFlightMarketing>>,
+          TError,
+          Awaited<ReturnType<typeof getFlightMarketing>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFlightMarketing<TData = Awaited<ReturnType<typeof getFlightMarketing>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlightMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a marketing flight
+ */
+
+export function useGetFlightMarketing<TData = Awaited<ReturnType<typeof getFlightMarketing>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlightMarketing>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetFlightMarketingQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a marketing flight
+ */
+export type updateFlightMarketingResponse200 = {
+  data: FlightMarketingDto
+  status: 200
+}
+    
+export type updateFlightMarketingResponseSuccess = (updateFlightMarketingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type updateFlightMarketingResponse = (updateFlightMarketingResponseSuccess)
+
+export const getUpdateFlightMarketingUrl = (id: string,) => {
+
+
+  
+
+  return `/api/flight-marketing/${id}`
+}
+
+export const updateFlightMarketing = async (id: string,
+    updateFlightMarketingDto: UpdateFlightMarketingDto, options?: RequestInit): Promise<updateFlightMarketingResponse> => {
+  
+  return customFetch<updateFlightMarketingResponse>(getUpdateFlightMarketingUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateFlightMarketingDto,)
+  }
+);}
+
+
+
+
+export const getUpdateFlightMarketingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateFlightMarketing>>, TError,{id: string;data: UpdateFlightMarketingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateFlightMarketing>>, TError,{id: string;data: UpdateFlightMarketingDto}, TContext> => {
+
+const mutationKey = ['updateFlightMarketing'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateFlightMarketing>>, {id: string;data: UpdateFlightMarketingDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateFlightMarketing(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateFlightMarketingMutationResult = NonNullable<Awaited<ReturnType<typeof updateFlightMarketing>>>
+    export type UpdateFlightMarketingMutationBody = UpdateFlightMarketingDto
+    export type UpdateFlightMarketingMutationError = unknown
+
+    /**
+ * @summary Update a marketing flight
+ */
+export const useUpdateFlightMarketing = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateFlightMarketing>>, TError,{id: string;data: UpdateFlightMarketingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateFlightMarketing>>,
+        TError,
+        {id: string;data: UpdateFlightMarketingDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateFlightMarketingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a marketing flight
+ */
+export type deleteFlightMarketingResponse204 = {
+  data: void
+  status: 204
+}
+    
+export type deleteFlightMarketingResponseSuccess = (deleteFlightMarketingResponse204) & {
+  headers: Headers;
+};
+;
+
+export type deleteFlightMarketingResponse = (deleteFlightMarketingResponseSuccess)
+
+export const getDeleteFlightMarketingUrl = (id: string,) => {
+
+
+  
+
+  return `/api/flight-marketing/${id}`
+}
+
+export const deleteFlightMarketing = async (id: string, options?: RequestInit): Promise<deleteFlightMarketingResponse> => {
+  
+  return customFetch<deleteFlightMarketingResponse>(getDeleteFlightMarketingUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteFlightMarketingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFlightMarketing>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteFlightMarketing>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteFlightMarketing'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteFlightMarketing>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteFlightMarketing(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteFlightMarketingMutationResult = NonNullable<Awaited<ReturnType<typeof deleteFlightMarketing>>>
+    
+    export type DeleteFlightMarketingMutationError = unknown
+
+    /**
+ * @summary Delete a marketing flight
+ */
+export const useDeleteFlightMarketing = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFlightMarketing>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteFlightMarketing>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteFlightMarketingMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

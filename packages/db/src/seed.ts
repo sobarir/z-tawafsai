@@ -147,6 +147,12 @@ type LegSeed = {
   arrivalTime: string;
 };
 
+type MarketingSeed = {
+  marketingAirline: string;
+  marketingNumber: string;
+  isOperatingCarrier: boolean;
+};
+
 type FlightSeed = {
   operatingAirline: string;
   flightNumber: string;
@@ -156,12 +162,14 @@ type FlightSeed = {
   arrivalTime: string;
   /** Omit for a point-to-point flight (one FULL leg). Provide for a technical stop. */
   legs?: LegSeed[];
+  /** Codeshare marketing rows. Exactly one must have isOperatingCarrier=true. */
+  marketing?: MarketingSeed[];
 };
 
 // Demo flights powering the golden scenarios in prd/14-scenarios.md.
-// S9, S10, S11, S13-S18 need mct_rules / flight_marketing / interline_agreements
-// (Steps 6-7.5) and aren't seeded yet. S12's exact 3-flight chain composition
-// is deferred to Step 8, once the connection-validation service pins it down.
+// S9, S11, S13-S18 need mct_rules / interline_agreements (Steps 7-7.5) and
+// aren't seeded yet. S12's exact 3-flight chain composition is deferred to
+// Step 8, once the connection-validation service pins it down.
 const flights: FlightSeed[] = [
   // S7 — NH 10 CGK->LHR, technical stop via BKK. One `flights` row, two
   // `flight_legs` (role TECHNICAL_STOP), one segment.
@@ -297,6 +305,33 @@ const flights: FlightSeed[] = [
     departureTime: '2026-06-01T11:00:00+07:00',
     arrivalTime: '2026-06-01T14:00:00+08:00',
   },
+  // S10 — GA 874 CGK->NRT, operating GA, sold under 3 marketing numbers.
+  // Querying by NH 5502 or KL 4062 must resolve back to this one flight.
+  {
+    operatingAirline: 'GA',
+    flightNumber: '874',
+    originAirport: 'CGK',
+    destAirport: 'NRT',
+    departureTime: '2026-06-05T09:00:00+07:00',
+    arrivalTime: '2026-06-05T17:15:00+09:00',
+    marketing: [
+      {
+        marketingAirline: 'GA',
+        marketingNumber: '874',
+        isOperatingCarrier: true,
+      },
+      {
+        marketingAirline: 'NH',
+        marketingNumber: '5502',
+        isOperatingCarrier: false,
+      },
+      {
+        marketingAirline: 'KL',
+        marketingNumber: '4062',
+        isOperatingCarrier: false,
+      },
+    ],
+  },
 ];
 
 async function seed() {
@@ -378,10 +413,33 @@ async function seed() {
           },
         });
     }
+
+    for (const mkt of flight.marketing ?? []) {
+      await db
+        .insert(schema.flightMarketing)
+        .values({
+          flightId: row.id,
+          marketingAirline: mkt.marketingAirline,
+          marketingNumber: mkt.marketingNumber,
+          isOperatingCarrier: mkt.isOperatingCarrier,
+        })
+        .onConflictDoUpdate({
+          target: [
+            schema.flightMarketing.marketingAirline,
+            schema.flightMarketing.marketingNumber,
+            schema.flightMarketing.flightId,
+          ],
+          set: { isOperatingCarrier: mkt.isOperatingCarrier },
+        });
+    }
   }
 
+  const marketingCount = flights.reduce(
+    (count, flight) => count + (flight.marketing?.length ?? 0),
+    0,
+  );
   console.log(
-    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights`,
+    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows`,
   );
 }
 

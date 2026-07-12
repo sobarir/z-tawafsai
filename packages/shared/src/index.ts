@@ -186,6 +186,42 @@ export const updateFlightSchema = z.object({
 });
 export type UpdateFlightInput = z.infer<typeof updateFlightSchema>;
 
+/**
+ * A sellable/displayable identity mapped onto an operating flight
+ * (`flights`). Codeshare = many marketing rows -> one operating flight; see
+ * /prd/01-glossary.md.
+ */
+export const flightMarketingSchema = z.object({
+  id: ulidSchema,
+  flightId: ulidSchema,
+  marketingAirline: airlineCodeSchema,
+  marketingNumber: flightNumberSchema,
+  isOperatingCarrier: z.boolean(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type FlightMarketing = z.infer<typeof flightMarketingSchema>;
+
+export const flightMarketingListSchema = z.array(flightMarketingSchema);
+
+export const createFlightMarketingSchema = z.object({
+  flightId: ulidSchema,
+  marketingAirline: airlineCodeSchema,
+  marketingNumber: flightNumberSchema,
+  isOperatingCarrier: z.boolean().optional(),
+});
+export type CreateFlightMarketingInput = z.infer<
+  typeof createFlightMarketingSchema
+>;
+
+export const updateFlightMarketingSchema = z.object({
+  marketingNumber: flightNumberSchema.optional(),
+  isOperatingCarrier: z.boolean().optional(),
+});
+export type UpdateFlightMarketingInput = z.infer<
+  typeof updateFlightMarketingSchema
+>;
+
 export const sessionUserSchema = z.object({
   id: z.string(),
   name: z.string(),
