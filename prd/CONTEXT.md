@@ -5,7 +5,11 @@
 
 ## Current step
 
-> **STEP 0 — not started.** Next action: run the Schema-First Kickoff (see `/prd/20-steps.md` Step 3).
+> **STEP 4 — not started.** Next action: Reference-data module (airports, airlines) — see
+> `/prd/20-steps.md` Step 4. Step 3 (schema) is done; schema lives at
+> `packages/db/src/schema/app.ts`, migration `packages/db/drizzle/0001_fresh_killraven.sql`.
+> `pnpm db:push` still needs to run against a live Postgres instance (no local DB available in
+> this session) before Step 4 work touches real data.
 
 ## Confirmed decisions (do not re-litigate)
 
@@ -23,19 +27,19 @@
 
 | Entity              | Type       | PK strategy                    | Confirmed |
 | ------------------- | ---------- | ------------------------------ | :-------: |
-| airports            | domain     | `varchar(3)` IATA code         |    [ ]    |
-| airlines            | domain     | `varchar(2)` IATA code         |    [ ]    |
-| flights             | operating  | `varchar(26)` ULID             |    [ ]    |
-| flight_legs         | operating  | `varchar(26)` ULID             |    [ ]    |
-| flight_marketing    | marketing  | `varchar(26)` ULID             |    [ ]    |
-| mct_rules           | rules      | `varchar(26)` ULID             |    [ ]    |
-| interline_agreements | agreement | `varchar(26)` ULID            |    [ ]    |
+| airports            | domain     | `varchar(3)` IATA code         |    [x]    |
+| airlines            | domain     | `varchar(2)` IATA code         |    [x]    |
+| flights             | operating  | `varchar(26)` ULID             |    [x]    |
+| flight_legs         | operating  | `varchar(26)` ULID             |    [x]    |
+| flight_marketing    | marketing  | `varchar(26)` ULID             |    [x]    |
+| mct_rules           | rules      | `varchar(26)` ULID             |    [x]    |
+| interline_agreements | agreement | `varchar(26)` ULID            |    [x]    |
 | connection_candidates (view/derived, optional cache) | derived | n/a |    [ ]    |
 
 ## Progress checklist
 
-- [ ] Step 3 — Schema-first kickoff (schema.ts + enums + inferred types) **← start here**
-- [ ] Step 4 — Reference-data module (airports, airlines CRUD + seed)
+- [x] Step 3 — Schema-first kickoff (schema.ts + enums + inferred types)
+- [ ] Step 4 — Reference-data module (airports, airlines CRUD + seed) **← start here**
 - [ ] Step 5 — Operating-flight module (flights + legs, technical-stop support)
 - [ ] Step 6 — Marketing/codeshare module (marketing→operating mapping, own-metal partners)
 - [ ] Step 7 — MCT rules module (CRUD + most-specific-first resolver)
