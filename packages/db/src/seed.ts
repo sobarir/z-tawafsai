@@ -103,6 +103,16 @@ const airports: (typeof schema.airports.$inferInsert)[] = [
     countryCode: 'US',
     timezone: 'America/New_York',
   },
+  {
+    // Not in prd/15-seed-data.md's airport table, but required as the
+    // technical-stop airport for NH 10's route (prd/14-scenarios.md S7).
+    airportCode: 'BKK',
+    icaoCode: 'VTBS',
+    name: 'Suvarnabhumi Airport',
+    cityCode: 'BKK',
+    countryCode: 'TH',
+    timezone: 'Asia/Bangkok',
+  },
 ];
 
 const airlines: (typeof schema.airlines.$inferInsert)[] = [
@@ -129,6 +139,166 @@ const airlines: (typeof schema.airlines.$inferInsert)[] = [
   },
 ];
 
+type LegSeed = {
+  role: 'FULL' | 'TECHNICAL_STOP';
+  depAirport: string;
+  arrAirport: string;
+  departureTime: string;
+  arrivalTime: string;
+};
+
+type FlightSeed = {
+  operatingAirline: string;
+  flightNumber: string;
+  originAirport: string;
+  destAirport: string;
+  departureTime: string;
+  arrivalTime: string;
+  /** Omit for a point-to-point flight (one FULL leg). Provide for a technical stop. */
+  legs?: LegSeed[];
+};
+
+// Demo flights powering the golden scenarios in prd/14-scenarios.md.
+// S9, S10, S11, S13-S18 need mct_rules / flight_marketing / interline_agreements
+// (Steps 6-7.5) and aren't seeded yet. S12's exact 3-flight chain composition
+// is deferred to Step 8, once the connection-validation service pins it down.
+const flights: FlightSeed[] = [
+  // S7 — NH 10 CGK->LHR, technical stop via BKK. One `flights` row, two
+  // `flight_legs` (role TECHNICAL_STOP), one segment.
+  {
+    operatingAirline: 'NH',
+    flightNumber: '10',
+    originAirport: 'CGK',
+    destAirport: 'LHR',
+    departureTime: '2026-06-01T01:00:00+07:00',
+    arrivalTime: '2026-06-01T20:00:00+01:00',
+    legs: [
+      {
+        role: 'TECHNICAL_STOP',
+        depAirport: 'CGK',
+        arrAirport: 'BKK',
+        departureTime: '2026-06-01T01:00:00+07:00',
+        arrivalTime: '2026-06-01T04:15:00+07:00',
+      },
+      {
+        role: 'TECHNICAL_STOP',
+        depAirport: 'BKK',
+        arrAirport: 'LHR',
+        departureTime: '2026-06-01T05:30:00+07:00',
+        arrivalTime: '2026-06-01T20:00:00+01:00',
+      },
+    ],
+  },
+  // S1/S2 — P leg. Renamed from the scenario doc's "NH 10" to NH 12 to avoid
+  // colliding with the canonical NH 10 technical-stop flight above (S7).
+  {
+    operatingAirline: 'NH',
+    flightNumber: '12',
+    originAirport: 'CGK',
+    destAirport: 'NRT',
+    departureTime: '2026-06-01T02:00:00+07:00',
+    arrivalTime: '2026-06-01T10:45:00+09:00',
+  },
+  // S1 — N leg: NH 847 NRT->SIN, dep 12:45 JST -> gap 120min vs S1's P.
+  {
+    operatingAirline: 'NH',
+    flightNumber: '847',
+    originAirport: 'NRT',
+    destAirport: 'SIN',
+    departureTime: '2026-06-01T12:45:00+09:00',
+    arrivalTime: '2026-06-01T18:30:00+08:00',
+  },
+  // S2 — N leg: same flight number, different departure -> distinct row.
+  // dep 11:15 JST -> gap 30min vs S1/S2's shared P (below MCT).
+  {
+    operatingAirline: 'NH',
+    flightNumber: '847',
+    originAirport: 'NRT',
+    destAirport: 'SIN',
+    departureTime: '2026-06-01T11:15:00+09:00',
+    arrivalTime: '2026-06-01T17:00:00+08:00',
+  },
+  // S3 — P: QR 1 CGK->DOH, arr 11:30 +03:00.
+  {
+    operatingAirline: 'QR',
+    flightNumber: '1',
+    originAirport: 'CGK',
+    destAirport: 'DOH',
+    departureTime: '2026-06-01T06:30:00+07:00',
+    arrivalTime: '2026-06-01T11:30:00+03:00',
+  },
+  // S3 — N: QR 2 DOH->LHR, dep 09:00 +03:00 two days later (stopover gap).
+  {
+    operatingAirline: 'QR',
+    flightNumber: '2',
+    originAirport: 'DOH',
+    destAirport: 'LHR',
+    departureTime: '2026-06-03T09:00:00+03:00',
+    arrivalTime: '2026-06-03T14:00:00+01:00',
+  },
+  // S4/S5 — P: intl arrival into NRT 08:00 JST (inter-airport connection source).
+  {
+    operatingAirline: 'GA',
+    flightNumber: '5',
+    originAirport: 'CGK',
+    destAirport: 'NRT',
+    departureTime: '2026-05-31T23:00:00+07:00',
+    arrivalTime: '2026-06-01T08:00:00+09:00',
+  },
+  // S4 — N: intl departure from HND 13:00 JST -> gap 300min (valid, >=240 MCT).
+  {
+    operatingAirline: 'GA',
+    flightNumber: '6',
+    originAirport: 'HND',
+    destAirport: 'CDG',
+    departureTime: '2026-06-01T13:00:00+09:00',
+    arrivalTime: '2026-06-01T18:00:00+02:00',
+  },
+  // S5 — N: same route, dep 11:00 JST -> gap 180min (invalid, <240 inter-airport MCT).
+  {
+    operatingAirline: 'GA',
+    flightNumber: '7',
+    originAirport: 'HND',
+    destAirport: 'CDG',
+    departureTime: '2026-06-01T11:00:00+09:00',
+    arrivalTime: '2026-06-01T16:00:00+02:00',
+  },
+  // S6 — open-jaw pair: arrives Rome (ROM), next departs Paris (PAR) -- cities don't line up.
+  {
+    operatingAirline: 'GA',
+    flightNumber: '1',
+    originAirport: 'CGK',
+    destAirport: 'FCO',
+    departureTime: '2026-05-31T21:00:00+07:00',
+    arrivalTime: '2026-06-01T06:00:00+02:00',
+  },
+  {
+    operatingAirline: 'AF',
+    flightNumber: '2',
+    originAirport: 'CDG',
+    destAirport: 'CGK',
+    departureTime: '2026-06-01T09:00:00+02:00',
+    arrivalTime: '2026-06-02T04:00:00+07:00',
+  },
+  // S8 — negative-gap guard: N departs before P arrives, same airport (CGK).
+  {
+    operatingAirline: 'NH',
+    flightNumber: '20',
+    originAirport: 'SIN',
+    destAirport: 'CGK',
+    departureTime: '2026-06-01T11:15:00+08:00',
+    arrivalTime: '2026-06-01T12:00:00+07:00',
+  },
+  {
+    operatingAirline: 'NH',
+    flightNumber: '21',
+    originAirport: 'CGK',
+    destAirport: 'DPS',
+    departureTime: '2026-06-01T11:00:00+07:00',
+    arrivalTime: '2026-06-01T14:00:00+08:00',
+  },
+];
+
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -150,8 +320,68 @@ async function seed() {
     });
   }
 
+  for (const flight of flights) {
+    const [row] = await db
+      .insert(schema.flights)
+      .values({
+        operatingAirline: flight.operatingAirline,
+        flightNumber: flight.flightNumber,
+        originAirport: flight.originAirport,
+        destAirport: flight.destAirport,
+        departureTime: new Date(flight.departureTime),
+        arrivalTime: new Date(flight.arrivalTime),
+      })
+      .onConflictDoUpdate({
+        target: [
+          schema.flights.operatingAirline,
+          schema.flights.flightNumber,
+          schema.flights.departureTime,
+        ],
+        set: {
+          originAirport: flight.originAirport,
+          destAirport: flight.destAirport,
+          arrivalTime: new Date(flight.arrivalTime),
+        },
+      })
+      .returning();
+
+    const legs = flight.legs ?? [
+      {
+        role: 'FULL' as const,
+        depAirport: flight.originAirport,
+        arrAirport: flight.destAirport,
+        departureTime: flight.departureTime,
+        arrivalTime: flight.arrivalTime,
+      },
+    ];
+
+    for (const [index, leg] of legs.entries()) {
+      await db
+        .insert(schema.flightLegs)
+        .values({
+          flightId: row.id,
+          legSequence: index + 1,
+          role: leg.role,
+          depAirport: leg.depAirport,
+          arrAirport: leg.arrAirport,
+          departureTime: new Date(leg.departureTime),
+          arrivalTime: new Date(leg.arrivalTime),
+        })
+        .onConflictDoUpdate({
+          target: [schema.flightLegs.flightId, schema.flightLegs.legSequence],
+          set: {
+            role: leg.role,
+            depAirport: leg.depAirport,
+            arrAirport: leg.arrAirport,
+            departureTime: new Date(leg.departureTime),
+            arrivalTime: new Date(leg.arrivalTime),
+          },
+        });
+    }
+  }
+
   console.log(
-    `Seeded ${airports.length} airports and ${airlines.length} airlines`,
+    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights`,
   );
 }
 

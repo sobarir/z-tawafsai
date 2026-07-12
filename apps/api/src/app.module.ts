@@ -10,6 +10,7 @@ import { auth } from './auth/auth';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { loggerConfig } from './common/logger/logger.config';
 import { DatabaseModule } from './database/database.module';
+import { FlightsModule } from './flights/flights.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     PostsModule,
     AirportsModule,
     AirlinesModule,
+    FlightsModule,
   ],
   controllers: [AppController],
   providers: [

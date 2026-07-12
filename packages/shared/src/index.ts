@@ -105,6 +105,87 @@ export const updateAirlineSchema = createAirlineSchema
   .partial();
 export type UpdateAirlineInput = z.infer<typeof updateAirlineSchema>;
 
+/** Physical flight status. */
+export const flightStatusSchema = z.enum(['ACTIVE', 'SUSPENDED', 'SEASONAL']);
+export type FlightStatus = z.infer<typeof flightStatusSchema>;
+
+/** Whether a leg is the flight's whole journey (FULL) or an internal technical stop. */
+export const legRoleSchema = z.enum(['FULL', 'TECHNICAL_STOP']);
+export type LegRole = z.infer<typeof legRoleSchema>;
+
+/** IATA flight number: 1-4 digits with an optional trailing letter (e.g. '10', '874'). */
+export const flightNumberSchema = z
+  .string()
+  .regex(/^[0-9]{1,4}[A-Z]?$/, 'Invalid flight number');
+
+/**
+ * Scheduled departure/arrival times are local to the airport and carry their
+ * UTC offset (e.g. '2026-06-01T10:45:00+09:00') rather than being forced to
+ * UTC — schedules are authored and read in local airport time.
+ */
+export const offsetDateTimeSchema = z.iso.datetime({ offset: true });
+
+export const flightLegSchema = z.object({
+  id: ulidSchema,
+  flightId: ulidSchema,
+  legSequence: z.number().int().min(1),
+  role: legRoleSchema,
+  depAirport: airportCodeSchema,
+  arrAirport: airportCodeSchema,
+  departureTime: offsetDateTimeSchema,
+  arrivalTime: offsetDateTimeSchema,
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type FlightLeg = z.infer<typeof flightLegSchema>;
+
+export const flightSchema = z.object({
+  id: ulidSchema,
+  operatingAirline: airlineCodeSchema,
+  flightNumber: flightNumberSchema,
+  originAirport: airportCodeSchema,
+  destAirport: airportCodeSchema,
+  departureTime: offsetDateTimeSchema,
+  arrivalTime: offsetDateTimeSchema,
+  aircraftType: z.string().max(10).nullable(),
+  status: flightStatusSchema,
+  legs: z.array(flightLegSchema),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type Flight = z.infer<typeof flightSchema>;
+
+export const flightListSchema = z.array(flightSchema);
+
+export const createFlightLegInputSchema = z.object({
+  role: legRoleSchema,
+  depAirport: airportCodeSchema,
+  arrAirport: airportCodeSchema,
+  departureTime: offsetDateTimeSchema,
+  arrivalTime: offsetDateTimeSchema,
+});
+export type CreateFlightLegInput = z.infer<typeof createFlightLegInputSchema>;
+
+export const createFlightSchema = z.object({
+  operatingAirline: airlineCodeSchema,
+  flightNumber: flightNumberSchema,
+  originAirport: airportCodeSchema,
+  destAirport: airportCodeSchema,
+  departureTime: offsetDateTimeSchema,
+  arrivalTime: offsetDateTimeSchema,
+  aircraftType: z.string().max(10).optional(),
+  status: flightStatusSchema.optional(),
+  /** Omit for a single-leg flight (auto-creates one FULL leg). Provide >=2 for a technical stop. */
+  legs: z.array(createFlightLegInputSchema).min(2).optional(),
+});
+export type CreateFlightInput = z.infer<typeof createFlightSchema>;
+
+export const updateFlightSchema = z.object({
+  aircraftType: z.string().max(10).optional(),
+  status: flightStatusSchema.optional(),
+});
+export type UpdateFlightInput = z.infer<typeof updateFlightSchema>;
+
 export const sessionUserSchema = z.object({
   id: z.string(),
   name: z.string(),

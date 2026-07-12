@@ -29,11 +29,14 @@ import type {
   AirportDto,
   CreateAirlineDto,
   CreateAirportDto,
+  CreateFlightDto,
   CreatePostDto,
+  FlightDto,
   MeResponseDto,
   PostDto,
   UpdateAirlineDto,
-  UpdateAirportDto
+  UpdateAirportDto,
+  UpdateFlightDto
 } from './models';
 
 import { customFetch } from '../mutator';
@@ -1410,6 +1413,484 @@ export const useDeleteAirline = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteAirlineMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List flights
+ */
+export type listFlightsResponse200 = {
+  data: FlightDto[]
+  status: 200
+}
+    
+export type listFlightsResponseSuccess = (listFlightsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listFlightsResponse = (listFlightsResponseSuccess)
+
+export const getListFlightsUrl = () => {
+
+
+  
+
+  return `/api/flights`
+}
+
+export const listFlights = async ( options?: RequestInit): Promise<listFlightsResponse> => {
+  
+  return customFetch<listFlightsResponse>(getListFlightsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListFlightsQueryKey = () => {
+    return [
+    `/api/flights`
+    ] as const;
+    }
+
+    
+export const getListFlightsQueryOptions = <TData = Awaited<ReturnType<typeof listFlights>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlights>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFlightsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFlights>>> = ({ signal }) => listFlights({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFlights>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListFlightsQueryResult = NonNullable<Awaited<ReturnType<typeof listFlights>>>
+export type ListFlightsQueryError = unknown
+
+
+export function useListFlights<TData = Awaited<ReturnType<typeof listFlights>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlights>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFlights>>,
+          TError,
+          Awaited<ReturnType<typeof listFlights>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListFlights<TData = Awaited<ReturnType<typeof listFlights>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlights>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFlights>>,
+          TError,
+          Awaited<ReturnType<typeof listFlights>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListFlights<TData = Awaited<ReturnType<typeof listFlights>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlights>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List flights
+ */
+
+export function useListFlights<TData = Awaited<ReturnType<typeof listFlights>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFlights>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListFlightsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a flight
+ */
+export type createFlightResponse201 = {
+  data: FlightDto
+  status: 201
+}
+    
+export type createFlightResponseSuccess = (createFlightResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createFlightResponse = (createFlightResponseSuccess)
+
+export const getCreateFlightUrl = () => {
+
+
+  
+
+  return `/api/flights`
+}
+
+export const createFlight = async (createFlightDto: CreateFlightDto, options?: RequestInit): Promise<createFlightResponse> => {
+  
+  return customFetch<createFlightResponse>(getCreateFlightUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createFlightDto,)
+  }
+);}
+
+
+
+
+export const getCreateFlightMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFlight>>, TError,{data: CreateFlightDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFlight>>, TError,{data: CreateFlightDto}, TContext> => {
+
+const mutationKey = ['createFlight'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFlight>>, {data: CreateFlightDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFlight(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFlightMutationResult = NonNullable<Awaited<ReturnType<typeof createFlight>>>
+    export type CreateFlightMutationBody = CreateFlightDto
+    export type CreateFlightMutationError = unknown
+
+    /**
+ * @summary Create a flight
+ */
+export const useCreateFlight = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFlight>>, TError,{data: CreateFlightDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createFlight>>,
+        TError,
+        {data: CreateFlightDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateFlightMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a flight
+ */
+export type getFlightResponse200 = {
+  data: FlightDto
+  status: 200
+}
+    
+export type getFlightResponseSuccess = (getFlightResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getFlightResponse = (getFlightResponseSuccess)
+
+export const getGetFlightUrl = (id: string,) => {
+
+
+  
+
+  return `/api/flights/${id}`
+}
+
+export const getFlight = async (id: string, options?: RequestInit): Promise<getFlightResponse> => {
+  
+  return customFetch<getFlightResponse>(getGetFlightUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetFlightQueryKey = (id?: string,) => {
+    return [
+    `/api/flights/${id}`
+    ] as const;
+    }
+
+    
+export const getGetFlightQueryOptions = <TData = Awaited<ReturnType<typeof getFlight>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlight>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFlightQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFlight>>> = ({ signal }) => getFlight(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFlight>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetFlightQueryResult = NonNullable<Awaited<ReturnType<typeof getFlight>>>
+export type GetFlightQueryError = unknown
+
+
+export function useGetFlight<TData = Awaited<ReturnType<typeof getFlight>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlight>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFlight>>,
+          TError,
+          Awaited<ReturnType<typeof getFlight>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFlight<TData = Awaited<ReturnType<typeof getFlight>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlight>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFlight>>,
+          TError,
+          Awaited<ReturnType<typeof getFlight>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetFlight<TData = Awaited<ReturnType<typeof getFlight>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlight>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a flight
+ */
+
+export function useGetFlight<TData = Awaited<ReturnType<typeof getFlight>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFlight>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetFlightQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a flight
+ */
+export type updateFlightResponse200 = {
+  data: FlightDto
+  status: 200
+}
+    
+export type updateFlightResponseSuccess = (updateFlightResponse200) & {
+  headers: Headers;
+};
+;
+
+export type updateFlightResponse = (updateFlightResponseSuccess)
+
+export const getUpdateFlightUrl = (id: string,) => {
+
+
+  
+
+  return `/api/flights/${id}`
+}
+
+export const updateFlight = async (id: string,
+    updateFlightDto: UpdateFlightDto, options?: RequestInit): Promise<updateFlightResponse> => {
+  
+  return customFetch<updateFlightResponse>(getUpdateFlightUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateFlightDto,)
+  }
+);}
+
+
+
+
+export const getUpdateFlightMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateFlight>>, TError,{id: string;data: UpdateFlightDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateFlight>>, TError,{id: string;data: UpdateFlightDto}, TContext> => {
+
+const mutationKey = ['updateFlight'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateFlight>>, {id: string;data: UpdateFlightDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateFlight(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateFlightMutationResult = NonNullable<Awaited<ReturnType<typeof updateFlight>>>
+    export type UpdateFlightMutationBody = UpdateFlightDto
+    export type UpdateFlightMutationError = unknown
+
+    /**
+ * @summary Update a flight
+ */
+export const useUpdateFlight = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateFlight>>, TError,{id: string;data: UpdateFlightDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateFlight>>,
+        TError,
+        {id: string;data: UpdateFlightDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateFlightMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a flight
+ */
+export type deleteFlightResponse204 = {
+  data: void
+  status: 204
+}
+    
+export type deleteFlightResponseSuccess = (deleteFlightResponse204) & {
+  headers: Headers;
+};
+;
+
+export type deleteFlightResponse = (deleteFlightResponseSuccess)
+
+export const getDeleteFlightUrl = (id: string,) => {
+
+
+  
+
+  return `/api/flights/${id}`
+}
+
+export const deleteFlight = async (id: string, options?: RequestInit): Promise<deleteFlightResponse> => {
+  
+  return customFetch<deleteFlightResponse>(getDeleteFlightUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteFlightMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFlight>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteFlight>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteFlight'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteFlight>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteFlight(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteFlightMutationResult = NonNullable<Awaited<ReturnType<typeof deleteFlight>>>
+    
+    export type DeleteFlightMutationError = unknown
+
+    /**
+ * @summary Delete a flight
+ */
+export const useDeleteFlight = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteFlight>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteFlight>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteFlightMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

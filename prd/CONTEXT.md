@@ -5,10 +5,16 @@
 
 ## Current step
 
-> **STEP 5 — not started.** Next action: Operating-flight module (flights + legs) — see
-> `/prd/20-steps.md` Step 5. Step 4 (reference-data) is done: CRUD for airports/airlines at
-> `apps/api/src/airports/` and `apps/api/src/airlines/`, idempotent seed at
-> `packages/db/src/seed.ts` (`pnpm db:seed`), Vitest specs colocated per service (`pnpm --filter api test`).
+> **STEP 6 — not started.** Next action: Marketing/codeshare module — see `/prd/20-steps.md`
+> Step 6. Step 5 (operating-flight module) is done: CRUD for flights + flight_legs at
+> `apps/api/src/flights/`, leg invariants enforced service-side (`buildFlightLegs` in
+> `flights.service.ts` — first leg dep = origin, last leg arr = dest, contiguous legs), NH 10
+> CGK-BKK-LHR technical stop + point-to-point demo flights (S1-S6, S8) added to
+> `packages/db/src/seed.ts` (BKK airport added too — missing from `15-seed-data.md`'s table but
+> required by S7's route). S12's 3-flight chain composition is deliberately NOT seeded yet — its
+> exact shape is ambiguous from `14-scenarios.md` alone and depends on the connection-validation
+> service (Step 8) to pin down. Vitest specs at `apps/api/src/flights/flights.service.spec.ts`
+> (`pnpm --filter api test`).
 
 ## Confirmed decisions (do not re-litigate)
 
@@ -39,8 +45,8 @@
 
 - [x] Step 3 — Schema-first kickoff (schema.ts + enums + inferred types)
 - [x] Step 4 — Reference-data module (airports, airlines CRUD + seed)
-- [ ] Step 5 — Operating-flight module (flights + legs, technical-stop support) **← start here**
-- [ ] Step 6 — Marketing/codeshare module (marketing→operating mapping, own-metal partners)
+- [x] Step 5 — Operating-flight module (flights + legs, technical-stop support)
+- [ ] Step 6 — Marketing/codeshare module (marketing→operating mapping, own-metal partners) **← start here**
 - [ ] Step 7 — MCT rules module (CRUD + most-specific-first resolver)
 - [ ] Step 7.5 — Interline-agreements module (carrier-pair gate + directional lookup)
 - [ ] Step 8 — Connection-validation service (classify gap + interline gate + bagThroughChecked)
