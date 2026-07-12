@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
+import { and, eq } from 'drizzle-orm';
 import { createDb } from './client';
 import * as schema from './schema';
 
@@ -334,6 +335,77 @@ const flights: FlightSeed[] = [
   },
 ];
 
+type MctScope = 'DD' | 'DI' | 'ID' | 'II';
+
+type MctRuleSeed = {
+  arrivalAirport: string;
+  departureAirport: string;
+  scope: MctScope;
+  arrivalAirline?: string;
+  departureAirline?: string;
+  arrivalTerminal?: string;
+  departureTerminal?: string;
+  mctMinutes: number;
+  maxConnectionMinutes?: number;
+};
+
+// Minimum viable rule set from prd/13-mct-rules.md, plus the S11 pair (the
+// NRT/NRT II default below + the NH-specific row that must outrank it).
+const mctRules: MctRuleSeed[] = [
+  {
+    arrivalAirport: 'NRT',
+    departureAirport: 'NRT',
+    scope: 'II',
+    mctMinutes: 60,
+  },
+  {
+    arrivalAirport: 'NRT',
+    departureAirport: 'NRT',
+    scope: 'ID',
+    mctMinutes: 90,
+  },
+  {
+    arrivalAirport: 'NRT',
+    departureAirport: 'HND',
+    scope: 'II',
+    mctMinutes: 240,
+  },
+  {
+    arrivalAirport: 'SIN',
+    departureAirport: 'SIN',
+    scope: 'II',
+    mctMinutes: 60,
+  },
+  {
+    arrivalAirport: 'JFK',
+    departureAirport: 'JFK',
+    scope: 'II',
+    mctMinutes: 75,
+  },
+  {
+    arrivalAirport: 'JFK',
+    departureAirport: 'EWR',
+    scope: 'II',
+    mctMinutes: 300,
+  },
+  {
+    arrivalAirport: 'DOH',
+    departureAirport: 'DOH',
+    scope: 'II',
+    mctMinutes: 60,
+    maxConnectionMinutes: 2880,
+  },
+  // S11 — outranks the NRT/NRT II default above for NH arrivals (1 non-NULL
+  // field beats 0).
+  {
+    arrivalAirport: 'NRT',
+    departureAirport: 'NRT',
+    scope: 'II',
+    arrivalAirline: 'NH',
+    mctMinutes: 45,
+  },
+];
+
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -438,8 +510,53 @@ async function seed() {
     (count, flight) => count + (flight.marketing?.length ?? 0),
     0,
   );
+
+  // mct_rules has no unique constraint to target with onConflictDoUpdate —
+  // find the matching row by its full identity tuple (nullable fields
+  // included) and update it in place, or insert if it's new.
+  for (const rule of mctRules) {
+    const candidates = await db
+      .select()
+      .from(schema.mctRules)
+      .where(
+        and(
+          eq(schema.mctRules.arrivalAirport, rule.arrivalAirport),
+          eq(schema.mctRules.departureAirport, rule.departureAirport),
+          eq(schema.mctRules.scope, rule.scope),
+        ),
+      );
+    const existing = candidates.find(
+      (row) =>
+        (row.arrivalAirline ?? undefined) === rule.arrivalAirline &&
+        (row.departureAirline ?? undefined) === rule.departureAirline &&
+        (row.arrivalTerminal ?? undefined) === rule.arrivalTerminal &&
+        (row.departureTerminal ?? undefined) === rule.departureTerminal,
+    );
+
+    const values = {
+      arrivalAirport: rule.arrivalAirport,
+      departureAirport: rule.departureAirport,
+      scope: rule.scope,
+      arrivalAirline: rule.arrivalAirline ?? null,
+      departureAirline: rule.departureAirline ?? null,
+      arrivalTerminal: rule.arrivalTerminal ?? null,
+      departureTerminal: rule.departureTerminal ?? null,
+      mctMinutes: rule.mctMinutes,
+      maxConnectionMinutes: rule.maxConnectionMinutes ?? 1440,
+    };
+
+    if (existing) {
+      await db
+        .update(schema.mctRules)
+        .set(values)
+        .where(eq(schema.mctRules.id, existing.id));
+    } else {
+      await db.insert(schema.mctRules).values(values);
+    }
+  }
+
   console.log(
-    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows`,
+    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows, ${mctRules.length} MCT rules`,
   );
 }
 

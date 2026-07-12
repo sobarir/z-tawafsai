@@ -12,6 +12,7 @@ import { loggerConfig } from './common/logger/logger.config';
 import { DatabaseModule } from './database/database.module';
 import { FlightMarketingModule } from './flight-marketing/flight-marketing.module';
 import { FlightsModule } from './flights/flights.module';
+import { MctRulesModule } from './mct-rules/mct-rules.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 
@@ -30,6 +31,7 @@ import { UsersModule } from './users/users.module';
     AirlinesModule,
     FlightsModule,
     FlightMarketingModule,
+    MctRulesModule,
   ],
   controllers: [AppController],
   providers: [

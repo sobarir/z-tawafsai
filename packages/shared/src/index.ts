@@ -222,6 +222,71 @@ export type UpdateFlightMarketingInput = z.infer<
   typeof updateFlightMarketingSchema
 >;
 
+/** Domestic/international combination at the connection airport; see /prd/13-mct-rules.md §A. */
+export const mctScopeSchema = z.enum(['DD', 'DI', 'ID', 'II']);
+export type MctScope = z.infer<typeof mctScopeSchema>;
+
+/** IATA terminal designator, e.g. '1', '2', 'S'. */
+export const terminalSchema = z.string().min(1).max(5);
+
+export const mctRuleSchema = z.object({
+  id: ulidSchema,
+  arrivalAirport: airportCodeSchema,
+  departureAirport: airportCodeSchema,
+  scope: mctScopeSchema,
+  arrivalAirline: airlineCodeSchema.nullable(),
+  departureAirline: airlineCodeSchema.nullable(),
+  arrivalTerminal: terminalSchema.nullable(),
+  departureTerminal: terminalSchema.nullable(),
+  mctMinutes: z.number().int().positive(),
+  maxConnectionMinutes: z.number().int().positive(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type MctRule = z.infer<typeof mctRuleSchema>;
+
+export const mctRuleListSchema = z.array(mctRuleSchema);
+
+export const createMctRuleSchema = z
+  .object({
+    arrivalAirport: airportCodeSchema,
+    departureAirport: airportCodeSchema,
+    scope: mctScopeSchema,
+    arrivalAirline: airlineCodeSchema.optional(),
+    departureAirline: airlineCodeSchema.optional(),
+    arrivalTerminal: terminalSchema.optional(),
+    departureTerminal: terminalSchema.optional(),
+    mctMinutes: z.number().int().positive(),
+    maxConnectionMinutes: z.number().int().positive().optional(),
+  })
+  .refine((data) => (data.maxConnectionMinutes ?? 1440) >= data.mctMinutes, {
+    message: 'maxConnectionMinutes must be >= mctMinutes',
+    path: ['maxConnectionMinutes'],
+  });
+export type CreateMctRuleInput = z.infer<typeof createMctRuleSchema>;
+
+export const updateMctRuleSchema = z.object({
+  arrivalAirline: airlineCodeSchema.optional(),
+  departureAirline: airlineCodeSchema.optional(),
+  arrivalTerminal: terminalSchema.optional(),
+  departureTerminal: terminalSchema.optional(),
+  mctMinutes: z.number().int().positive().optional(),
+  maxConnectionMinutes: z.number().int().positive().optional(),
+});
+export type UpdateMctRuleInput = z.infer<typeof updateMctRuleSchema>;
+
+/** Query for the most-specific-first resolver (/prd/13-mct-rules.md §A). */
+export const resolveMctRuleQuerySchema = z.object({
+  arrivalAirport: airportCodeSchema,
+  departureAirport: airportCodeSchema,
+  scope: mctScopeSchema,
+  arrivalAirline: airlineCodeSchema.optional(),
+  departureAirline: airlineCodeSchema.optional(),
+  arrivalTerminal: terminalSchema.optional(),
+  departureTerminal: terminalSchema.optional(),
+});
+export type ResolveMctRuleQuery = z.infer<typeof resolveMctRuleQuerySchema>;
+
 export const sessionUserSchema = z.object({
   id: z.string(),
   name: z.string(),

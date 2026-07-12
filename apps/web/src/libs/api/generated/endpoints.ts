@@ -31,17 +31,21 @@ import type {
   CreateAirportDto,
   CreateFlightDto,
   CreateFlightMarketingDto,
+  CreateMctRuleDto,
   CreatePostDto,
   FlightDto,
   FlightMarketingDto,
   GetOperatingFlightByMarketingParams,
   ListFlightMarketingParams,
+  MctRuleDto,
   MeResponseDto,
   PostDto,
+  ResolveMctRuleParams,
   UpdateAirlineDto,
   UpdateAirportDto,
   UpdateFlightDto,
-  UpdateFlightMarketingDto
+  UpdateFlightMarketingDto,
+  UpdateMctRuleDto
 } from './models';
 
 import { customFetch } from '../mutator';
@@ -2501,6 +2505,604 @@ export const useDeleteFlightMarketing = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteFlightMarketingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List MCT rules
+ */
+export type listMctRulesResponse200 = {
+  data: MctRuleDto[]
+  status: 200
+}
+    
+export type listMctRulesResponseSuccess = (listMctRulesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listMctRulesResponse = (listMctRulesResponseSuccess)
+
+export const getListMctRulesUrl = () => {
+
+
+  
+
+  return `/api/mct-rules`
+}
+
+export const listMctRules = async ( options?: RequestInit): Promise<listMctRulesResponse> => {
+  
+  return customFetch<listMctRulesResponse>(getListMctRulesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListMctRulesQueryKey = () => {
+    return [
+    `/api/mct-rules`
+    ] as const;
+    }
+
+    
+export const getListMctRulesQueryOptions = <TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMctRulesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMctRules>>> = ({ signal }) => listMctRules({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListMctRulesQueryResult = NonNullable<Awaited<ReturnType<typeof listMctRules>>>
+export type ListMctRulesQueryError = unknown
+
+
+export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMctRules>>,
+          TError,
+          Awaited<ReturnType<typeof listMctRules>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMctRules>>,
+          TError,
+          Awaited<ReturnType<typeof listMctRules>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List MCT rules
+ */
+
+export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListMctRulesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create an MCT rule
+ */
+export type createMctRuleResponse201 = {
+  data: MctRuleDto
+  status: 201
+}
+    
+export type createMctRuleResponseSuccess = (createMctRuleResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createMctRuleResponse = (createMctRuleResponseSuccess)
+
+export const getCreateMctRuleUrl = () => {
+
+
+  
+
+  return `/api/mct-rules`
+}
+
+export const createMctRule = async (createMctRuleDto: CreateMctRuleDto, options?: RequestInit): Promise<createMctRuleResponse> => {
+  
+  return customFetch<createMctRuleResponse>(getCreateMctRuleUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createMctRuleDto,)
+  }
+);}
+
+
+
+
+export const getCreateMctRuleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMctRule>>, TError,{data: CreateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createMctRule>>, TError,{data: CreateMctRuleDto}, TContext> => {
+
+const mutationKey = ['createMctRule'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMctRule>>, {data: CreateMctRuleDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createMctRule(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateMctRuleMutationResult = NonNullable<Awaited<ReturnType<typeof createMctRule>>>
+    export type CreateMctRuleMutationBody = CreateMctRuleDto
+    export type CreateMctRuleMutationError = unknown
+
+    /**
+ * @summary Create an MCT rule
+ */
+export const useCreateMctRule = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMctRule>>, TError,{data: CreateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createMctRule>>,
+        TError,
+        {data: CreateMctRuleDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateMctRuleMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Resolve the most-specific matching MCT rule
+ */
+export type resolveMctRuleResponse200 = {
+  data: MctRuleDto
+  status: 200
+}
+    
+export type resolveMctRuleResponseSuccess = (resolveMctRuleResponse200) & {
+  headers: Headers;
+};
+;
+
+export type resolveMctRuleResponse = (resolveMctRuleResponseSuccess)
+
+export const getResolveMctRuleUrl = (params: ResolveMctRuleParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/mct-rules/resolve?${stringifiedParams}` : `/api/mct-rules/resolve`
+}
+
+export const resolveMctRule = async (params: ResolveMctRuleParams, options?: RequestInit): Promise<resolveMctRuleResponse> => {
+  
+  return customFetch<resolveMctRuleResponse>(getResolveMctRuleUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getResolveMctRuleQueryKey = (params?: ResolveMctRuleParams,) => {
+    return [
+    `/api/mct-rules/resolve`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getResolveMctRuleQueryOptions = <TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getResolveMctRuleQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveMctRule>>> = ({ signal }) => resolveMctRule(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ResolveMctRuleQueryResult = NonNullable<Awaited<ReturnType<typeof resolveMctRule>>>
+export type ResolveMctRuleQueryError = unknown
+
+
+export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
+ params: ResolveMctRuleParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof resolveMctRule>>,
+          TError,
+          Awaited<ReturnType<typeof resolveMctRule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
+ params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof resolveMctRule>>,
+          TError,
+          Awaited<ReturnType<typeof resolveMctRule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
+ params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Resolve the most-specific matching MCT rule
+ */
+
+export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
+ params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getResolveMctRuleQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Get an MCT rule
+ */
+export type getMctRuleResponse200 = {
+  data: MctRuleDto
+  status: 200
+}
+    
+export type getMctRuleResponseSuccess = (getMctRuleResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getMctRuleResponse = (getMctRuleResponseSuccess)
+
+export const getGetMctRuleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/mct-rules/${id}`
+}
+
+export const getMctRule = async (id: string, options?: RequestInit): Promise<getMctRuleResponse> => {
+  
+  return customFetch<getMctRuleResponse>(getGetMctRuleUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetMctRuleQueryKey = (id?: string,) => {
+    return [
+    `/api/mct-rules/${id}`
+    ] as const;
+    }
+
+    
+export const getGetMctRuleQueryOptions = <TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMctRuleQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMctRule>>> = ({ signal }) => getMctRule(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMctRuleQueryResult = NonNullable<Awaited<ReturnType<typeof getMctRule>>>
+export type GetMctRuleQueryError = unknown
+
+
+export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMctRule>>,
+          TError,
+          Awaited<ReturnType<typeof getMctRule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMctRule>>,
+          TError,
+          Awaited<ReturnType<typeof getMctRule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get an MCT rule
+ */
+
+export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMctRuleQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update an MCT rule
+ */
+export type updateMctRuleResponse200 = {
+  data: MctRuleDto
+  status: 200
+}
+    
+export type updateMctRuleResponseSuccess = (updateMctRuleResponse200) & {
+  headers: Headers;
+};
+;
+
+export type updateMctRuleResponse = (updateMctRuleResponseSuccess)
+
+export const getUpdateMctRuleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/mct-rules/${id}`
+}
+
+export const updateMctRule = async (id: string,
+    updateMctRuleDto: UpdateMctRuleDto, options?: RequestInit): Promise<updateMctRuleResponse> => {
+  
+  return customFetch<updateMctRuleResponse>(getUpdateMctRuleUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateMctRuleDto,)
+  }
+);}
+
+
+
+
+export const getUpdateMctRuleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMctRule>>, TError,{id: string;data: UpdateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMctRule>>, TError,{id: string;data: UpdateMctRuleDto}, TContext> => {
+
+const mutationKey = ['updateMctRule'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMctRule>>, {id: string;data: UpdateMctRuleDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateMctRule(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMctRuleMutationResult = NonNullable<Awaited<ReturnType<typeof updateMctRule>>>
+    export type UpdateMctRuleMutationBody = UpdateMctRuleDto
+    export type UpdateMctRuleMutationError = unknown
+
+    /**
+ * @summary Update an MCT rule
+ */
+export const useUpdateMctRule = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMctRule>>, TError,{id: string;data: UpdateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateMctRule>>,
+        TError,
+        {id: string;data: UpdateMctRuleDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateMctRuleMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete an MCT rule
+ */
+export type deleteMctRuleResponse204 = {
+  data: void
+  status: 204
+}
+    
+export type deleteMctRuleResponseSuccess = (deleteMctRuleResponse204) & {
+  headers: Headers;
+};
+;
+
+export type deleteMctRuleResponse = (deleteMctRuleResponseSuccess)
+
+export const getDeleteMctRuleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/mct-rules/${id}`
+}
+
+export const deleteMctRule = async (id: string, options?: RequestInit): Promise<deleteMctRuleResponse> => {
+  
+  return customFetch<deleteMctRuleResponse>(getDeleteMctRuleUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteMctRuleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMctRule>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMctRule>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteMctRule'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMctRule>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteMctRule(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMctRuleMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMctRule>>>
+    
+    export type DeleteMctRuleMutationError = unknown
+
+    /**
+ * @summary Delete an MCT rule
+ */
+export const useDeleteMctRule = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMctRule>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMctRule>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteMctRuleMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

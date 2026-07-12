@@ -5,19 +5,17 @@
 
 ## Current step
 
-> **STEP 7 — not started.** Next action: MCT rules module — see `/prd/20-steps.md` Step 7.
-> Step 6 (marketing/codeshare module) is done: CRUD for `flight_marketing` at
-> `apps/api/src/flight-marketing/`, invariants enforced service-side
-> (`assertOperatingCarrierInvariant` in `flight-marketing.service.ts` — the
-> `is_operating_carrier=true` row's airline must equal the flight's operating airline, and only one
-> such row may exist per flight). Resolver `resolveOperatingFlight(marketingAirline,
-> marketingNumber)` exposed as `GET /flight-marketing/resolve`, operationId
-> `getOperatingFlightByMarketing` (delegates to `FlightsService.findById`, now exported from
-> `FlightsModule`). Note: the resolver takes no date, so it assumes at most one live marketing row
-> per (airline, number) pair across all flights — fine for the v1 seed data, but a real recurring
-> schedule would need a date param to disambiguate; flag this if Step 8 hits it. GA 874 CGK->NRT
-> seeded with 3 marketing rows (GA 874 operating, NH 5502, KL 4062) per S10. Vitest specs at
-> `apps/api/src/flight-marketing/flight-marketing.service.spec.ts` (`pnpm --filter api test`).
+> **STEP 7.5 — not started.** Next action: Interline-agreements module — see `/prd/20-steps.md`
+> Step 7.5. Step 7 (MCT rules module) is done: CRUD for `mct_rules` at `apps/api/src/mct-rules/`,
+> most-specific-first resolver `pickMostSpecificMctRule` (pure function, unit-tested directly) +
+> `MctRulesService.resolve()` (DB-backed, throws `NotFoundException` for `NO_MCT_RULE`) exposed as
+> `GET /mct-rules/resolve`, operationId `resolveMctRule` (registered before `:id`). Ranking: each
+> non-NULL rule field must equal the candidate's value (NULL = wildcard), most non-NULL fields
+> wins, ties broken by newest `updatedAt`. Seeded the minimum viable rule set from
+> `13-mct-rules.md` plus the S11 pair (NRT/NRT II default mct=60 + NH-specific mct=45); idempotent
+> upsert matches by full identity tuple since `mct_rules` has no unique constraint to target.
+> `MctRulesModule` exports `MctRulesService` for Step 8 to consume directly. Vitest specs at
+> `apps/api/src/mct-rules/mct-rules.service.spec.ts` (`pnpm --filter api test`).
 
 ## Confirmed decisions (do not re-litigate)
 
@@ -50,8 +48,8 @@
 - [x] Step 4 — Reference-data module (airports, airlines CRUD + seed)
 - [x] Step 5 — Operating-flight module (flights + legs, technical-stop support)
 - [x] Step 6 — Marketing/codeshare module (marketing→operating mapping, own-metal partners)
-- [ ] Step 7 — MCT rules module (CRUD + most-specific-first resolver) **← start here**
-- [ ] Step 7.5 — Interline-agreements module (carrier-pair gate + directional lookup)
+- [x] Step 7 — MCT rules module (CRUD + most-specific-first resolver)
+- [ ] Step 7.5 — Interline-agreements module (carrier-pair gate + directional lookup) **← start here**
 - [ ] Step 8 — Connection-validation service (classify gap + interline gate + bagThroughChecked)
 
 ## Open questions (resolve before the step that needs them)
