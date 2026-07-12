@@ -967,6 +967,155 @@
           "mct-rules"
         ]
       }
+    },
+    "/api/interline-agreements": {
+      "get": {
+        "operationId": "listInterlineAgreements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterlineAgreementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List interline agreements",
+        "tags": [
+          "interline-agreements"
+        ]
+      },
+      "post": {
+        "operationId": "createInterlineAgreement",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInterlineAgreementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterlineAgreementDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create an interline agreement",
+        "tags": [
+          "interline-agreements"
+        ]
+      }
+    },
+    "/api/interline-agreements/resolve": {
+      "get": {
+        "operationId": "resolveInterline",
+        "parameters": [
+          {
+            "name": "inboundAirline",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Z0-9]{2}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "outboundAirline",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Z0-9]{2}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterlineResolutionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resolve the directional interline gate for a carrier pair",
+        "tags": [
+          "interline-agreements"
+        ]
+      }
+    },
+    "/api/interline-agreements/{id}": {
+      "get": {
+        "operationId": "getInterlineAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterlineAgreementDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get an interline agreement",
+        "tags": [
+          "interline-agreements"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteInterlineAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete an interline agreement",
+        "tags": [
+          "interline-agreements"
+        ]
+      }
     }
   },
   "info": {
@@ -1839,6 +1988,89 @@
             "minimum": 0
           }
         }
+      },
+      "InterlineAgreementDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "inboundAirline": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "outboundAirline": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "bagThroughChecked": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "inboundAirline",
+          "outboundAirline",
+          "bagThroughChecked",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "InterlineResolutionDto": {
+        "type": "object",
+        "properties": {
+          "online": {
+            "type": "boolean"
+          },
+          "permitted": {
+            "type": "boolean"
+          },
+          "bagThroughChecked": {
+            "type": "boolean"
+          },
+          "agreementId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "nullable": true
+          }
+        },
+        "required": [
+          "online",
+          "permitted",
+          "bagThroughChecked",
+          "agreementId"
+        ]
+      },
+      "CreateInterlineAgreementDto": {
+        "type": "object",
+        "properties": {
+          "inboundAirline": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "outboundAirline": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "bagThroughChecked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inboundAirline",
+          "outboundAirline"
+        ]
       }
     }
   }

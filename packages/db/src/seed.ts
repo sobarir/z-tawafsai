@@ -406,6 +406,21 @@ const mctRules: MctRuleSeed[] = [
   },
 ];
 
+type InterlineAgreementSeed = {
+  inboundAirline: string;
+  outboundAirline: string;
+  bagThroughChecked: boolean;
+};
+
+// Deliberately NO GA->AF (powers S15's NO_INTERLINE case) and NO QR->GA
+// (powers S17's directionality case — only GA->QR is seeded).
+const interlineAgreements: InterlineAgreementSeed[] = [
+  { inboundAirline: 'GA', outboundAirline: 'SQ', bagThroughChecked: true },
+  { inboundAirline: 'SQ', outboundAirline: 'GA', bagThroughChecked: true },
+  { inboundAirline: 'GA', outboundAirline: 'QR', bagThroughChecked: true },
+  { inboundAirline: 'NH', outboundAirline: 'KL', bagThroughChecked: false },
+];
+
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -555,8 +570,21 @@ async function seed() {
     }
   }
 
+  for (const agreement of interlineAgreements) {
+    await db
+      .insert(schema.interlineAgreements)
+      .values(agreement)
+      .onConflictDoUpdate({
+        target: [
+          schema.interlineAgreements.inboundAirline,
+          schema.interlineAgreements.outboundAirline,
+        ],
+        set: { bagThroughChecked: agreement.bagThroughChecked },
+      });
+  }
+
   console.log(
-    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows, ${mctRules.length} MCT rules`,
+    `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows, ${mctRules.length} MCT rules, ${interlineAgreements.length} interline agreements`,
   );
 }
 

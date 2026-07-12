@@ -287,6 +287,56 @@ export const resolveMctRuleQuerySchema = z.object({
 });
 export type ResolveMctRuleQuery = z.infer<typeof resolveMctRuleQuerySchema>;
 
+/**
+ * Directional carrier-pair gate: does the inbound operating carrier permit a
+ * through-ticketed interline connection onto the outbound operating carrier?
+ * See /prd/01-glossary.md (codeshare vs interline) and /prd/13-mct-rules.md §A2.
+ */
+export const interlineAgreementSchema = z.object({
+  id: ulidSchema,
+  inboundAirline: airlineCodeSchema,
+  outboundAirline: airlineCodeSchema,
+  bagThroughChecked: z.boolean(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type InterlineAgreement = z.infer<typeof interlineAgreementSchema>;
+
+export const interlineAgreementListSchema = z.array(interlineAgreementSchema);
+
+export const createInterlineAgreementSchema = z
+  .object({
+    inboundAirline: airlineCodeSchema,
+    outboundAirline: airlineCodeSchema,
+    bagThroughChecked: z.boolean().optional(),
+  })
+  .refine((data) => data.inboundAirline !== data.outboundAirline, {
+    message: 'inboundAirline and outboundAirline must differ',
+    path: ['outboundAirline'],
+  });
+export type CreateInterlineAgreementInput = z.infer<
+  typeof createInterlineAgreementSchema
+>;
+
+/** Query for the directional interline resolver (/prd/13-mct-rules.md §A2). */
+export const resolveInterlineQuerySchema = z.object({
+  inboundAirline: airlineCodeSchema,
+  outboundAirline: airlineCodeSchema,
+});
+export type ResolveInterlineQuery = z.infer<typeof resolveInterlineQuerySchema>;
+
+/**
+ * Result of the interline resolver — same shape the Step 8 classifier
+ * consumes directly (`InterlineResolution` in /prd/13-mct-rules.md §B).
+ */
+export const interlineResolutionSchema = z.object({
+  online: z.boolean(),
+  permitted: z.boolean(),
+  bagThroughChecked: z.boolean(),
+  agreementId: ulidSchema.nullable(),
+});
+export type InterlineResolution = z.infer<typeof interlineResolutionSchema>;
+
 export const sessionUserSchema = z.object({
   id: z.string(),
   name: z.string(),
