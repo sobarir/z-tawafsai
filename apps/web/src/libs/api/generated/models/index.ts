@@ -8,6 +8,8 @@
 
 export * from './airlineDto';
 export * from './airportDto';
+export * from './connectionResultDto';
+export * from './connectionResultDtoKind';
 export * from './createAirlineDto';
 export * from './createAirportDto';
 export * from './createFlightDto';
@@ -42,3 +44,5 @@ export * from './updateFlightDto';
 export * from './updateFlightDtoStatus';
 export * from './updateFlightMarketingDto';
 export * from './updateMctRuleDto';
+export * from './validateConnectionChainDto';
+export * from './validateConnectionDto';

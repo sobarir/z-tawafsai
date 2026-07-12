@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { auth } from './auth/auth';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { loggerConfig } from './common/logger/logger.config';
+import { ConnectionsModule } from './connections/connections.module';
 import { DatabaseModule } from './database/database.module';
 import { FlightMarketingModule } from './flight-marketing/flight-marketing.module';
 import { FlightsModule } from './flights/flights.module';
@@ -34,6 +35,7 @@ import { UsersModule } from './users/users.module';
     FlightMarketingModule,
     MctRulesModule,
     InterlineAgreementsModule,
+    ConnectionsModule,
   ],
   controllers: [AppController],
   providers: [

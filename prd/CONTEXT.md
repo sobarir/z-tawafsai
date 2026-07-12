@@ -5,28 +5,38 @@
 
 ## Current step
 
-> **STEP 8 — not started.** Next action: Connection-validation service — see `/prd/20-steps.md`
-> Step 8. Step 7.5 (interline-agreements module) is done: CRUD (GET/POST/DELETE only — no PATCH,
-> per `13-mct-rules.md`'s API surface) for `interline_agreements` at
-> `apps/api/src/interline-agreements/`. Resolver `resolveInterline(inboundAirline,
-> outboundAirline)` exposed as `GET /interline-agreements/resolve`, operationId `resolveInterline`
-> (registered before `:id`): same carrier -> `{online:true, permitted:true,
-> bagThroughChecked:true, agreementId:null}` with no DB lookup; otherwise a directional lookup —
-> absence is a valid `{permitted:false}` result, NOT a 404 (matches the `InterlineResolution` type
-> in `13-mct-rules.md` §A2/§B, which Step 8's classifier consumes directly).
-> `InterlineAgreementsModule` exports `InterlineAgreementsService` for Step 8. Seeded GA->SQ,
-> SQ->GA, GA->QR (bag=true), NH->KL (bag=false); deliberately NOT GA->AF (S15) or QR->GA (S17).
-> Vitest specs at `apps/api/src/interline-agreements/interline-agreements.service.spec.ts` cover
-> S13-S17 (`pnpm --filter api test`).
+> **Backend v1 complete.** All of Steps 3–8 from `/prd/20-steps.md` are done — the definition of
+> done for v1 (`/prd/00-overview.md` success criteria): **all of S1–S18 in `14-scenarios.md` are
+> green**, plus lint/format/typecheck clean. No further backend step is queued; the next session
+> should pick a new task explicitly rather than assume there's a "next step."
 >
-> Step 8 now has all 3 resolvers ready to wire together: `FlightMarketingService` (Step 6,
-> marketing->operating), `MctRulesService.resolve()` (Step 7, NO_MCT_RULE on no match), and
-> `InterlineAgreementsService.resolveInterline()` (Step 7.5, NO_INTERLINE on not-permitted). Build
-> the classifier exactly per `13-mct-rules.md` §B's order: transit -> open_jaw -> interline gate ->
-> MCT (NEGATIVE_GAP / NO_MCT_RULE / BELOW_MCT) -> connection/stopover. Then `POST
-> /connections/validate` and `POST /connections/validate-chain`. Target: ALL of S1-S18 green
-> (S12's 3-flight chain composition still needs to be decided/seeded — see the Step 5 note in git
-> history and `packages/db/src/seed.ts` comments).
+> Step 8 (connection-validation service) added `apps/api/src/connections/`:
+> `ConnectionsService.classify(prevFlightId, nextFlightId)` implements the `13-mct-rules.md` §B
+> classifier exactly — transit -> open_jaw -> interline gate (via `InterlineAgreementsService`,
+> Step 7.5) -> gap sign (`NEGATIVE_GAP`, checked before rule lookup so an unrelated airport pair
+> with no rule still reports the right reason) -> MCT (via `MctRulesService.findApplicableRule()`,
+> a new non-throwing variant added alongside the existing `resolve()`) -> connection/stopover.
+> `POST /connections/validate` and `POST /connections/validate-chain` (both `@HttpCode(200)`,
+> overriding Nest's POST-default 201 since these are read/compute endpoints, not creates).
+> `resolveScope()` (domestic/international per leg, DD/DI/ID/II) and `minutesBetween()` are pure,
+> directly unit-tested helpers. `AirportsModule` now exports `AirportsService` (needed for
+> city_code/country_code lookups — open-jaw detection and scope determination).
+>
+> Seed additions for S9/S12–S18: AMS airport (KL 800's destination), 14 new flights, 1 new MCT
+> rule (`HND`->`NRT` `DI` 240 — S12 junction 2). **Found and fixed a real PRD inconsistency**: the
+> DOH/DOH II rule's `maxConnectionMinutes` is documented as 2880 in both `13-mct-rules.md`'s seed
+> table and `15-seed-data.md`, but S3's 2730-min gap only classifies as `stopover` (as the scenario
+> requires) if `maxConnectionMinutes=1440` — used 1440 since the scenario doc is the acceptance
+> oracle. S12's 3-flight chain (previously deferred) is now fully specified: `GA10 CGK->NRT`,
+> `GA11 NRT->HND` (junction 1, NRT/NRT ID, reuses an existing rule), `GA12 NRT->LHR` (junction 2,
+> HND/NRT DI, the new rule) — note the actual airports touched deviate slightly from
+> `14-scenarios.md`'s prose ("HND intl dep") because the existing NRT/HND rule's direction forced
+> this specific routing; the *structural* assertion (same-airport then inter-airport) is exact.
+>
+> All 4 resolvers are now composed end-to-end and covered by
+> `apps/api/src/connections/connections.service.spec.ts` (one test per scenario, S1–S9 and
+> S11–S18; S10 remains covered by the Step 6 flight-marketing specs since it doesn't involve
+> `classify()`). Full suite: 59/59 (`pnpm --filter api test`).
 
 ## Confirmed decisions (do not re-litigate)
 
@@ -61,7 +71,7 @@
 - [x] Step 6 — Marketing/codeshare module (marketing→operating mapping, own-metal partners)
 - [x] Step 7 — MCT rules module (CRUD + most-specific-first resolver)
 - [x] Step 7.5 — Interline-agreements module (carrier-pair gate + directional lookup)
-- [ ] Step 8 — Connection-validation service (classify gap + interline gate + bagThroughChecked) **← start here**
+- [x] Step 8 — Connection-validation service (classify gap + interline gate + bagThroughChecked) — **backend v1 done, all S1-S18 green**
 
 ## Open questions (resolve before the step that needs them)
 

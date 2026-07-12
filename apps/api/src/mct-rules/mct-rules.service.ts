@@ -115,8 +115,13 @@ export class MctRulesService {
     await this.db.delete(schema.mctRules).where(eq(schema.mctRules.id, id));
   }
 
-  /** operationId: resolveMctRule. Throws NotFoundException (NO_MCT_RULE) if no rule matches. */
-  async resolve(criteria: ResolveMctRuleQuery): Promise<MctRule> {
+  /**
+   * Non-throwing form for callers (the Step 8 classifier) that need to
+   * branch on NO_MCT_RULE themselves rather than catch an exception.
+   */
+  async findApplicableRule(
+    criteria: ResolveMctRuleQuery,
+  ): Promise<MctRule | null> {
     const candidates = await this.db
       .select()
       .from(schema.mctRules)
@@ -128,11 +133,17 @@ export class MctRulesService {
         ),
       );
     const resolved = pickMostSpecificMctRule(candidates, criteria);
-    if (!resolved) {
+    return resolved ? toMctRule(resolved) : null;
+  }
+
+  /** operationId: resolveMctRule. Throws NotFoundException (NO_MCT_RULE) if no rule matches. */
+  async resolve(criteria: ResolveMctRuleQuery): Promise<MctRule> {
+    const rule = await this.findApplicableRule(criteria);
+    if (!rule) {
       throw new NotFoundException(
         `NO_MCT_RULE: no rule for ${criteria.arrivalAirport}->${criteria.departureAirport} scope ${criteria.scope}`,
       );
     }
-    return toMctRule(resolved);
+    return rule;
   }
 }

@@ -114,6 +114,16 @@ const airports: (typeof schema.airports.$inferInsert)[] = [
     countryCode: 'TH',
     timezone: 'Asia/Bangkok',
   },
+  {
+    // Not in prd/15-seed-data.md's airport table, but required as KL 800's
+    // destination for the interline scenario (prd/14-scenarios.md S16).
+    airportCode: 'AMS',
+    icaoCode: 'EHAM',
+    name: 'Amsterdam Airport Schiphol',
+    cityCode: 'AMS',
+    countryCode: 'NL',
+    timezone: 'Europe/Amsterdam',
+  },
 ];
 
 const airlines: (typeof schema.airlines.$inferInsert)[] = [
@@ -167,10 +177,9 @@ type FlightSeed = {
   marketing?: MarketingSeed[];
 };
 
-// Demo flights powering the golden scenarios in prd/14-scenarios.md.
-// S9, S11, S13-S18 need mct_rules / interline_agreements (Steps 7-7.5) and
-// aren't seeded yet. S12's exact 3-flight chain composition is deferred to
-// Step 8, once the connection-validation service pins it down.
+// Demo flights powering the golden scenarios in prd/14-scenarios.md. S1-S8's
+// gaps fall out of the times below exactly as scripted; S9+ are keyed by
+// scenario in the comments alongside each flight.
 const flights: FlightSeed[] = [
   // S7 — NH 10 CGK->LHR, technical stop via BKK. One `flights` row, two
   // `flight_legs` (role TECHNICAL_STOP), one segment.
@@ -333,6 +342,130 @@ const flights: FlightSeed[] = [
       },
     ],
   },
+  // S9 — no MCT rule seeded for DPS at all (guard: NO_MCT_RULE, not a silent pass).
+  {
+    operatingAirline: 'SQ',
+    flightNumber: '10',
+    originAirport: 'SIN',
+    destAirport: 'DPS',
+    departureTime: '2026-06-01T11:30:00+08:00',
+    arrivalTime: '2026-06-01T14:00:00+08:00',
+  },
+  {
+    operatingAirline: 'SQ',
+    flightNumber: '11',
+    originAirport: 'DPS',
+    destAirport: 'SIN',
+    departureTime: '2026-06-01T16:00:00+08:00',
+    arrivalTime: '2026-06-01T19:00:00+08:00',
+  },
+  // S12 — 3-flight chain CGK->NRT->HND->LHR. Junction 1 (F1/F2, NRT/NRT
+  // ID) is same-airport; junction 2 (F2/F3, HND/NRT DI — see the new
+  // mct_rules entry below) is inter-airport, same Tokyo metro.
+  {
+    operatingAirline: 'GA',
+    flightNumber: '10',
+    originAirport: 'CGK',
+    destAirport: 'NRT',
+    departureTime: '2026-06-01T05:00:00+07:00',
+    arrivalTime: '2026-06-01T13:00:00+09:00',
+  },
+  {
+    operatingAirline: 'GA',
+    flightNumber: '11',
+    originAirport: 'NRT',
+    destAirport: 'HND',
+    departureTime: '2026-06-01T14:45:00+09:00',
+    arrivalTime: '2026-06-01T15:30:00+09:00',
+  },
+  {
+    operatingAirline: 'GA',
+    flightNumber: '12',
+    originAirport: 'NRT',
+    destAirport: 'LHR',
+    departureTime: '2026-06-01T20:00:00+09:00',
+    arrivalTime: '2026-06-02T01:00:00+01:00',
+  },
+  // S13/S14/S15 — shared P: GA 100 CGK->SIN, online/interline/no-interline Ns.
+  {
+    operatingAirline: 'GA',
+    flightNumber: '100',
+    originAirport: 'CGK',
+    destAirport: 'SIN',
+    departureTime: '2026-06-04T05:00:00+07:00',
+    arrivalTime: '2026-06-04T10:00:00+08:00',
+  },
+  // S13 — N: same carrier GA, online, no interline lookup needed.
+  {
+    operatingAirline: 'GA',
+    flightNumber: '200',
+    originAirport: 'SIN',
+    destAirport: 'NRT',
+    departureTime: '2026-06-04T11:30:00+08:00',
+    arrivalTime: '2026-06-04T19:30:00+09:00',
+  },
+  // S14 — N: operating SQ, GA->SQ agreement permits it, bags through.
+  {
+    operatingAirline: 'SQ',
+    flightNumber: '300',
+    originAirport: 'SIN',
+    destAirport: 'NRT',
+    departureTime: '2026-06-04T11:30:00+08:00',
+    arrivalTime: '2026-06-04T19:30:00+09:00',
+  },
+  // S15 — N: operating AF, no GA->AF agreement -> NO_INTERLINE.
+  {
+    operatingAirline: 'AF',
+    flightNumber: '400',
+    originAirport: 'SIN',
+    destAirport: 'CDG',
+    departureTime: '2026-06-04T13:00:00+08:00',
+    arrivalTime: '2026-06-04T20:00:00+02:00',
+  },
+  // S16 — interline permitted but bags NOT through-checked (NH->KL agreement).
+  {
+    operatingAirline: 'NH',
+    flightNumber: '30',
+    originAirport: 'CGK',
+    destAirport: 'NRT',
+    departureTime: '2026-06-05T01:00:00+07:00',
+    arrivalTime: '2026-06-05T09:00:00+09:00',
+  },
+  {
+    operatingAirline: 'KL',
+    flightNumber: '800',
+    originAirport: 'NRT',
+    destAirport: 'AMS',
+    departureTime: '2026-06-05T10:30:00+09:00',
+    arrivalTime: '2026-06-05T15:30:00+02:00',
+  },
+  // S17 — directional agreement is one-way: GA->QR exists, QR->GA does not.
+  {
+    operatingAirline: 'QR',
+    flightNumber: '50',
+    originAirport: 'CGK',
+    destAirport: 'DOH',
+    departureTime: '2026-06-02T05:00:00+07:00',
+    arrivalTime: '2026-06-02T10:00:00+03:00',
+  },
+  {
+    operatingAirline: 'GA',
+    flightNumber: '51',
+    originAirport: 'DOH',
+    destAirport: 'CGK',
+    departureTime: '2026-06-02T11:30:00+03:00',
+    arrivalTime: '2026-06-03T00:30:00+07:00',
+  },
+  // S18 — N for GA 874 (S10): interline gate must key off GA (operating),
+  // never NH 5502 (marketing). No NH->SQ agreement exists — only GA->SQ.
+  {
+    operatingAirline: 'SQ',
+    flightNumber: '500',
+    originAirport: 'NRT',
+    destAirport: 'SIN',
+    departureTime: '2026-06-05T19:00:00+09:00',
+    arrivalTime: '2026-06-06T01:00:00+08:00',
+  },
 ];
 
 type MctScope = 'DD' | 'DI' | 'ID' | 'II';
@@ -389,11 +522,15 @@ const mctRules: MctRuleSeed[] = [
     mctMinutes: 300,
   },
   {
+    // maxConnectionMinutes=1440, NOT the 2880 ("max 48h") suggested by
+    // 13-mct-rules.md's seed table / 15-seed-data.md: S3's 2730-min gap
+    // must classify as 'stopover', which only holds if max=1440. The
+    // scenario doc is the acceptance oracle; it wins over the seed-table note.
     arrivalAirport: 'DOH',
     departureAirport: 'DOH',
     scope: 'II',
     mctMinutes: 60,
-    maxConnectionMinutes: 2880,
+    maxConnectionMinutes: 1440,
   },
   // S11 — outranks the NRT/NRT II default above for NH arrivals (1 non-NULL
   // field beats 0).
@@ -403,6 +540,14 @@ const mctRules: MctRuleSeed[] = [
     scope: 'II',
     arrivalAirline: 'NH',
     mctMinutes: 45,
+  },
+  // S12 — junction 2 of the 3-flight chain: arrives HND (domestic leg from
+  // NRT), departs NRT (international leg to LHR).
+  {
+    arrivalAirport: 'HND',
+    departureAirport: 'NRT',
+    scope: 'DI',
+    mctMinutes: 240,
   },
 ];
 

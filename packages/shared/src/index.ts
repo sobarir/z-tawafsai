@@ -337,6 +337,48 @@ export const interlineResolutionSchema = z.object({
 });
 export type InterlineResolution = z.infer<typeof interlineResolutionSchema>;
 
+/** The four DERIVED gap types plus 'invalid' — never stored, always computed. See /prd/01-glossary.md. */
+export const connectionKindSchema = z.enum([
+  'connection',
+  'stopover',
+  'open_jaw',
+  'transit',
+  'invalid',
+]);
+export type ConnectionKind = z.infer<typeof connectionKindSchema>;
+
+/**
+ * Output of the connection-validation classifier (/prd/13-mct-rules.md §B).
+ * `gapMinutes` is null for open_jaw/transit, and for invalid/NO_INTERLINE
+ * (the interline gate runs before gap math) and invalid/NO_INTERLINE only.
+ */
+export const connectionResultSchema = z.object({
+  prevFlightId: ulidSchema,
+  nextFlightId: ulidSchema,
+  kind: connectionKindSchema,
+  gapMinutes: z.number().int().nullable(),
+  sameMetroInterAirport: z.boolean(),
+  isInterline: z.boolean(),
+  bagThroughChecked: z.boolean(),
+  appliedMctRuleId: ulidSchema.nullable(),
+  appliedInterlineId: ulidSchema.nullable(),
+  reason: z.string(),
+});
+export type ConnectionResult = z.infer<typeof connectionResultSchema>;
+
+export const validateConnectionSchema = z.object({
+  prevFlightId: ulidSchema,
+  nextFlightId: ulidSchema,
+});
+export type ValidateConnectionInput = z.infer<typeof validateConnectionSchema>;
+
+export const validateConnectionChainSchema = z.object({
+  flightIds: z.array(ulidSchema).min(2),
+});
+export type ValidateConnectionChainInput = z.infer<
+  typeof validateConnectionChainSchema
+>;
+
 export const sessionUserSchema = z.object({
   id: z.string(),
   name: z.string(),

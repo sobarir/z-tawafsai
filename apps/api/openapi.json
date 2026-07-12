@@ -1116,6 +1116,73 @@
           "interline-agreements"
         ]
       }
+    },
+    "/api/connections/validate": {
+      "post": {
+        "operationId": "validateConnection",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateConnectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Classify the connection between two consecutive flights",
+        "tags": [
+          "connections"
+        ]
+      }
+    },
+    "/api/connections/validate-chain": {
+      "post": {
+        "operationId": "validateConnectionChain",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateConnectionChainDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectionResultDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Classify every consecutive connection in an itinerary",
+        "tags": [
+          "connections"
+        ]
+      }
     }
   },
   "info": {
@@ -2070,6 +2137,102 @@
         "required": [
           "inboundAirline",
           "outboundAirline"
+        ]
+      },
+      "ValidateConnectionDto": {
+        "type": "object",
+        "properties": {
+          "prevFlightId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "nextFlightId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          }
+        },
+        "required": [
+          "prevFlightId",
+          "nextFlightId"
+        ]
+      },
+      "ConnectionResultDto": {
+        "type": "object",
+        "properties": {
+          "prevFlightId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "nextFlightId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "connection",
+              "stopover",
+              "open_jaw",
+              "transit",
+              "invalid"
+            ]
+          },
+          "gapMinutes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          },
+          "sameMetroInterAirport": {
+            "type": "boolean"
+          },
+          "isInterline": {
+            "type": "boolean"
+          },
+          "bagThroughChecked": {
+            "type": "boolean"
+          },
+          "appliedMctRuleId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "nullable": true
+          },
+          "appliedInterlineId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "prevFlightId",
+          "nextFlightId",
+          "kind",
+          "gapMinutes",
+          "sameMetroInterAirport",
+          "isInterline",
+          "bagThroughChecked",
+          "appliedMctRuleId",
+          "appliedInterlineId",
+          "reason"
+        ]
+      },
+      "ValidateConnectionChainDto": {
+        "type": "object",
+        "properties": {
+          "flightIds": {
+            "minItems": 2,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            }
+          }
+        },
+        "required": [
+          "flightIds"
         ]
       }
     }

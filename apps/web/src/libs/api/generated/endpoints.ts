@@ -27,6 +27,7 @@ import type {
 import type {
   AirlineDto,
   AirportDto,
+  ConnectionResultDto,
   CreateAirlineDto,
   CreateAirportDto,
   CreateFlightDto,
@@ -49,7 +50,9 @@ import type {
   UpdateAirportDto,
   UpdateFlightDto,
   UpdateFlightMarketingDto,
-  UpdateMctRuleDto
+  UpdateMctRuleDto,
+  ValidateConnectionChainDto,
+  ValidateConnectionDto
 } from './models';
 
 import { customFetch } from '../mutator';
@@ -3620,6 +3623,174 @@ export const useDeleteInterlineAgreement = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteInterlineAgreementMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Classify the connection between two consecutive flights
+ */
+export type validateConnectionResponse200 = {
+  data: ConnectionResultDto
+  status: 200
+}
+    
+export type validateConnectionResponseSuccess = (validateConnectionResponse200) & {
+  headers: Headers;
+};
+;
+
+export type validateConnectionResponse = (validateConnectionResponseSuccess)
+
+export const getValidateConnectionUrl = () => {
+
+
+  
+
+  return `/api/connections/validate`
+}
+
+export const validateConnection = async (validateConnectionDto: ValidateConnectionDto, options?: RequestInit): Promise<validateConnectionResponse> => {
+  
+  return customFetch<validateConnectionResponse>(getValidateConnectionUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      validateConnectionDto,)
+  }
+);}
+
+
+
+
+export const getValidateConnectionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnection>>, TError,{data: ValidateConnectionDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof validateConnection>>, TError,{data: ValidateConnectionDto}, TContext> => {
+
+const mutationKey = ['validateConnection'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof validateConnection>>, {data: ValidateConnectionDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  validateConnection(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ValidateConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof validateConnection>>>
+    export type ValidateConnectionMutationBody = ValidateConnectionDto
+    export type ValidateConnectionMutationError = unknown
+
+    /**
+ * @summary Classify the connection between two consecutive flights
+ */
+export const useValidateConnection = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnection>>, TError,{data: ValidateConnectionDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof validateConnection>>,
+        TError,
+        {data: ValidateConnectionDto},
+        TContext
+      > => {
+
+      const mutationOptions = getValidateConnectionMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Classify every consecutive connection in an itinerary
+ */
+export type validateConnectionChainResponse200 = {
+  data: ConnectionResultDto[]
+  status: 200
+}
+    
+export type validateConnectionChainResponseSuccess = (validateConnectionChainResponse200) & {
+  headers: Headers;
+};
+;
+
+export type validateConnectionChainResponse = (validateConnectionChainResponseSuccess)
+
+export const getValidateConnectionChainUrl = () => {
+
+
+  
+
+  return `/api/connections/validate-chain`
+}
+
+export const validateConnectionChain = async (validateConnectionChainDto: ValidateConnectionChainDto, options?: RequestInit): Promise<validateConnectionChainResponse> => {
+  
+  return customFetch<validateConnectionChainResponse>(getValidateConnectionChainUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      validateConnectionChainDto,)
+  }
+);}
+
+
+
+
+export const getValidateConnectionChainMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnectionChain>>, TError,{data: ValidateConnectionChainDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof validateConnectionChain>>, TError,{data: ValidateConnectionChainDto}, TContext> => {
+
+const mutationKey = ['validateConnectionChain'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof validateConnectionChain>>, {data: ValidateConnectionChainDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  validateConnectionChain(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ValidateConnectionChainMutationResult = NonNullable<Awaited<ReturnType<typeof validateConnectionChain>>>
+    export type ValidateConnectionChainMutationBody = ValidateConnectionChainDto
+    export type ValidateConnectionChainMutationError = unknown
+
+    /**
+ * @summary Classify every consecutive connection in an itinerary
+ */
+export const useValidateConnectionChain = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnectionChain>>, TError,{data: ValidateConnectionChainDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof validateConnectionChain>>,
+        TError,
+        {data: ValidateConnectionChainDto},
+        TContext
+      > => {
+
+      const mutationOptions = getValidateConnectionChainMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
