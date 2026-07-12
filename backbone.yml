@@ -1,0 +1,160 @@
+# backbone.yml — machine-readable map of this repository.
+#
+# PURPOSE: agents read this file INSTEAD of exploring with find/grep/ls.
+# It is the single source of truth for project topology, conventions,
+# boundaries, and how the pieces relate. Read on demand — not meant to sit
+# in context permanently.
+#
+# MAINTENANCE: if you add/move/rename a directory, generated artifact, or
+# convention listed here, update this file in the same change. A stale map
+# is worse than no map.
+
+version: 1
+
+agents:
+  instruction_files:
+    root: AGENTS.md                    # always-loaded guide + task routing table
+    frontend: apps/web/AGENTS.md       # load only for UI work
+    backend: apps/api/AGENTS.md        # load only for API work
+    database: packages/db/AGENTS.md
+    contracts: packages/shared/AGENTS.md
+    auth_config: packages/auth/AGENTS.md
+  bootstrap: .claude/commands/bootstrap.md   # /bootstrap — session orientation workflow
+  skills:
+    add_endpoint: .claude/skills/add-endpoint/SKILL.md   # full contract loop as a skill
+  hooks:
+    settings: .claude/settings.json                       # PreToolUse + PostToolUse wiring
+    block_generated: scripts/hooks/block-generated.mjs    # hard-blocks writes to generated files
+    format_edited: scripts/hooks/format-edited.mjs        # auto-formats every agent edit with Biome
+  notes: >
+    CLAUDE.md files are one-line @AGENTS.md import stubs (Claude Code
+    lazy-loads them per directory). Edit AGENTS.md files only.
+    Workflows inside AGENTS.md are Mermaid flowcharts — keep arrows intact
+    when editing; a dangling branch is a broken process.
+
+structure:
+  apps:
+    web: # Next.js 16 frontend — NO database access
+      root: apps/web/
+      routes: apps/web/src/app/                    # App Router; (site)/ public, (auth)/ login, dashboard/@admin|@user parallel routes
+      features: apps/web/src/features/             # auth, i18n, navigation, site, theme, users — components/hooks/lib/server per feature
+      ui_primitives: apps/web/src/components/ui/   # vendored shadcn/ui
+      shared_components: apps/web/src/components/
+      libs: apps/web/src/libs/                     # env.ts, api-client.ts, utils, query-client
+      generated_api: apps/web/src/libs/api/generated/  # Orval output (GENERATED)
+      api_mutator: apps/web/src/libs/api/mutator.ts
+      env_schema: apps/web/src/libs/env.ts
+      i18n_messages: apps/web/messages/            # en.json, es.json, fr.json, ar.json, bn.json, zh.json
+      unit_tests: apps/web/tests/                  # plus colocated *.test.ts(x) in src/
+      e2e_tests: apps/web/e2e/                     # Playwright
+      test_config: apps/web/config/                # vitest.config.ts + setup
+      orval_config: apps/web/orval.config.ts
+  api: # NestJS 11 on Fastify — owns Better Auth + all data access
+    root: apps/api/
+    entrypoint: apps/api/src/main.ts               # Fastify adapter, genReqId, CORS, Swagger, /api prefix
+    root_module: apps/api/src/app.module.ts        # LoggerModule, AuthModule.forRoot, global pipe+filter
+    env_schema: apps/api/src/env.ts
+    auth_instance: apps/api/src/auth/auth.ts
+    db_provider: apps/api/src/database/database.module.ts   # DATABASE injection token
+    error_filter: apps/api/src/common/filters/all-exceptions.filter.ts
+    logger_config: apps/api/src/common/logger/logger.config.ts
+    swagger: apps/api/src/swagger.ts
+    spec_emitter: apps/api/src/openapi.ts          # writes openapi.json without a server/DB
+    openapi_spec: apps/api/openapi.json            # (GENERATED)
+    feature_pattern: "apps/api/src/{feature}/{feature}.controller.ts|service.ts|dto.ts|module.ts"
+    reference_feature: apps/api/src/posts/         # copy this for new endpoints
+  packages:
+    db:
+      root: packages/db/
+      id_generator: packages/db/src/id.ts          # createId() — ULID, used system-wide
+      schema_auth: packages/db/src/schema/auth.ts  # Better Auth tables (sync with packages/auth plugins)
+      schema_app: packages/db/src/schema/app.ts    # application tables — add new tables HERE
+      client_factory: packages/db/src/client.ts
+      migrations: packages/db/drizzle/             # (GENERATED SQL)
+      drizzle_config: packages/db/drizzle.config.ts
+    auth:
+      root: packages/auth/
+      config: packages/auth/src/index.ts           # createAuth() — adapter, admin plugin, generateId, cookies
+    shared:
+      root: packages/shared/
+      contracts: packages/shared/src/index.ts      # ALL API request/response Zod schemas + ulidSchema
+
+  tooling:
+    workspace: pnpm-workspace.yaml
+    pipeline: turbo.json
+    lint_format: biome.json                        # replaces ESLint+Prettier repo-wide
+    local_infra: docker-compose.yml                # Postgres 17
+    env_template: .env.example                     # root .env feeds api + drizzle-kit
+    git_hooks: lefthook.yml                        # pre-commit: biome + backbone check; commit-msg: commitlint
+    ci: .github/workflows/ci.yml                   # install, backbone, lint, build, typecheck, test, contract drift
+    backbone_checker: scripts/check-backbone.mjs   # fails if this map references missing paths
+    instructions_checker: scripts/check-instructions.mjs  # heading depth, budgets, prohibition rationale
+    dupes_config: .jscpd.json                              # DRY gate config (threshold 2%, generated/vendored excluded)
+
+conventions:
+  package_manager: pnpm                            # never npm/yarn
+  ids: "ULID via createId() from @repo/db — text PKs with $defaultFn; Better Auth via advanced.database.generateId"
+  api_wire_format: "dates are ISO strings (z.iso.datetime()); never Date in contracts"
+  api_route_prefix: /api                           # auth mounted at /api/auth/* by Better Auth
+  operation_ids: "every controller route sets @ApiOperation({ operationId }) — it names the generated frontend hook"
+  frontend_data_access: "Orval-generated TanStack Query hooks only; mutator adds credentials + ApiError"
+  unit_test_pattern: "*.test.ts(x) colocated (web) / apps/web/tests/"
+  e2e_test_pattern: "apps/web/e2e/*.spec.ts"
+  internal_deps: "workspace:* protocol; @repo/db, @repo/auth, @repo/shared consumed as built output (turbo ^build)"
+  logging: "nestjs-pino structured logs; never console.log in apps/api"
+  errors: "throw Nest HttpException; AllExceptionsFilter formats the single envelope"
+  dry: "rule of three — extract at the third occurrence, never abstract at the first; jscpd enforces the ceiling"
+
+relationships:
+  contract_pipeline: # who feeds whom — the order matters
+    - packages/shared/src/index.ts                 # 1. Zod schema (source of truth)
+    - "apps/api/src/{feature}/{feature}.dto.ts"    # 2. createZodDto -> validation + Swagger
+    - apps/api/openapi.json                        # 3. pnpm generate:api (emits spec)
+    - apps/web/src/libs/api/generated/             # 4. Orval hooks (same command)
+  auth_chain:
+    - packages/auth/src/index.ts                   # config (plugins, generateId, cookies)
+    - packages/db/src/schema/auth.ts               # tables must match enabled plugins
+    - apps/api/src/auth/auth.ts                    # instance, mounted by AuthModule.forRoot
+    - apps/web/src/features/auth/lib/auth-client.ts  # browser client -> NEXT_PUBLIC_API_URL
+    - apps/web/src/features/auth/server/get-current-user.ts  # SSR session via /api/auth/get-session
+  env_files:
+    root_env: "root .env -> apps/api (src/env.ts) + packages/db (drizzle.config.ts)"
+    web_env: "apps/web/.env (create from apps/web/.env.example) -> apps/web/src/libs/env.ts (t3-env)"
+
+generated: # never hand-edit; run the listed command instead
+  - path: apps/api/openapi.json
+    command: pnpm generate:api
+  - path: apps/web/src/libs/api/generated/
+    command: pnpm generate:api
+  - path: packages/db/drizzle/
+    command: pnpm db:generate
+  - path: pnpm-lock.yaml
+    command: pnpm install
+
+boundaries:
+  never_modify:
+    - apps/web/src/libs/api/generated/   # regenerate: pnpm generate:api
+    - apps/api/openapi.json              # regenerate: pnpm generate:api
+    - packages/db/drizzle/               # regenerate: pnpm db:generate
+    - pnpm-lock.yaml                     # regenerate: pnpm install
+    - .env                               # local secrets; edit .env.example instead
+  modify_with_care:
+    - apps/web/src/components/ui/        # vendored shadcn — real design changes only, no wholesale reformatting
+    - packages/db/src/schema/auth.ts     # must stay in sync with packages/auth plugins
+  never_do:
+    - "add database access or data API routes to apps/web"
+    - "add routes under /api/auth/* in apps/api (Better Auth owns that path)"
+    - "reintroduce ESLint or Prettier (Biome only)"
+    - "use uuid/serial/nanoid for IDs (ULID via createId only)"
+
+commands:
+  dev: pnpm dev                          # web :3000, api :3001, Swagger :3001/docs
+  build: pnpm build
+  contract_sync: pnpm generate:api       # REQUIRED after any packages/shared or controller change
+  quality: "pnpm typecheck && pnpm lint && pnpm test"
+  map_check: pnpm check:backbone                   # runs in pre-commit and CI
+  instructions_check: pnpm check:instructions      # runs in pre-commit and CI
+  dupes_check: pnpm check:dupes                     # DRY gate — runs in pre-commit and CI
+  db: "pnpm db:generate | db:migrate | db:push (dev only) | db:studio"
+  single_app: "pnpm --filter web|api|@repo/db <script>"
+  local_db: docker compose up -d

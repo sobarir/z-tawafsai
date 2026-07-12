@@ -1,0 +1,28 @@
+# Git hooks for the monorepo (installed via `pnpm exec lefthook install`,
+# runs automatically after `pnpm install` through the root prepare script).
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: '*.{js,jsx,ts,tsx,json}'
+      # Scoped to cwd rather than an explicit {staged_files} list — a large
+      # commit's file list can exceed the Windows command-line length limit.
+      run: pnpm exec biome check --write --no-errors-on-unmatched .
+      stage_fixed: true
+    backbone:
+      # The map must stay true — fails the commit if backbone.yml references
+      # paths that don't exist (see scripts/check-backbone.mjs).
+      run: pnpm check:backbone
+    instructions:
+      # Agent files must stay machine-readable — heading depth, line budgets,
+      # prohibition rationale, mermaid sanity (scripts/check-instructions.mjs).
+      run: pnpm check:instructions
+    dupes:
+      # DRY gate — fails above 2% duplicated lines (baseline: ~1%).
+      # Generated + vendored code excluded in .jscpd.json.
+      run: pnpm check:dupes
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}

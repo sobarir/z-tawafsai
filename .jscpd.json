@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kucherenko/jscpd/master/schema.json",
+  "threshold": 2,
+  "minTokens": 70,
+  "minLines": 6,
+  "format": ["typescript", "tsx", "javascript"],
+  "reporters": ["consoleFull"],
+  "gitignore": true,
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/coverage/**",
+    "apps/web/src/libs/api/generated/**",
+    "apps/web/src/components/ui/**",
+    "packages/db/drizzle/**",
+    "**/*.test.*",
+    "**/tests/**",
+    "**/e2e/**"
+  ]
+}

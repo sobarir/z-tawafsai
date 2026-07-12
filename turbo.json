@@ -1,0 +1,71 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": [".env"],
+  "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "API_PORT",
+    "WEB_URL",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_APP_URL",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "COOKIE_DOMAIN",
+    "AUTH_ADMIN_EMAILS",
+    "NEXT_PUBLIC_AUTH_ADMIN_EMAILS",
+    "NEXT_PUBLIC_DEMO_MODE",
+    "NEXT_PUBLIC_GOOGLE_AUTH_ENABLED",
+    "SKIP_ENV_VALIDATION",
+    "SENTRY_DSN",
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "VERCEL_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {},
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    },
+    "generate:api": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": ["openapi.json", "src/libs/api/generated/**"]
+    },
+    "web#generate:api": {
+      "dependsOn": ["api#generate:api"],
+      "cache": false
+    }
+  }
+}

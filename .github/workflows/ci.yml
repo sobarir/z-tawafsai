@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      SKIP_ENV_VALIDATION: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Backbone map is accurate
+        run: pnpm check:backbone
+
+      - name: Instruction files pass formatting rules
+        run: pnpm check:instructions
+
+      - name: Duplication under threshold (DRY gate)
+        run: pnpm check:dupes
+
+      - name: Lint (Biome)
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: API contract is in sync (spec + generated hooks committed)
+        run: |
+          pnpm generate:api
+          git diff --exit-code apps/api/openapi.json apps/web/src/libs/api/generated \
+            || (echo '::error::openapi.json / generated hooks are stale — run `pnpm generate:api` and commit the output' && exit 1)
