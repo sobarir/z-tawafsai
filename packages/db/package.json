@@ -36,6 +36,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/seed.ts",
     "clean": "rm -rf dist .turbo",
     "lint": "biome check ."
   },
@@ -50,6 +51,7 @@
     "@types/pg": "^8.15.0",
     "drizzle-kit": "^0.31.1",
     "tsup": "^8.4.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.9.2"
   }
 }

@@ -91,6 +91,300 @@
           "posts"
         ]
       }
+    },
+    "/api/airports": {
+      "get": {
+        "operationId": "listAirports",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AirportDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List airports",
+        "tags": [
+          "airports"
+        ]
+      },
+      "post": {
+        "operationId": "createAirport",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAirportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirportDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create an airport",
+        "tags": [
+          "airports"
+        ]
+      }
+    },
+    "/api/airports/{code}": {
+      "get": {
+        "operationId": "getAirport",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirportDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get an airport",
+        "tags": [
+          "airports"
+        ]
+      },
+      "patch": {
+        "operationId": "updateAirport",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAirportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirportDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update an airport",
+        "tags": [
+          "airports"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAirport",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete an airport",
+        "tags": [
+          "airports"
+        ]
+      }
+    },
+    "/api/airlines": {
+      "get": {
+        "operationId": "listAirlines",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AirlineDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List airlines",
+        "tags": [
+          "airlines"
+        ]
+      },
+      "post": {
+        "operationId": "createAirline",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAirlineDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirlineDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create an airline",
+        "tags": [
+          "airlines"
+        ]
+      }
+    },
+    "/api/airlines/{code}": {
+      "get": {
+        "operationId": "getAirline",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirlineDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get an airline",
+        "tags": [
+          "airlines"
+        ]
+      },
+      "patch": {
+        "operationId": "updateAirline",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAirlineDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirlineDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update an airline",
+        "tags": [
+          "airlines"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAirline",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete an airline",
+        "tags": [
+          "airlines"
+        ]
+      }
     }
   },
   "info": {
@@ -215,6 +509,248 @@
         "required": [
           "title"
         ]
+      },
+      "AirportDto": {
+        "type": "object",
+        "properties": {
+          "airportCode": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "icaoCode": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4,
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "cityCode": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "airportCode",
+          "icaoCode",
+          "name",
+          "cityCode",
+          "countryCode",
+          "timezone",
+          "latitude",
+          "longitude",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateAirportDto": {
+        "type": "object",
+        "properties": {
+          "airportCode": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "icaoCode": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "cityCode": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": [
+          "airportCode",
+          "name",
+          "cityCode",
+          "countryCode",
+          "timezone"
+        ]
+      },
+      "UpdateAirportDto": {
+        "type": "object",
+        "properties": {
+          "icaoCode": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "cityCode": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        }
+      },
+      "AirlineDto": {
+        "type": "object",
+        "properties": {
+          "airlineCode": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "icaoCode": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "airlineCode",
+          "icaoCode",
+          "name",
+          "countryCode",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateAirlineDto": {
+        "type": "object",
+        "properties": {
+          "airlineCode": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "icaoCode": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          }
+        },
+        "required": [
+          "airlineCode",
+          "name",
+          "countryCode"
+        ]
+      },
+      "UpdateAirlineDto": {
+        "type": "object",
+        "properties": {
+          "icaoCode": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          }
+        }
       }
     }
   }

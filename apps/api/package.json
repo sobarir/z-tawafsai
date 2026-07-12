@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "test": "echo \"no api tests yet\"",
+    "test": "vitest run",
     "generate:api": "nest build && node dist/openapi.js",
     "clean": "rm -rf dist .turbo openapi.json"
   },
@@ -39,6 +39,7 @@
     "@nestjs/cli": "^11.0.7",
     "@types/node": "^22.15.0",
     "pino-pretty": "^13.0.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "4.1.7"
   }
 }

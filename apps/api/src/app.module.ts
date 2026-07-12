@@ -3,6 +3,8 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { LoggerModule } from 'nestjs-pino';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { AirlinesModule } from './airlines/airlines.module';
+import { AirportsModule } from './airports/airports.module';
 import { AppController } from './app.controller';
 import { auth } from './auth/auth';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -22,6 +24,8 @@ import { UsersModule } from './users/users.module';
     DatabaseModule,
     UsersModule,
     PostsModule,
+    AirportsModule,
+    AirlinesModule,
   ],
   controllers: [AppController],
   providers: [

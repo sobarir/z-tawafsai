@@ -155,6 +155,6 @@ commands:
   map_check: pnpm check:backbone                   # runs in pre-commit and CI
   instructions_check: pnpm check:instructions      # runs in pre-commit and CI
   dupes_check: pnpm check:dupes                     # DRY gate — runs in pre-commit and CI
-  db: "pnpm db:generate | db:migrate | db:push (dev only) | db:studio"
+  db: "pnpm db:generate | db:migrate | db:push (dev only) | db:studio | db:seed"
   single_app: "pnpm --filter web|api|@repo/db <script>"
   local_db: docker compose up -d

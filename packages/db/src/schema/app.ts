@@ -55,8 +55,8 @@ export const airports = pgTable(
     cityCode: varchar('city_code', { length: 3 }).notNull(),
     countryCode: varchar('country_code', { length: 2 }).notNull(),
     timezone: varchar('timezone', { length: 50 }).notNull(),
-    latitude: numeric('latitude', { precision: 9, scale: 6 }),
-    longitude: numeric('longitude', { precision: 9, scale: 6 }),
+    latitude: numeric('latitude', { precision: 9, scale: 6, mode: 'number' }),
+    longitude: numeric('longitude', { precision: 9, scale: 6, mode: 'number' }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),

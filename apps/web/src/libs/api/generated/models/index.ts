@@ -6,7 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from './airlineDto';
+export * from './airportDto';
+export * from './createAirlineDto';
+export * from './createAirportDto';
 export * from './createPostDto';
 export * from './meResponseDto';
 export * from './meResponseDtoUser';
 export * from './postDto';
+export * from './updateAirlineDto';
+export * from './updateAirportDto';

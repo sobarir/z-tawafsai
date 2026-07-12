@@ -5,11 +5,10 @@
 
 ## Current step
 
-> **STEP 4 — not started.** Next action: Reference-data module (airports, airlines) — see
-> `/prd/20-steps.md` Step 4. Step 3 (schema) is done; schema lives at
-> `packages/db/src/schema/app.ts`, migration `packages/db/drizzle/0001_fresh_killraven.sql`.
-> `pnpm db:push` still needs to run against a live Postgres instance (no local DB available in
-> this session) before Step 4 work touches real data.
+> **STEP 5 — not started.** Next action: Operating-flight module (flights + legs) — see
+> `/prd/20-steps.md` Step 5. Step 4 (reference-data) is done: CRUD for airports/airlines at
+> `apps/api/src/airports/` and `apps/api/src/airlines/`, idempotent seed at
+> `packages/db/src/seed.ts` (`pnpm db:seed`), Vitest specs colocated per service (`pnpm --filter api test`).
 
 ## Confirmed decisions (do not re-litigate)
 
@@ -39,8 +38,8 @@
 ## Progress checklist
 
 - [x] Step 3 — Schema-first kickoff (schema.ts + enums + inferred types)
-- [ ] Step 4 — Reference-data module (airports, airlines CRUD + seed) **← start here**
-- [ ] Step 5 — Operating-flight module (flights + legs, technical-stop support)
+- [x] Step 4 — Reference-data module (airports, airlines CRUD + seed)
+- [ ] Step 5 — Operating-flight module (flights + legs, technical-stop support) **← start here**
 - [ ] Step 6 — Marketing/codeshare module (marketing→operating mapping, own-metal partners)
 - [ ] Step 7 — MCT rules module (CRUD + most-specific-first resolver)
 - [ ] Step 7.5 — Interline-agreements module (carrier-pair gate + directional lookup)

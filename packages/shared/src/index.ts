@@ -37,6 +37,74 @@ export const createPostSchema = z.object({
 });
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 
+/** IATA airport code: 3 uppercase letters (JFK, NRT). */
+export const airportCodeSchema = z
+  .string()
+  .regex(/^[A-Z]{3}$/, 'Invalid IATA airport code');
+
+/** IATA airline code: 2 uppercase alphanumerics (GA, NH, 5J). */
+export const airlineCodeSchema = z
+  .string()
+  .regex(/^[A-Z0-9]{2}$/, 'Invalid IATA airline code');
+
+export const airportSchema = z.object({
+  airportCode: airportCodeSchema,
+  icaoCode: z.string().length(4).nullable(),
+  name: z.string(),
+  cityCode: z.string().length(3),
+  countryCode: z.string().length(2),
+  timezone: z.string(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type Airport = z.infer<typeof airportSchema>;
+
+export const airportListSchema = z.array(airportSchema);
+
+export const createAirportSchema = z.object({
+  airportCode: airportCodeSchema,
+  icaoCode: z.string().length(4).optional(),
+  name: z.string().min(1).max(100),
+  cityCode: z.string().length(3),
+  countryCode: z.string().length(2),
+  timezone: z.string().min(1).max(50),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+});
+export type CreateAirportInput = z.infer<typeof createAirportSchema>;
+
+export const updateAirportSchema = createAirportSchema
+  .omit({ airportCode: true })
+  .partial();
+export type UpdateAirportInput = z.infer<typeof updateAirportSchema>;
+
+export const airlineSchema = z.object({
+  airlineCode: airlineCodeSchema,
+  icaoCode: z.string().length(3).nullable(),
+  name: z.string(),
+  countryCode: z.string().length(2),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type Airline = z.infer<typeof airlineSchema>;
+
+export const airlineListSchema = z.array(airlineSchema);
+
+export const createAirlineSchema = z.object({
+  airlineCode: airlineCodeSchema,
+  icaoCode: z.string().length(3).optional(),
+  name: z.string().min(1).max(100),
+  countryCode: z.string().length(2),
+});
+export type CreateAirlineInput = z.infer<typeof createAirlineSchema>;
+
+export const updateAirlineSchema = createAirlineSchema
+  .omit({ airlineCode: true })
+  .partial();
+export type UpdateAirlineInput = z.infer<typeof updateAirlineSchema>;
+
 export const sessionUserSchema = z.object({
   id: z.string(),
   name: z.string(),
