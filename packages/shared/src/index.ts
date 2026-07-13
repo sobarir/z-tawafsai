@@ -47,6 +47,11 @@ export const airlineCodeSchema = z
   .string()
   .regex(/^[A-Z0-9]{2}$/, 'Invalid IATA airline code');
 
+/** ISO 4217 currency code: 3 uppercase letters (USD, EUR, IDR). */
+export const currencyCodeSchema = z
+  .string()
+  .regex(/^[A-Z]{3}$/, 'Invalid currency code');
+
 export const airportSchema = z.object({
   airportCode: airportCodeSchema,
   icaoCode: z.string().length(4).nullable(),
@@ -149,6 +154,9 @@ export const flightSchema = z.object({
   arrivalTime: offsetDateTimeSchema,
   aircraftType: z.string().max(10).nullable(),
   status: flightStatusSchema,
+  /** Flat, admin-managed price for search display/sorting — not a fare class. */
+  price: z.number().nonnegative(),
+  currency: currencyCodeSchema,
   legs: z.array(flightLegSchema),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
@@ -175,6 +183,8 @@ export const createFlightSchema = z.object({
   arrivalTime: offsetDateTimeSchema,
   aircraftType: z.string().max(10).optional(),
   status: flightStatusSchema.optional(),
+  price: z.number().nonnegative(),
+  currency: currencyCodeSchema,
   /** Omit for a single-leg flight (auto-creates one FULL leg). Provide >=2 for a technical stop. */
   legs: z.array(createFlightLegInputSchema).min(2).optional(),
 });
@@ -183,13 +193,23 @@ export type CreateFlightInput = z.infer<typeof createFlightSchema>;
 export const updateFlightSchema = z.object({
   aircraftType: z.string().max(10).optional(),
   status: flightStatusSchema.optional(),
+  price: z.number().nonnegative().optional(),
+  currency: currencyCodeSchema.optional(),
 });
 export type UpdateFlightInput = z.infer<typeof updateFlightSchema>;
+
+/** Query for the OTA-style search endpoint — matches on route + UTC calendar day of departure. */
+export const searchFlightsQuerySchema = z.object({
+  originAirport: airportCodeSchema,
+  destAirport: airportCodeSchema,
+  date: z.iso.date(),
+});
+export type SearchFlightsQuery = z.infer<typeof searchFlightsQuerySchema>;
 
 /**
  * A sellable/displayable identity mapped onto an operating flight
  * (`flights`). Codeshare = many marketing rows -> one operating flight; see
- * /prd/01-glossary.md.
+ * /prd/flights/01-glossary.md.
  */
 export const flightMarketingSchema = z.object({
   id: ulidSchema,
@@ -222,7 +242,7 @@ export type UpdateFlightMarketingInput = z.infer<
   typeof updateFlightMarketingSchema
 >;
 
-/** Domestic/international combination at the connection airport; see /prd/13-mct-rules.md §A. */
+/** Domestic/international combination at the connection airport; see /prd/flights/13-mct-rules.md §A. */
 export const mctScopeSchema = z.enum(['DD', 'DI', 'ID', 'II']);
 export type MctScope = z.infer<typeof mctScopeSchema>;
 
@@ -275,7 +295,7 @@ export const updateMctRuleSchema = z.object({
 });
 export type UpdateMctRuleInput = z.infer<typeof updateMctRuleSchema>;
 
-/** Query for the most-specific-first resolver (/prd/13-mct-rules.md §A). */
+/** Query for the most-specific-first resolver (/prd/flights/13-mct-rules.md §A). */
 export const resolveMctRuleQuerySchema = z.object({
   arrivalAirport: airportCodeSchema,
   departureAirport: airportCodeSchema,
@@ -290,7 +310,7 @@ export type ResolveMctRuleQuery = z.infer<typeof resolveMctRuleQuerySchema>;
 /**
  * Directional carrier-pair gate: does the inbound operating carrier permit a
  * through-ticketed interline connection onto the outbound operating carrier?
- * See /prd/01-glossary.md (codeshare vs interline) and /prd/13-mct-rules.md §A2.
+ * See /prd/flights/01-glossary.md (codeshare vs interline) and /prd/flights/13-mct-rules.md §A2.
  */
 export const interlineAgreementSchema = z.object({
   id: ulidSchema,
@@ -318,7 +338,7 @@ export type CreateInterlineAgreementInput = z.infer<
   typeof createInterlineAgreementSchema
 >;
 
-/** Query for the directional interline resolver (/prd/13-mct-rules.md §A2). */
+/** Query for the directional interline resolver (/prd/flights/13-mct-rules.md §A2). */
 export const resolveInterlineQuerySchema = z.object({
   inboundAirline: airlineCodeSchema,
   outboundAirline: airlineCodeSchema,
@@ -327,7 +347,7 @@ export type ResolveInterlineQuery = z.infer<typeof resolveInterlineQuerySchema>;
 
 /**
  * Result of the interline resolver — same shape the Step 8 classifier
- * consumes directly (`InterlineResolution` in /prd/13-mct-rules.md §B).
+ * consumes directly (`InterlineResolution` in /prd/flights/13-mct-rules.md §B).
  */
 export const interlineResolutionSchema = z.object({
   online: z.boolean(),
@@ -337,7 +357,7 @@ export const interlineResolutionSchema = z.object({
 });
 export type InterlineResolution = z.infer<typeof interlineResolutionSchema>;
 
-/** The four DERIVED gap types plus 'invalid' — never stored, always computed. See /prd/01-glossary.md. */
+/** The four DERIVED gap types plus 'invalid' — never stored, always computed. See /prd/flights/01-glossary.md. */
 export const connectionKindSchema = z.enum([
   'connection',
   'stopover',
@@ -348,7 +368,7 @@ export const connectionKindSchema = z.enum([
 export type ConnectionKind = z.infer<typeof connectionKindSchema>;
 
 /**
- * Output of the connection-validation classifier (/prd/13-mct-rules.md §B).
+ * Output of the connection-validation classifier (/prd/flights/13-mct-rules.md §B).
  * `gapMinutes` is null for open_jaw/transit, and for invalid/NO_INTERLINE
  * (the interline gate runs before gap math) and invalid/NO_INTERLINE only.
  */

@@ -11,4 +11,8 @@ export interface UpdateFlightDto {
   /** @maxLength 10 */
   aircraftType?: string;
   status?: UpdateFlightDtoStatus;
+  /** @minimum 0 */
+  price?: number;
+  /** @pattern ^[A-Z]{3}$ */
+  currency?: string;
 }

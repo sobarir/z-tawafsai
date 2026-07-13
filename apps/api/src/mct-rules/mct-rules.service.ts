@@ -35,7 +35,7 @@ const fieldMatches = (
 
 /**
  * Picks the most-specific matching rule from a pre-filtered set (same
- * arrival_airport/departure_airport/scope), per /prd/13-mct-rules.md §A:
+ * arrival_airport/departure_airport/scope), per /prd/flights/13-mct-rules.md §A:
  * each non-NULL rule field must equal the candidate's value, ranked by count
  * of non-NULL fields (more specific wins), ties broken by newest updatedAt.
  */

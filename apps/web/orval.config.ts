@@ -24,6 +24,12 @@ export default defineConfig({
           path: './src/libs/api/mutator.ts',
           name: 'customFetch',
         },
+        fetch: {
+          // customFetch (mutator.ts) returns the parsed body directly, not a
+          // { data, status, headers } envelope — this must match, or every
+          // generated hook is typed one level too deep for its runtime value.
+          includeHttpResponseReturnType: false,
+        },
       },
     },
   },

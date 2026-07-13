@@ -27,7 +27,7 @@ const BACKBONE = resolve(ROOT, 'backbone.yml');
 /** Gitignored paths the map may reference but a fresh clone won't have. */
 const ALLOWED_MISSING = new Set(['.env', 'apps/web/.env']);
 
-const PATH_TOKEN = /(?:apps|packages|scripts)\/[\w./\-{}|]+/g;
+const PATH_TOKEN = /(?:apps|packages|scripts|prd)\/[\w./\-{}|]+/g;
 
 /** Sections whose leaf values are root-relative file paths (no prefix). */
 const ROOT_FILE_SECTIONS = [

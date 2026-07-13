@@ -21,7 +21,10 @@
     "noData": "لا توجد بيانات",
     "toggleTheme": "تبديل المظهر",
     "sidebar": "الشريط الجانبي",
-    "toggleSidebar": "تبديل الشريط الجانبي"
+    "toggleSidebar": "تبديل الشريط الجانبي",
+    "yes": "نعم",
+    "no": "لا",
+    "view": "عرض"
   },
   "theme": {
     "light": "فاتح",
@@ -36,6 +39,7 @@
     "language": "اللغة",
     "dashboard": "لوحة التحكم",
     "profile": "الملف الشخصي",
+    "searchFlights": "البحث عن رحلات",
     "logout": "تسجيل الخروج",
     "login": "تسجيل الدخول",
     "uiComponents": "مكونات الواجهة"
@@ -151,10 +155,255 @@
       "layoutDesc": "الأكورديون والعرض الدوار والتقويم والعناصر القابلة للطي."
     }
   },
+  "schedule": {
+    "nav": {
+      "section": "إدارة الجدول الزمني",
+      "airports": "المطارات",
+      "airlines": "شركات الطيران",
+      "flights": "الرحلات",
+      "codeshare": "الرمز المشترك",
+      "mctRules": "قواعد الحد الأدنى لوقت الاتصال",
+      "interlineAgreements": "اتفاقيات النقل المشترك",
+      "connections": "مدقق الاتصال"
+    },
+    "actions": "الإجراءات",
+    "openMenu": "فتح القائمة",
+    "createButton": "إنشاء",
+    "searchPlaceholder": "بحث...",
+    "noResults": "لم يتم العثور على نتائج.",
+    "loadingRows": "جارٍ التحميل...",
+    "pageOf": "صفحة {current} من {total}",
+    "deleteConfirmTitle": "هل تريد حذف هذا السجل؟",
+    "deleteConfirmDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "createSuccess": "تم الإنشاء بنجاح.",
+    "updateSuccess": "تم التحديث بنجاح.",
+    "deleteSuccess": "تم الحذف بنجاح.",
+    "noUpdateNotice": "لا يمكن إلا إنشاء هذا السجل أو حذفه، وليس تعديله.",
+    "airports": {
+      "title": "المطارات",
+      "description": "إدارة بيانات المطارات المرجعية المستخدمة في الرحلات وقواعد الحد الأدنى لوقت الاتصال والتحقق من الاتصال.",
+      "createTitle": "إنشاء مطار",
+      "editTitle": "تعديل المطار",
+      "columns": {
+        "airportCode": "الرمز",
+        "icaoCode": "رمز الإيكاو",
+        "name": "الاسم",
+        "cityCode": "المدينة",
+        "countryCode": "البلد",
+        "timezone": "المنطقة الزمنية",
+        "coordinates": "الإحداثيات"
+      },
+      "fields": {
+        "airportCode": "رمز الإياتا",
+        "airportCodePlaceholder": "مثال: JFK",
+        "icaoCode": "رمز الإيكاو",
+        "icaoCodePlaceholder": "مثال: KJFK",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: مطار جون إف كينيدي الدولي",
+        "cityCode": "رمز المدينة",
+        "cityCodePlaceholder": "مثال: NYC",
+        "countryCode": "رمز البلد",
+        "countryCodePlaceholder": "مثال: US",
+        "timezone": "المنطقة الزمنية",
+        "timezonePlaceholder": "مثال: America/New_York",
+        "latitude": "خط العرض",
+        "longitude": "خط الطول"
+      }
+    },
+    "airlines": {
+      "title": "شركات الطيران",
+      "description": "إدارة بيانات شركات الطيران المشغلة والمسوّقة المرجعية.",
+      "createTitle": "إنشاء شركة طيران",
+      "editTitle": "تعديل شركة الطيران",
+      "columns": {
+        "airlineCode": "الرمز",
+        "icaoCode": "رمز الإيكاو",
+        "name": "الاسم",
+        "countryCode": "البلد"
+      },
+      "fields": {
+        "airlineCode": "رمز الإياتا",
+        "airlineCodePlaceholder": "مثال: GA",
+        "icaoCode": "رمز الإيكاو",
+        "icaoCodePlaceholder": "مثال: GIA",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: غارودا إندونيسيا",
+        "countryCode": "رمز البلد",
+        "countryCodePlaceholder": "مثال: ID"
+      }
+    },
+    "flights": {
+      "title": "الرحلات",
+      "description": "إدارة الرحلات المشغلة ومراحلها. يتم تحديد المراحل عند الإنشاء ولا يمكن تعديلها لاحقًا.",
+      "createTitle": "إنشاء رحلة",
+      "editTitle": "تعديل الرحلة",
+      "viewLegs": "عرض المراحل",
+      "columns": {
+        "operatingAirline": "شركة الطيران",
+        "flightNumber": "رقم الرحلة",
+        "route": "المسار",
+        "departureTime": "المغادرة",
+        "arrivalTime": "الوصول",
+        "aircraftType": "الطائرة",
+        "status": "الحالة",
+        "legs": "المراحل",
+        "price": "السعر"
+      },
+      "fields": {
+        "operatingAirline": "شركة الطيران المشغّلة",
+        "flightNumber": "رقم الرحلة",
+        "flightNumberPlaceholder": "مثال: 874",
+        "originAirport": "مطار المغادرة",
+        "destAirport": "مطار الوصول",
+        "departureTime": "وقت المغادرة",
+        "arrivalTime": "وقت الوصول",
+        "aircraftType": "نوع الطائرة",
+        "aircraftTypePlaceholder": "مثال: B738",
+        "status": "الحالة",
+        "multiLeg": "توقف فني (عدة مراحل)",
+        "legRole": "الدور",
+        "legDepAirport": "مغادرة المرحلة",
+        "legArrAirport": "وصول المرحلة",
+        "legDeparture": "وقت مغادرة المرحلة",
+        "legArrival": "وقت وصول المرحلة",
+        "addLeg": "إضافة مرحلة",
+        "removeLeg": "إزالة المرحلة",
+        "price": "السعر",
+        "currency": "العملة",
+        "currencyPlaceholder": "مثال: USD"
+      },
+      "status": {
+        "ACTIVE": "نشط",
+        "SUSPENDED": "موقوف",
+        "SEASONAL": "موسمي"
+      },
+      "legRole": {
+        "FULL": "كامل",
+        "TECHNICAL_STOP": "توقف فني"
+      },
+      "legsSummary": "{count} مرحلة"
+    },
+    "codeshare": {
+      "title": "الرمز المشترك",
+      "description": "إدارة الهويات التسويقية المرتبطة بالرحلات المشغلة.",
+      "createTitle": "إنشاء رمز مشترك",
+      "editTitle": "تعديل الرمز المشترك",
+      "columns": {
+        "flight": "الرحلة المشغّلة",
+        "marketingAirline": "شركة الطيران المسوِّقة",
+        "marketingNumber": "الرقم التسويقي",
+        "isOperatingCarrier": "الناقل المشغّل"
+      },
+      "fields": {
+        "flightId": "الرحلة المشغّلة",
+        "flightIdPlaceholder": "ابحث بشركة الطيران أو الرقم أو المسار...",
+        "marketingAirline": "شركة الطيران المسوِّقة",
+        "marketingNumber": "الرقم التسويقي",
+        "marketingNumberPlaceholder": "مثال: 5502",
+        "isOperatingCarrier": "هذا هو السجل التسويقي للناقل المشغّل"
+      }
+    },
+    "mctRules": {
+      "title": "قواعد الحد الأدنى لوقت الاتصال",
+      "description": "إدارة قواعد الحد الأدنى لوقت الاتصال، وتُطبَّق من الأكثر تحديدًا إلى الأعم.",
+      "createTitle": "إنشاء قاعدة",
+      "editTitle": "تعديل القاعدة",
+      "resolverTitle": "اختبار المحلل",
+      "resolverDescription": "ابحث عن القاعدة المطبَّقة على اتصال معين.",
+      "resolverButton": "تحليل",
+      "resolverNoMatch": "لا توجد قاعدة مطابقة (NO_MCT_RULE).",
+      "columns": {
+        "arrivalAirport": "مطار الوصول",
+        "departureAirport": "مطار المغادرة",
+        "scope": "النطاق",
+        "arrivalAirline": "شركة طيران الوصول",
+        "departureAirline": "شركة طيران المغادرة",
+        "arrivalTerminal": "صالة الوصول",
+        "departureTerminal": "صالة المغادرة",
+        "mctMinutes": "الحد الأدنى (دقيقة)",
+        "maxConnectionMinutes": "الحد الأقصى (دقيقة)"
+      },
+      "fields": {
+        "arrivalAirport": "مطار الوصول",
+        "departureAirport": "مطار المغادرة",
+        "scope": "النطاق",
+        "arrivalAirline": "شركة طيران الوصول (اختياري)",
+        "departureAirline": "شركة طيران المغادرة (اختياري)",
+        "arrivalTerminal": "صالة الوصول (اختياري)",
+        "departureTerminal": "صالة المغادرة (اختياري)",
+        "mctMinutes": "دقائق الحد الأدنى",
+        "maxConnectionMinutes": "الحد الأقصى لدقائق الاتصال (الافتراضي 1440)"
+      }
+    },
+    "interlineAgreements": {
+      "title": "اتفاقيات النقل المشترك",
+      "description": "إدارة أذونات الاتصال الاتجاهية بين الناقلين وخيار تسجيل الأمتعة المباشر.",
+      "createTitle": "إنشاء اتفاقية نقل مشترك",
+      "resolverTitle": "اختبار المحلل",
+      "resolverDescription": "تحقق مما إذا كان الناقل الوارد يسمح بالاتصال بالناقل الصادر.",
+      "resolverButton": "تحليل",
+      "resolverOnline": "داخلي (نفس الناقل) — مسموح دائمًا.",
+      "resolverPermitted": "مسموح.",
+      "resolverNotPermitted": "غير مسموح.",
+      "columns": {
+        "inboundAirline": "الناقل الوارد",
+        "outboundAirline": "الناقل الصادر",
+        "bagThroughChecked": "تسجيل الأمتعة المباشر"
+      },
+      "fields": {
+        "inboundAirline": "الناقل الوارد",
+        "outboundAirline": "الناقل الصادر",
+        "bagThroughChecked": "يتم تسجيل الأمتعة مباشرة"
+      }
+    },
+    "connections": {
+      "title": "مدقق الاتصال",
+      "description": "تصنيف الفجوة بين الرحلات تمامًا كما تفعل واجهة الحجز.",
+      "pairTab": "اتصال واحد",
+      "chainTab": "سلسلة رحلة",
+      "prevFlight": "الرحلة السابقة",
+      "nextFlight": "الرحلة التالية",
+      "addFlight": "إضافة رحلة",
+      "removeFlight": "إزالة الرحلة",
+      "validateButton": "تحقق",
+      "resultTitle": "النتيجة",
+      "resultKind": "النوع",
+      "resultGap": "الفجوة (دقائق)",
+      "resultSameMetro": "نفس المنطقة الحضرية (بين مطارين)",
+      "resultInterline": "نقل مشترك",
+      "resultBagThrough": "تسجيل الأمتعة المباشر",
+      "resultMctRule": "قاعدة الحد الأدنى المطبَّقة",
+      "resultInterlineAgreement": "اتفاقية النقل المشترك المطبَّقة",
+      "resultReason": "السبب",
+      "kind": {
+        "connection": "اتصال",
+        "stopover": "توقف طويل",
+        "open_jaw": "مسار مفتوح",
+        "transit": "عبور",
+        "invalid": "غير صالح"
+      }
+    }
+  },
+  "flightSearch": {
+    "title": "البحث عن رحلات",
+    "description": "ابحث عن الرحلات حسب المسار والتاريخ، مرتبة حسب السعر.",
+    "originAirport": "من",
+    "destAirport": "إلى",
+    "date": "تاريخ المغادرة",
+    "searchButton": "بحث",
+    "loading": "جارٍ البحث...",
+    "noResults": "لم يتم العثور على رحلات لهذا المسار والتاريخ.",
+    "resultsCount": "تم العثور على {count} رحلة",
+    "aircraft": "الطائرة",
+    "duration": "المدة",
+    "direct": "مباشر",
+    "stopsCount": "{count} توقف",
+    "viaAirports": "عبر {airports}"
+  },
   "errors": {
-    "404": "الصفحة غير موجودة",
     "401": "غير مصرح",
     "403": "محظور",
+    "404": "الصفحة غير موجودة",
     "500": "خطأ في الخادم الداخلي",
     "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     "unauthorizedDescription": "ليس لديك إذن للوصول إلى هذه الصفحة.",

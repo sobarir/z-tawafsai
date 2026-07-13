@@ -15,7 +15,7 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new InterlineAgreementsService(db);
 
-// A pair not in prd/15-seed-data.md's interline table, so tests never collide with seeded rows.
+// A pair not in prd/flights/15-seed-data.md's interline table, so tests never collide with seeded rows.
 const TEST_INBOUND = 'AF';
 const TEST_OUTBOUND = 'QR';
 

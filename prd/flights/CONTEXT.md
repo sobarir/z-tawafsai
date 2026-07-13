@@ -5,10 +5,39 @@
 
 ## Current step
 
-> **Backend v1 complete.** All of Steps 3–8 from `/prd/20-steps.md` are done — the definition of
-> done for v1 (`/prd/00-overview.md` success criteria): **all of S1–S18 in `14-scenarios.md` are
-> green**, plus lint/format/typecheck clean. No further backend step is queued; the next session
-> should pick a new task explicitly rather than assume there's a "next step."
+> **Step 10 (v1.2) — Realistic CGK↔JED/MED Umrah-corridor seed data: done.** Added 9 airports
+> (JED, MED, KUL, DXB, AUH, CAI, BOM, HAK, MCT), 10 airlines (SV, MH, EK, EY, MS, AI, HU, WY, TR,
+> 6E), 180 new `flights` rows across 26 route-patterns (direct GA/SV CGK-JED/CGK-MED, 9 transit
+> hubs, plus a standalone SV JED-MED domestic connector), 8 new `mct_rules`, and 8 new
+> `interline_agreements`, spanning Aug/Sep/Oct 2026 at 2-3 dates/month/route. Routing was
+> researched (WebSearch) against real-world carrier coverage for the corridor rather than
+> fabricated; prices are realistic estimates, not literal future fares. Design decision: MED is
+> only reachable directly or via the 3 hubs whose carrier genuinely flies onward to MED (KUL/MH,
+> DOH/QR, MCT/WY) — confirmed by reading `FlightsService.search()`, which matches a single
+> `flights` row by origin+dest+UTC-day and never chains two flights into one itinerary, so a
+> hub route that doesn't reach MED on its own metal simply isn't seeded as a MED itinerary. The
+> other 6 hubs (SIN, DXB, AUH, CAI, BOM, HAK) reach JED only, plus riders can interline onto the
+> new SV JED-MED connector. Full details and the known HAK/CAI date-alignment limitation:
+> `15-seed-data.md`. Idempotency and live search/`connections/validate` behavior verified against
+> Postgres; all quality gates green.
+>
+> **Step 9 (v1.1) — Flight pricing + OTA-style search: done.** Backend v1 (Steps 3–8, all S1–S18
+> green) was already complete. This step added a single admin-managed, seeded `price`/`currency`
+> per flight (`flights` table columns + `flights.dto/service/controller`), `GET /flights/search`
+> (route + UTC-calendar-day match, `ACTIVE` only, sorted price-ascending — declared before
+> `GET /flights/:id`, same ordering trick as `mct-rules`/`interline-agreements` `resolve`), a public
+> `/search` page reachable by any signed-in user (built under **both** `@admin/search/page.tsx` and
+> `@user/search/page.tsx` — the `(protected)` layout picks its rendered slot purely from the
+> viewer's `dashboard.view:*` permission, not from which slot actually has a matching page, so a
+> page that should be visible to every role must exist in every slot or the other role sees a blank
+> `default.tsx`), and price/currency fields added to the existing admin Flights create/edit forms.
+> Full quality gates green (typecheck/lint/test/`check:dupes`/`check:backbone` across the repo) plus
+> end-to-end verification against live Postgres. No further step is queued; the next session should
+> pick a new task explicitly.
+>
+> **Backend v1 (Steps 3–8) recap:** all done — the definition of done for v1
+> (`00-overview.md` success criteria): **all of S1–S18 in `14-scenarios.md` are green**, plus
+> lint/format/typecheck clean.
 >
 > Step 8 (connection-validation service) added `apps/api/src/connections/`:
 > `ConnectionsService.classify(prevFlightId, nextFlightId)` implements the `13-mct-rules.md` §B
@@ -40,11 +69,19 @@
 
 ## Confirmed decisions (do not re-litigate)
 
-- Scope: **schedule & inventory only** — no booking engine, no fares, no PNR, no seat inventory.
+- Scope: **schedule & inventory, plus (v1.1) read-only price-aware search** — still no booking
+  engine, no PNR, no seat inventory, no payment. See the price/search decision below.
 - Codeshare: **own-metal model only**, no external GDS/NDC in v1.
 - ORM: Drizzle. DB: PostgreSQL 16. API: NestJS. IDs: ULID (`varchar(26)`) for supporting entities,
   natural keys for airports/airlines.
-- Money: **not in scope** (no fares). If any price-like field sneaks in, stop and flag it.
+- Money (**amended 2026-07-13, v1.1**): a **single flat price + currency per flight** is in scope —
+  columns on `flights` (`price numeric(10,2)`, `currency varchar(3)`), admin-managed via the
+  existing Schedule Admin screens, seeded for demo flights, used only for `GET /flights/search`
+  display and price-ascending sort. Originally "not in scope" for v1; the user explicitly asked for
+  OTA-style search with price, this was flagged against the Non-Goals below before being adopted
+  (see `00-overview.md` Goal 7), and the scope stays narrow on purpose: still **no** fare classes,
+  fare construction, dynamic/multi-class pricing, promotions, or payment — if any of those sneak in,
+  stop and flag it again.
 - Data model centers on: **Journey/Segment/Leg + MCT** and **Codeshare (marketing vs operating)**.
 - Interline: **simple carrier-pair gate** (directional agreement exists or not) + a
   `bagThroughChecked` flag on connection results. No fare/segment scope, no effective dates in v1.
@@ -72,6 +109,8 @@
 - [x] Step 7 — MCT rules module (CRUD + most-specific-first resolver)
 - [x] Step 7.5 — Interline-agreements module (carrier-pair gate + directional lookup)
 - [x] Step 8 — Connection-validation service (classify gap + interline gate + bagThroughChecked) — **backend v1 done, all S1-S18 green**
+- [x] Step 9 (v1.1) — Flight pricing + OTA-style search (price/currency columns, `GET /flights/search`, public `/search` page, admin price management)
+- [x] Step 10 (v1.2) — CGK↔JED/MED realistic seed data (26 route-patterns, 9 airports, 10 airlines, 180 flights, 8 MCT rules, 8 interline agreements)
 
 ## Open questions (resolve before the step that needs them)
 
@@ -79,3 +118,6 @@
       **Decision: YES** — required for open-jaw detection and inter-airport MCT. Confirmed in `11-data-model.md`.
 - [ ] Terminal-level MCT granularity in v1, or airport-pair only? **Decision: model the column,
       seed airport-pair rules only; terminal rules optional.** See `13-mct-rules.md`.
+- [ ] v1.2's HAK/CAI seed dates don't always line up with the SV JED-MED connector's dates
+      (known, documented limitation — see `15-seed-data.md`). Not blocking; revisit only if a
+      future step needs every hub's MED itinerary demonstrable end-to-end on the same date.

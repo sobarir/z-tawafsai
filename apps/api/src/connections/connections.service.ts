@@ -11,7 +11,7 @@ const isDomestic = (origin: Airport, dest: Airport): boolean =>
 
 /**
  * Determines the mct_rules scope for a candidate connection, per
- * /prd/13-mct-rules.md §A step 1: domestic/international of the arriving
+ * /prd/flights/13-mct-rules.md §A step 1: domestic/international of the arriving
  * flight's own route, then of the departing flight's own route.
  */
 export function resolveScope(
@@ -41,7 +41,7 @@ export class ConnectionsService {
   ) {}
 
   /**
-   * The classifier from /prd/13-mct-rules.md §B, in order: transit ->
+   * The classifier from /prd/flights/13-mct-rules.md §B, in order: transit ->
    * open_jaw -> interline gate -> gap (NEGATIVE_GAP) -> MCT (NO_MCT_RULE /
    * BELOW_MCT) -> connection/stopover.
    */

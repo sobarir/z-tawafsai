@@ -21,7 +21,10 @@
     "noData": "No hay datos disponibles",
     "toggleTheme": "Cambiar tema",
     "sidebar": "Barra lateral",
-    "toggleSidebar": "Alternar barra lateral"
+    "toggleSidebar": "Alternar barra lateral",
+    "yes": "Sí",
+    "no": "No",
+    "view": "Ver"
   },
   "theme": {
     "light": "Claro",
@@ -36,6 +39,7 @@
     "language": "Idioma",
     "dashboard": "Panel de control",
     "profile": "Perfil",
+    "searchFlights": "Buscar vuelos",
     "logout": "Cerrar sesión",
     "login": "Iniciar sesión",
     "uiComponents": "Componentes UI"
@@ -151,10 +155,255 @@
       "layoutDesc": "Acordeón, carrusel, calendario y plegable."
     }
   },
+  "schedule": {
+    "nav": {
+      "section": "Administración de Itinerarios",
+      "airports": "Aeropuertos",
+      "airlines": "Aerolíneas",
+      "flights": "Vuelos",
+      "codeshare": "Código compartido",
+      "mctRules": "Reglas de TMC",
+      "interlineAgreements": "Acuerdos interlínea",
+      "connections": "Validador de conexiones"
+    },
+    "actions": "Acciones",
+    "openMenu": "Abrir menú",
+    "createButton": "Crear",
+    "searchPlaceholder": "Buscar...",
+    "noResults": "No se encontraron resultados.",
+    "loadingRows": "Cargando...",
+    "pageOf": "Página {current} de {total}",
+    "deleteConfirmTitle": "¿Eliminar este registro?",
+    "deleteConfirmDescription": "Esto eliminará permanentemente \"{name}\". Esta acción no se puede deshacer.",
+    "createSuccess": "Creado correctamente.",
+    "updateSuccess": "Actualizado correctamente.",
+    "deleteSuccess": "Eliminado correctamente.",
+    "noUpdateNotice": "Este registro solo se puede crear o eliminar, no editar.",
+    "airports": {
+      "title": "Aeropuertos",
+      "description": "Administra los datos de referencia de aeropuertos usados en vuelos, reglas de TMC y validación de conexiones.",
+      "createTitle": "Crear aeropuerto",
+      "editTitle": "Editar aeropuerto",
+      "columns": {
+        "airportCode": "Código",
+        "icaoCode": "OACI",
+        "name": "Nombre",
+        "cityCode": "Ciudad",
+        "countryCode": "País",
+        "timezone": "Zona horaria",
+        "coordinates": "Coordenadas"
+      },
+      "fields": {
+        "airportCode": "Código IATA",
+        "airportCodePlaceholder": "p. ej. JFK",
+        "icaoCode": "Código OACI",
+        "icaoCodePlaceholder": "p. ej. KJFK",
+        "name": "Nombre",
+        "namePlaceholder": "p. ej. John F. Kennedy International",
+        "cityCode": "Código de ciudad",
+        "cityCodePlaceholder": "p. ej. NYC",
+        "countryCode": "Código de país",
+        "countryCodePlaceholder": "p. ej. US",
+        "timezone": "Zona horaria",
+        "timezonePlaceholder": "p. ej. America/New_York",
+        "latitude": "Latitud",
+        "longitude": "Longitud"
+      }
+    },
+    "airlines": {
+      "title": "Aerolíneas",
+      "description": "Administra los datos de referencia de aerolíneas operadoras y comercializadoras.",
+      "createTitle": "Crear aerolínea",
+      "editTitle": "Editar aerolínea",
+      "columns": {
+        "airlineCode": "Código",
+        "icaoCode": "OACI",
+        "name": "Nombre",
+        "countryCode": "País"
+      },
+      "fields": {
+        "airlineCode": "Código IATA",
+        "airlineCodePlaceholder": "p. ej. GA",
+        "icaoCode": "Código OACI",
+        "icaoCodePlaceholder": "p. ej. GIA",
+        "name": "Nombre",
+        "namePlaceholder": "p. ej. Garuda Indonesia",
+        "countryCode": "Código de país",
+        "countryCodePlaceholder": "p. ej. ID"
+      }
+    },
+    "flights": {
+      "title": "Vuelos",
+      "description": "Administra los vuelos operados y sus tramos. Los tramos se definen al crear el vuelo y no se pueden editar después.",
+      "createTitle": "Crear vuelo",
+      "editTitle": "Editar vuelo",
+      "viewLegs": "Ver tramos",
+      "columns": {
+        "operatingAirline": "Aerolínea",
+        "flightNumber": "N.º de vuelo",
+        "route": "Ruta",
+        "departureTime": "Salida",
+        "arrivalTime": "Llegada",
+        "aircraftType": "Aeronave",
+        "status": "Estado",
+        "legs": "Tramos",
+        "price": "Precio"
+      },
+      "fields": {
+        "operatingAirline": "Aerolínea operadora",
+        "flightNumber": "Número de vuelo",
+        "flightNumberPlaceholder": "p. ej. 874",
+        "originAirport": "Aeropuerto de origen",
+        "destAirport": "Aeropuerto de destino",
+        "departureTime": "Hora de salida",
+        "arrivalTime": "Hora de llegada",
+        "aircraftType": "Tipo de aeronave",
+        "aircraftTypePlaceholder": "p. ej. B738",
+        "status": "Estado",
+        "multiLeg": "Escala técnica (varios tramos)",
+        "legRole": "Función",
+        "legDepAirport": "Salida del tramo",
+        "legArrAirport": "Llegada del tramo",
+        "legDeparture": "Hora de salida del tramo",
+        "legArrival": "Hora de llegada del tramo",
+        "addLeg": "Añadir tramo",
+        "removeLeg": "Quitar tramo",
+        "price": "Precio",
+        "currency": "Moneda",
+        "currencyPlaceholder": "p. ej. USD"
+      },
+      "status": {
+        "ACTIVE": "Activo",
+        "SUSPENDED": "Suspendido",
+        "SEASONAL": "Estacional"
+      },
+      "legRole": {
+        "FULL": "Completo",
+        "TECHNICAL_STOP": "Escala técnica"
+      },
+      "legsSummary": "{count, plural, one {# tramo} other {# tramos}}"
+    },
+    "codeshare": {
+      "title": "Código compartido",
+      "description": "Administra las identidades comerciales asignadas a los vuelos operados.",
+      "createTitle": "Crear código compartido",
+      "editTitle": "Editar código compartido",
+      "columns": {
+        "flight": "Vuelo operador",
+        "marketingAirline": "Aerolínea comercializadora",
+        "marketingNumber": "N.º comercial",
+        "isOperatingCarrier": "Aerolínea operadora"
+      },
+      "fields": {
+        "flightId": "Vuelo operador",
+        "flightIdPlaceholder": "Buscar por aerolínea, número o ruta...",
+        "marketingAirline": "Aerolínea comercializadora",
+        "marketingNumber": "Número comercial",
+        "marketingNumberPlaceholder": "p. ej. 5502",
+        "isOperatingCarrier": "Esta es la fila comercial de la aerolínea operadora"
+      }
+    },
+    "mctRules": {
+      "title": "Reglas de TMC",
+      "description": "Administra las reglas de tiempo mínimo de conexión, aplicadas de la más específica a la más general.",
+      "createTitle": "Crear regla de TMC",
+      "editTitle": "Editar regla de TMC",
+      "resolverTitle": "Probar el resolutor",
+      "resolverDescription": "Encuentra qué regla aplica a una conexión dada.",
+      "resolverButton": "Resolver",
+      "resolverNoMatch": "No hay ninguna regla coincidente (NO_MCT_RULE).",
+      "columns": {
+        "arrivalAirport": "Aeropuerto de llegada",
+        "departureAirport": "Aeropuerto de salida",
+        "scope": "Ámbito",
+        "arrivalAirline": "Aerolínea de llegada",
+        "departureAirline": "Aerolínea de salida",
+        "arrivalTerminal": "Terminal de llegada",
+        "departureTerminal": "Terminal de salida",
+        "mctMinutes": "TMC (min)",
+        "maxConnectionMinutes": "Máx. (min)"
+      },
+      "fields": {
+        "arrivalAirport": "Aeropuerto de llegada",
+        "departureAirport": "Aeropuerto de salida",
+        "scope": "Ámbito",
+        "arrivalAirline": "Aerolínea de llegada (opcional)",
+        "departureAirline": "Aerolínea de salida (opcional)",
+        "arrivalTerminal": "Terminal de llegada (opcional)",
+        "departureTerminal": "Terminal de salida (opcional)",
+        "mctMinutes": "Minutos de TMC",
+        "maxConnectionMinutes": "Minutos máximos de conexión (por defecto 1440)"
+      }
+    },
+    "interlineAgreements": {
+      "title": "Acuerdos interlínea",
+      "description": "Administra los permisos direccionales de conexión entre aerolíneas y la facturación directa de equipaje.",
+      "createTitle": "Crear acuerdo interlínea",
+      "resolverTitle": "Probar el resolutor",
+      "resolverDescription": "Comprueba si una aerolínea de entrada permite conectar con una aerolínea de salida.",
+      "resolverButton": "Resolver",
+      "resolverOnline": "En línea (misma aerolínea): siempre permitido.",
+      "resolverPermitted": "Permitido.",
+      "resolverNotPermitted": "No permitido.",
+      "columns": {
+        "inboundAirline": "Aerolínea de entrada",
+        "outboundAirline": "Aerolínea de salida",
+        "bagThroughChecked": "Equipaje facturado directo"
+      },
+      "fields": {
+        "inboundAirline": "Aerolínea de entrada",
+        "outboundAirline": "Aerolínea de salida",
+        "bagThroughChecked": "El equipaje se factura de forma directa"
+      }
+    },
+    "connections": {
+      "title": "Validador de conexiones",
+      "description": "Clasifica el intervalo entre vuelos exactamente como lo haría la API de reservas.",
+      "pairTab": "Conexión individual",
+      "chainTab": "Cadena de itinerario",
+      "prevFlight": "Vuelo anterior",
+      "nextFlight": "Vuelo siguiente",
+      "addFlight": "Añadir vuelo",
+      "removeFlight": "Quitar vuelo",
+      "validateButton": "Validar",
+      "resultTitle": "Resultado",
+      "resultKind": "Tipo",
+      "resultGap": "Intervalo (minutos)",
+      "resultSameMetro": "Misma área metropolitana (inter-aeropuerto)",
+      "resultInterline": "Interlínea",
+      "resultBagThrough": "Equipaje facturado directo",
+      "resultMctRule": "Regla de TMC aplicada",
+      "resultInterlineAgreement": "Acuerdo interlínea aplicado",
+      "resultReason": "Motivo",
+      "kind": {
+        "connection": "Conexión",
+        "stopover": "Escala prolongada",
+        "open_jaw": "Trayecto abierto",
+        "transit": "Tránsito",
+        "invalid": "No válido"
+      }
+    }
+  },
+  "flightSearch": {
+    "title": "Buscar vuelos",
+    "description": "Encuentra vuelos por ruta y fecha, ordenados por precio.",
+    "originAirport": "Desde",
+    "destAirport": "Hasta",
+    "date": "Fecha de salida",
+    "searchButton": "Buscar",
+    "loading": "Buscando...",
+    "noResults": "No se encontraron vuelos para esta ruta y fecha.",
+    "resultsCount": "{count, plural, one {# vuelo encontrado} other {# vuelos encontrados}}",
+    "aircraft": "Aeronave",
+    "duration": "Duración",
+    "direct": "Directo",
+    "stopsCount": "{count, plural, one {# escala} other {# escalas}}",
+    "viaAirports": "vía {airports}"
+  },
   "errors": {
-    "404": "Página no encontrada",
     "401": "No autorizado",
     "403": "Prohibido",
+    "404": "Página no encontrada",
     "500": "Error interno del servidor",
     "generic": "Algo salió mal. Por favor intente de nuevo.",
     "unauthorizedDescription": "No tienes permiso para acceder a esta página.",

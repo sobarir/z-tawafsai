@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
@@ -16,7 +17,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Flight } from '@repo/shared';
-import { CreateFlightDto, FlightDto, UpdateFlightDto } from './flights.dto';
+import {
+  CreateFlightDto,
+  FlightDto,
+  SearchFlightsDto,
+  UpdateFlightDto,
+} from './flights.dto';
 import { FlightsService } from './flights.service';
 
 @ApiTags('flights')
@@ -29,6 +35,19 @@ export class FlightsController {
   @ApiOkResponse({ type: [FlightDto] })
   list(): Promise<Flight[]> {
     return this.flights.list();
+  }
+
+  @Get('search')
+  @ApiOperation({
+    operationId: 'searchFlights',
+    summary: 'OTA-style flight search by route and date, sorted by price',
+  })
+  @ApiOkResponse({ type: [FlightDto] })
+  search(
+    // Validated by the global ZodValidationPipe against searchFlightsQuerySchema
+    @Query() query: SearchFlightsDto,
+  ): Promise<Flight[]> {
+    return this.flights.search(query);
   }
 
   @Get(':id')

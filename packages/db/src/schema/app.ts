@@ -36,7 +36,7 @@ export const post = pgTable('post', {
     .notNull(),
 });
 
-// Flight schedule & inventory domain — see /prd/11-data-model.md for the full spec.
+// Flight schedule & inventory domain — see /prd/flights/11-data-model.md for the full spec.
 
 export const mctScope = pgEnum('mct_scope', ['DD', 'DI', 'ID', 'II']);
 export const legRole = pgEnum('leg_role', ['FULL', 'TECHNICAL_STOP']);
@@ -104,6 +104,12 @@ export const flights = pgTable(
     arrivalTime: timestamp('arrival_time', { withTimezone: true }).notNull(),
     aircraftType: varchar('aircraft_type', { length: 10 }),
     status: flightStatus('status').notNull().default('ACTIVE'),
+    // Flat, admin-managed price for OTA-style search display/sorting — not a
+    // fare class or fare construction; see /prd/flights/00-overview.md Goal 7.
+    price: numeric('price', { precision: 10, scale: 2, mode: 'number' })
+      .notNull()
+      .default(0),
+    currency: varchar('currency', { length: 3 }).notNull().default('USD'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -127,6 +133,7 @@ export const flights = pgTable(
       'flights_arrival_after_departure',
       sql`${table.arrivalTime} > ${table.departureTime}`,
     ),
+    check('flights_price_non_negative', sql`${table.price} >= 0`),
   ],
 );
 

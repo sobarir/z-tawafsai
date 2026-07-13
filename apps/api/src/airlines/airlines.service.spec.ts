@@ -11,7 +11,7 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new AirlinesService(db);
 
-// A code not used by prd/15-seed-data.md, so tests never collide with seeded rows.
+// A code not used by prd/flights/15-seed-data.md, so tests never collide with seeded rows.
 const TEST_CODE = 'ZZ';
 
 async function cleanup() {

@@ -24,6 +24,10 @@ export interface CreateFlightDto {
   /** @maxLength 10 */
   aircraftType?: string;
   status?: CreateFlightDtoStatus;
+  /** @minimum 0 */
+  price: number;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
   /** @minItems 2 */
   legs?: CreateFlightDtoLegsItem[];
 }

@@ -46,6 +46,7 @@ import type {
   PostDto,
   ResolveInterlineParams,
   ResolveMctRuleParams,
+  SearchFlightsParams,
   UpdateAirlineDto,
   UpdateAirportDto,
   UpdateFlightDto,
@@ -60,18 +61,6 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type appControllerHealthResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type appControllerHealthResponseSuccess = (appControllerHealthResponse200) & {
-  headers: Headers;
-};
-;
-
-export type appControllerHealthResponse = (appControllerHealthResponseSuccess)
-
 export const getAppControllerHealthUrl = () => {
 
 
@@ -80,9 +69,9 @@ export const getAppControllerHealthUrl = () => {
   return `/health`
 }
 
-export const appControllerHealth = async ( options?: RequestInit): Promise<appControllerHealthResponse> => {
+export const appControllerHealth = async ( options?: RequestInit): Promise<void> => {
   
-  return customFetch<appControllerHealthResponse>(getAppControllerHealthUrl(),
+  return customFetch<void>(getAppControllerHealthUrl(),
   {      
     ...options,
     method: 'GET'
@@ -170,18 +159,6 @@ export function useAppControllerHealth<TData = Awaited<ReturnType<typeof appCont
 /**
  * @summary The authenticated user
  */
-export type getMeResponse200 = {
-  data: MeResponseDto
-  status: 200
-}
-    
-export type getMeResponseSuccess = (getMeResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getMeResponse = (getMeResponseSuccess)
-
 export const getGetMeUrl = () => {
 
 
@@ -190,9 +167,9 @@ export const getGetMeUrl = () => {
   return `/api/users/me`
 }
 
-export const getMe = async ( options?: RequestInit): Promise<getMeResponse> => {
+export const getMe = async ( options?: RequestInit): Promise<MeResponseDto> => {
   
-  return customFetch<getMeResponse>(getGetMeUrl(),
+  return customFetch<MeResponseDto>(getGetMeUrl(),
   {      
     ...options,
     method: 'GET'
@@ -283,18 +260,6 @@ export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = unk
 /**
  * @summary List the authenticated user's posts
  */
-export type listPostsResponse200 = {
-  data: PostDto[]
-  status: 200
-}
-    
-export type listPostsResponseSuccess = (listPostsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listPostsResponse = (listPostsResponseSuccess)
-
 export const getListPostsUrl = () => {
 
 
@@ -303,9 +268,9 @@ export const getListPostsUrl = () => {
   return `/api/posts`
 }
 
-export const listPosts = async ( options?: RequestInit): Promise<listPostsResponse> => {
+export const listPosts = async ( options?: RequestInit): Promise<PostDto[]> => {
   
-  return customFetch<listPostsResponse>(getListPostsUrl(),
+  return customFetch<PostDto[]>(getListPostsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -396,18 +361,6 @@ export function useListPosts<TData = Awaited<ReturnType<typeof listPosts>>, TErr
 /**
  * @summary Create a post
  */
-export type createPostResponse201 = {
-  data: PostDto
-  status: 201
-}
-    
-export type createPostResponseSuccess = (createPostResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createPostResponse = (createPostResponseSuccess)
-
 export const getCreatePostUrl = () => {
 
 
@@ -416,9 +369,9 @@ export const getCreatePostUrl = () => {
   return `/api/posts`
 }
 
-export const createPost = async (createPostDto: CreatePostDto, options?: RequestInit): Promise<createPostResponse> => {
+export const createPost = async (createPostDto: CreatePostDto, options?: RequestInit): Promise<PostDto> => {
   
-  return customFetch<createPostResponse>(getCreatePostUrl(),
+  return customFetch<PostDto>(getCreatePostUrl(),
   {      
     ...options,
     method: 'POST',
@@ -480,18 +433,6 @@ export const useCreatePost = <TError = unknown,
 /**
  * @summary List airports
  */
-export type listAirportsResponse200 = {
-  data: AirportDto[]
-  status: 200
-}
-    
-export type listAirportsResponseSuccess = (listAirportsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listAirportsResponse = (listAirportsResponseSuccess)
-
 export const getListAirportsUrl = () => {
 
 
@@ -500,9 +441,9 @@ export const getListAirportsUrl = () => {
   return `/api/airports`
 }
 
-export const listAirports = async ( options?: RequestInit): Promise<listAirportsResponse> => {
+export const listAirports = async ( options?: RequestInit): Promise<AirportDto[]> => {
   
-  return customFetch<listAirportsResponse>(getListAirportsUrl(),
+  return customFetch<AirportDto[]>(getListAirportsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -593,18 +534,6 @@ export function useListAirports<TData = Awaited<ReturnType<typeof listAirports>>
 /**
  * @summary Create an airport
  */
-export type createAirportResponse201 = {
-  data: AirportDto
-  status: 201
-}
-    
-export type createAirportResponseSuccess = (createAirportResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createAirportResponse = (createAirportResponseSuccess)
-
 export const getCreateAirportUrl = () => {
 
 
@@ -613,9 +542,9 @@ export const getCreateAirportUrl = () => {
   return `/api/airports`
 }
 
-export const createAirport = async (createAirportDto: CreateAirportDto, options?: RequestInit): Promise<createAirportResponse> => {
+export const createAirport = async (createAirportDto: CreateAirportDto, options?: RequestInit): Promise<AirportDto> => {
   
-  return customFetch<createAirportResponse>(getCreateAirportUrl(),
+  return customFetch<AirportDto>(getCreateAirportUrl(),
   {      
     ...options,
     method: 'POST',
@@ -677,18 +606,6 @@ export const useCreateAirport = <TError = unknown,
 /**
  * @summary Get an airport
  */
-export type getAirportResponse200 = {
-  data: AirportDto
-  status: 200
-}
-    
-export type getAirportResponseSuccess = (getAirportResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getAirportResponse = (getAirportResponseSuccess)
-
 export const getGetAirportUrl = (code: string,) => {
 
 
@@ -697,9 +614,9 @@ export const getGetAirportUrl = (code: string,) => {
   return `/api/airports/${code}`
 }
 
-export const getAirport = async (code: string, options?: RequestInit): Promise<getAirportResponse> => {
+export const getAirport = async (code: string, options?: RequestInit): Promise<AirportDto> => {
   
-  return customFetch<getAirportResponse>(getGetAirportUrl(code),
+  return customFetch<AirportDto>(getGetAirportUrl(code),
   {      
     ...options,
     method: 'GET'
@@ -790,18 +707,6 @@ export function useGetAirport<TData = Awaited<ReturnType<typeof getAirport>>, TE
 /**
  * @summary Update an airport
  */
-export type updateAirportResponse200 = {
-  data: AirportDto
-  status: 200
-}
-    
-export type updateAirportResponseSuccess = (updateAirportResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateAirportResponse = (updateAirportResponseSuccess)
-
 export const getUpdateAirportUrl = (code: string,) => {
 
 
@@ -811,9 +716,9 @@ export const getUpdateAirportUrl = (code: string,) => {
 }
 
 export const updateAirport = async (code: string,
-    updateAirportDto: UpdateAirportDto, options?: RequestInit): Promise<updateAirportResponse> => {
+    updateAirportDto: UpdateAirportDto, options?: RequestInit): Promise<AirportDto> => {
   
-  return customFetch<updateAirportResponse>(getUpdateAirportUrl(code),
+  return customFetch<AirportDto>(getUpdateAirportUrl(code),
   {      
     ...options,
     method: 'PATCH',
@@ -875,18 +780,6 @@ export const useUpdateAirport = <TError = unknown,
 /**
  * @summary Delete an airport
  */
-export type deleteAirportResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteAirportResponseSuccess = (deleteAirportResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteAirportResponse = (deleteAirportResponseSuccess)
-
 export const getDeleteAirportUrl = (code: string,) => {
 
 
@@ -895,9 +788,9 @@ export const getDeleteAirportUrl = (code: string,) => {
   return `/api/airports/${code}`
 }
 
-export const deleteAirport = async (code: string, options?: RequestInit): Promise<deleteAirportResponse> => {
+export const deleteAirport = async (code: string, options?: RequestInit): Promise<void> => {
   
-  return customFetch<deleteAirportResponse>(getDeleteAirportUrl(code),
+  return customFetch<void>(getDeleteAirportUrl(code),
   {      
     ...options,
     method: 'DELETE'
@@ -958,18 +851,6 @@ export const useDeleteAirport = <TError = unknown,
 /**
  * @summary List airlines
  */
-export type listAirlinesResponse200 = {
-  data: AirlineDto[]
-  status: 200
-}
-    
-export type listAirlinesResponseSuccess = (listAirlinesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listAirlinesResponse = (listAirlinesResponseSuccess)
-
 export const getListAirlinesUrl = () => {
 
 
@@ -978,9 +859,9 @@ export const getListAirlinesUrl = () => {
   return `/api/airlines`
 }
 
-export const listAirlines = async ( options?: RequestInit): Promise<listAirlinesResponse> => {
+export const listAirlines = async ( options?: RequestInit): Promise<AirlineDto[]> => {
   
-  return customFetch<listAirlinesResponse>(getListAirlinesUrl(),
+  return customFetch<AirlineDto[]>(getListAirlinesUrl(),
   {      
     ...options,
     method: 'GET'
@@ -1071,18 +952,6 @@ export function useListAirlines<TData = Awaited<ReturnType<typeof listAirlines>>
 /**
  * @summary Create an airline
  */
-export type createAirlineResponse201 = {
-  data: AirlineDto
-  status: 201
-}
-    
-export type createAirlineResponseSuccess = (createAirlineResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createAirlineResponse = (createAirlineResponseSuccess)
-
 export const getCreateAirlineUrl = () => {
 
 
@@ -1091,9 +960,9 @@ export const getCreateAirlineUrl = () => {
   return `/api/airlines`
 }
 
-export const createAirline = async (createAirlineDto: CreateAirlineDto, options?: RequestInit): Promise<createAirlineResponse> => {
+export const createAirline = async (createAirlineDto: CreateAirlineDto, options?: RequestInit): Promise<AirlineDto> => {
   
-  return customFetch<createAirlineResponse>(getCreateAirlineUrl(),
+  return customFetch<AirlineDto>(getCreateAirlineUrl(),
   {      
     ...options,
     method: 'POST',
@@ -1155,18 +1024,6 @@ export const useCreateAirline = <TError = unknown,
 /**
  * @summary Get an airline
  */
-export type getAirlineResponse200 = {
-  data: AirlineDto
-  status: 200
-}
-    
-export type getAirlineResponseSuccess = (getAirlineResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getAirlineResponse = (getAirlineResponseSuccess)
-
 export const getGetAirlineUrl = (code: string,) => {
 
 
@@ -1175,9 +1032,9 @@ export const getGetAirlineUrl = (code: string,) => {
   return `/api/airlines/${code}`
 }
 
-export const getAirline = async (code: string, options?: RequestInit): Promise<getAirlineResponse> => {
+export const getAirline = async (code: string, options?: RequestInit): Promise<AirlineDto> => {
   
-  return customFetch<getAirlineResponse>(getGetAirlineUrl(code),
+  return customFetch<AirlineDto>(getGetAirlineUrl(code),
   {      
     ...options,
     method: 'GET'
@@ -1268,18 +1125,6 @@ export function useGetAirline<TData = Awaited<ReturnType<typeof getAirline>>, TE
 /**
  * @summary Update an airline
  */
-export type updateAirlineResponse200 = {
-  data: AirlineDto
-  status: 200
-}
-    
-export type updateAirlineResponseSuccess = (updateAirlineResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateAirlineResponse = (updateAirlineResponseSuccess)
-
 export const getUpdateAirlineUrl = (code: string,) => {
 
 
@@ -1289,9 +1134,9 @@ export const getUpdateAirlineUrl = (code: string,) => {
 }
 
 export const updateAirline = async (code: string,
-    updateAirlineDto: UpdateAirlineDto, options?: RequestInit): Promise<updateAirlineResponse> => {
+    updateAirlineDto: UpdateAirlineDto, options?: RequestInit): Promise<AirlineDto> => {
   
-  return customFetch<updateAirlineResponse>(getUpdateAirlineUrl(code),
+  return customFetch<AirlineDto>(getUpdateAirlineUrl(code),
   {      
     ...options,
     method: 'PATCH',
@@ -1353,18 +1198,6 @@ export const useUpdateAirline = <TError = unknown,
 /**
  * @summary Delete an airline
  */
-export type deleteAirlineResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteAirlineResponseSuccess = (deleteAirlineResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteAirlineResponse = (deleteAirlineResponseSuccess)
-
 export const getDeleteAirlineUrl = (code: string,) => {
 
 
@@ -1373,9 +1206,9 @@ export const getDeleteAirlineUrl = (code: string,) => {
   return `/api/airlines/${code}`
 }
 
-export const deleteAirline = async (code: string, options?: RequestInit): Promise<deleteAirlineResponse> => {
+export const deleteAirline = async (code: string, options?: RequestInit): Promise<void> => {
   
-  return customFetch<deleteAirlineResponse>(getDeleteAirlineUrl(code),
+  return customFetch<void>(getDeleteAirlineUrl(code),
   {      
     ...options,
     method: 'DELETE'
@@ -1436,18 +1269,6 @@ export const useDeleteAirline = <TError = unknown,
 /**
  * @summary List flights
  */
-export type listFlightsResponse200 = {
-  data: FlightDto[]
-  status: 200
-}
-    
-export type listFlightsResponseSuccess = (listFlightsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listFlightsResponse = (listFlightsResponseSuccess)
-
 export const getListFlightsUrl = () => {
 
 
@@ -1456,9 +1277,9 @@ export const getListFlightsUrl = () => {
   return `/api/flights`
 }
 
-export const listFlights = async ( options?: RequestInit): Promise<listFlightsResponse> => {
+export const listFlights = async ( options?: RequestInit): Promise<FlightDto[]> => {
   
-  return customFetch<listFlightsResponse>(getListFlightsUrl(),
+  return customFetch<FlightDto[]>(getListFlightsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -1549,18 +1370,6 @@ export function useListFlights<TData = Awaited<ReturnType<typeof listFlights>>, 
 /**
  * @summary Create a flight
  */
-export type createFlightResponse201 = {
-  data: FlightDto
-  status: 201
-}
-    
-export type createFlightResponseSuccess = (createFlightResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createFlightResponse = (createFlightResponseSuccess)
-
 export const getCreateFlightUrl = () => {
 
 
@@ -1569,9 +1378,9 @@ export const getCreateFlightUrl = () => {
   return `/api/flights`
 }
 
-export const createFlight = async (createFlightDto: CreateFlightDto, options?: RequestInit): Promise<createFlightResponse> => {
+export const createFlight = async (createFlightDto: CreateFlightDto, options?: RequestInit): Promise<FlightDto> => {
   
-  return customFetch<createFlightResponse>(getCreateFlightUrl(),
+  return customFetch<FlightDto>(getCreateFlightUrl(),
   {      
     ...options,
     method: 'POST',
@@ -1631,20 +1440,116 @@ export const useCreateFlight = <TError = unknown,
     }
     
 /**
+ * @summary OTA-style flight search by route and date, sorted by price
+ */
+export const getSearchFlightsUrl = (params: SearchFlightsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/flights/search?${stringifiedParams}` : `/api/flights/search`
+}
+
+export const searchFlights = async (params: SearchFlightsParams, options?: RequestInit): Promise<FlightDto[]> => {
+  
+  return customFetch<FlightDto[]>(getSearchFlightsUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getSearchFlightsQueryKey = (params?: SearchFlightsParams,) => {
+    return [
+    `/api/flights/search`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getSearchFlightsQueryOptions = <TData = Awaited<ReturnType<typeof searchFlights>>, TError = unknown>(params: SearchFlightsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchFlights>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchFlightsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchFlights>>> = ({ signal }) => searchFlights(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchFlights>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SearchFlightsQueryResult = NonNullable<Awaited<ReturnType<typeof searchFlights>>>
+export type SearchFlightsQueryError = unknown
+
+
+export function useSearchFlights<TData = Awaited<ReturnType<typeof searchFlights>>, TError = unknown>(
+ params: SearchFlightsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchFlights>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchFlights>>,
+          TError,
+          Awaited<ReturnType<typeof searchFlights>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchFlights<TData = Awaited<ReturnType<typeof searchFlights>>, TError = unknown>(
+ params: SearchFlightsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchFlights>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchFlights>>,
+          TError,
+          Awaited<ReturnType<typeof searchFlights>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchFlights<TData = Awaited<ReturnType<typeof searchFlights>>, TError = unknown>(
+ params: SearchFlightsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchFlights>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary OTA-style flight search by route and date, sorted by price
+ */
+
+export function useSearchFlights<TData = Awaited<ReturnType<typeof searchFlights>>, TError = unknown>(
+ params: SearchFlightsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchFlights>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSearchFlightsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
  * @summary Get a flight
  */
-export type getFlightResponse200 = {
-  data: FlightDto
-  status: 200
-}
-    
-export type getFlightResponseSuccess = (getFlightResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getFlightResponse = (getFlightResponseSuccess)
-
 export const getGetFlightUrl = (id: string,) => {
 
 
@@ -1653,9 +1558,9 @@ export const getGetFlightUrl = (id: string,) => {
   return `/api/flights/${id}`
 }
 
-export const getFlight = async (id: string, options?: RequestInit): Promise<getFlightResponse> => {
+export const getFlight = async (id: string, options?: RequestInit): Promise<FlightDto> => {
   
-  return customFetch<getFlightResponse>(getGetFlightUrl(id),
+  return customFetch<FlightDto>(getGetFlightUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -1746,18 +1651,6 @@ export function useGetFlight<TData = Awaited<ReturnType<typeof getFlight>>, TErr
 /**
  * @summary Update a flight
  */
-export type updateFlightResponse200 = {
-  data: FlightDto
-  status: 200
-}
-    
-export type updateFlightResponseSuccess = (updateFlightResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateFlightResponse = (updateFlightResponseSuccess)
-
 export const getUpdateFlightUrl = (id: string,) => {
 
 
@@ -1767,9 +1660,9 @@ export const getUpdateFlightUrl = (id: string,) => {
 }
 
 export const updateFlight = async (id: string,
-    updateFlightDto: UpdateFlightDto, options?: RequestInit): Promise<updateFlightResponse> => {
+    updateFlightDto: UpdateFlightDto, options?: RequestInit): Promise<FlightDto> => {
   
-  return customFetch<updateFlightResponse>(getUpdateFlightUrl(id),
+  return customFetch<FlightDto>(getUpdateFlightUrl(id),
   {      
     ...options,
     method: 'PATCH',
@@ -1831,18 +1724,6 @@ export const useUpdateFlight = <TError = unknown,
 /**
  * @summary Delete a flight
  */
-export type deleteFlightResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteFlightResponseSuccess = (deleteFlightResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteFlightResponse = (deleteFlightResponseSuccess)
-
 export const getDeleteFlightUrl = (id: string,) => {
 
 
@@ -1851,9 +1732,9 @@ export const getDeleteFlightUrl = (id: string,) => {
   return `/api/flights/${id}`
 }
 
-export const deleteFlight = async (id: string, options?: RequestInit): Promise<deleteFlightResponse> => {
+export const deleteFlight = async (id: string, options?: RequestInit): Promise<void> => {
   
-  return customFetch<deleteFlightResponse>(getDeleteFlightUrl(id),
+  return customFetch<void>(getDeleteFlightUrl(id),
   {      
     ...options,
     method: 'DELETE'
@@ -1914,18 +1795,6 @@ export const useDeleteFlight = <TError = unknown,
 /**
  * @summary List marketing flights
  */
-export type listFlightMarketingResponse200 = {
-  data: FlightMarketingDto[]
-  status: 200
-}
-    
-export type listFlightMarketingResponseSuccess = (listFlightMarketingResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listFlightMarketingResponse = (listFlightMarketingResponseSuccess)
-
 export const getListFlightMarketingUrl = (params?: ListFlightMarketingParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -1941,9 +1810,9 @@ export const getListFlightMarketingUrl = (params?: ListFlightMarketingParams,) =
   return stringifiedParams.length > 0 ? `/api/flight-marketing?${stringifiedParams}` : `/api/flight-marketing`
 }
 
-export const listFlightMarketing = async (params?: ListFlightMarketingParams, options?: RequestInit): Promise<listFlightMarketingResponse> => {
+export const listFlightMarketing = async (params?: ListFlightMarketingParams, options?: RequestInit): Promise<FlightMarketingDto[]> => {
   
-  return customFetch<listFlightMarketingResponse>(getListFlightMarketingUrl(params),
+  return customFetch<FlightMarketingDto[]>(getListFlightMarketingUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -2034,18 +1903,6 @@ export function useListFlightMarketing<TData = Awaited<ReturnType<typeof listFli
 /**
  * @summary Create a marketing flight
  */
-export type createFlightMarketingResponse201 = {
-  data: FlightMarketingDto
-  status: 201
-}
-    
-export type createFlightMarketingResponseSuccess = (createFlightMarketingResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createFlightMarketingResponse = (createFlightMarketingResponseSuccess)
-
 export const getCreateFlightMarketingUrl = () => {
 
 
@@ -2054,9 +1911,9 @@ export const getCreateFlightMarketingUrl = () => {
   return `/api/flight-marketing`
 }
 
-export const createFlightMarketing = async (createFlightMarketingDto: CreateFlightMarketingDto, options?: RequestInit): Promise<createFlightMarketingResponse> => {
+export const createFlightMarketing = async (createFlightMarketingDto: CreateFlightMarketingDto, options?: RequestInit): Promise<FlightMarketingDto> => {
   
-  return customFetch<createFlightMarketingResponse>(getCreateFlightMarketingUrl(),
+  return customFetch<FlightMarketingDto>(getCreateFlightMarketingUrl(),
   {      
     ...options,
     method: 'POST',
@@ -2118,18 +1975,6 @@ export const useCreateFlightMarketing = <TError = unknown,
 /**
  * @summary Resolve a marketing flight to its operating flight
  */
-export type getOperatingFlightByMarketingResponse200 = {
-  data: FlightDto
-  status: 200
-}
-    
-export type getOperatingFlightByMarketingResponseSuccess = (getOperatingFlightByMarketingResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getOperatingFlightByMarketingResponse = (getOperatingFlightByMarketingResponseSuccess)
-
 export const getGetOperatingFlightByMarketingUrl = (params: GetOperatingFlightByMarketingParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -2145,9 +1990,9 @@ export const getGetOperatingFlightByMarketingUrl = (params: GetOperatingFlightBy
   return stringifiedParams.length > 0 ? `/api/flight-marketing/resolve?${stringifiedParams}` : `/api/flight-marketing/resolve`
 }
 
-export const getOperatingFlightByMarketing = async (params: GetOperatingFlightByMarketingParams, options?: RequestInit): Promise<getOperatingFlightByMarketingResponse> => {
+export const getOperatingFlightByMarketing = async (params: GetOperatingFlightByMarketingParams, options?: RequestInit): Promise<FlightDto> => {
   
-  return customFetch<getOperatingFlightByMarketingResponse>(getGetOperatingFlightByMarketingUrl(params),
+  return customFetch<FlightDto>(getGetOperatingFlightByMarketingUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -2238,18 +2083,6 @@ export function useGetOperatingFlightByMarketing<TData = Awaited<ReturnType<type
 /**
  * @summary Get a marketing flight
  */
-export type getFlightMarketingResponse200 = {
-  data: FlightMarketingDto
-  status: 200
-}
-    
-export type getFlightMarketingResponseSuccess = (getFlightMarketingResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getFlightMarketingResponse = (getFlightMarketingResponseSuccess)
-
 export const getGetFlightMarketingUrl = (id: string,) => {
 
 
@@ -2258,9 +2091,9 @@ export const getGetFlightMarketingUrl = (id: string,) => {
   return `/api/flight-marketing/${id}`
 }
 
-export const getFlightMarketing = async (id: string, options?: RequestInit): Promise<getFlightMarketingResponse> => {
+export const getFlightMarketing = async (id: string, options?: RequestInit): Promise<FlightMarketingDto> => {
   
-  return customFetch<getFlightMarketingResponse>(getGetFlightMarketingUrl(id),
+  return customFetch<FlightMarketingDto>(getGetFlightMarketingUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -2351,18 +2184,6 @@ export function useGetFlightMarketing<TData = Awaited<ReturnType<typeof getFligh
 /**
  * @summary Update a marketing flight
  */
-export type updateFlightMarketingResponse200 = {
-  data: FlightMarketingDto
-  status: 200
-}
-    
-export type updateFlightMarketingResponseSuccess = (updateFlightMarketingResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateFlightMarketingResponse = (updateFlightMarketingResponseSuccess)
-
 export const getUpdateFlightMarketingUrl = (id: string,) => {
 
 
@@ -2372,9 +2193,9 @@ export const getUpdateFlightMarketingUrl = (id: string,) => {
 }
 
 export const updateFlightMarketing = async (id: string,
-    updateFlightMarketingDto: UpdateFlightMarketingDto, options?: RequestInit): Promise<updateFlightMarketingResponse> => {
+    updateFlightMarketingDto: UpdateFlightMarketingDto, options?: RequestInit): Promise<FlightMarketingDto> => {
   
-  return customFetch<updateFlightMarketingResponse>(getUpdateFlightMarketingUrl(id),
+  return customFetch<FlightMarketingDto>(getUpdateFlightMarketingUrl(id),
   {      
     ...options,
     method: 'PATCH',
@@ -2436,18 +2257,6 @@ export const useUpdateFlightMarketing = <TError = unknown,
 /**
  * @summary Delete a marketing flight
  */
-export type deleteFlightMarketingResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteFlightMarketingResponseSuccess = (deleteFlightMarketingResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteFlightMarketingResponse = (deleteFlightMarketingResponseSuccess)
-
 export const getDeleteFlightMarketingUrl = (id: string,) => {
 
 
@@ -2456,9 +2265,9 @@ export const getDeleteFlightMarketingUrl = (id: string,) => {
   return `/api/flight-marketing/${id}`
 }
 
-export const deleteFlightMarketing = async (id: string, options?: RequestInit): Promise<deleteFlightMarketingResponse> => {
+export const deleteFlightMarketing = async (id: string, options?: RequestInit): Promise<void> => {
   
-  return customFetch<deleteFlightMarketingResponse>(getDeleteFlightMarketingUrl(id),
+  return customFetch<void>(getDeleteFlightMarketingUrl(id),
   {      
     ...options,
     method: 'DELETE'
@@ -2519,18 +2328,6 @@ export const useDeleteFlightMarketing = <TError = unknown,
 /**
  * @summary List MCT rules
  */
-export type listMctRulesResponse200 = {
-  data: MctRuleDto[]
-  status: 200
-}
-    
-export type listMctRulesResponseSuccess = (listMctRulesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listMctRulesResponse = (listMctRulesResponseSuccess)
-
 export const getListMctRulesUrl = () => {
 
 
@@ -2539,9 +2336,9 @@ export const getListMctRulesUrl = () => {
   return `/api/mct-rules`
 }
 
-export const listMctRules = async ( options?: RequestInit): Promise<listMctRulesResponse> => {
+export const listMctRules = async ( options?: RequestInit): Promise<MctRuleDto[]> => {
   
-  return customFetch<listMctRulesResponse>(getListMctRulesUrl(),
+  return customFetch<MctRuleDto[]>(getListMctRulesUrl(),
   {      
     ...options,
     method: 'GET'
@@ -2632,18 +2429,6 @@ export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>
 /**
  * @summary Create an MCT rule
  */
-export type createMctRuleResponse201 = {
-  data: MctRuleDto
-  status: 201
-}
-    
-export type createMctRuleResponseSuccess = (createMctRuleResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createMctRuleResponse = (createMctRuleResponseSuccess)
-
 export const getCreateMctRuleUrl = () => {
 
 
@@ -2652,9 +2437,9 @@ export const getCreateMctRuleUrl = () => {
   return `/api/mct-rules`
 }
 
-export const createMctRule = async (createMctRuleDto: CreateMctRuleDto, options?: RequestInit): Promise<createMctRuleResponse> => {
+export const createMctRule = async (createMctRuleDto: CreateMctRuleDto, options?: RequestInit): Promise<MctRuleDto> => {
   
-  return customFetch<createMctRuleResponse>(getCreateMctRuleUrl(),
+  return customFetch<MctRuleDto>(getCreateMctRuleUrl(),
   {      
     ...options,
     method: 'POST',
@@ -2716,18 +2501,6 @@ export const useCreateMctRule = <TError = unknown,
 /**
  * @summary Resolve the most-specific matching MCT rule
  */
-export type resolveMctRuleResponse200 = {
-  data: MctRuleDto
-  status: 200
-}
-    
-export type resolveMctRuleResponseSuccess = (resolveMctRuleResponse200) & {
-  headers: Headers;
-};
-;
-
-export type resolveMctRuleResponse = (resolveMctRuleResponseSuccess)
-
 export const getResolveMctRuleUrl = (params: ResolveMctRuleParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -2743,9 +2516,9 @@ export const getResolveMctRuleUrl = (params: ResolveMctRuleParams,) => {
   return stringifiedParams.length > 0 ? `/api/mct-rules/resolve?${stringifiedParams}` : `/api/mct-rules/resolve`
 }
 
-export const resolveMctRule = async (params: ResolveMctRuleParams, options?: RequestInit): Promise<resolveMctRuleResponse> => {
+export const resolveMctRule = async (params: ResolveMctRuleParams, options?: RequestInit): Promise<MctRuleDto> => {
   
-  return customFetch<resolveMctRuleResponse>(getResolveMctRuleUrl(params),
+  return customFetch<MctRuleDto>(getResolveMctRuleUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -2836,18 +2609,6 @@ export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRu
 /**
  * @summary Get an MCT rule
  */
-export type getMctRuleResponse200 = {
-  data: MctRuleDto
-  status: 200
-}
-    
-export type getMctRuleResponseSuccess = (getMctRuleResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getMctRuleResponse = (getMctRuleResponseSuccess)
-
 export const getGetMctRuleUrl = (id: string,) => {
 
 
@@ -2856,9 +2617,9 @@ export const getGetMctRuleUrl = (id: string,) => {
   return `/api/mct-rules/${id}`
 }
 
-export const getMctRule = async (id: string, options?: RequestInit): Promise<getMctRuleResponse> => {
+export const getMctRule = async (id: string, options?: RequestInit): Promise<MctRuleDto> => {
   
-  return customFetch<getMctRuleResponse>(getGetMctRuleUrl(id),
+  return customFetch<MctRuleDto>(getGetMctRuleUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -2949,18 +2710,6 @@ export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TE
 /**
  * @summary Update an MCT rule
  */
-export type updateMctRuleResponse200 = {
-  data: MctRuleDto
-  status: 200
-}
-    
-export type updateMctRuleResponseSuccess = (updateMctRuleResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateMctRuleResponse = (updateMctRuleResponseSuccess)
-
 export const getUpdateMctRuleUrl = (id: string,) => {
 
 
@@ -2970,9 +2719,9 @@ export const getUpdateMctRuleUrl = (id: string,) => {
 }
 
 export const updateMctRule = async (id: string,
-    updateMctRuleDto: UpdateMctRuleDto, options?: RequestInit): Promise<updateMctRuleResponse> => {
+    updateMctRuleDto: UpdateMctRuleDto, options?: RequestInit): Promise<MctRuleDto> => {
   
-  return customFetch<updateMctRuleResponse>(getUpdateMctRuleUrl(id),
+  return customFetch<MctRuleDto>(getUpdateMctRuleUrl(id),
   {      
     ...options,
     method: 'PATCH',
@@ -3034,18 +2783,6 @@ export const useUpdateMctRule = <TError = unknown,
 /**
  * @summary Delete an MCT rule
  */
-export type deleteMctRuleResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteMctRuleResponseSuccess = (deleteMctRuleResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteMctRuleResponse = (deleteMctRuleResponseSuccess)
-
 export const getDeleteMctRuleUrl = (id: string,) => {
 
 
@@ -3054,9 +2791,9 @@ export const getDeleteMctRuleUrl = (id: string,) => {
   return `/api/mct-rules/${id}`
 }
 
-export const deleteMctRule = async (id: string, options?: RequestInit): Promise<deleteMctRuleResponse> => {
+export const deleteMctRule = async (id: string, options?: RequestInit): Promise<void> => {
   
-  return customFetch<deleteMctRuleResponse>(getDeleteMctRuleUrl(id),
+  return customFetch<void>(getDeleteMctRuleUrl(id),
   {      
     ...options,
     method: 'DELETE'
@@ -3117,18 +2854,6 @@ export const useDeleteMctRule = <TError = unknown,
 /**
  * @summary List interline agreements
  */
-export type listInterlineAgreementsResponse200 = {
-  data: InterlineAgreementDto[]
-  status: 200
-}
-    
-export type listInterlineAgreementsResponseSuccess = (listInterlineAgreementsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listInterlineAgreementsResponse = (listInterlineAgreementsResponseSuccess)
-
 export const getListInterlineAgreementsUrl = () => {
 
 
@@ -3137,9 +2862,9 @@ export const getListInterlineAgreementsUrl = () => {
   return `/api/interline-agreements`
 }
 
-export const listInterlineAgreements = async ( options?: RequestInit): Promise<listInterlineAgreementsResponse> => {
+export const listInterlineAgreements = async ( options?: RequestInit): Promise<InterlineAgreementDto[]> => {
   
-  return customFetch<listInterlineAgreementsResponse>(getListInterlineAgreementsUrl(),
+  return customFetch<InterlineAgreementDto[]>(getListInterlineAgreementsUrl(),
   {      
     ...options,
     method: 'GET'
@@ -3230,18 +2955,6 @@ export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof lis
 /**
  * @summary Create an interline agreement
  */
-export type createInterlineAgreementResponse201 = {
-  data: InterlineAgreementDto
-  status: 201
-}
-    
-export type createInterlineAgreementResponseSuccess = (createInterlineAgreementResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createInterlineAgreementResponse = (createInterlineAgreementResponseSuccess)
-
 export const getCreateInterlineAgreementUrl = () => {
 
 
@@ -3250,9 +2963,9 @@ export const getCreateInterlineAgreementUrl = () => {
   return `/api/interline-agreements`
 }
 
-export const createInterlineAgreement = async (createInterlineAgreementDto: CreateInterlineAgreementDto, options?: RequestInit): Promise<createInterlineAgreementResponse> => {
+export const createInterlineAgreement = async (createInterlineAgreementDto: CreateInterlineAgreementDto, options?: RequestInit): Promise<InterlineAgreementDto> => {
   
-  return customFetch<createInterlineAgreementResponse>(getCreateInterlineAgreementUrl(),
+  return customFetch<InterlineAgreementDto>(getCreateInterlineAgreementUrl(),
   {      
     ...options,
     method: 'POST',
@@ -3314,18 +3027,6 @@ export const useCreateInterlineAgreement = <TError = unknown,
 /**
  * @summary Resolve the directional interline gate for a carrier pair
  */
-export type resolveInterlineResponse200 = {
-  data: InterlineResolutionDto
-  status: 200
-}
-    
-export type resolveInterlineResponseSuccess = (resolveInterlineResponse200) & {
-  headers: Headers;
-};
-;
-
-export type resolveInterlineResponse = (resolveInterlineResponseSuccess)
-
 export const getResolveInterlineUrl = (params: ResolveInterlineParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -3341,9 +3042,9 @@ export const getResolveInterlineUrl = (params: ResolveInterlineParams,) => {
   return stringifiedParams.length > 0 ? `/api/interline-agreements/resolve?${stringifiedParams}` : `/api/interline-agreements/resolve`
 }
 
-export const resolveInterline = async (params: ResolveInterlineParams, options?: RequestInit): Promise<resolveInterlineResponse> => {
+export const resolveInterline = async (params: ResolveInterlineParams, options?: RequestInit): Promise<InterlineResolutionDto> => {
   
-  return customFetch<resolveInterlineResponse>(getResolveInterlineUrl(params),
+  return customFetch<InterlineResolutionDto>(getResolveInterlineUrl(params),
   {      
     ...options,
     method: 'GET'
@@ -3434,18 +3135,6 @@ export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInt
 /**
  * @summary Get an interline agreement
  */
-export type getInterlineAgreementResponse200 = {
-  data: InterlineAgreementDto
-  status: 200
-}
-    
-export type getInterlineAgreementResponseSuccess = (getInterlineAgreementResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getInterlineAgreementResponse = (getInterlineAgreementResponseSuccess)
-
 export const getGetInterlineAgreementUrl = (id: string,) => {
 
 
@@ -3454,9 +3143,9 @@ export const getGetInterlineAgreementUrl = (id: string,) => {
   return `/api/interline-agreements/${id}`
 }
 
-export const getInterlineAgreement = async (id: string, options?: RequestInit): Promise<getInterlineAgreementResponse> => {
+export const getInterlineAgreement = async (id: string, options?: RequestInit): Promise<InterlineAgreementDto> => {
   
-  return customFetch<getInterlineAgreementResponse>(getGetInterlineAgreementUrl(id),
+  return customFetch<InterlineAgreementDto>(getGetInterlineAgreementUrl(id),
   {      
     ...options,
     method: 'GET'
@@ -3547,18 +3236,6 @@ export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getIn
 /**
  * @summary Delete an interline agreement
  */
-export type deleteInterlineAgreementResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type deleteInterlineAgreementResponseSuccess = (deleteInterlineAgreementResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteInterlineAgreementResponse = (deleteInterlineAgreementResponseSuccess)
-
 export const getDeleteInterlineAgreementUrl = (id: string,) => {
 
 
@@ -3567,9 +3244,9 @@ export const getDeleteInterlineAgreementUrl = (id: string,) => {
   return `/api/interline-agreements/${id}`
 }
 
-export const deleteInterlineAgreement = async (id: string, options?: RequestInit): Promise<deleteInterlineAgreementResponse> => {
+export const deleteInterlineAgreement = async (id: string, options?: RequestInit): Promise<void> => {
   
-  return customFetch<deleteInterlineAgreementResponse>(getDeleteInterlineAgreementUrl(id),
+  return customFetch<void>(getDeleteInterlineAgreementUrl(id),
   {      
     ...options,
     method: 'DELETE'
@@ -3630,18 +3307,6 @@ export const useDeleteInterlineAgreement = <TError = unknown,
 /**
  * @summary Classify the connection between two consecutive flights
  */
-export type validateConnectionResponse200 = {
-  data: ConnectionResultDto
-  status: 200
-}
-    
-export type validateConnectionResponseSuccess = (validateConnectionResponse200) & {
-  headers: Headers;
-};
-;
-
-export type validateConnectionResponse = (validateConnectionResponseSuccess)
-
 export const getValidateConnectionUrl = () => {
 
 
@@ -3650,9 +3315,9 @@ export const getValidateConnectionUrl = () => {
   return `/api/connections/validate`
 }
 
-export const validateConnection = async (validateConnectionDto: ValidateConnectionDto, options?: RequestInit): Promise<validateConnectionResponse> => {
+export const validateConnection = async (validateConnectionDto: ValidateConnectionDto, options?: RequestInit): Promise<ConnectionResultDto> => {
   
-  return customFetch<validateConnectionResponse>(getValidateConnectionUrl(),
+  return customFetch<ConnectionResultDto>(getValidateConnectionUrl(),
   {      
     ...options,
     method: 'POST',
@@ -3714,18 +3379,6 @@ export const useValidateConnection = <TError = unknown,
 /**
  * @summary Classify every consecutive connection in an itinerary
  */
-export type validateConnectionChainResponse200 = {
-  data: ConnectionResultDto[]
-  status: 200
-}
-    
-export type validateConnectionChainResponseSuccess = (validateConnectionChainResponse200) & {
-  headers: Headers;
-};
-;
-
-export type validateConnectionChainResponse = (validateConnectionChainResponseSuccess)
-
 export const getValidateConnectionChainUrl = () => {
 
 
@@ -3734,9 +3387,9 @@ export const getValidateConnectionChainUrl = () => {
   return `/api/connections/validate-chain`
 }
 
-export const validateConnectionChain = async (validateConnectionChainDto: ValidateConnectionChainDto, options?: RequestInit): Promise<validateConnectionChainResponse> => {
+export const validateConnectionChain = async (validateConnectionChainDto: ValidateConnectionChainDto, options?: RequestInit): Promise<ConnectionResultDto[]> => {
   
-  return customFetch<validateConnectionChainResponse>(getValidateConnectionChainUrl(),
+  return customFetch<ConnectionResultDto[]>(getValidateConnectionChainUrl(),
   {      
     ...options,
     method: 'POST',

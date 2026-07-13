@@ -19,6 +19,9 @@
     "filter": "Filter",
     "reset": "Reset",
     "noData": "No data available",
+    "yes": "Yes",
+    "no": "No",
+    "view": "View",
     "toggleTheme": "Toggle theme",
     "sidebar": "Sidebar",
     "toggleSidebar": "Toggle Sidebar"
@@ -36,6 +39,7 @@
     "language": "Language",
     "dashboard": "Dashboard",
     "profile": "Profile",
+    "searchFlights": "Search Flights",
     "logout": "Logout",
     "login": "Login",
     "uiComponents": "UI Components"
@@ -151,6 +155,22 @@
       "layoutDesc": "Accordion, carousel, calendar, and collapsible."
     }
   },
+  "flightSearch": {
+    "title": "Search Flights",
+    "description": "Find flights by route and date, sorted by price.",
+    "originAirport": "From",
+    "destAirport": "To",
+    "date": "Departure date",
+    "searchButton": "Search",
+    "loading": "Searching...",
+    "noResults": "No flights found for this route and date.",
+    "resultsCount": "{count, plural, one {# flight found} other {# flights found}}",
+    "aircraft": "Aircraft",
+    "duration": "Duration",
+    "direct": "Direct",
+    "stopsCount": "{count, plural, one {# stop} other {# stops}}",
+    "viaAirports": "via {airports}"
+  },
   "errors": {
     "404": "Page not found",
     "401": "Unauthorized",
@@ -159,5 +179,234 @@
     "generic": "Something went wrong. Please try again.",
     "unauthorizedDescription": "You do not have permission to access this page.",
     "goToDashboard": "Go to Dashboard"
+  },
+  "schedule": {
+    "nav": {
+      "section": "Schedule Admin",
+      "airports": "Airports",
+      "airlines": "Airlines",
+      "flights": "Flights",
+      "codeshare": "Codeshare",
+      "mctRules": "MCT Rules",
+      "interlineAgreements": "Interline Agreements",
+      "connections": "Connection Validator"
+    },
+    "actions": "Actions",
+    "openMenu": "Open menu",
+    "createButton": "Create",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "loadingRows": "Loading...",
+    "pageOf": "Page {current} of {total}",
+    "deleteConfirmTitle": "Delete this record?",
+    "deleteConfirmDescription": "This will permanently remove \"{name}\". This action cannot be undone.",
+    "createSuccess": "Created successfully.",
+    "updateSuccess": "Updated successfully.",
+    "deleteSuccess": "Deleted successfully.",
+    "noUpdateNotice": "This record can only be created or deleted, not edited.",
+    "airports": {
+      "title": "Airports",
+      "description": "Manage the airport reference data used across flights, MCT rules, and connection validation.",
+      "createTitle": "Create airport",
+      "editTitle": "Edit airport",
+      "columns": {
+        "airportCode": "Code",
+        "icaoCode": "ICAO",
+        "name": "Name",
+        "cityCode": "City",
+        "countryCode": "Country",
+        "timezone": "Timezone",
+        "coordinates": "Coordinates"
+      },
+      "fields": {
+        "airportCode": "IATA code",
+        "airportCodePlaceholder": "e.g. JFK",
+        "icaoCode": "ICAO code",
+        "icaoCodePlaceholder": "e.g. KJFK",
+        "name": "Name",
+        "namePlaceholder": "e.g. John F. Kennedy International",
+        "cityCode": "City code",
+        "cityCodePlaceholder": "e.g. NYC",
+        "countryCode": "Country code",
+        "countryCodePlaceholder": "e.g. US",
+        "timezone": "Timezone",
+        "timezonePlaceholder": "e.g. America/New_York",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
+      }
+    },
+    "airlines": {
+      "title": "Airlines",
+      "description": "Manage the airline reference data used for operating and marketing carriers.",
+      "createTitle": "Create airline",
+      "editTitle": "Edit airline",
+      "columns": {
+        "airlineCode": "Code",
+        "icaoCode": "ICAO",
+        "name": "Name",
+        "countryCode": "Country"
+      },
+      "fields": {
+        "airlineCode": "IATA code",
+        "airlineCodePlaceholder": "e.g. GA",
+        "icaoCode": "ICAO code",
+        "icaoCodePlaceholder": "e.g. GIA",
+        "name": "Name",
+        "namePlaceholder": "e.g. Garuda Indonesia",
+        "countryCode": "Country code",
+        "countryCodePlaceholder": "e.g. ID"
+      }
+    },
+    "flights": {
+      "title": "Flights",
+      "description": "Manage operating flights and their legs. Legs are set at creation and cannot be edited afterward.",
+      "createTitle": "Create flight",
+      "editTitle": "Edit flight",
+      "viewLegs": "View legs",
+      "columns": {
+        "operatingAirline": "Airline",
+        "flightNumber": "Flight #",
+        "route": "Route",
+        "departureTime": "Departure",
+        "arrivalTime": "Arrival",
+        "aircraftType": "Aircraft",
+        "price": "Price",
+        "status": "Status",
+        "legs": "Legs"
+      },
+      "fields": {
+        "operatingAirline": "Operating airline",
+        "flightNumber": "Flight number",
+        "flightNumberPlaceholder": "e.g. 874",
+        "originAirport": "Origin airport",
+        "destAirport": "Destination airport",
+        "departureTime": "Departure time",
+        "arrivalTime": "Arrival time",
+        "aircraftType": "Aircraft type",
+        "aircraftTypePlaceholder": "e.g. B738",
+        "price": "Price",
+        "currency": "Currency",
+        "currencyPlaceholder": "e.g. USD",
+        "status": "Status",
+        "multiLeg": "Technical stop (multiple legs)",
+        "legRole": "Role",
+        "legDepAirport": "Leg departure",
+        "legArrAirport": "Leg arrival",
+        "legDeparture": "Leg departure time",
+        "legArrival": "Leg arrival time",
+        "addLeg": "Add leg",
+        "removeLeg": "Remove leg"
+      },
+      "status": {
+        "ACTIVE": "Active",
+        "SUSPENDED": "Suspended",
+        "SEASONAL": "Seasonal"
+      },
+      "legRole": {
+        "FULL": "Full",
+        "TECHNICAL_STOP": "Technical stop"
+      },
+      "legsSummary": "{count, plural, one {# leg} other {# legs}}"
+    },
+    "codeshare": {
+      "title": "Codeshare",
+      "description": "Manage marketing identities mapped onto operating flights.",
+      "createTitle": "Create codeshare mapping",
+      "editTitle": "Edit codeshare mapping",
+      "columns": {
+        "flight": "Operating flight",
+        "marketingAirline": "Marketing airline",
+        "marketingNumber": "Marketing #",
+        "isOperatingCarrier": "Operating carrier"
+      },
+      "fields": {
+        "flightId": "Operating flight",
+        "flightIdPlaceholder": "Search by airline, number, or route...",
+        "marketingAirline": "Marketing airline",
+        "marketingNumber": "Marketing number",
+        "marketingNumberPlaceholder": "e.g. 5502",
+        "isOperatingCarrier": "This is the operating carrier's own marketing row"
+      }
+    },
+    "mctRules": {
+      "title": "MCT Rules",
+      "description": "Manage minimum-connection-time rules, matched most-specific-first.",
+      "createTitle": "Create MCT rule",
+      "editTitle": "Edit MCT rule",
+      "resolverTitle": "Test the resolver",
+      "resolverDescription": "Find which rule applies to a given connection.",
+      "resolverButton": "Resolve",
+      "resolverNoMatch": "No matching rule (NO_MCT_RULE).",
+      "columns": {
+        "arrivalAirport": "Arrival airport",
+        "departureAirport": "Departure airport",
+        "scope": "Scope",
+        "arrivalAirline": "Arrival airline",
+        "departureAirline": "Departure airline",
+        "arrivalTerminal": "Arr. terminal",
+        "departureTerminal": "Dep. terminal",
+        "mctMinutes": "MCT (min)",
+        "maxConnectionMinutes": "Max (min)"
+      },
+      "fields": {
+        "arrivalAirport": "Arrival airport",
+        "departureAirport": "Departure airport",
+        "scope": "Scope",
+        "arrivalAirline": "Arrival airline (optional)",
+        "departureAirline": "Departure airline (optional)",
+        "arrivalTerminal": "Arrival terminal (optional)",
+        "departureTerminal": "Departure terminal (optional)",
+        "mctMinutes": "MCT minutes",
+        "maxConnectionMinutes": "Max connection minutes (default 1440)"
+      }
+    },
+    "interlineAgreements": {
+      "title": "Interline Agreements",
+      "description": "Manage directional carrier-pair connection permissions and baggage through-check.",
+      "createTitle": "Create interline agreement",
+      "resolverTitle": "Test the resolver",
+      "resolverDescription": "Check whether an inbound carrier permits connecting onto an outbound carrier.",
+      "resolverButton": "Resolve",
+      "resolverOnline": "Online (same carrier) — always permitted.",
+      "resolverPermitted": "Permitted.",
+      "resolverNotPermitted": "Not permitted.",
+      "columns": {
+        "inboundAirline": "Inbound airline",
+        "outboundAirline": "Outbound airline",
+        "bagThroughChecked": "Bag through-check"
+      },
+      "fields": {
+        "inboundAirline": "Inbound airline",
+        "outboundAirline": "Outbound airline",
+        "bagThroughChecked": "Baggage is through-checked"
+      }
+    },
+    "connections": {
+      "title": "Connection Validator",
+      "description": "Classify the gap between flights exactly as the booking-facing API would.",
+      "pairTab": "Single connection",
+      "chainTab": "Itinerary chain",
+      "prevFlight": "Previous flight",
+      "nextFlight": "Next flight",
+      "addFlight": "Add flight",
+      "removeFlight": "Remove flight",
+      "validateButton": "Validate",
+      "resultTitle": "Result",
+      "resultKind": "Kind",
+      "resultGap": "Gap (minutes)",
+      "resultSameMetro": "Same-metro inter-airport",
+      "resultInterline": "Interline",
+      "resultBagThrough": "Bag through-checked",
+      "resultMctRule": "Applied MCT rule",
+      "resultInterlineAgreement": "Applied interline agreement",
+      "resultReason": "Reason",
+      "kind": {
+        "connection": "Connection",
+        "stopover": "Stopover",
+        "open_jaw": "Open jaw",
+        "transit": "Transit",
+        "invalid": "Invalid"
+      }
+    }
   }
 }

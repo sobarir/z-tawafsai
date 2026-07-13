@@ -108,7 +108,7 @@ describe('minutesBetween', () => {
   });
 });
 
-describe('ConnectionsService — golden scenarios (prd/14-scenarios.md)', () => {
+describe('ConnectionsService — golden scenarios (prd/flights/14-scenarios.md)', () => {
   const ids: Record<string, string> = {};
 
   beforeAll(async () => {

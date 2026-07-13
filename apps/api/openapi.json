@@ -441,6 +441,60 @@
         ]
       }
     },
+    "/api/flights/search": {
+      "get": {
+        "operationId": "searchFlights",
+        "parameters": [
+          {
+            "name": "originAirport",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destAirport",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FlightDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "OTA-style flight search by route and date, sorted by price",
+        "tags": [
+          "flights"
+        ]
+      }
+    },
     "/api/flights/{id}": {
       "get": {
         "operationId": "getFlight",
@@ -1596,6 +1650,14 @@
               "SEASONAL"
             ]
           },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
           "legs": {
             "type": "array",
             "items": {
@@ -1685,6 +1747,8 @@
           "arrivalTime",
           "aircraftType",
           "status",
+          "price",
+          "currency",
           "legs",
           "createdAt",
           "updatedAt"
@@ -1730,6 +1794,14 @@
               "SUSPENDED",
               "SEASONAL"
             ]
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
           },
           "legs": {
             "minItems": 2,
@@ -1779,7 +1851,9 @@
           "originAirport",
           "destAirport",
           "departureTime",
-          "arrivalTime"
+          "arrivalTime",
+          "price",
+          "currency"
         ]
       },
       "UpdateFlightDto": {
@@ -1796,6 +1870,14 @@
               "SUSPENDED",
               "SEASONAL"
             ]
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
           }
         }
       },

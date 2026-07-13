@@ -2,11 +2,19 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import {
+  Building2,
+  Clock,
+  Handshake,
   LayoutDashboard,
+  Link2,
   LogOut,
   type LucideIcon,
+  MapPin,
   Menu,
+  PlaneTakeoff,
+  Ticket,
   UserCircle,
+  Waypoints,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -49,6 +57,8 @@ interface SidebarContentProps {
   pathname: string;
   isRtl: boolean;
   items: NavItem[];
+  adminItems?: NavItem[];
+  adminSectionLabel?: string;
   labels: {
     theme: string;
     language: string;
@@ -136,6 +146,8 @@ function SidebarContent({
   pathname,
   isRtl,
   items,
+  adminItems,
+  adminSectionLabel,
   labels,
   onLogoutRequest,
   onItemClick,
@@ -185,6 +197,30 @@ function SidebarContent({
               </li>
             ))}
           </ul>
+
+          {adminItems?.length ? (
+            <>
+              <div className="my-2 border-t border-sidebar-glass-edge" />
+              {!isCollapsed && adminSectionLabel ? (
+                <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">
+                  {adminSectionLabel}
+                </p>
+              ) : null}
+              <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
+                {adminItems.map((item) => (
+                  <li key={item.id}>
+                    <NavLinkItem
+                      item={item}
+                      pathname={pathname}
+                      isCollapsed={isCollapsed}
+                      isRtl={isRtl}
+                      onItemClick={onItemClick}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </nav>
 
         {showFooter ? (
@@ -306,11 +342,13 @@ export function useSidebarCollapsed() {
 const NAV_ICONS = {
   dashboard: LayoutDashboard,
   profile: UserCircle,
+  search: PlaneTakeoff,
 } as const;
 
 function buildNavItems(
   dashboardLabel: string,
   profileLabel: string,
+  searchLabel: string,
 ): NavItem[] {
   return [
     {
@@ -325,12 +363,85 @@ function buildNavItems(
       href: '/profile',
       icon: NAV_ICONS.profile,
     },
+    {
+      id: 'search',
+      label: searchLabel,
+      href: '/search',
+      icon: NAV_ICONS.search,
+    },
+  ];
+}
+
+const SCHEDULE_NAV_ICONS = {
+  airports: MapPin,
+  airlines: Building2,
+  flights: Waypoints,
+  codeshare: Ticket,
+  mctRules: Clock,
+  interlineAgreements: Handshake,
+  connections: Link2,
+} as const;
+
+interface ScheduleNavLabels {
+  airports: string;
+  airlines: string;
+  flights: string;
+  codeshare: string;
+  mctRules: string;
+  interlineAgreements: string;
+  connections: string;
+}
+
+function buildScheduleAdminNavItems(labels: ScheduleNavLabels): NavItem[] {
+  return [
+    {
+      id: 'schedule-airports',
+      label: labels.airports,
+      href: '/schedule/airports',
+      icon: SCHEDULE_NAV_ICONS.airports,
+    },
+    {
+      id: 'schedule-airlines',
+      label: labels.airlines,
+      href: '/schedule/airlines',
+      icon: SCHEDULE_NAV_ICONS.airlines,
+    },
+    {
+      id: 'schedule-flights',
+      label: labels.flights,
+      href: '/schedule/flights',
+      icon: SCHEDULE_NAV_ICONS.flights,
+    },
+    {
+      id: 'schedule-codeshare',
+      label: labels.codeshare,
+      href: '/schedule/codeshare',
+      icon: SCHEDULE_NAV_ICONS.codeshare,
+    },
+    {
+      id: 'schedule-mct-rules',
+      label: labels.mctRules,
+      href: '/schedule/mct-rules',
+      icon: SCHEDULE_NAV_ICONS.mctRules,
+    },
+    {
+      id: 'schedule-interline-agreements',
+      label: labels.interlineAgreements,
+      href: '/schedule/interline-agreements',
+      icon: SCHEDULE_NAV_ICONS.interlineAgreements,
+    },
+    {
+      id: 'schedule-connections',
+      label: labels.connections,
+      href: '/schedule/connections',
+      icon: SCHEDULE_NAV_ICONS.connections,
+    },
   ];
 }
 
 export function Sidebar() {
   const t = useTranslations();
-  const { user, signOut } = useAuth();
+  const { user, signOut, hasPermission } = useAuth();
   const locale = useLocale();
   const pathname = usePathname();
   const isRtl = locale === 'ar';
@@ -340,9 +451,32 @@ export function Sidebar() {
   const [collapsed] = useSidebarCollapsed();
 
   const items = useMemo(
-    () => buildNavItems(t('navigation.dashboard'), t('navigation.profile')),
+    () =>
+      buildNavItems(
+        t('navigation.dashboard'),
+        t('navigation.profile'),
+        t('navigation.searchFlights'),
+      ),
     [t],
   );
+
+  const canManageSchedule = hasPermission('dashboard.view:admin');
+  const adminItems = useMemo(
+    () =>
+      canManageSchedule
+        ? buildScheduleAdminNavItems({
+            airports: t('schedule.nav.airports'),
+            airlines: t('schedule.nav.airlines'),
+            flights: t('schedule.nav.flights'),
+            codeshare: t('schedule.nav.codeshare'),
+            mctRules: t('schedule.nav.mctRules'),
+            interlineAgreements: t('schedule.nav.interlineAgreements'),
+            connections: t('schedule.nav.connections'),
+          })
+        : [],
+    [canManageSchedule, t],
+  );
+  const adminSectionLabel = t('schedule.nav.section');
 
   const labels = useMemo(
     () => ({
@@ -400,6 +534,8 @@ export function Sidebar() {
                 pathname={pathname}
                 isRtl={isRtl}
                 items={items}
+                adminItems={adminItems}
+                adminSectionLabel={adminSectionLabel}
                 labels={labels}
                 onLogoutRequest={handleLogoutRequest}
                 onItemClick={() => setMobileOpen(false)}
@@ -435,6 +571,8 @@ export function Sidebar() {
           pathname={pathname}
           isRtl={isRtl}
           items={items}
+          adminItems={adminItems}
+          adminSectionLabel={adminSectionLabel}
           labels={labels}
           onLogoutRequest={handleLogoutRequest}
           isCollapsed={collapsed}

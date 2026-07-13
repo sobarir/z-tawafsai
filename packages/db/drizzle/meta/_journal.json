@@ -15,6 +15,13 @@
       "when": 1783870503010,
       "tag": "0001_fresh_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783913127090,
+      "tag": "0002_clean_rage",
+      "breakpoints": true
     }
   ]
 }

@@ -12,9 +12,10 @@ import type {
   CreateFlightLegInput,
   Flight,
   FlightLeg,
+  SearchFlightsQuery,
   UpdateFlightInput,
 } from '@repo/shared';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, lt } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type FlightRow = typeof schema.flights.$inferSelect;
@@ -28,6 +29,21 @@ const toFlightLeg = (row: FlightLegRow): FlightLeg => ({
   updatedAt: row.updatedAt.toISOString(),
 });
 
+function groupLegsByFlight(
+  legRows: FlightLegRow[],
+): Map<string, FlightLegRow[]> {
+  const legsByFlight = new Map<string, FlightLegRow[]>();
+  for (const leg of legRows) {
+    const existing = legsByFlight.get(leg.flightId);
+    if (existing) {
+      existing.push(leg);
+    } else {
+      legsByFlight.set(leg.flightId, [leg]);
+    }
+  }
+  return legsByFlight;
+}
+
 const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
   ...row,
   departureTime: row.departureTime.toISOString(),
@@ -39,7 +55,7 @@ const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
 
 /**
  * Derives the ordered legs to insert for a new flight, enforcing the
- * invariants from /prd/11-data-model.md Entity 4: no legs given -> one FULL
+ * invariants from /prd/flights/11-data-model.md Entity 4: no legs given -> one FULL
  * leg spanning the flight's own route; legs given -> first leg departs the
  * flight origin, last leg arrives the flight destination, and legs are
  * contiguous (leg[n].arrAirport == leg[n+1].depAirport).
@@ -100,15 +116,48 @@ export class FlightsService {
       .select()
       .from(schema.flightLegs)
       .orderBy(asc(schema.flightLegs.legSequence));
-    const legsByFlight = new Map<string, FlightLegRow[]>();
-    for (const leg of legRows) {
-      const existing = legsByFlight.get(leg.flightId);
-      if (existing) {
-        existing.push(leg);
-      } else {
-        legsByFlight.set(leg.flightId, [leg]);
-      }
+    const legsByFlight = groupLegsByFlight(legRows);
+    return rows.map((row) => toFlight(row, legsByFlight.get(row.id) ?? []));
+  }
+
+  /**
+   * OTA-style route+date search — ACTIVE flights only, sorted cheapest first.
+   * `date` is matched against the UTC calendar day of `departureTime` (a
+   * documented v1.1 simplification, not per-airport local day; see
+   * /prd/flights/00-overview.md Goal 7).
+   */
+  async search(query: SearchFlightsQuery): Promise<Flight[]> {
+    const dayStart = new Date(`${query.date}T00:00:00.000Z`);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+    const rows = await this.db
+      .select()
+      .from(schema.flights)
+      .where(
+        and(
+          eq(schema.flights.originAirport, query.originAirport),
+          eq(schema.flights.destAirport, query.destAirport),
+          eq(schema.flights.status, 'ACTIVE'),
+          gte(schema.flights.departureTime, dayStart),
+          lt(schema.flights.departureTime, dayEnd),
+        ),
+      )
+      .orderBy(asc(schema.flights.price));
+    if (rows.length === 0) {
+      return [];
     }
+    const legRows = await this.db
+      .select()
+      .from(schema.flightLegs)
+      .where(
+        inArray(
+          schema.flightLegs.flightId,
+          rows.map((row) => row.id),
+        ),
+      )
+      .orderBy(asc(schema.flightLegs.legSequence));
+    const legsByFlight = groupLegsByFlight(legRows);
     return rows.map((row) => toFlight(row, legsByFlight.get(row.id) ?? []));
   }
 
@@ -159,6 +208,8 @@ export class FlightsService {
           arrivalTime: new Date(input.arrivalTime),
           aircraftType: input.aircraftType,
           status: input.status,
+          price: input.price,
+          currency: input.currency,
         })
         .returning();
 

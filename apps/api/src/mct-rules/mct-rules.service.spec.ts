@@ -126,7 +126,7 @@ describe('pickMostSpecificMctRule', () => {
   });
 });
 
-// A tuple not in prd/15-seed-data.md's MCT rule set, so tests never collide with seeded rows.
+// A tuple not in prd/flights/15-seed-data.md's MCT rule set, so tests never collide with seeded rows.
 const TEST_ARRIVAL = 'DPS';
 const TEST_DEPARTURE = 'DPS';
 const TEST_SCOPE = 'DD' as const;

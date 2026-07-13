@@ -21,7 +21,10 @@
     "noData": "কোন ডেটা নেই",
     "toggleTheme": "থিম পরিবর্তন করুন",
     "sidebar": "সাইডবার",
-    "toggleSidebar": "সাইডবার টগল করুন"
+    "toggleSidebar": "সাইডবার টগল করুন",
+    "yes": "হ্যাঁ",
+    "no": "না",
+    "view": "দেখুন"
   },
   "theme": {
     "light": "লাইট",
@@ -36,6 +39,7 @@
     "language": "ভাষা",
     "dashboard": "ড্যাশবোর্ড",
     "profile": "প্রোফাইল",
+    "searchFlights": "ফ্লাইট অনুসন্ধান",
     "logout": "লগআউট",
     "login": "লগইন",
     "uiComponents": "UI কম্পোনেন্ট"
@@ -153,10 +157,255 @@
       "layoutDesc": "অ্যাকর্ডিয়ন, ক্যারোসেল, ক্যালেন্ডার এবং কল্যাপসিবল।"
     }
   },
+  "schedule": {
+    "nav": {
+      "section": "শিডিউল অ্যাডমিন",
+      "airports": "বিমানবন্দর",
+      "airlines": "এয়ারলাইন",
+      "flights": "ফ্লাইট",
+      "codeshare": "কোডশেয়ার",
+      "mctRules": "এমসিটি নিয়ম",
+      "interlineAgreements": "ইন্টারলাইন চুক্তি",
+      "connections": "সংযোগ যাচাইকারী"
+    },
+    "actions": "কার্যক্রম",
+    "openMenu": "মেনু খুলুন",
+    "createButton": "তৈরি করুন",
+    "searchPlaceholder": "অনুসন্ধান করুন...",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি।",
+    "loadingRows": "লোড হচ্ছে...",
+    "pageOf": "পৃষ্ঠা {current} এর {total}",
+    "deleteConfirmTitle": "এই রেকর্ডটি মুছবেন?",
+    "deleteConfirmDescription": "এটি স্থায়ীভাবে \"{name}\" মুছে ফেলবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "createSuccess": "সফলভাবে তৈরি হয়েছে।",
+    "updateSuccess": "সফলভাবে আপডেট হয়েছে।",
+    "deleteSuccess": "সফলভাবে মুছে ফেলা হয়েছে।",
+    "noUpdateNotice": "এই রেকর্ডটি শুধু তৈরি বা মুছে ফেলা যায়, সম্পাদনা করা যায় না।",
+    "airports": {
+      "title": "বিমানবন্দর",
+      "description": "ফ্লাইট, এমসিটি নিয়ম এবং সংযোগ যাচাইকরণে ব্যবহৃত বিমানবন্দরের রেফারেন্স ডেটা পরিচালনা করুন।",
+      "createTitle": "বিমানবন্দর তৈরি করুন",
+      "editTitle": "বিমানবন্দর সম্পাদনা করুন",
+      "columns": {
+        "airportCode": "কোড",
+        "icaoCode": "আইসিএও",
+        "name": "নাম",
+        "cityCode": "শহর",
+        "countryCode": "দেশ",
+        "timezone": "সময় অঞ্চল",
+        "coordinates": "স্থানাঙ্ক"
+      },
+      "fields": {
+        "airportCode": "আইএটিএ কোড",
+        "airportCodePlaceholder": "যেমন JFK",
+        "icaoCode": "আইসিএও কোড",
+        "icaoCodePlaceholder": "যেমন KJFK",
+        "name": "নাম",
+        "namePlaceholder": "যেমন জন এফ কেনেডি ইন্টারন্যাশনাল",
+        "cityCode": "শহর কোড",
+        "cityCodePlaceholder": "যেমন NYC",
+        "countryCode": "দেশের কোড",
+        "countryCodePlaceholder": "যেমন US",
+        "timezone": "সময় অঞ্চল",
+        "timezonePlaceholder": "যেমন America/New_York",
+        "latitude": "অক্ষাংশ",
+        "longitude": "দ্রাঘিমাংশ"
+      }
+    },
+    "airlines": {
+      "title": "এয়ারলাইন",
+      "description": "পরিচালনাকারী ও বিপণনকারী এয়ারলাইনের রেফারেন্স ডেটা পরিচালনা করুন।",
+      "createTitle": "এয়ারলাইন তৈরি করুন",
+      "editTitle": "এয়ারলাইন সম্পাদনা করুন",
+      "columns": {
+        "airlineCode": "কোড",
+        "icaoCode": "আইসিএও",
+        "name": "নাম",
+        "countryCode": "দেশ"
+      },
+      "fields": {
+        "airlineCode": "আইএটিএ কোড",
+        "airlineCodePlaceholder": "যেমন GA",
+        "icaoCode": "আইসিএও কোড",
+        "icaoCodePlaceholder": "যেমন GIA",
+        "name": "নাম",
+        "namePlaceholder": "যেমন গরুড় ইন্দোনেশিয়া",
+        "countryCode": "দেশের কোড",
+        "countryCodePlaceholder": "যেমন ID"
+      }
+    },
+    "flights": {
+      "title": "ফ্লাইট",
+      "description": "পরিচালিত ফ্লাইট এবং তাদের লেগ পরিচালনা করুন। লেগ তৈরির সময় নির্ধারিত হয় এবং পরে সম্পাদনা করা যায় না।",
+      "createTitle": "ফ্লাইট তৈরি করুন",
+      "editTitle": "ফ্লাইট সম্পাদনা করুন",
+      "viewLegs": "লেগ দেখুন",
+      "columns": {
+        "operatingAirline": "এয়ারলাইন",
+        "flightNumber": "ফ্লাইট নং",
+        "route": "রুট",
+        "departureTime": "ছাড়ার সময়",
+        "arrivalTime": "পৌঁছানোর সময়",
+        "aircraftType": "বিমান",
+        "status": "অবস্থা",
+        "legs": "লেগ",
+        "price": "মূল্য"
+      },
+      "fields": {
+        "operatingAirline": "পরিচালনাকারী এয়ারলাইন",
+        "flightNumber": "ফ্লাইট নম্বর",
+        "flightNumberPlaceholder": "যেমন 874",
+        "originAirport": "উৎপত্তি বিমানবন্দর",
+        "destAirport": "গন্তব্য বিমানবন্দর",
+        "departureTime": "ছাড়ার সময়",
+        "arrivalTime": "পৌঁছানোর সময়",
+        "aircraftType": "বিমানের ধরন",
+        "aircraftTypePlaceholder": "যেমন B738",
+        "status": "অবস্থা",
+        "multiLeg": "কারিগরি স্টপ (একাধিক লেগ)",
+        "legRole": "ভূমিকা",
+        "legDepAirport": "লেগ ছাড়ার স্থান",
+        "legArrAirport": "লেগ পৌঁছানোর স্থান",
+        "legDeparture": "লেগ ছাড়ার সময়",
+        "legArrival": "লেগ পৌঁছানোর সময়",
+        "addLeg": "লেগ যোগ করুন",
+        "removeLeg": "লেগ সরান",
+        "price": "মূল্য",
+        "currency": "মুদ্রা",
+        "currencyPlaceholder": "যেমন USD"
+      },
+      "status": {
+        "ACTIVE": "সক্রিয়",
+        "SUSPENDED": "স্থগিত",
+        "SEASONAL": "ঋতুভিত্তিক"
+      },
+      "legRole": {
+        "FULL": "সম্পূর্ণ",
+        "TECHNICAL_STOP": "কারিগরি স্টপ"
+      },
+      "legsSummary": "{count}টি লেগ"
+    },
+    "codeshare": {
+      "title": "কোডশেয়ার",
+      "description": "পরিচালিত ফ্লাইটের সাথে যুক্ত বিপণন পরিচয় পরিচালনা করুন।",
+      "createTitle": "কোডশেয়ার তৈরি করুন",
+      "editTitle": "কোডশেয়ার সম্পাদনা করুন",
+      "columns": {
+        "flight": "পরিচালনাকারী ফ্লাইট",
+        "marketingAirline": "বিপণনকারী এয়ারলাইন",
+        "marketingNumber": "বিপণন নং",
+        "isOperatingCarrier": "পরিচালনাকারী বাহক"
+      },
+      "fields": {
+        "flightId": "পরিচালনাকারী ফ্লাইট",
+        "flightIdPlaceholder": "এয়ারলাইন, নম্বর বা রুট দিয়ে অনুসন্ধান করুন...",
+        "marketingAirline": "বিপণনকারী এয়ারলাইন",
+        "marketingNumber": "বিপণন নম্বর",
+        "marketingNumberPlaceholder": "যেমন 5502",
+        "isOperatingCarrier": "এটি পরিচালনাকারী বাহকের নিজস্ব বিপণন সারি"
+      }
+    },
+    "mctRules": {
+      "title": "এমসিটি নিয়ম",
+      "description": "সর্বনিম্ন সংযোগ সময়ের নিয়ম পরিচালনা করুন, সবচেয়ে নির্দিষ্ট থেকে সাধারণ ক্রমে প্রয়োগ করা হয়।",
+      "createTitle": "এমসিটি নিয়ম তৈরি করুন",
+      "editTitle": "এমসিটি নিয়ম সম্পাদনা করুন",
+      "resolverTitle": "রিজলভার পরীক্ষা করুন",
+      "resolverDescription": "একটি নির্দিষ্ট সংযোগের জন্য কোন নিয়ম প্রযোজ্য তা খুঁজুন।",
+      "resolverButton": "সমাধান করুন",
+      "resolverNoMatch": "কোনো মিল নিয়ম নেই (NO_MCT_RULE)।",
+      "columns": {
+        "arrivalAirport": "আগমন বিমানবন্দর",
+        "departureAirport": "প্রস্থান বিমানবন্দর",
+        "scope": "পরিধি",
+        "arrivalAirline": "আগমন এয়ারলাইন",
+        "departureAirline": "প্রস্থান এয়ারলাইন",
+        "arrivalTerminal": "আগমন টার্মিনাল",
+        "departureTerminal": "প্রস্থান টার্মিনাল",
+        "mctMinutes": "এমসিটি (মিনিট)",
+        "maxConnectionMinutes": "সর্বোচ্চ (মিনিট)"
+      },
+      "fields": {
+        "arrivalAirport": "আগমন বিমানবন্দর",
+        "departureAirport": "প্রস্থান বিমানবন্দর",
+        "scope": "পরিধি",
+        "arrivalAirline": "আগমন এয়ারলাইন (ঐচ্ছিক)",
+        "departureAirline": "প্রস্থান এয়ারলাইন (ঐচ্ছিক)",
+        "arrivalTerminal": "আগমন টার্মিনাল (ঐচ্ছিক)",
+        "departureTerminal": "প্রস্থান টার্মিনাল (ঐচ্ছিক)",
+        "mctMinutes": "এমসিটি মিনিট",
+        "maxConnectionMinutes": "সর্বোচ্চ সংযোগ মিনিট (ডিফল্ট 1440)"
+      }
+    },
+    "interlineAgreements": {
+      "title": "ইন্টারলাইন চুক্তি",
+      "description": "দিকনির্দেশমূলক বাহক-জোড়া সংযোগ অনুমতি এবং সরাসরি ব্যাগেজ চেক-থ্রু পরিচালনা করুন।",
+      "createTitle": "ইন্টারলাইন চুক্তি তৈরি করুন",
+      "resolverTitle": "রিজলভার পরীক্ষা করুন",
+      "resolverDescription": "একটি ইনবাউন্ড বাহক আউটবাউন্ড বাহকের সাথে সংযোগের অনুমতি দেয় কিনা তা পরীক্ষা করুন।",
+      "resolverButton": "সমাধান করুন",
+      "resolverOnline": "অনলাইন (একই বাহক) — সর্বদা অনুমোদিত।",
+      "resolverPermitted": "অনুমোদিত।",
+      "resolverNotPermitted": "অনুমোদিত নয়।",
+      "columns": {
+        "inboundAirline": "ইনবাউন্ড এয়ারলাইন",
+        "outboundAirline": "আউটবাউন্ড এয়ারলাইন",
+        "bagThroughChecked": "সরাসরি ব্যাগেজ চেক"
+      },
+      "fields": {
+        "inboundAirline": "ইনবাউন্ড এয়ারলাইন",
+        "outboundAirline": "আউটবাউন্ড এয়ারলাইন",
+        "bagThroughChecked": "ব্যাগেজ সরাসরি চেক করা হয়"
+      }
+    },
+    "connections": {
+      "title": "সংযোগ যাচাইকারী",
+      "description": "বুকিং-মুখী এপিআই যেভাবে করত ঠিক সেভাবেই ফ্লাইটগুলোর মধ্যে ব্যবধান শ্রেণীবদ্ধ করুন।",
+      "pairTab": "একক সংযোগ",
+      "chainTab": "যাত্রাপথের চেইন",
+      "prevFlight": "আগের ফ্লাইট",
+      "nextFlight": "পরের ফ্লাইট",
+      "addFlight": "ফ্লাইট যোগ করুন",
+      "removeFlight": "ফ্লাইট সরান",
+      "validateButton": "যাচাই করুন",
+      "resultTitle": "ফলাফল",
+      "resultKind": "ধরন",
+      "resultGap": "ব্যবধান (মিনিট)",
+      "resultSameMetro": "একই মহানগর (আন্তঃ-বিমানবন্দর)",
+      "resultInterline": "ইন্টারলাইন",
+      "resultBagThrough": "সরাসরি ব্যাগেজ চেক",
+      "resultMctRule": "প্রয়োগকৃত এমসিটি নিয়ম",
+      "resultInterlineAgreement": "প্রয়োগকৃত ইন্টারলাইন চুক্তি",
+      "resultReason": "কারণ",
+      "kind": {
+        "connection": "সংযোগ",
+        "stopover": "স্টপওভার",
+        "open_jaw": "ওপেন-জ",
+        "transit": "ট্রানজিট",
+        "invalid": "অবৈধ"
+      }
+    }
+  },
+  "flightSearch": {
+    "title": "ফ্লাইট অনুসন্ধান",
+    "description": "রুট এবং তারিখ অনুসারে ফ্লাইট খুঁজুন, মূল্য অনুসারে সাজানো।",
+    "originAirport": "থেকে",
+    "destAirport": "পর্যন্ত",
+    "date": "ছাড়ার তারিখ",
+    "searchButton": "অনুসন্ধান করুন",
+    "loading": "অনুসন্ধান করা হচ্ছে...",
+    "noResults": "এই রুট এবং তারিখের জন্য কোনো ফ্লাইট পাওয়া যায়নি।",
+    "resultsCount": "{count}টি ফ্লাইট পাওয়া গেছে",
+    "aircraft": "বিমান",
+    "duration": "সময়কাল",
+    "direct": "সরাসরি",
+    "stopsCount": "{count}টি স্টপ",
+    "viaAirports": "{airports} হয়ে"
+  },
   "errors": {
-    "404": "পৃষ্ঠা পাওয়া যায়নি",
     "401": "অননুমোদিত",
     "403": "নিষিদ্ধ",
+    "404": "পৃষ্ঠা পাওয়া যায়নি",
     "500": "অভ্যন্তরীণ সার্ভার ত্রুটি",
     "generic": "কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
     "unauthorizedDescription": "এই পৃষ্ঠায় প্রবেশের অনুমতি আপনার নেই।",

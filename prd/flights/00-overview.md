@@ -25,11 +25,20 @@ legality. It does one thing well and exposes clean data + a validation API.
    carriers) that must pass before a cross-carrier connection is valid, plus a baggage
    through-check flag on the result.
 6. **Expose a clean read + validation API** consumable by a downstream booking engine.
+7. **(v1.1) Support price-aware flight search** — a single flat price + currency per flight,
+   admin-managed and seeded, so a signed-in user can search by origin/destination/date and see
+   results sorted by price, OTA-results-page style. Read-only: no booking, PNR, payment, or seat
+   selection — see the amended Non-Goals below. Added 2026-07-13 at explicit user request; this
+   scope change was flagged against the original Non-Goals before being adopted.
 
 ## Non-Goals (explicitly OUT of scope for v1)
 
-- ❌ Booking engine / search-and-book flow.
-- ❌ Fares, fare classes, fare construction, pricing of any kind.
+- ❌ Booking / reservation flow — PNRs, payment, seat selection, ticketing. **Read-only flight
+  *search* with price display is IN scope as of v1.1 (Goal 7)** — searching is not booking; no
+  reservation record is ever created.
+- ❌ Fare classes, fare construction, dynamic/multi-class pricing, promotions or discounts. **A
+  single flat price + currency per flight is IN scope as of v1.1 (Goal 7)** — admin-managed and
+  seeded, used only for search display/sorting. This is not a fare engine.
 - ❌ PNRs, passengers, ticketing, loyalty/mileage.
 - ❌ Seat inventory / availability / booking classes.
 - ❌ External GDS/NDC integration (Amadeus, Sabre). Codeshare partners are local rows.
@@ -50,7 +59,7 @@ legality. It does one thing well and exposes clean data + a validation API.
 
 - Given two flights, the service returns the correct classification (connection / stopover /
   open-jaw / invalid-too-tight / transit-leg) 100% of the time on the golden test set
-  (`/prd/14-scenarios.md`).
+  (`14-scenarios.md`).
 - A codeshare flight resolves to exactly one operating carrier, and reports built on operating
   flights never double-count a physical flight sold under N marketing numbers.
 - A multi-leg flight (e.g. one flight number, one refuel stop) is stored as **one** segment with

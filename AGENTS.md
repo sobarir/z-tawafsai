@@ -2,7 +2,7 @@
 
 pnpm + Turborepo monorepo. Next.js frontend, NestJS (Fastify) backend, Postgres via Drizzle, Better Auth. API contracts flow Zod → OpenAPI → Orval.
 
-> Detailed specs live in `/prd/*.md`. Read `/prd/CONTEXT.md` at the start of every session.
+> One PRD per domain under `/prd/<domain>/`. Read `/prd/README.md` first, then the active domain's `CONTEXT.md`, every session.
 
 ## Initialization
 
@@ -73,23 +73,25 @@ The mechanical layer is enforced (Biome, `pnpm check:dupes` DRY gate, complexity
 
 ## What this is
 
-A **flight schedule & inventory management service** — not a booking engine (no fares, PNRs,
-seats, ticketing). Own-metal codeshare only, no external GDS/NDC in v1. Full scope, non-goals,
-and live status: `/prd/00-overview.md` and `/prd/CONTEXT.md` (read every session).
+A multi-domain platform — `/prd/README.md` indexes every domain. The flagship, complete domain is
+a **flight schedule & inventory service**, not a booking engine (no fares/PNRs/seats/ticketing
+beyond the v1.1 flat-price search exception), own-metal codeshare only, no GDS/NDC in v1. Scope,
+non-goals, live status: `/prd/flights/00-overview.md` and `/prd/flights/CONTEXT.md`.
 
-## Database conventions (STRICT — enforced in review)
+## Database conventions (STRICT — enforced in review, repo-wide across all domains)
 
 Domain-entity IDs (airport_code, airline_code) are natural keys — `varchar(3)`/`varchar(2)`, the
 real IATA code, no surrogate id. Every other ID is a ULID via `createId()` — never UUID, never
 auto-increment, keeps keys time-sortable. All timestamps are `timestamp({ withTimezone: true })`
-— a naive local time breaks cross-timezone gap math (e.g. NRT 17:00 → LAX 10:00 same day). Full
-entity/column reference: `/prd/11-data-model.md`.
+— a naive local time breaks cross-timezone gap math (e.g. NRT 17:00 → LAX 10:00 same day). Flight
+entity/column reference: `/prd/flights/11-data-model.md`.
 
-## Domain vocabulary and golden rules
+## Flight-domain vocabulary and golden rules
 
 Exact terms (Journey/Segment/Leg, Operating vs Marketing flight, MCT, Interline, connection vs
-stopover vs transit vs open-jaw) and the full connection-type decision logic: `/prd/01-glossary.md`.
-The two rules most often collapsed by mistake:
+stopover vs transit vs open-jaw) and the full connection-type decision logic:
+`/prd/flights/01-glossary.md`. Other domains define their own vocabulary in their own
+`prd/<domain>/` glossary. The two rules most often collapsed by mistake here:
 
 1. **Marketing vs operating is the spine of the model** — never collapse them; operations, gates,
    and reports key off operating; anything sellable or displayed keys off marketing.

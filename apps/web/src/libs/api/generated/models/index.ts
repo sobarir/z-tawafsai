@@ -38,6 +38,7 @@ export * from './postDto';
 export * from './resolveInterlineParams';
 export * from './resolveMctRuleParams';
 export * from './resolveMctRuleScope';
+export * from './searchFlightsParams';
 export * from './updateAirlineDto';
 export * from './updateAirportDto';
 export * from './updateFlightDto';

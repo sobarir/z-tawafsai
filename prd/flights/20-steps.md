@@ -1,13 +1,13 @@
 # 20 — Claude Code Workflow (Steps 3–8)
 
-> Steps 1–2 are already done: the PRD is chunked into `/prd/*.md` and `CLAUDE.md` sits at project
-> root. This guide is the actual sequence of Claude Code sessions. **One step ≈ one session.**
-> After each step: run the gates, commit, and tick the box in `CONTEXT.md`.
+> Steps 1–2 are already done: the PRD is chunked into `prd/flights/*.md` and `CLAUDE.md` sits at
+> project root. This guide is the actual sequence of Claude Code sessions. **One step ≈ one
+> session.** After each step: run the gates, commit, and tick the box in `CONTEXT.md`.
 
 Every session opens with the same first move:
 
 ```
-Read /prd/CONTEXT.md, then /prd/CLAUDE.md, then the files named in today's step. Do not write
+Read CONTEXT.md, then root CLAUDE.md, then the files named in today's step. Do not write
 code until you've confirmed the "Current step" line in CONTEXT.md matches what we're doing.
 ```
 
@@ -20,7 +20,7 @@ code until you've confirmed the "Current step" line in CONTEXT.md matches what w
 Opening message:
 
 ```
-Read /prd/CONTEXT.md, /prd/00-overview.md, /prd/01-glossary.md, /prd/11-data-model.md.
+Read CONTEXT.md, 00-overview.md, 01-glossary.md, 11-data-model.md.
 
 Your ONLY task today: generate /src/db/schema.ts (Drizzle) for the 7 tables in 11-data-model.md
 (airports, airlines, flights, flight_legs, flight_marketing, mct_rules, interline_agreements).
@@ -147,5 +147,5 @@ marketing carrier.
 1. pnpm biome check --write . && pnpm typecheck
 2. pnpm test           # step's tests + all prior tests still green
 3. git add -A && git commit -m "step N: <summary>"
-4. Update /prd/CONTEXT.md: tick the box, move the "Current step" line.
+4. Update CONTEXT.md: tick the box, move the "Current step" line.
 ```

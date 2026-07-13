@@ -17,7 +17,7 @@ const db = createDb(databaseUrl);
 const flights = new FlightsService(db);
 const service = new FlightMarketingService(db, flights);
 
-// A flight number not used by prd/15-seed-data.md, so tests never collide with seeded rows.
+// A flight number not used by prd/flights/15-seed-data.md, so tests never collide with seeded rows.
 const TEST_NUMBER = '998';
 const TEST_AIRLINE = 'GA';
 
@@ -40,6 +40,8 @@ async function createTestFlight() {
     destAirport: 'NRT',
     departureTime: '2026-08-01T01:00:00+07:00',
     arrivalTime: '2026-08-01T10:00:00+09:00',
+    price: 500,
+    currency: 'USD',
   });
 }
 

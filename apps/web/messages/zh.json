@@ -21,7 +21,10 @@
     "noData": "暂无数据",
     "toggleTheme": "切换主题",
     "sidebar": "侧边栏",
-    "toggleSidebar": "切换侧边栏"
+    "toggleSidebar": "切换侧边栏",
+    "yes": "是",
+    "no": "否",
+    "view": "查看"
   },
   "theme": {
     "light": "浅色",
@@ -36,6 +39,7 @@
     "language": "语言",
     "dashboard": "仪表板",
     "profile": "个人资料",
+    "searchFlights": "搜索航班",
     "logout": "退出登录",
     "login": "登录",
     "uiComponents": "UI 组件"
@@ -151,10 +155,255 @@
       "layoutDesc": "手风琴、轮播、日历和可折叠组件。"
     }
   },
+  "schedule": {
+    "nav": {
+      "section": "航班计划管理",
+      "airports": "机场",
+      "airlines": "航空公司",
+      "flights": "航班",
+      "codeshare": "代码共享",
+      "mctRules": "最短转机时间规则",
+      "interlineAgreements": "联运协议",
+      "connections": "航段衔接验证器"
+    },
+    "actions": "操作",
+    "openMenu": "打开菜单",
+    "createButton": "新建",
+    "searchPlaceholder": "搜索...",
+    "noResults": "未找到结果。",
+    "loadingRows": "加载中...",
+    "pageOf": "第 {current} 页，共 {total} 页",
+    "deleteConfirmTitle": "删除此记录？",
+    "deleteConfirmDescription": "这将永久删除“{name}”。此操作无法撤销。",
+    "createSuccess": "创建成功。",
+    "updateSuccess": "更新成功。",
+    "deleteSuccess": "删除成功。",
+    "noUpdateNotice": "此记录只能创建或删除，不能编辑。",
+    "airports": {
+      "title": "机场",
+      "description": "管理航班、最短转机时间规则和航段衔接验证所使用的机场参考数据。",
+      "createTitle": "新建机场",
+      "editTitle": "编辑机场",
+      "columns": {
+        "airportCode": "代码",
+        "icaoCode": "ICAO",
+        "name": "名称",
+        "cityCode": "城市",
+        "countryCode": "国家",
+        "timezone": "时区",
+        "coordinates": "坐标"
+      },
+      "fields": {
+        "airportCode": "IATA 代码",
+        "airportCodePlaceholder": "例如 JFK",
+        "icaoCode": "ICAO 代码",
+        "icaoCodePlaceholder": "例如 KJFK",
+        "name": "名称",
+        "namePlaceholder": "例如 肯尼迪国际机场",
+        "cityCode": "城市代码",
+        "cityCodePlaceholder": "例如 NYC",
+        "countryCode": "国家代码",
+        "countryCodePlaceholder": "例如 US",
+        "timezone": "时区",
+        "timezonePlaceholder": "例如 America/New_York",
+        "latitude": "纬度",
+        "longitude": "经度"
+      }
+    },
+    "airlines": {
+      "title": "航空公司",
+      "description": "管理承运航空公司与销售航空公司的参考数据。",
+      "createTitle": "新建航空公司",
+      "editTitle": "编辑航空公司",
+      "columns": {
+        "airlineCode": "代码",
+        "icaoCode": "ICAO",
+        "name": "名称",
+        "countryCode": "国家"
+      },
+      "fields": {
+        "airlineCode": "IATA 代码",
+        "airlineCodePlaceholder": "例如 GA",
+        "icaoCode": "ICAO 代码",
+        "icaoCodePlaceholder": "例如 GIA",
+        "name": "名称",
+        "namePlaceholder": "例如 印尼鹰航",
+        "countryCode": "国家代码",
+        "countryCodePlaceholder": "例如 ID"
+      }
+    },
+    "flights": {
+      "title": "航班",
+      "description": "管理承运航班及其航段。航段在创建时设定，创建后无法编辑。",
+      "createTitle": "新建航班",
+      "editTitle": "编辑航班",
+      "viewLegs": "查看航段",
+      "columns": {
+        "operatingAirline": "航空公司",
+        "flightNumber": "航班号",
+        "route": "航线",
+        "departureTime": "起飞时间",
+        "arrivalTime": "到达时间",
+        "aircraftType": "机型",
+        "status": "状态",
+        "legs": "航段",
+        "price": "价格"
+      },
+      "fields": {
+        "operatingAirline": "承运航空公司",
+        "flightNumber": "航班号",
+        "flightNumberPlaceholder": "例如 874",
+        "originAirport": "出发机场",
+        "destAirport": "到达机场",
+        "departureTime": "起飞时间",
+        "arrivalTime": "到达时间",
+        "aircraftType": "机型",
+        "aircraftTypePlaceholder": "例如 B738",
+        "status": "状态",
+        "multiLeg": "技术经停（多航段）",
+        "legRole": "角色",
+        "legDepAirport": "航段出发机场",
+        "legArrAirport": "航段到达机场",
+        "legDeparture": "航段起飞时间",
+        "legArrival": "航段到达时间",
+        "addLeg": "添加航段",
+        "removeLeg": "移除航段",
+        "price": "价格",
+        "currency": "货币",
+        "currencyPlaceholder": "例如 USD"
+      },
+      "status": {
+        "ACTIVE": "生效",
+        "SUSPENDED": "暂停",
+        "SEASONAL": "季节性"
+      },
+      "legRole": {
+        "FULL": "完整航段",
+        "TECHNICAL_STOP": "技术经停"
+      },
+      "legsSummary": "{count} 个航段"
+    },
+    "codeshare": {
+      "title": "代码共享",
+      "description": "管理映射到承运航班的销售身份。",
+      "createTitle": "新建代码共享",
+      "editTitle": "编辑代码共享",
+      "columns": {
+        "flight": "承运航班",
+        "marketingAirline": "销售航空公司",
+        "marketingNumber": "销售航班号",
+        "isOperatingCarrier": "承运方标记"
+      },
+      "fields": {
+        "flightId": "承运航班",
+        "flightIdPlaceholder": "按航空公司、航班号或航线搜索...",
+        "marketingAirline": "销售航空公司",
+        "marketingNumber": "销售航班号",
+        "marketingNumberPlaceholder": "例如 5502",
+        "isOperatingCarrier": "这是承运航空公司自身的销售记录"
+      }
+    },
+    "mctRules": {
+      "title": "最短转机时间规则",
+      "description": "管理最短转机时间规则，按从最具体到最通用的顺序匹配。",
+      "createTitle": "新建规则",
+      "editTitle": "编辑规则",
+      "resolverTitle": "测试解析器",
+      "resolverDescription": "查找适用于给定转机的规则。",
+      "resolverButton": "解析",
+      "resolverNoMatch": "没有匹配的规则（NO_MCT_RULE）。",
+      "columns": {
+        "arrivalAirport": "到达机场",
+        "departureAirport": "出发机场",
+        "scope": "范围",
+        "arrivalAirline": "到达航空公司",
+        "departureAirline": "出发航空公司",
+        "arrivalTerminal": "到达航站楼",
+        "departureTerminal": "出发航站楼",
+        "mctMinutes": "最短转机时间（分钟）",
+        "maxConnectionMinutes": "最长（分钟）"
+      },
+      "fields": {
+        "arrivalAirport": "到达机场",
+        "departureAirport": "出发机场",
+        "scope": "范围",
+        "arrivalAirline": "到达航空公司（可选）",
+        "departureAirline": "出发航空公司（可选）",
+        "arrivalTerminal": "到达航站楼（可选）",
+        "departureTerminal": "出发航站楼（可选）",
+        "mctMinutes": "最短转机分钟数",
+        "maxConnectionMinutes": "最长转机分钟数（默认 1440）"
+      }
+    },
+    "interlineAgreements": {
+      "title": "联运协议",
+      "description": "管理承运人对之间的定向转机许可以及行李直挂设置。",
+      "createTitle": "新建联运协议",
+      "resolverTitle": "测试解析器",
+      "resolverDescription": "检查入境承运人是否允许转接到出境承运人。",
+      "resolverButton": "解析",
+      "resolverOnline": "同一承运人 — 始终允许。",
+      "resolverPermitted": "允许。",
+      "resolverNotPermitted": "不允许。",
+      "columns": {
+        "inboundAirline": "入境航空公司",
+        "outboundAirline": "出境航空公司",
+        "bagThroughChecked": "行李直挂"
+      },
+      "fields": {
+        "inboundAirline": "入境航空公司",
+        "outboundAirline": "出境航空公司",
+        "bagThroughChecked": "行李可直挂"
+      }
+    },
+    "connections": {
+      "title": "航段衔接验证器",
+      "description": "按照面向预订的 API 相同的方式对航班之间的间隔进行分类。",
+      "pairTab": "单次衔接",
+      "chainTab": "行程链",
+      "prevFlight": "前序航班",
+      "nextFlight": "后续航班",
+      "addFlight": "添加航班",
+      "removeFlight": "移除航班",
+      "validateButton": "验证",
+      "resultTitle": "结果",
+      "resultKind": "类型",
+      "resultGap": "间隔（分钟）",
+      "resultSameMetro": "同城不同机场",
+      "resultInterline": "联程",
+      "resultBagThrough": "行李直挂",
+      "resultMctRule": "适用的最短转机时间规则",
+      "resultInterlineAgreement": "适用的联运协议",
+      "resultReason": "原因",
+      "kind": {
+        "connection": "中转",
+        "stopover": "经停",
+        "open_jaw": "开口行程",
+        "transit": "过境",
+        "invalid": "无效"
+      }
+    }
+  },
+  "flightSearch": {
+    "title": "搜索航班",
+    "description": "按航线和日期查找航班，按价格排序。",
+    "originAirport": "出发地",
+    "destAirport": "目的地",
+    "date": "出发日期",
+    "searchButton": "搜索",
+    "loading": "搜索中...",
+    "noResults": "未找到该航线和日期的航班。",
+    "resultsCount": "找到 {count} 个航班",
+    "aircraft": "机型",
+    "duration": "飞行时长",
+    "direct": "直飞",
+    "stopsCount": "{count} 次中转",
+    "viaAirports": "经停 {airports}"
+  },
   "errors": {
-    "404": "页面未找到",
     "401": "未授权",
     "403": "禁止访问",
+    "404": "页面未找到",
     "500": "内部服务器错误",
     "generic": "出错了，请稍后再试。",
     "unauthorizedDescription": "您没有权限访问此页面。",

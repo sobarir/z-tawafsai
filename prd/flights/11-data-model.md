@@ -57,15 +57,23 @@ Indexes: `idx_airports_city_code` on `city_code` (critical — open-jaw + inter-
 | arrival_time      | `timestamp(tz)` | not null — overall scheduled arrival               |
 | aircraft_type     | `varchar(10)`   | nullable (e.g. '789', '77W')                        |
 | status            | `flight_status` | not null default `ACTIVE`                          |
+| price             | `numeric(10,2)` | not null default 0 — flat, admin-managed; v1.1, see `00-overview.md` Goal 7 |
+| currency          | `varchar(3)`    | not null default `'USD'` — ISO 4217; v1.1           |
 | created_at        | `timestamp(tz)` | not null default now()                             |
 | updated_at        | `timestamp(tz)` | not null default now() `$onUpdate`                  |
 
 Constraints/Indexes:
 - CHECK `arrival_time > departure_time`.
+- CHECK `price >= 0`.
 - UNIQUE `(operating_airline, flight_number, departure_time)` — a physical flight is unique by
   carrier + number + departure instant.
 - `idx_flights_origin_dep` on `(origin_airport, departure_time)`,
-  `idx_flights_dest_arr` on `(dest_airport, arrival_time)` — for connection candidate search.
+  `idx_flights_dest_arr` on `(dest_airport, arrival_time)` — for connection candidate search and
+  `GET /flights/search` (route + date match).
+
+> `price`/`currency` are a flat, admin-managed value for OTA-style search display/sorting — **not**
+> a fare class, fare construction, or dynamic pricing. See `00-overview.md` Goal 7 and
+> `CONTEXT.md`'s amended "Money" decision.
 
 ## Entity 4 — `flight_legs` (operating — takeoff/landing units)
 
