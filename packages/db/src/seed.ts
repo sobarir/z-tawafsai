@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { createDb } from './client';
 import * as schema from './schema';
 
@@ -2421,6 +2421,194 @@ const interlineAgreements: InterlineAgreementSeed[] = [
   { inboundAirline: 'HU', outboundAirline: 'SV', bagThroughChecked: false },
 ];
 
+// Hotel & package search domain — see /prd/hotels/15-seed-data.md for the full spec.
+
+const currencies: (typeof schema.currency.$inferInsert)[] = [
+  { code: 'USD', minorUnit: 2, symbol: '$', name: 'US Dollar' },
+  { code: 'SAR', minorUnit: 2, symbol: '\u{FDFC}', name: 'Saudi Riyal' },
+  { code: 'IDR', minorUnit: 0, symbol: 'Rp', name: 'Indonesian Rupiah' },
+];
+
+type FxRateSeed = {
+  baseCurrency: string;
+  quoteCurrency: string;
+  /** rate x 1_000_000 (parts per million). */
+  ratePpm: number;
+};
+
+// Inverse pairs (e.g. IDR->SAR) are resolved by the FX helper at query time,
+// never stored — see prd/hotels/13-resolver-and-search.md.
+const fxRates: FxRateSeed[] = [
+  { baseCurrency: 'SAR', quoteCurrency: 'IDR', ratePpm: 4_350_000_000 },
+  { baseCurrency: 'USD', quoteCurrency: 'IDR', ratePpm: 16_300_000_000 },
+  { baseCurrency: 'USD', quoteCurrency: 'SAR', ratePpm: 3_750_000 },
+];
+
+type RoomTypeSeed = { name: string; maxOccupancy: number };
+type SeasonSeed = {
+  name: 'standard' | 'peak' | 'ramadan' | 'hajj' | 'promo';
+  startDate: string;
+  endDate: string;
+};
+type RateRuleSeed = {
+  seasonName: SeasonSeed['name'];
+  /** Property rate rules only — omit for packages (room_type_id stays NULL). */
+  roomTypeName?: string;
+  minOccupancy: number;
+  maxOccupancy: number;
+  /** Integer minor units. Per-night for properties, total for packages. */
+  amount: number;
+  currency: string;
+};
+
+type PropertyListingSeed = {
+  kind: 'property';
+  code: string;
+  displayName: string;
+  destination: string;
+  countryCode: string;
+  starRating?: number;
+  address?: string;
+  roomTypes: RoomTypeSeed[];
+  seasons: SeasonSeed[];
+  rateRules: RateRuleSeed[];
+};
+
+type PackageListingSeed = {
+  kind: 'package';
+  code: string;
+  displayName: string;
+  destination: string;
+  countryCode: string;
+  durationNights: number;
+  includes?: string;
+  seasons: SeasonSeed[];
+  rateRules: RateRuleSeed[];
+};
+
+type HotelListingSeed = PropertyListingSeed | PackageListingSeed;
+
+// L1/L2/L3 exactly as specified in prd/hotels/15-seed-data.md (L2's season
+// windows use the doc's own non-overlapping revision to satisfy the season
+// EXCLUDE constraint).
+const hotelListings: HotelListingSeed[] = [
+  {
+    kind: 'property',
+    code: 'JED-WFH',
+    displayName: 'Jeddah Waterfront Hotel',
+    destination: 'Jeddah',
+    countryCode: 'SA',
+    roomTypes: [
+      { name: 'Double', maxOccupancy: 2 },
+      { name: 'Quad', maxOccupancy: 4 },
+    ],
+    seasons: [
+      { name: 'standard', startDate: '2026-01-01', endDate: '2026-05-01' },
+      { name: 'peak', startDate: '2026-05-01', endDate: '2026-07-01' },
+    ],
+    rateRules: [
+      {
+        seasonName: 'standard',
+        roomTypeName: 'Double',
+        minOccupancy: 1,
+        maxOccupancy: 2,
+        amount: 40_000,
+        currency: 'SAR',
+      },
+      {
+        seasonName: 'standard',
+        roomTypeName: 'Quad',
+        minOccupancy: 3,
+        maxOccupancy: 4,
+        amount: 70_000,
+        currency: 'SAR',
+      },
+      {
+        seasonName: 'peak',
+        roomTypeName: 'Double',
+        minOccupancy: 1,
+        maxOccupancy: 2,
+        amount: 60_000,
+        currency: 'SAR',
+      },
+      {
+        seasonName: 'peak',
+        roomTypeName: 'Quad',
+        minOccupancy: 3,
+        maxOccupancy: 4,
+        amount: 95_000,
+        currency: 'SAR',
+      },
+    ],
+  },
+  {
+    kind: 'package',
+    code: 'UMR-9D-ECO',
+    displayName: '9-Day Umrah Economy',
+    destination: 'Jeddah',
+    countryCode: 'SA',
+    durationNights: 9,
+    seasons: [
+      { name: 'standard', startDate: '2026-01-01', endDate: '2026-02-18' },
+      { name: 'ramadan', startDate: '2026-02-18', endDate: '2026-03-20' },
+      { name: 'peak', startDate: '2026-03-20', endDate: '2026-07-01' },
+    ],
+    rateRules: [
+      {
+        seasonName: 'standard',
+        minOccupancy: 1,
+        maxOccupancy: 2,
+        amount: 180_000,
+        currency: 'USD',
+      },
+      {
+        seasonName: 'standard',
+        minOccupancy: 3,
+        maxOccupancy: 4,
+        amount: 340_000,
+        currency: 'USD',
+      },
+      {
+        seasonName: 'ramadan',
+        minOccupancy: 1,
+        maxOccupancy: 2,
+        amount: 260_000,
+        currency: 'USD',
+      },
+      {
+        seasonName: 'ramadan',
+        minOccupancy: 3,
+        maxOccupancy: 4,
+        amount: 480_000,
+        currency: 'USD',
+      },
+    ],
+  },
+  {
+    // Exists so a NO_SEASON case (S9) is easy: query dates outside this
+    // listing's single season window.
+    kind: 'property',
+    code: 'MAD-CIN',
+    displayName: 'Madinah Central Inn',
+    destination: 'Madinah',
+    countryCode: 'SA',
+    roomTypes: [{ name: 'Double', maxOccupancy: 2 }],
+    seasons: [
+      { name: 'standard', startDate: '2026-01-01', endDate: '2026-05-01' },
+    ],
+    rateRules: [
+      {
+        seasonName: 'standard',
+        roomTypeName: 'Double',
+        minOccupancy: 1,
+        maxOccupancy: 2,
+        amount: 35_000,
+        currency: 'SAR',
+      },
+    ],
+  },
+];
+
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -2587,8 +2775,216 @@ async function seed() {
       });
   }
 
+  for (const currencyRow of currencies) {
+    await db.insert(schema.currency).values(currencyRow).onConflictDoUpdate({
+      target: schema.currency.code,
+      set: currencyRow,
+    });
+  }
+
+  const fxAsOf = new Date('2026-07-01T00:00:00Z');
+  for (const fx of fxRates) {
+    await db
+      .insert(schema.fxRate)
+      .values({
+        baseCurrency: fx.baseCurrency,
+        quoteCurrency: fx.quoteCurrency,
+        ratePpm: fx.ratePpm,
+        asOf: fxAsOf,
+      })
+      .onConflictDoUpdate({
+        target: [schema.fxRate.baseCurrency, schema.fxRate.quoteCurrency],
+        set: { ratePpm: fx.ratePpm, asOf: fxAsOf },
+      });
+  }
+
+  for (const item of hotelListings) {
+    const existingListingId =
+      item.kind === 'property'
+        ? (
+            await db
+              .select({ listingId: schema.property.listingId })
+              .from(schema.property)
+              .where(eq(schema.property.propertyCode, item.code))
+          )[0]?.listingId
+        : (
+            await db
+              .select({ listingId: schema.travelPackage.listingId })
+              .from(schema.travelPackage)
+              .where(eq(schema.travelPackage.packageCode, item.code))
+          )[0]?.listingId;
+
+    const listingValues = {
+      kind: item.kind,
+      displayName: item.displayName,
+      destination: item.destination,
+      countryCode: item.countryCode,
+      isActive: true,
+    };
+
+    let listingId: string;
+    if (existingListingId) {
+      listingId = existingListingId;
+      await db
+        .update(schema.listing)
+        .set(listingValues)
+        .where(eq(schema.listing.id, listingId));
+    } else {
+      const [row] = await db
+        .insert(schema.listing)
+        .values(listingValues)
+        .returning();
+      listingId = row.id;
+    }
+
+    if (item.kind === 'property') {
+      await db
+        .insert(schema.property)
+        .values({
+          propertyCode: item.code,
+          listingId,
+          starRating: item.starRating ?? null,
+          address: item.address ?? null,
+        })
+        .onConflictDoUpdate({
+          target: schema.property.propertyCode,
+          set: {
+            listingId,
+            starRating: item.starRating ?? null,
+            address: item.address ?? null,
+          },
+        });
+    } else {
+      await db
+        .insert(schema.travelPackage)
+        .values({
+          packageCode: item.code,
+          listingId,
+          durationNights: item.durationNights,
+          includes: item.includes ?? null,
+        })
+        .onConflictDoUpdate({
+          target: schema.travelPackage.packageCode,
+          set: {
+            listingId,
+            durationNights: item.durationNights,
+            includes: item.includes ?? null,
+          },
+        });
+    }
+
+    const roomTypeIdByName = new Map<string, string>();
+    if (item.kind === 'property') {
+      for (const roomType of item.roomTypes) {
+        const [row] = await db
+          .insert(schema.roomType)
+          .values({
+            propertyCode: item.code,
+            name: roomType.name,
+            maxOccupancy: roomType.maxOccupancy,
+          })
+          .onConflictDoUpdate({
+            target: [schema.roomType.propertyCode, schema.roomType.name],
+            set: { maxOccupancy: roomType.maxOccupancy },
+          })
+          .returning();
+        roomTypeIdByName.set(roomType.name, row.id);
+      }
+    }
+
+    const seasonIdByName = new Map<string, string>();
+    for (const season of item.seasons) {
+      const [existing] = await db
+        .select()
+        .from(schema.season)
+        .where(
+          and(
+            eq(schema.season.listingId, listingId),
+            eq(schema.season.name, season.name),
+          ),
+        );
+      if (existing) {
+        await db
+          .update(schema.season)
+          .set({ startDate: season.startDate, endDate: season.endDate })
+          .where(eq(schema.season.id, existing.id));
+        seasonIdByName.set(season.name, existing.id);
+      } else {
+        const [row] = await db
+          .insert(schema.season)
+          .values({
+            listingId,
+            name: season.name,
+            startDate: season.startDate,
+            endDate: season.endDate,
+          })
+          .returning();
+        seasonIdByName.set(season.name, row.id);
+      }
+    }
+
+    for (const rule of item.rateRules) {
+      const seasonId = seasonIdByName.get(rule.seasonName);
+      if (!seasonId) {
+        throw new Error(
+          `Seed error: rate rule for ${item.code} references unknown season "${rule.seasonName}"`,
+        );
+      }
+      const roomTypeId = rule.roomTypeName
+        ? (roomTypeIdByName.get(rule.roomTypeName) ?? null)
+        : null;
+      if (rule.roomTypeName && !roomTypeId) {
+        throw new Error(
+          `Seed error: rate rule for ${item.code} references unknown room type "${rule.roomTypeName}"`,
+        );
+      }
+
+      const [existing] = await db
+        .select()
+        .from(schema.rateRule)
+        .where(
+          and(
+            eq(schema.rateRule.listingId, listingId),
+            eq(schema.rateRule.seasonId, seasonId),
+            roomTypeId
+              ? eq(schema.rateRule.roomTypeId, roomTypeId)
+              : isNull(schema.rateRule.roomTypeId),
+            eq(schema.rateRule.minOccupancy, rule.minOccupancy),
+            eq(schema.rateRule.maxOccupancy, rule.maxOccupancy),
+          ),
+        );
+
+      const values = {
+        listingId,
+        seasonId,
+        roomTypeId,
+        minOccupancy: rule.minOccupancy,
+        maxOccupancy: rule.maxOccupancy,
+        amount: rule.amount,
+        currency: rule.currency,
+      };
+
+      if (existing) {
+        await db
+          .update(schema.rateRule)
+          .set(values)
+          .where(eq(schema.rateRule.id, existing.id));
+      } else {
+        await db.insert(schema.rateRule).values(values);
+      }
+    }
+  }
+
+  const rateRuleCount = hotelListings.reduce(
+    (count, item) => count + item.rateRules.length,
+    0,
+  );
+
   console.log(
     `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows, ${mctRules.length} MCT rules, ${interlineAgreements.length} interline agreements`,
+  );
+  console.log(
+    `Seeded ${currencies.length} currencies, ${fxRates.length} fx rates, ${hotelListings.length} hotel listings, ${rateRuleCount} rate rules`,
   );
 }
 

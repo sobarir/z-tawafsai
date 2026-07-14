@@ -13,6 +13,7 @@ import { ConnectionsModule } from './connections/connections.module';
 import { DatabaseModule } from './database/database.module';
 import { FlightMarketingModule } from './flight-marketing/flight-marketing.module';
 import { FlightsModule } from './flights/flights.module';
+import { HotelsModule } from './hotels/hotels.module';
 import { InterlineAgreementsModule } from './interline-agreements/interline-agreements.module';
 import { MctRulesModule } from './mct-rules/mct-rules.module';
 import { PostsModule } from './posts/posts.module';
@@ -36,6 +37,7 @@ import { UsersModule } from './users/users.module';
     MctRulesModule,
     InterlineAgreementsModule,
     ConnectionsModule,
+    HotelsModule,
   ],
   controllers: [AppController],
   providers: [

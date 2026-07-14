@@ -432,3 +432,68 @@ export const meResponseSchema = z.object({
   user: sessionUserSchema,
 });
 export type MeResponse = z.infer<typeof meResponseSchema>;
+
+/**
+ * Hotel & package search domain — see /prd/hotels/11-data-model.md and
+ * /prd/hotels/13-resolver-and-search.md. Money is always integer minor units
+ * + an ISO currency code — never a bare number, never a float.
+ */
+export const moneySchema = z.object({
+  amount: z.number().int(),
+  currency: currencyCodeSchema,
+});
+export type Money = z.infer<typeof moneySchema>;
+
+export const listingKindSchema = z.enum(['property', 'package']);
+export type ListingKind = z.infer<typeof listingKindSchema>;
+
+/**
+ * Mirrors the resolver's outcome for a single listing: `perNight`/`nights`
+ * are present for properties, absent for packages — `total` is always
+ * present. See /prd/hotels/01-glossary.md's "5 golden rules" #5.
+ */
+export const hotelPriceBreakdownSchema = z.object({
+  perNight: moneySchema.optional(),
+  nights: z.number().int().positive().optional(),
+  total: moneySchema,
+});
+export type HotelPriceBreakdown = z.infer<typeof hotelPriceBreakdownSchema>;
+
+export const hotelSearchQuerySchema = z.object({
+  destination: z.string().min(1),
+  checkIn: z.iso.date(),
+  checkOut: z.iso.date(),
+  occupancy: z.coerce.number().int().min(1),
+  currency: currencyCodeSchema,
+  kind: listingKindSchema.or(z.literal('both')).optional().default('both'),
+  roomType: z.string().optional(),
+  minPrice: z.coerce.number().int().min(0).optional(),
+  maxPrice: z.coerce.number().int().min(0).optional(),
+  sort: z
+    .enum(['price_asc', 'price_desc', 'name'])
+    .optional()
+    .default('price_asc'),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+export type HotelSearchQuery = z.infer<typeof hotelSearchQuerySchema>;
+
+export const hotelSearchResultSchema = z.object({
+  listingId: ulidSchema,
+  kind: listingKindSchema,
+  displayName: z.string(),
+  destination: z.string(),
+  heroImageUrl: z.string().nullable(),
+  price: moneySchema,
+  nativePrice: moneySchema,
+  breakdown: hotelPriceBreakdownSchema,
+  starRating: z.number().int().min(1).max(5).nullable().optional(),
+  durationNights: z.number().int().positive().optional(),
+});
+export type HotelSearchResult = z.infer<typeof hotelSearchResultSchema>;
+
+export const hotelSearchResponseSchema = z.object({
+  items: z.array(hotelSearchResultSchema),
+  total: z.number().int().nonnegative(),
+});
+export type HotelSearchResponse = z.infer<typeof hotelSearchResponseSchema>;

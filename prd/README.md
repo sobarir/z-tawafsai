@@ -12,7 +12,7 @@ ask before picking one.
 | Domain | Folder | Status | Start here |
 | --- | --- | --- | --- |
 | Flight schedule & inventory | `prd/flights/` | v1 + v1.1 (pricing/search) complete | `prd/flights/CONTEXT.md` |
-| Hotel search & pricing | `prd/hotels/` | not started | — |
+| Hotel search & pricing | `prd/hotels/` | not started | `prd/hotels/CONTEXT.md` |
 
 ## Adding a new domain
 

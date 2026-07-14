@@ -1,7 +1,10 @@
 import { sql } from 'drizzle-orm';
 import {
+  bigint,
   boolean,
+  char,
   check,
+  date,
   index,
   integer,
   numeric,
@@ -297,6 +300,209 @@ export const interlineAgreements = pgTable(
   ],
 );
 
+// Hotel & package search domain — see /prd/hotels/11-data-model.md for the full spec.
+
+export const listingKind = pgEnum('listing_kind', ['property', 'package']);
+export const seasonName = pgEnum('season_name', [
+  'standard',
+  'peak',
+  'ramadan',
+  'hajj',
+  'promo',
+]);
+
+export const currency = pgTable('currency', {
+  code: char('code', { length: 3 }).primaryKey(),
+  minorUnit: integer('minor_unit').notNull(),
+  symbol: text('symbol').notNull(),
+  name: text('name').notNull(),
+});
+
+export const fxRate = pgTable(
+  'fx_rate',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    baseCurrency: char('base_currency', { length: 3 })
+      .notNull()
+      .references(() => currency.code),
+    quoteCurrency: char('quote_currency', { length: 3 })
+      .notNull()
+      .references(() => currency.code),
+    ratePpm: bigint('rate_ppm', { mode: 'number' }).notNull(),
+    asOf: timestamp('as_of', { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    uniqueIndex('fx_rate_base_quote_unique').on(
+      table.baseCurrency,
+      table.quoteCurrency,
+    ),
+    check(
+      'fx_rate_base_ne_quote',
+      sql`${table.baseCurrency} <> ${table.quoteCurrency}`,
+    ),
+  ],
+);
+
+export const listing = pgTable(
+  'listing',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    kind: listingKind('kind').notNull(),
+    displayName: text('display_name').notNull(),
+    destination: text('destination').notNull(),
+    countryCode: char('country_code', { length: 2 }).notNull(),
+    heroImageUrl: text('hero_image_url'),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index('idx_listing_destination').on(table.destination),
+    index('idx_listing_kind').on(table.kind),
+    index('idx_listing_active_kind').on(table.isActive, table.kind),
+  ],
+);
+
+// 1:1 with a `kind='property'` listing. `property_code` is a natural key
+// (e.g. 'JED-WFH'), matching this repo's convention for stable domain codes.
+export const property = pgTable(
+  'property',
+  {
+    propertyCode: text('property_code').primaryKey(),
+    listingId: text('listing_id')
+      .notNull()
+      .unique()
+      .references(() => listing.id),
+    starRating: integer('star_rating'),
+    address: text('address'),
+  },
+  (table) => [
+    check(
+      'property_star_rating_range',
+      sql`${table.starRating} IS NULL OR (${table.starRating} BETWEEN 1 AND 5)`,
+    ),
+  ],
+);
+
+// 1:1 with a `kind='package'` listing. `package` is a reserved word in strict
+// mode JS, so the export binding is `travelPackage`; the table name stays `package`.
+export const travelPackage = pgTable(
+  'package',
+  {
+    packageCode: text('package_code').primaryKey(),
+    listingId: text('listing_id')
+      .notNull()
+      .unique()
+      .references(() => listing.id),
+    durationNights: integer('duration_nights').notNull(),
+    includes: text('includes'),
+  },
+  (table) => [
+    check('package_duration_positive', sql`${table.durationNights} > 0`),
+  ],
+);
+
+export const roomType = pgTable(
+  'room_type',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    propertyCode: text('property_code')
+      .notNull()
+      .references(() => property.propertyCode),
+    name: text('name').notNull(),
+    maxOccupancy: integer('max_occupancy').notNull(),
+  },
+  (table) => [
+    uniqueIndex('room_type_property_name_unique').on(
+      table.propertyCode,
+      table.name,
+    ),
+    index('idx_room_type_property').on(table.propertyCode),
+    check('room_type_max_occupancy_positive', sql`${table.maxOccupancy} > 0`),
+  ],
+);
+
+// Non-overlap within a listing is enforced by a Postgres EXCLUDE constraint
+// (daterange + btree_gist) — Drizzle's schema builder has no API for EXCLUDE,
+// so it's added via a hand-written custom migration, not expressed here.
+// See drizzle/<timestamp>_season_no_overlap.sql.
+export const season = pgTable(
+  'season',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    listingId: text('listing_id')
+      .notNull()
+      .references(() => listing.id),
+    name: seasonName('name').notNull(),
+    startDate: date('start_date', { mode: 'string' }).notNull(),
+    endDate: date('end_date', { mode: 'string' }).notNull(),
+  },
+  (table) => [
+    index('idx_season_listing_start').on(table.listingId, table.startDate),
+    check('season_end_after_start', sql`${table.endDate} > ${table.startDate}`),
+  ],
+);
+
+export const rateRule = pgTable(
+  'rate_rule',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    listingId: text('listing_id')
+      .notNull()
+      .references(() => listing.id),
+    seasonId: text('season_id')
+      .notNull()
+      .references(() => season.id),
+    // NULL for packages, required for properties.
+    roomTypeId: text('room_type_id').references(() => roomType.id),
+    minOccupancy: integer('min_occupancy').notNull(),
+    maxOccupancy: integer('max_occupancy').notNull(),
+    // Minor units. Per-night for properties, total for packages — the
+    // distinction is carried by the parent listing's `kind`, not this table.
+    amount: integer('amount').notNull(),
+    currency: char('currency', { length: 3 })
+      .notNull()
+      .references(() => currency.code),
+  },
+  (table) => [
+    index('idx_rate_rule_listing_season').on(table.listingId, table.seasonId),
+    check(
+      'rate_rule_max_gte_min',
+      sql`${table.maxOccupancy} >= ${table.minOccupancy}`,
+    ),
+    check('rate_rule_amount_non_negative', sql`${table.amount} >= 0`),
+    uniqueIndex('rate_rule_band_unique').on(
+      table.listingId,
+      table.seasonId,
+      table.roomTypeId,
+      table.minOccupancy,
+      table.maxOccupancy,
+    ),
+    // Partial unique for the package case: Postgres treats NULLs as distinct
+    // in a plain UNIQUE constraint, so the base index above never catches
+    // colliding package bands (room_type_id always NULL for those rows).
+    uniqueIndex('rate_rule_band_unique_no_room_type')
+      .on(
+        table.listingId,
+        table.seasonId,
+        table.minOccupancy,
+        table.maxOccupancy,
+      )
+      .where(sql`${table.roomTypeId} IS NULL`),
+  ],
+);
+
 export type Airport = typeof airports.$inferSelect;
 export type NewAirport = typeof airports.$inferInsert;
 export type Airline = typeof airlines.$inferSelect;
@@ -311,3 +517,20 @@ export type MctRule = typeof mctRules.$inferSelect;
 export type NewMctRule = typeof mctRules.$inferInsert;
 export type InterlineAgreement = typeof interlineAgreements.$inferSelect;
 export type NewInterlineAgreement = typeof interlineAgreements.$inferInsert;
+
+export type Currency = typeof currency.$inferSelect;
+export type NewCurrency = typeof currency.$inferInsert;
+export type FxRate = typeof fxRate.$inferSelect;
+export type NewFxRate = typeof fxRate.$inferInsert;
+export type Listing = typeof listing.$inferSelect;
+export type NewListing = typeof listing.$inferInsert;
+export type Property = typeof property.$inferSelect;
+export type NewProperty = typeof property.$inferInsert;
+export type TravelPackage = typeof travelPackage.$inferSelect;
+export type NewTravelPackage = typeof travelPackage.$inferInsert;
+export type RoomType = typeof roomType.$inferSelect;
+export type NewRoomType = typeof roomType.$inferInsert;
+export type Season = typeof season.$inferSelect;
+export type NewSeason = typeof season.$inferInsert;
+export type RateRule = typeof rateRule.$inferSelect;
+export type NewRateRule = typeof rateRule.$inferInsert;

@@ -39,6 +39,7 @@ import type {
   FlightItineraryDto,
   FlightMarketingDto,
   GetOperatingFlightByMarketingParams,
+  HotelSearchResponseDto,
   InterlineAgreementDto,
   InterlineResolutionDto,
   ListFlightMarketingParams,
@@ -48,6 +49,7 @@ import type {
   ResolveInterlineParams,
   ResolveMctRuleParams,
   SearchFlightsParams,
+  SearchHotelsParams,
   UpdateAirlineDto,
   UpdateAirportDto,
   UpdateFlightDto,
@@ -3448,3 +3450,107 @@ export const useDeleteFlightMarketing = <TError = unknown,
 
       return useMutation(mutationOptions, queryClient);
     }
+    
+/**
+ * @summary Search properties and packages by destination/dates/occupancy, priced in the requested display currency
+ */
+export const getSearchHotelsUrl = (params: SearchHotelsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/hotels/search?${stringifiedParams}` : `/api/hotels/search`
+}
+
+export const searchHotels = async (params: SearchHotelsParams, options?: RequestInit): Promise<HotelSearchResponseDto> => {
+  
+  return customFetch<HotelSearchResponseDto>(getSearchHotelsUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getSearchHotelsQueryKey = (params?: SearchHotelsParams,) => {
+    return [
+    `/api/hotels/search`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getSearchHotelsQueryOptions = <TData = Awaited<ReturnType<typeof searchHotels>>, TError = unknown>(params: SearchHotelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHotels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchHotelsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchHotels>>> = ({ signal }) => searchHotels(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchHotels>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SearchHotelsQueryResult = NonNullable<Awaited<ReturnType<typeof searchHotels>>>
+export type SearchHotelsQueryError = unknown
+
+
+export function useSearchHotels<TData = Awaited<ReturnType<typeof searchHotels>>, TError = unknown>(
+ params: SearchHotelsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHotels>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchHotels>>,
+          TError,
+          Awaited<ReturnType<typeof searchHotels>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchHotels<TData = Awaited<ReturnType<typeof searchHotels>>, TError = unknown>(
+ params: SearchHotelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHotels>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchHotels>>,
+          TError,
+          Awaited<ReturnType<typeof searchHotels>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchHotels<TData = Awaited<ReturnType<typeof searchHotels>>, TError = unknown>(
+ params: SearchHotelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHotels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Search properties and packages by destination/dates/occupancy, priced in the requested display currency
+ */
+
+export function useSearchHotels<TData = Awaited<ReturnType<typeof searchHotels>>, TError = unknown>(
+ params: SearchHotelsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHotels>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSearchHotelsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}

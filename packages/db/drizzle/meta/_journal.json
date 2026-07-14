@@ -22,6 +22,20 @@
       "when": 1783913127090,
       "tag": "0002_clean_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783958957404,
+      "tag": "0003_powerful_killer_shrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783958971114,
+      "tag": "0004_hotels_season_no_overlap",
+      "breakpoints": true
     }
   ]
 }
