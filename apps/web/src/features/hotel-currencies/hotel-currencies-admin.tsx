@@ -22,8 +22,8 @@ import { getCurrencyColumns } from './columns';
 import { CurrencyForm } from './currency-form';
 
 export function HotelCurrenciesAdmin() {
-  const t = useTranslations('catalog.currencies');
-  const tCatalog = useTranslations('catalog');
+  const t = useTranslations('reference.currencies');
+  const tReference = useTranslations('reference');
   const tCommon = useTranslations('common');
 
   const { data: currencies, isLoading } = useListHotelCurrencies();
@@ -32,7 +32,10 @@ export function HotelCurrenciesAdmin() {
   const [editing, setEditing] = useState<Currency | null>(null);
   const [deleting, setDeleting] = useState<Currency | null>(null);
 
-  const feedback = useCrudFeedback(getListHotelCurrenciesQueryKey(), 'catalog');
+  const feedback = useCrudFeedback(
+    getListHotelCurrenciesQueryKey(),
+    'reference',
+  );
 
   const createMutation = useCreateHotelCurrency({
     mutation: crudMutationOptions(feedback, 'createSuccess', () =>
@@ -60,8 +63,8 @@ export function HotelCurrenciesAdmin() {
           symbol: t('columns.symbol'),
           name: t('columns.name'),
         },
-        actionsLabel: tCatalog('actions'),
-        openMenuLabel: tCatalog('openMenu'),
+        actionsLabel: tReference('actions'),
+        openMenuLabel: tReference('openMenu'),
         editLabel: tCommon('edit'),
         deleteLabel: tCommon('delete'),
         onEdit: (currency) => {
@@ -70,7 +73,7 @@ export function HotelCurrenciesAdmin() {
         },
         onDelete: (currency) => setDeleting(currency),
       }),
-    [t, tCatalog, tCommon],
+    [t, tReference, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -78,7 +81,7 @@ export function HotelCurrenciesAdmin() {
   return (
     <div className="flex w-full min-w-0 flex-col gap-4">
       <EntityDataTable
-        namespace="catalog"
+        namespace="reference"
         columns={columns}
         data={currencies ?? []}
         isLoading={isLoading}
@@ -91,7 +94,7 @@ export function HotelCurrenciesAdmin() {
               setFormOpen(true);
             }}
           >
-            {tCatalog('createButton')}
+            {tReference('createButton')}
           </Button>
         }
       />
@@ -123,7 +126,7 @@ export function HotelCurrenciesAdmin() {
       </EntityFormDialog>
 
       <EntityDeleteConfirm
-        namespace="catalog"
+        namespace="reference"
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
         name={deleting?.code ?? ''}

@@ -38,7 +38,7 @@ export function FxRateForm({
   onCancel,
   submitting,
 }: FxRateFormProps) {
-  const t = useTranslations('catalog.fxRates.fields');
+  const t = useTranslations('reference.fxRates.fields');
   const tCommon = useTranslations('common');
 
   const form = useForm<FxRateFormValues>({

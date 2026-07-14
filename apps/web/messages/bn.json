@@ -19,6 +19,7 @@
     "filter": "ফিল্টার",
     "reset": "রিসেট",
     "noData": "কোন ডেটা নেই",
+    "noResultsFound": "কোনো ফলাফল পাওয়া যায়নি।",
     "toggleTheme": "থিম পরিবর্তন করুন",
     "sidebar": "সাইডবার",
     "toggleSidebar": "সাইডবার টগল করুন",
@@ -43,7 +44,8 @@
     "searchHotels": "হোটেল অনুসন্ধান",
     "logout": "লগআউট",
     "login": "লগইন",
-    "uiComponents": "UI কম্পোনেন্ট"
+    "uiComponents": "UI কম্পোনেন্ট",
+    "travelPackages": "ভ্রমণ প্যাকেজ"
   },
   "auth": {
     "login": {
@@ -204,7 +206,6 @@
         "name": "নাম",
         "namePlaceholder": "যেমন জন এফ কেনেডি ইন্টারন্যাশনাল",
         "cityCode": "শহর কোড",
-        "cityCodePlaceholder": "যেমন NYC",
         "countryCode": "দেশের কোড",
         "countryCodePlaceholder": "যেমন US",
         "timezone": "সময় অঞ্চল",
@@ -443,8 +444,6 @@
   "catalog": {
     "nav": {
       "section": "ক্যাটালগ অ্যাডমিন",
-      "currencies": "মুদ্রা",
-      "fxRates": "বিনিময় হার",
       "properties": "থাকার জায়গা",
       "packages": "প্যাকেজ",
       "roomTypes": "রুম টাইপ",
@@ -463,45 +462,6 @@
     "createSuccess": "সফলভাবে তৈরি হয়েছে।",
     "updateSuccess": "সফলভাবে আপডেট হয়েছে।",
     "deleteSuccess": "সফলভাবে মুছে ফেলা হয়েছে।",
-    "currencies": {
-      "title": "মুদ্রা",
-      "description": "থাকার জায়গা ও প্যাকেজের মূল্য নির্ধারণে ব্যবহৃত রেফারেন্স মুদ্রা।",
-      "createTitle": "নতুন মুদ্রা",
-      "editTitle": "মুদ্রা সম্পাদনা করুন",
-      "columns": {
-        "code": "কোড",
-        "name": "নাম",
-        "symbol": "প্রতীক",
-        "minorUnit": "দশমিক ঘর"
-      },
-      "fields": {
-        "code": "মুদ্রা কোড",
-        "codePlaceholder": "যেমন USD",
-        "minorUnit": "দশমিক ঘর সংখ্যা",
-        "symbol": "প্রতীক",
-        "symbolPlaceholder": "যেমন $",
-        "name": "নাম",
-        "namePlaceholder": "যেমন মার্কিন ডলার"
-      }
-    },
-    "fxRates": {
-      "title": "বিনিময় হার",
-      "description": "ভিন্ন মুদ্রায় মূল্য দেখানোর জন্য ব্যবহৃত মুদ্রা-জোড়া রূপান্তর হার।",
-      "createTitle": "নতুন বিনিময় হার",
-      "editTitle": "বিনিময় হার সম্পাদনা করুন",
-      "columns": {
-        "baseCurrency": "মূল",
-        "quoteCurrency": "লক্ষ্য",
-        "rate": "হার",
-        "asOf": "তারিখ"
-      },
-      "fields": {
-        "baseCurrency": "মূল মুদ্রা",
-        "quoteCurrency": "লক্ষ্য মুদ্রা",
-        "rate": "হার (১ মূল = ? লক্ষ্য)",
-        "asOf": "তারিখ"
-      }
-    },
     "properties": {
       "title": "থাকার জায়গা",
       "description": "হোটেল-স্টাইল থাকার জায়গা, রুম টাইপ অনুযায়ী প্রতি রাতে মূল্য নির্ধারিত।",
@@ -521,7 +481,7 @@
         "displayName": "প্রদর্শিত নাম",
         "displayNamePlaceholder": "যেমন জেদ্দা ওয়াটারফ্রন্ট হোটেল",
         "destination": "গন্তব্য",
-        "destinationPlaceholder": "যেমন জেদ্দা",
+        "destinationHint": "দেখতে পাচ্ছেন না? প্রথমে রেফারেন্স ডেটা → শহর-এ যোগ করুন।",
         "countryCode": "দেশের কোড",
         "countryCodePlaceholder": "যেমন SA",
         "heroImageUrl": "প্রধান ছবির URL",
@@ -551,7 +511,7 @@
         "displayName": "প্রদর্শিত নাম",
         "displayNamePlaceholder": "যেমন ৯-দিনের ইকোনমি উমরাহ",
         "destination": "গন্তব্য",
-        "destinationPlaceholder": "যেমন জেদ্দা",
+        "destinationHint": "দেখতে পাচ্ছেন না? প্রথমে রেফারেন্স ডেটা → শহর-এ যোগ করুন।",
         "countryCode": "দেশের কোড",
         "countryCodePlaceholder": "যেমন SA",
         "heroImageUrl": "প্রধান ছবির URL",
@@ -628,6 +588,84 @@
       }
     }
   },
+  "reference": {
+    "nav": {
+      "section": "রেফারেন্স অ্যাডমিন",
+      "cities": "শহর",
+      "currencies": "মুদ্রা",
+      "fxRates": "বিনিময় হার"
+    },
+    "actions": "কার্যক্রম",
+    "openMenu": "মেনু খুলুন",
+    "createButton": "নতুন",
+    "searchPlaceholder": "অনুসন্ধান করুন...",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি।",
+    "loadingRows": "লোড হচ্ছে...",
+    "pageOf": "পৃষ্ঠা {current} এর {total}",
+    "deleteConfirmTitle": "এই রেকর্ডটি মুছবেন?",
+    "deleteConfirmDescription": "এটি স্থায়ীভাবে \"{name}\" মুছে ফেলবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "createSuccess": "সফলভাবে তৈরি হয়েছে।",
+    "updateSuccess": "সফলভাবে আপডেট হয়েছে।",
+    "deleteSuccess": "সফলভাবে মুছে ফেলা হয়েছে।",
+    "cities": {
+      "title": "শহর",
+      "description": "বিমানবন্দর এবং হোটেল প্রপার্টি/প্যাকেজে ব্যবহৃত রেফারেন্স শহর।",
+      "createTitle": "নতুন শহর",
+      "editTitle": "শহর সম্পাদনা করুন",
+      "columns": {
+        "cityCode": "কোড",
+        "name": "নাম",
+        "countryCode": "দেশ"
+      },
+      "fields": {
+        "cityCode": "শহর কোড",
+        "cityCodePlaceholder": "যেমন NYC",
+        "name": "নাম",
+        "namePlaceholder": "যেমন নিউ ইয়র্ক",
+        "countryCode": "দেশের কোড",
+        "countryCodePlaceholder": "যেমন US"
+      }
+    },
+    "currencies": {
+      "title": "মুদ্রা",
+      "description": "থাকার জায়গা ও প্যাকেজের মূল্য নির্ধারণে ব্যবহৃত রেফারেন্স মুদ্রা।",
+      "createTitle": "নতুন মুদ্রা",
+      "editTitle": "মুদ্রা সম্পাদনা করুন",
+      "columns": {
+        "code": "কোড",
+        "name": "নাম",
+        "symbol": "প্রতীক",
+        "minorUnit": "দশমিক ঘর"
+      },
+      "fields": {
+        "code": "মুদ্রা কোড",
+        "codePlaceholder": "যেমন USD",
+        "minorUnit": "দশমিক ঘর সংখ্যা",
+        "symbol": "প্রতীক",
+        "symbolPlaceholder": "যেমন $",
+        "name": "নাম",
+        "namePlaceholder": "যেমন মার্কিন ডলার"
+      }
+    },
+    "fxRates": {
+      "title": "বিনিময় হার",
+      "description": "ভিন্ন মুদ্রায় মূল্য দেখানোর জন্য ব্যবহৃত মুদ্রা-জোড়া রূপান্তর হার।",
+      "createTitle": "নতুন বিনিময় হার",
+      "editTitle": "বিনিময় হার সম্পাদনা করুন",
+      "columns": {
+        "baseCurrency": "মূল",
+        "quoteCurrency": "লক্ষ্য",
+        "rate": "হার",
+        "asOf": "তারিখ"
+      },
+      "fields": {
+        "baseCurrency": "মূল মুদ্রা",
+        "quoteCurrency": "লক্ষ্য মুদ্রা",
+        "rate": "হার (১ মূল = ? লক্ষ্য)",
+        "asOf": "তারিখ"
+      }
+    }
+  },
   "errors": {
     "401": "অননুমোদিত",
     "403": "নিষিদ্ধ",
@@ -636,5 +674,62 @@
     "generic": "কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
     "unauthorizedDescription": "এই পৃষ্ঠায় প্রবেশের অনুমতি আপনার নেই।",
     "goToDashboard": "ড্যাশবোর্ডে যান"
+  },
+  "travelPackages": {
+    "title": "ভ্রমণ প্যাকেজ",
+    "description": "ফ্লাইট এবং হোটেল, এক ভ্রমণে একত্রিত।",
+    "loading": "লোড হচ্ছে...",
+    "noResults": "এই মুহূর্তে কোনো ভ্রমণ প্যাকেজ নেই।",
+    "requestThis": "অনুরোধ করুন",
+    "requestSubject": "অনুরোধ",
+    "durationNights": "{count, plural, one {# রাত} other {# রাত}}",
+    "direct": "সরাসরি",
+    "transitIn": "{city} ({code})-এ ট্রানজিট"
+  },
+  "travelPackagesAdmin": {
+    "nav": {
+      "section": "ভ্রমণ প্যাকেজ অ্যাডমিন",
+      "travelPackages": "ভ্রমণ প্যাকেজ"
+    },
+    "actions": "কার্যক্রম",
+    "openMenu": "মেনু খুলুন",
+    "createButton": "নতুন",
+    "searchPlaceholder": "অনুসন্ধান করুন...",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি।",
+    "loadingRows": "লোড হচ্ছে...",
+    "pageOf": "পৃষ্ঠা {current} এর {total}",
+    "deleteConfirmTitle": "এই রেকর্ডটি মুছবেন?",
+    "deleteConfirmDescription": "এটি স্থায়ীভাবে \"{name}\" মুছে ফেলবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "createSuccess": "সফলভাবে তৈরি হয়েছে।",
+    "updateSuccess": "সফলভাবে আপডেট হয়েছে।",
+    "deleteSuccess": "সফলভাবে মুছে ফেলা হয়েছে।",
+    "travelPackages": {
+      "title": "ভ্রমণ প্যাকেজ",
+      "description": "ফ্লাইট এবং হোটেল, এক ভ্রমণে একত্রিত।",
+      "createTitle": "নতুন ভ্রমণ প্যাকেজ",
+      "editTitle": "ভ্রমণ প্যাকেজ সম্পাদনা করুন",
+      "columns": {
+        "title": "শিরোনাম",
+        "flight": "ফ্লাইট",
+        "property": "থাকার জায়গা",
+        "durationNights": "রাত",
+        "price": "মূল্য",
+        "isActive": "সক্রিয়"
+      },
+      "fields": {
+        "title": "শিরোনাম",
+        "titlePlaceholder": "যেমন জেদ্দায় ৫ রাত",
+        "description": "বিবরণ",
+        "descriptionPlaceholder": "পাবলিক কার্ডে দেখানো সংক্ষিপ্ত বিবরণ",
+        "flight": "ফ্লাইট",
+        "property": "থাকার জায়গা",
+        "heroImageUrl": "হিরো ইমেজ URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "সময়কাল (রাত)",
+        "price": "মূল্য",
+        "currency": "মুদ্রা",
+        "isActive": "সক্রিয় (সর্বজনীনভাবে প্রদর্শিত)"
+      }
+    }
   }
 }

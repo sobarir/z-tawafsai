@@ -11,6 +11,7 @@ import {
   getListHotelPackagesQueryKey,
   useCreateHotelPackage,
   useDeleteHotelPackage,
+  useListCities,
   useListHotelPackages,
   useUpdateHotelPackage,
 } from '@/libs/api/generated/endpoints';
@@ -18,6 +19,7 @@ import {
   crudMutationOptions,
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
+import { toCityNameOptions } from '@/libs/combobox-options';
 import { getPackageColumns } from './columns';
 import { PackageForm } from './package-form';
 
@@ -27,6 +29,11 @@ export function HotelPackagesAdmin() {
   const tCommon = useTranslations('common');
 
   const { data: packages, isLoading } = useListHotelPackages();
+  const { data: cities } = useListCities();
+  const cityNameOptions = useMemo(
+    () => toCityNameOptions(cities ?? []),
+    [cities],
+  );
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Package | null>(null);
@@ -107,6 +114,7 @@ export function HotelPackagesAdmin() {
       >
         <PackageForm
           pkg={editing ?? undefined}
+          cityNameOptions={cityNameOptions}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {

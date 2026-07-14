@@ -19,6 +19,7 @@
     "filter": "Filtrer",
     "reset": "Réinitialiser",
     "noData": "Aucune donnée disponible",
+    "noResultsFound": "Aucun résultat trouvé.",
     "toggleTheme": "Basculer le thème",
     "sidebar": "Barre latérale",
     "toggleSidebar": "Basculer la barre latérale",
@@ -43,7 +44,8 @@
     "searchHotels": "Rechercher des hôtels",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "uiComponents": "Composants UI"
+    "uiComponents": "Composants UI",
+    "travelPackages": "Forfaits voyage"
   },
   "auth": {
     "login": {
@@ -202,7 +204,6 @@
         "name": "Nom",
         "namePlaceholder": "p. ex. John F. Kennedy International",
         "cityCode": "Code ville",
-        "cityCodePlaceholder": "p. ex. NYC",
         "countryCode": "Code pays",
         "countryCodePlaceholder": "p. ex. US",
         "timezone": "Fuseau horaire",
@@ -441,8 +442,6 @@
   "catalog": {
     "nav": {
       "section": "Administration du catalogue",
-      "currencies": "Devises",
-      "fxRates": "Taux de change",
       "properties": "Hébergements",
       "packages": "Forfaits",
       "roomTypes": "Types de chambre",
@@ -461,45 +460,6 @@
     "createSuccess": "Créé avec succès.",
     "updateSuccess": "Mis à jour avec succès.",
     "deleteSuccess": "Supprimé avec succès.",
-    "currencies": {
-      "title": "Devises",
-      "description": "Devises de référence utilisées pour les prix des hébergements et forfaits.",
-      "createTitle": "Nouvelle devise",
-      "editTitle": "Modifier la devise",
-      "columns": {
-        "code": "Code",
-        "name": "Nom",
-        "symbol": "Symbole",
-        "minorUnit": "Décimales"
-      },
-      "fields": {
-        "code": "Code devise",
-        "codePlaceholder": "ex. USD",
-        "minorUnit": "Décimales (unité mineure)",
-        "symbol": "Symbole",
-        "symbolPlaceholder": "ex. $",
-        "name": "Nom",
-        "namePlaceholder": "ex. Dollar américain"
-      }
-    },
-    "fxRates": {
-      "title": "Taux de change",
-      "description": "Taux de conversion entre devises utilisés pour afficher les prix dans une autre devise.",
-      "createTitle": "Nouveau taux de change",
-      "editTitle": "Modifier le taux de change",
-      "columns": {
-        "baseCurrency": "Base",
-        "quoteCurrency": "Cotée",
-        "rate": "Taux",
-        "asOf": "Date"
-      },
-      "fields": {
-        "baseCurrency": "Devise de base",
-        "quoteCurrency": "Devise cotée",
-        "rate": "Taux (1 base = ? cotée)",
-        "asOf": "Date"
-      }
-    },
     "properties": {
       "title": "Hébergements",
       "description": "Séjours de type hôtel, facturés à la nuit selon le type de chambre.",
@@ -519,7 +479,7 @@
         "displayName": "Nom affiché",
         "displayNamePlaceholder": "ex. Jeddah Waterfront Hotel",
         "destination": "Destination",
-        "destinationPlaceholder": "ex. Jeddah",
+        "destinationHint": "Vous ne le voyez pas ? Ajoutez-le d'abord dans Données de référence → Villes.",
         "countryCode": "Code pays",
         "countryCodePlaceholder": "ex. SA",
         "heroImageUrl": "URL de l'image principale",
@@ -549,7 +509,7 @@
         "displayName": "Nom affiché",
         "displayNamePlaceholder": "ex. Omra Économique 9 jours",
         "destination": "Destination",
-        "destinationPlaceholder": "ex. Jeddah",
+        "destinationHint": "Vous ne le voyez pas ? Ajoutez-le d'abord dans Données de référence → Villes.",
         "countryCode": "Code pays",
         "countryCodePlaceholder": "ex. SA",
         "heroImageUrl": "URL de l'image principale",
@@ -626,6 +586,84 @@
       }
     }
   },
+  "reference": {
+    "nav": {
+      "section": "Données de référence",
+      "cities": "Villes",
+      "currencies": "Devises",
+      "fxRates": "Taux de change"
+    },
+    "actions": "Actions",
+    "openMenu": "Ouvrir le menu",
+    "createButton": "Nouveau",
+    "searchPlaceholder": "Rechercher...",
+    "noResults": "Aucun résultat trouvé.",
+    "loadingRows": "Chargement...",
+    "pageOf": "Page {current} sur {total}",
+    "deleteConfirmTitle": "Supprimer cet enregistrement ?",
+    "deleteConfirmDescription": "Cette action supprimera définitivement \"{name}\". Cette action est irréversible.",
+    "createSuccess": "Créé avec succès.",
+    "updateSuccess": "Mis à jour avec succès.",
+    "deleteSuccess": "Supprimé avec succès.",
+    "cities": {
+      "title": "Villes",
+      "description": "Villes de référence utilisées pour les aéroports et les hébergements/forfaits hôteliers.",
+      "createTitle": "Nouvelle ville",
+      "editTitle": "Modifier la ville",
+      "columns": {
+        "cityCode": "Code",
+        "name": "Nom",
+        "countryCode": "Pays"
+      },
+      "fields": {
+        "cityCode": "Code ville",
+        "cityCodePlaceholder": "p. ex. NYC",
+        "name": "Nom",
+        "namePlaceholder": "p. ex. New York",
+        "countryCode": "Code pays",
+        "countryCodePlaceholder": "p. ex. US"
+      }
+    },
+    "currencies": {
+      "title": "Devises",
+      "description": "Devises de référence utilisées pour les prix des hébergements et forfaits.",
+      "createTitle": "Nouvelle devise",
+      "editTitle": "Modifier la devise",
+      "columns": {
+        "code": "Code",
+        "name": "Nom",
+        "symbol": "Symbole",
+        "minorUnit": "Décimales"
+      },
+      "fields": {
+        "code": "Code devise",
+        "codePlaceholder": "ex. USD",
+        "minorUnit": "Décimales (unité mineure)",
+        "symbol": "Symbole",
+        "symbolPlaceholder": "ex. $",
+        "name": "Nom",
+        "namePlaceholder": "ex. Dollar américain"
+      }
+    },
+    "fxRates": {
+      "title": "Taux de change",
+      "description": "Taux de conversion entre devises utilisés pour afficher les prix dans une autre devise.",
+      "createTitle": "Nouveau taux de change",
+      "editTitle": "Modifier le taux de change",
+      "columns": {
+        "baseCurrency": "Base",
+        "quoteCurrency": "Cotée",
+        "rate": "Taux",
+        "asOf": "Date"
+      },
+      "fields": {
+        "baseCurrency": "Devise de base",
+        "quoteCurrency": "Devise cotée",
+        "rate": "Taux (1 base = ? cotée)",
+        "asOf": "Date"
+      }
+    }
+  },
   "errors": {
     "401": "Non autorisé",
     "403": "Interdit",
@@ -634,5 +672,62 @@
     "generic": "Une erreur est survenue. Veuillez réessayer.",
     "unauthorizedDescription": "Vous n'avez pas la permission d'accéder à cette page.",
     "goToDashboard": "Aller au tableau de bord"
+  },
+  "travelPackages": {
+    "title": "Forfaits voyage",
+    "description": "Vol et hôtel, réunis en un seul voyage.",
+    "loading": "Chargement...",
+    "noResults": "Aucun forfait voyage disponible pour le moment.",
+    "requestThis": "Faire une demande",
+    "requestSubject": "Demande",
+    "durationNights": "{count, plural, one {# nuit} other {# nuits}}",
+    "direct": "Direct",
+    "transitIn": "Escale à {city} ({code})"
+  },
+  "travelPackagesAdmin": {
+    "nav": {
+      "section": "Admin. des forfaits voyage",
+      "travelPackages": "Forfaits voyage"
+    },
+    "actions": "Actions",
+    "openMenu": "Ouvrir le menu",
+    "createButton": "Nouveau",
+    "searchPlaceholder": "Rechercher...",
+    "noResults": "Aucun résultat trouvé.",
+    "loadingRows": "Chargement...",
+    "pageOf": "Page {current} sur {total}",
+    "deleteConfirmTitle": "Supprimer cet enregistrement ?",
+    "deleteConfirmDescription": "Cette action supprimera définitivement \"{name}\". Cette action est irréversible.",
+    "createSuccess": "Créé avec succès.",
+    "updateSuccess": "Mis à jour avec succès.",
+    "deleteSuccess": "Supprimé avec succès.",
+    "travelPackages": {
+      "title": "Forfaits voyage",
+      "description": "Vol et hôtel, réunis en un seul voyage.",
+      "createTitle": "Nouveau forfait voyage",
+      "editTitle": "Modifier le forfait voyage",
+      "columns": {
+        "title": "Titre",
+        "flight": "Vol",
+        "property": "Hébergement",
+        "durationNights": "Nuits",
+        "price": "Prix",
+        "isActive": "Actif"
+      },
+      "fields": {
+        "title": "Titre",
+        "titlePlaceholder": "ex. 5 nuits à Jeddah",
+        "description": "Description",
+        "descriptionPlaceholder": "Résumé affiché sur la carte publique",
+        "flight": "Vol",
+        "property": "Hébergement",
+        "heroImageUrl": "URL de l'image principale",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "Durée (nuits)",
+        "price": "Prix",
+        "currency": "Devise",
+        "isActive": "Actif (visible publiquement)"
+      }
+    }
   }
 }

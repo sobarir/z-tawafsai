@@ -5,6 +5,20 @@
 
 ## Current step
 
+**Hotel search's bespoke "umrah/pilgrimage" visual identity (see `31-design.md`,
+now marked superseded) has been removed.** The user noticed Search Flights and
+Search Hotels looked like two different products and asked for one consistent
+design system; decision was to unify hotel search onto the app's default
+semantic tokens and shadcn `Card`/`Badge`/`Button` — the same primitives
+`flight-search` already used correctly — rather than keep two brands. Removed:
+`globals.css`'s `.hotel-search-theme`/`.hs-card`/`.hs-cta`/`.hs-mizan`/
+`.hs-reveal` block, the unused `fontHotelDisplay`/`fontHotelBody` exports in
+`fonts.ts` (these were never actually wired into `layout.tsx`, so the brief's
+serif display font had silently never been loading). All `hotel-search/*`
+components now match `flight-search`'s exact patterns (bare form, `Card`-based
+results/detail, `text-primary` price, `text-muted-foreground` secondary text).
+No business logic, data-fetching, or copy changed — styling only.
+
 **Search (Steps 3–8 backend, F1–F5 frontend) is done, browser-verified, and
 committed.** A second build pass then added **full admin CRUD for the
 catalog** (all 7 manageable entities: currency, fx_rate, property, package,

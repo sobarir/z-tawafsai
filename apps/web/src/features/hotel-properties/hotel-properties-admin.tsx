@@ -11,6 +11,7 @@ import {
   getListHotelPropertiesQueryKey,
   useCreateHotelProperty,
   useDeleteHotelProperty,
+  useListCities,
   useListHotelProperties,
   useUpdateHotelProperty,
 } from '@/libs/api/generated/endpoints';
@@ -18,6 +19,7 @@ import {
   crudMutationOptions,
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
+import { toCityNameOptions } from '@/libs/combobox-options';
 import { getPropertyColumns } from './columns';
 import { PropertyForm } from './property-form';
 
@@ -27,6 +29,11 @@ export function HotelPropertiesAdmin() {
   const tCommon = useTranslations('common');
 
   const { data: properties, isLoading } = useListHotelProperties();
+  const { data: cities } = useListCities();
+  const cityNameOptions = useMemo(
+    () => toCityNameOptions(cities ?? []),
+    [cities],
+  );
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Property | null>(null);
@@ -107,6 +114,7 @@ export function HotelPropertiesAdmin() {
       >
         <PropertyForm
           property={editing ?? undefined}
+          cityNameOptions={cityNameOptions}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {

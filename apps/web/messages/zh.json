@@ -19,6 +19,7 @@
     "filter": "筛选",
     "reset": "重置",
     "noData": "暂无数据",
+    "noResultsFound": "未找到结果。",
     "toggleTheme": "切换主题",
     "sidebar": "侧边栏",
     "toggleSidebar": "切换侧边栏",
@@ -43,7 +44,8 @@
     "searchHotels": "搜索酒店",
     "logout": "退出登录",
     "login": "登录",
-    "uiComponents": "UI 组件"
+    "uiComponents": "UI 组件",
+    "travelPackages": "旅行套餐"
   },
   "auth": {
     "login": {
@@ -202,7 +204,6 @@
         "name": "名称",
         "namePlaceholder": "例如 肯尼迪国际机场",
         "cityCode": "城市代码",
-        "cityCodePlaceholder": "例如 NYC",
         "countryCode": "国家代码",
         "countryCodePlaceholder": "例如 US",
         "timezone": "时区",
@@ -441,8 +442,6 @@
   "catalog": {
     "nav": {
       "section": "目录管理",
-      "currencies": "货币",
-      "fxRates": "汇率",
       "properties": "酒店",
       "packages": "套餐",
       "roomTypes": "房型",
@@ -461,45 +460,6 @@
     "createSuccess": "创建成功。",
     "updateSuccess": "更新成功。",
     "deleteSuccess": "删除成功。",
-    "currencies": {
-      "title": "货币",
-      "description": "用于酒店和套餐定价的参考货币。",
-      "createTitle": "新建货币",
-      "editTitle": "编辑货币",
-      "columns": {
-        "code": "代码",
-        "name": "名称",
-        "symbol": "符号",
-        "minorUnit": "小数位数"
-      },
-      "fields": {
-        "code": "货币代码",
-        "codePlaceholder": "例如 USD",
-        "minorUnit": "小数位数",
-        "symbol": "符号",
-        "symbolPlaceholder": "例如 $",
-        "name": "名称",
-        "namePlaceholder": "例如 美元"
-      }
-    },
-    "fxRates": {
-      "title": "汇率",
-      "description": "用于以其他货币显示价格的货币对换算汇率。",
-      "createTitle": "新建汇率",
-      "editTitle": "编辑汇率",
-      "columns": {
-        "baseCurrency": "基础货币",
-        "quoteCurrency": "报价货币",
-        "rate": "汇率",
-        "asOf": "截至日期"
-      },
-      "fields": {
-        "baseCurrency": "基础货币",
-        "quoteCurrency": "报价货币",
-        "rate": "汇率（1 基础 = ? 报价）",
-        "asOf": "截至日期"
-      }
-    },
     "properties": {
       "title": "酒店",
       "description": "酒店式住宿，按房型每晚定价。",
@@ -519,7 +479,7 @@
         "displayName": "显示名称",
         "displayNamePlaceholder": "例如 吉达海滨酒店",
         "destination": "目的地",
-        "destinationPlaceholder": "例如 吉达",
+        "destinationHint": "没看到？请先在“参考数据 → 城市”中添加。",
         "countryCode": "国家代码",
         "countryCodePlaceholder": "例如 SA",
         "heroImageUrl": "主图 URL",
@@ -549,7 +509,7 @@
         "displayName": "显示名称",
         "displayNamePlaceholder": "例如 9天经济朝觐套餐",
         "destination": "目的地",
-        "destinationPlaceholder": "例如 吉达",
+        "destinationHint": "没看到？请先在“参考数据 → 城市”中添加。",
         "countryCode": "国家代码",
         "countryCodePlaceholder": "例如 SA",
         "heroImageUrl": "主图 URL",
@@ -626,6 +586,84 @@
       }
     }
   },
+  "reference": {
+    "nav": {
+      "section": "参考数据管理",
+      "cities": "城市",
+      "currencies": "货币",
+      "fxRates": "汇率"
+    },
+    "actions": "操作",
+    "openMenu": "打开菜单",
+    "createButton": "新建",
+    "searchPlaceholder": "搜索...",
+    "noResults": "未找到结果。",
+    "loadingRows": "加载中...",
+    "pageOf": "第 {current} 页，共 {total} 页",
+    "deleteConfirmTitle": "删除此记录？",
+    "deleteConfirmDescription": "这将永久删除“{name}”。此操作无法撤销。",
+    "createSuccess": "创建成功。",
+    "updateSuccess": "更新成功。",
+    "deleteSuccess": "删除成功。",
+    "cities": {
+      "title": "城市",
+      "description": "用于机场和酒店物业/套餐的参考城市。",
+      "createTitle": "新建城市",
+      "editTitle": "编辑城市",
+      "columns": {
+        "cityCode": "代码",
+        "name": "名称",
+        "countryCode": "国家"
+      },
+      "fields": {
+        "cityCode": "城市代码",
+        "cityCodePlaceholder": "例如 NYC",
+        "name": "名称",
+        "namePlaceholder": "例如 纽约",
+        "countryCode": "国家代码",
+        "countryCodePlaceholder": "例如 US"
+      }
+    },
+    "currencies": {
+      "title": "货币",
+      "description": "用于酒店和套餐定价的参考货币。",
+      "createTitle": "新建货币",
+      "editTitle": "编辑货币",
+      "columns": {
+        "code": "代码",
+        "name": "名称",
+        "symbol": "符号",
+        "minorUnit": "小数位数"
+      },
+      "fields": {
+        "code": "货币代码",
+        "codePlaceholder": "例如 USD",
+        "minorUnit": "小数位数",
+        "symbol": "符号",
+        "symbolPlaceholder": "例如 $",
+        "name": "名称",
+        "namePlaceholder": "例如 美元"
+      }
+    },
+    "fxRates": {
+      "title": "汇率",
+      "description": "用于以其他货币显示价格的货币对换算汇率。",
+      "createTitle": "新建汇率",
+      "editTitle": "编辑汇率",
+      "columns": {
+        "baseCurrency": "基础货币",
+        "quoteCurrency": "报价货币",
+        "rate": "汇率",
+        "asOf": "截至日期"
+      },
+      "fields": {
+        "baseCurrency": "基础货币",
+        "quoteCurrency": "报价货币",
+        "rate": "汇率（1 基础 = ? 报价）",
+        "asOf": "截至日期"
+      }
+    }
+  },
   "errors": {
     "401": "未授权",
     "403": "禁止访问",
@@ -634,5 +672,62 @@
     "generic": "出错了，请稍后再试。",
     "unauthorizedDescription": "您没有权限访问此页面。",
     "goToDashboard": "前往仪表板"
+  },
+  "travelPackages": {
+    "title": "旅行套餐",
+    "description": "机票加酒店，合二为一的行程。",
+    "loading": "加载中...",
+    "noResults": "目前没有可用的旅行套餐。",
+    "requestThis": "发送咨询",
+    "requestSubject": "咨询",
+    "durationNights": "{count}晚",
+    "direct": "直飞",
+    "transitIn": "经停{city}（{code}）"
+  },
+  "travelPackagesAdmin": {
+    "nav": {
+      "section": "旅行套餐管理",
+      "travelPackages": "旅行套餐"
+    },
+    "actions": "操作",
+    "openMenu": "打开菜单",
+    "createButton": "新建",
+    "searchPlaceholder": "搜索...",
+    "noResults": "未找到结果。",
+    "loadingRows": "加载中...",
+    "pageOf": "第 {current} 页，共 {total} 页",
+    "deleteConfirmTitle": "删除此记录？",
+    "deleteConfirmDescription": "这将永久删除“{name}”。此操作无法撤销。",
+    "createSuccess": "创建成功。",
+    "updateSuccess": "更新成功。",
+    "deleteSuccess": "删除成功。",
+    "travelPackages": {
+      "title": "旅行套餐",
+      "description": "机票加酒店，合二为一的行程。",
+      "createTitle": "新建旅行套餐",
+      "editTitle": "编辑旅行套餐",
+      "columns": {
+        "title": "标题",
+        "flight": "航班",
+        "property": "酒店",
+        "durationNights": "晚数",
+        "price": "价格",
+        "isActive": "启用"
+      },
+      "fields": {
+        "title": "标题",
+        "titlePlaceholder": "例如：吉达 5 晚",
+        "description": "描述",
+        "descriptionPlaceholder": "公开卡片上显示的简短说明",
+        "flight": "航班",
+        "property": "酒店",
+        "heroImageUrl": "主图链接",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "时长（晚）",
+        "price": "价格",
+        "currency": "货币",
+        "isActive": "启用（公开显示）"
+      }
+    }
   }
 }

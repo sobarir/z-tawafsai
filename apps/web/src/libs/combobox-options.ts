@@ -1,6 +1,7 @@
 import type {
   Airline,
   Airport,
+  City,
   Currency,
   Flight,
   Package,
@@ -14,6 +15,22 @@ export function toAirportOptions(airports: Airport[]): ComboboxOption[] {
   return airports.map((a) => ({
     value: a.airportCode,
     label: `${a.airportCode} — ${a.name}`,
+  }));
+}
+
+/** Feeds pickers that store a city code (e.g. airport.cityCode). */
+export function toCityOptions(cities: City[]): ComboboxOption[] {
+  return cities.map((c) => ({
+    value: c.cityCode,
+    label: `${c.cityCode} — ${c.name}`,
+  }));
+}
+
+/** Feeds pickers that store a free-text city name (e.g. listing.destination). */
+export function toCityNameOptions(cities: City[]): ComboboxOption[] {
+  return cities.map((c) => ({
+    value: c.name,
+    label: `${c.name} (${c.cityCode})`,
   }));
 }
 

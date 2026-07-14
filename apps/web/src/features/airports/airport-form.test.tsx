@@ -28,6 +28,8 @@ const messages = {
   },
 };
 
+const cityOptions = [{ value: 'NYC', label: 'NYC — New York' }];
+
 const renderForm = (ui: ReactElement) =>
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
@@ -39,7 +41,12 @@ describe('AirportForm', () => {
   it('rejects submission when required fields are missing', async () => {
     const onSubmit = vi.fn();
     renderForm(
-      <AirportForm onSubmit={onSubmit} onCancel={vi.fn()} submitting={false} />,
+      <AirportForm
+        cityOptions={cityOptions}
+        onSubmit={onSubmit}
+        onCancel={vi.fn()}
+        submitting={false}
+      />,
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -52,7 +59,12 @@ describe('AirportForm', () => {
   it('submits the entered values when the form is valid', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     renderForm(
-      <AirportForm onSubmit={onSubmit} onCancel={vi.fn()} submitting={false} />,
+      <AirportForm
+        cityOptions={cityOptions}
+        onSubmit={onSubmit}
+        onCancel={vi.fn()}
+        submitting={false}
+      />,
     );
 
     fireEvent.change(screen.getByPlaceholderText('e.g. JFK'), {
@@ -62,9 +74,8 @@ describe('AirportForm', () => {
       screen.getByPlaceholderText('e.g. John F. Kennedy International'),
       { target: { value: 'John F. Kennedy International' } },
     );
-    fireEvent.change(screen.getByPlaceholderText('e.g. NYC'), {
-      target: { value: 'nyc' },
-    });
+    fireEvent.click(screen.getByRole('combobox'));
+    fireEvent.click(screen.getByRole('option', { name: 'NYC — New York' }));
     fireEvent.change(screen.getByPlaceholderText('e.g. US'), {
       target: { value: 'us' },
     });
@@ -89,6 +100,7 @@ describe('AirportForm', () => {
   it('disables the natural-key field when editing an existing airport', () => {
     renderForm(
       <AirportForm
+        cityOptions={cityOptions}
         airport={{
           airportCode: 'JFK',
           icaoCode: 'KJFK',

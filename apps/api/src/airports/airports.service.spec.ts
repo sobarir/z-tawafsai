@@ -28,7 +28,7 @@ describe('AirportsService', () => {
     const created = await service.create({
       airportCode: TEST_CODE,
       name: 'Test Airport',
-      cityCode: 'ZZZ',
+      cityCode: 'JED',
       countryCode: 'ZZ',
       timezone: 'UTC',
     });
@@ -52,7 +52,7 @@ describe('AirportsService', () => {
     await service.create({
       airportCode: TEST_CODE,
       name: 'Test Airport',
-      cityCode: 'ZZZ',
+      cityCode: 'JED',
       countryCode: 'ZZ',
       timezone: 'UTC',
     });
@@ -61,7 +61,7 @@ describe('AirportsService', () => {
       service.create({
         airportCode: TEST_CODE,
         name: 'Duplicate Airport',
-        cityCode: 'ZZZ',
+        cityCode: 'JED',
         countryCode: 'ZZ',
         timezone: 'UTC',
       }),

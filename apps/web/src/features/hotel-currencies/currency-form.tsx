@@ -23,7 +23,7 @@ export function CurrencyForm({
   onCancel,
   submitting,
 }: CurrencyFormProps) {
-  const t = useTranslations('catalog.currencies.fields');
+  const t = useTranslations('reference.currencies.fields');
   const tCommon = useTranslations('common');
   const isEdit = !!currency;
 

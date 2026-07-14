@@ -1,5 +1,18 @@
 # 31 — Design Direction & Tokens
 
+> **Superseded.** This bespoke visual identity shipped as specified below, but it
+> made Search Hotels and Search Flights look like two different products — the
+> user flagged the inconsistency and asked for one design system across both.
+> Per that decision, hotel search now uses the app's default semantic tokens
+> and shadcn `Card`/`Badge`/`Button` (the same primitives `flight-search` uses),
+> not the palette/tokens on this page. The `--hs-*` CSS variables, `.hs-card`/
+> `.hs-cta`/`.hs-mizan`/`.hs-reveal` classes, and the Amiri/Plus Jakarta Sans
+> fonts described here have been removed from the codebase. Kept below only as
+> a record of what was built and why, and as the reason
+> `feedback_confirm_prd_pattern_deviations` exists as a standing instruction:
+> ask before implementing a PRD-specified deviation from established build
+> patterns, don't just build the brief as written.
+
 > This is the design brief for Claude Code. Follow the tokens exactly; derive
 > every color and type decision from here. The goal is a search UI that could not
 > be mistaken for a generic OTA or for a templated AI page.

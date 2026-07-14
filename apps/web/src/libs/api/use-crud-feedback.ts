@@ -10,7 +10,11 @@ type CrudMessageKey = 'createSuccess' | 'updateSuccess' | 'deleteSuccess';
 /** Wires the toast + query-invalidation side effects shared by every entity's create/update/delete mutations. */
 export function useCrudFeedback(
   queryKey: QueryKey,
-  namespace: 'schedule' | 'catalog' = 'schedule',
+  namespace:
+    | 'schedule'
+    | 'catalog'
+    | 'reference'
+    | 'travelPackagesAdmin' = 'schedule',
 ) {
   const queryClient = useQueryClient();
   const tNamespace = useTranslations(namespace);

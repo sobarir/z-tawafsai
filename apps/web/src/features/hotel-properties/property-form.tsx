@@ -6,13 +6,16 @@ import { createPropertySchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { CheckboxFormField } from '@/components/shared/checkbox-form-field';
+import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
+import type { ComboboxOption } from '@/components/ui/combobox';
 import { Form } from '@/components/ui/form';
 
 interface PropertyFormProps {
   property?: Property;
+  cityNameOptions: ComboboxOption[];
   onSubmit: (values: CreatePropertyInput) => Promise<void>;
   onCancel: () => void;
   submitting: boolean;
@@ -20,6 +23,7 @@ interface PropertyFormProps {
 
 export function PropertyForm({
   property,
+  cityNameOptions,
   onSubmit,
   onCancel,
   submitting,
@@ -67,12 +71,17 @@ export function PropertyForm({
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <TextFormField
-            control={form.control}
-            name="destination"
-            label={t('destination')}
-            placeholder={t('destinationPlaceholder')}
-          />
+          <div className="flex flex-col gap-2">
+            <ComboboxFormField
+              control={form.control}
+              name="destination"
+              label={t('destination')}
+              options={cityNameOptions}
+            />
+            <p className="text-xs text-muted-foreground">
+              {t('destinationHint')}
+            </p>
+          </div>
           <TextFormField
             control={form.control}
             name="countryCode"

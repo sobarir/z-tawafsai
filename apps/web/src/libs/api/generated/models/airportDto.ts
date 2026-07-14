@@ -16,10 +16,7 @@ export interface AirportDto {
    */
   icaoCode: string | null;
   name: string;
-  /**
-   * @minLength 3
-   * @maxLength 3
-   */
+  /** @pattern ^[A-Z]{3}$ */
   cityCode: string;
   /**
    * @minLength 2

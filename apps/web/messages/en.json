@@ -19,6 +19,7 @@
     "filter": "Filter",
     "reset": "Reset",
     "noData": "No data available",
+    "noResultsFound": "No results found.",
     "yes": "Yes",
     "no": "No",
     "view": "View",
@@ -43,7 +44,8 @@
     "searchHotels": "Search Hotels",
     "logout": "Logout",
     "login": "Login",
-    "uiComponents": "UI Components"
+    "uiComponents": "UI Components",
+    "travelPackages": "Travel Packages"
   },
   "auth": {
     "login": {
@@ -212,8 +214,6 @@
   "catalog": {
     "nav": {
       "section": "Catalog Admin",
-      "currencies": "Currencies",
-      "fxRates": "FX Rates",
       "properties": "Properties",
       "packages": "Packages",
       "roomTypes": "Room Types",
@@ -232,45 +232,6 @@
     "createSuccess": "Created successfully.",
     "updateSuccess": "Updated successfully.",
     "deleteSuccess": "Deleted successfully.",
-    "currencies": {
-      "title": "Currencies",
-      "description": "Reference currencies used for hotel and package pricing.",
-      "createTitle": "New currency",
-      "editTitle": "Edit currency",
-      "columns": {
-        "code": "Code",
-        "name": "Name",
-        "symbol": "Symbol",
-        "minorUnit": "Minor unit"
-      },
-      "fields": {
-        "code": "Currency code",
-        "codePlaceholder": "e.g. USD",
-        "minorUnit": "Minor unit (decimal digits)",
-        "symbol": "Symbol",
-        "symbolPlaceholder": "e.g. $",
-        "name": "Name",
-        "namePlaceholder": "e.g. US Dollar"
-      }
-    },
-    "fxRates": {
-      "title": "FX Rates",
-      "description": "Currency-pair conversion rates used to display prices in a different currency.",
-      "createTitle": "New FX rate",
-      "editTitle": "Edit FX rate",
-      "columns": {
-        "baseCurrency": "Base",
-        "quoteCurrency": "Quote",
-        "rate": "Rate",
-        "asOf": "As of"
-      },
-      "fields": {
-        "baseCurrency": "Base currency",
-        "quoteCurrency": "Quote currency",
-        "rate": "Rate (1 base = ? quote)",
-        "asOf": "As of"
-      }
-    },
     "properties": {
       "title": "Properties",
       "description": "Hotel-style stays, priced per night per room type.",
@@ -290,7 +251,7 @@
         "displayName": "Display name",
         "displayNamePlaceholder": "e.g. Jeddah Waterfront Hotel",
         "destination": "Destination",
-        "destinationPlaceholder": "e.g. Jeddah",
+        "destinationHint": "Don't see it? Add it under Reference Data → Cities first.",
         "countryCode": "Country code",
         "countryCodePlaceholder": "e.g. SA",
         "heroImageUrl": "Hero image URL",
@@ -320,7 +281,7 @@
         "displayName": "Display name",
         "displayNamePlaceholder": "e.g. 9-Day Umrah Economy",
         "destination": "Destination",
-        "destinationPlaceholder": "e.g. Jeddah",
+        "destinationHint": "Don't see it? Add it under Reference Data → Cities first.",
         "countryCode": "Country code",
         "countryCodePlaceholder": "e.g. SA",
         "heroImageUrl": "Hero image URL",
@@ -397,10 +358,88 @@
       }
     }
   },
+  "reference": {
+    "nav": {
+      "section": "Reference Data",
+      "cities": "Cities",
+      "currencies": "Currencies",
+      "fxRates": "FX Rates"
+    },
+    "actions": "Actions",
+    "openMenu": "Open menu",
+    "createButton": "New",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "loadingRows": "Loading...",
+    "pageOf": "Page {current} of {total}",
+    "deleteConfirmTitle": "Delete this record?",
+    "deleteConfirmDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+    "createSuccess": "Created successfully.",
+    "updateSuccess": "Updated successfully.",
+    "deleteSuccess": "Deleted successfully.",
+    "cities": {
+      "title": "Cities",
+      "description": "Reference cities used across airports and hotel properties/packages.",
+      "createTitle": "New city",
+      "editTitle": "Edit city",
+      "columns": {
+        "cityCode": "Code",
+        "name": "Name",
+        "countryCode": "Country"
+      },
+      "fields": {
+        "cityCode": "City code",
+        "cityCodePlaceholder": "e.g. NYC",
+        "name": "Name",
+        "namePlaceholder": "e.g. New York",
+        "countryCode": "Country code",
+        "countryCodePlaceholder": "e.g. US"
+      }
+    },
+    "currencies": {
+      "title": "Currencies",
+      "description": "Reference currencies used for hotel and package pricing.",
+      "createTitle": "New currency",
+      "editTitle": "Edit currency",
+      "columns": {
+        "code": "Code",
+        "name": "Name",
+        "symbol": "Symbol",
+        "minorUnit": "Minor unit"
+      },
+      "fields": {
+        "code": "Currency code",
+        "codePlaceholder": "e.g. USD",
+        "minorUnit": "Minor unit (decimal digits)",
+        "symbol": "Symbol",
+        "symbolPlaceholder": "e.g. $",
+        "name": "Name",
+        "namePlaceholder": "e.g. US Dollar"
+      }
+    },
+    "fxRates": {
+      "title": "FX Rates",
+      "description": "Currency-pair conversion rates used to display prices in a different currency.",
+      "createTitle": "New FX rate",
+      "editTitle": "Edit FX rate",
+      "columns": {
+        "baseCurrency": "Base",
+        "quoteCurrency": "Quote",
+        "rate": "Rate",
+        "asOf": "As of"
+      },
+      "fields": {
+        "baseCurrency": "Base currency",
+        "quoteCurrency": "Quote currency",
+        "rate": "Rate (1 base = ? quote)",
+        "asOf": "As of"
+      }
+    }
+  },
   "errors": {
-    "404": "Page not found",
     "401": "Unauthorized",
     "403": "Forbidden",
+    "404": "Page not found",
     "500": "Internal server error",
     "generic": "Something went wrong. Please try again.",
     "unauthorizedDescription": "You do not have permission to access this page.",
@@ -452,7 +491,6 @@
         "name": "Name",
         "namePlaceholder": "e.g. John F. Kennedy International",
         "cityCode": "City code",
-        "cityCodePlaceholder": "e.g. NYC",
         "countryCode": "Country code",
         "countryCodePlaceholder": "e.g. US",
         "timezone": "Timezone",
@@ -632,6 +670,63 @@
         "open_jaw": "Open jaw",
         "transit": "Transit",
         "invalid": "Invalid"
+      }
+    }
+  },
+  "travelPackages": {
+    "title": "Travel Packages",
+    "description": "Flight and hotel, bundled into one trip.",
+    "loading": "Loading...",
+    "noResults": "No travel packages available right now.",
+    "requestThis": "Request this",
+    "requestSubject": "Request",
+    "durationNights": "{count, plural, one {# night} other {# nights}}",
+    "direct": "Direct",
+    "transitIn": "Transit in {city} ({code})"
+  },
+  "travelPackagesAdmin": {
+    "nav": {
+      "section": "Travel Packages Admin",
+      "travelPackages": "Travel Packages"
+    },
+    "actions": "Actions",
+    "openMenu": "Open menu",
+    "createButton": "New",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "loadingRows": "Loading...",
+    "pageOf": "Page {current} of {total}",
+    "deleteConfirmTitle": "Delete this record?",
+    "deleteConfirmDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+    "createSuccess": "Created successfully.",
+    "updateSuccess": "Updated successfully.",
+    "deleteSuccess": "Deleted successfully.",
+    "travelPackages": {
+      "title": "Travel Packages",
+      "description": "Flight and hotel, bundled into one trip.",
+      "createTitle": "New travel package",
+      "editTitle": "Edit travel package",
+      "columns": {
+        "title": "Title",
+        "flight": "Flight",
+        "property": "Property",
+        "durationNights": "Nights",
+        "price": "Price",
+        "isActive": "Active"
+      },
+      "fields": {
+        "title": "Title",
+        "titlePlaceholder": "e.g. 5-Night Jeddah Getaway",
+        "description": "Description",
+        "descriptionPlaceholder": "Short summary shown on the public card",
+        "flight": "Flight",
+        "property": "Property",
+        "heroImageUrl": "Hero image URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "Duration (nights)",
+        "price": "Price",
+        "currency": "Currency",
+        "isActive": "Active (shown publicly)"
       }
     }
   }

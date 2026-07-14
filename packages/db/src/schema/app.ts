@@ -49,13 +49,32 @@ export const flightStatus = pgEnum('flight_status', [
   'SEASONAL',
 ]);
 
+export const city = pgTable(
+  'city',
+  {
+    cityCode: varchar('city_code', { length: 3 }).primaryKey(),
+    name: varchar('name', { length: 100 }).notNull(),
+    countryCode: varchar('country_code', { length: 2 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [uniqueIndex('idx_city_name').on(table.name)],
+);
+
 export const airports = pgTable(
   'airports',
   {
     airportCode: varchar('airport_code', { length: 3 }).primaryKey(),
     icaoCode: varchar('icao_code', { length: 4 }),
     name: varchar('name', { length: 100 }).notNull(),
-    cityCode: varchar('city_code', { length: 3 }).notNull(),
+    cityCode: varchar('city_code', { length: 3 })
+      .notNull()
+      .references(() => city.cityCode),
     countryCode: varchar('country_code', { length: 2 }).notNull(),
     timezone: varchar('timezone', { length: 50 }).notNull(),
     latitude: numeric('latitude', { precision: 9, scale: 6, mode: 'number' }),
@@ -503,6 +522,37 @@ export const rateRule = pgTable(
   ],
 );
 
+// Combines a specific flight with a specific hotel property into one
+// admin-curated, flat-priced offering — a display/catalog product, not a
+// booking (no fares/PNR/seats). See prd/hotels/CONTEXT.md for the decision.
+export const flightHotelPackage = pgTable('travel_package', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  title: varchar('title', { length: 200 }).notNull(),
+  description: text('description'),
+  flightId: varchar('flight_id', { length: 26 })
+    .notNull()
+    .references(() => flights.id),
+  propertyCode: text('property_code')
+    .notNull()
+    .references(() => property.propertyCode),
+  durationNights: integer('duration_nights').notNull(),
+  heroImageUrl: text('hero_image_url'),
+  price: numeric('price', { precision: 10, scale: 2, mode: 'number' })
+    .notNull()
+    .default(0),
+  currency: varchar('currency', { length: 3 }).notNull().default('USD'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
 export type Airport = typeof airports.$inferSelect;
 export type NewAirport = typeof airports.$inferInsert;
 export type Airline = typeof airlines.$inferSelect;
@@ -532,5 +582,7 @@ export type RoomType = typeof roomType.$inferSelect;
 export type NewRoomType = typeof roomType.$inferInsert;
 export type Season = typeof season.$inferSelect;
 export type NewSeason = typeof season.$inferInsert;
+export type FlightHotelPackage = typeof flightHotelPackage.$inferSelect;
+export type NewFlightHotelPackage = typeof flightHotelPackage.$inferInsert;
 export type RateRule = typeof rateRule.$inferSelect;
 export type NewRateRule = typeof rateRule.$inferInsert;

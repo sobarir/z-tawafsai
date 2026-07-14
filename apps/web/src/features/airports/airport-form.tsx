@@ -5,13 +5,16 @@ import type { Airport, CreateAirportInput } from '@repo/shared';
 import { createAirportSchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
+import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
+import type { ComboboxOption } from '@/components/ui/combobox';
 import { Form } from '@/components/ui/form';
 
 interface AirportFormProps {
   airport?: Airport;
+  cityOptions: ComboboxOption[];
   onSubmit: (values: CreateAirportInput) => Promise<void>;
   onCancel: () => void;
   submitting: boolean;
@@ -19,6 +22,7 @@ interface AirportFormProps {
 
 export function AirportForm({
   airport,
+  cityOptions,
   onSubmit,
   onCancel,
   submitting,
@@ -76,12 +80,11 @@ export function AirportForm({
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <TextFormField
+          <ComboboxFormField
             control={form.control}
             name="cityCode"
             label={t('cityCode')}
-            placeholder={t('cityCodePlaceholder')}
-            uppercase
+            options={cityOptions}
           />
 
           <TextFormField

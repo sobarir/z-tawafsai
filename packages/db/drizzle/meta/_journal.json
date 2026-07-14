@@ -36,6 +36,27 @@
       "when": 1783958971114,
       "tag": "0004_hotels_season_no_overlap",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784021191084,
+      "tag": "0005_parallel_doorman",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784033879516,
+      "tag": "0006_outstanding_maginty",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784037031778,
+      "tag": "0007_lonely_bromley",
+      "breakpoints": true
     }
   ]
 }

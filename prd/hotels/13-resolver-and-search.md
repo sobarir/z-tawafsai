@@ -72,7 +72,7 @@ Query params:
 | checkOut     | date      | yes      | ISO date, exclusive, > checkIn          |
 | occupancy    | integer   | yes      | ≥ 1                                      |
 | currency     | char(3)   | yes      | display currency                        |
-| kind         | enum      | no       | property \| package \| both (default both)|
+| kind         | enum      | no       | property \| package \| both (default property)|
 | roomType     | string    | no       | property-only preference hint           |
 | minPrice     | integer   | no       | in display currency minor units         |
 | maxPrice     | integer   | no       | in display currency minor units         |

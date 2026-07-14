@@ -14,7 +14,9 @@ import {
   Link2,
   LogOut,
   type LucideIcon,
+  Luggage,
   MapPin,
+  MapPinned,
   Menu,
   Package as PackageIcon,
   PlaneTakeoff,
@@ -60,14 +62,16 @@ interface NavItem {
   icon: LucideIcon;
 }
 
+interface NavGroup {
+  items: NavItem[];
+  sectionLabel?: string;
+}
+
 interface SidebarContentProps {
   pathname: string;
   isRtl: boolean;
   items: NavItem[];
-  adminItems?: NavItem[];
-  adminSectionLabel?: string;
-  catalogItems?: NavItem[];
-  catalogSectionLabel?: string;
+  secondaryGroups?: NavGroup[];
   labels: {
     theme: string;
     language: string;
@@ -151,14 +155,51 @@ function NavLinkItem({
   );
 }
 
+function NavGroupSection({
+  group,
+  pathname,
+  isCollapsed,
+  isRtl,
+  onItemClick,
+}: {
+  group: NavGroup;
+  pathname: string;
+  isCollapsed: boolean;
+  isRtl: boolean;
+  onItemClick?: () => void;
+}) {
+  if (group.items.length === 0) return null;
+
+  return (
+    <>
+      <div className="my-2 border-t border-sidebar-glass-edge" />
+      {!isCollapsed && group.sectionLabel ? (
+        <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">
+          {group.sectionLabel}
+        </p>
+      ) : null}
+      <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
+        {group.items.map((item) => (
+          <li key={item.id}>
+            <NavLinkItem
+              item={item}
+              pathname={pathname}
+              isCollapsed={isCollapsed}
+              isRtl={isRtl}
+              onItemClick={onItemClick}
+            />
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 function SidebarContent({
   pathname,
   isRtl,
   items,
-  adminItems,
-  adminSectionLabel,
-  catalogItems,
-  catalogSectionLabel,
+  secondaryGroups = [],
   labels,
   onLogoutRequest,
   onItemClick,
@@ -209,53 +250,16 @@ function SidebarContent({
             ))}
           </ul>
 
-          {adminItems?.length ? (
-            <>
-              <div className="my-2 border-t border-sidebar-glass-edge" />
-              {!isCollapsed && adminSectionLabel ? (
-                <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">
-                  {adminSectionLabel}
-                </p>
-              ) : null}
-              <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
-                {adminItems.map((item) => (
-                  <li key={item.id}>
-                    <NavLinkItem
-                      item={item}
-                      pathname={pathname}
-                      isCollapsed={isCollapsed}
-                      isRtl={isRtl}
-                      onItemClick={onItemClick}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-
-          {catalogItems?.length ? (
-            <>
-              <div className="my-2 border-t border-sidebar-glass-edge" />
-              {!isCollapsed && catalogSectionLabel ? (
-                <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">
-                  {catalogSectionLabel}
-                </p>
-              ) : null}
-              <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
-                {catalogItems.map((item) => (
-                  <li key={item.id}>
-                    <NavLinkItem
-                      item={item}
-                      pathname={pathname}
-                      isCollapsed={isCollapsed}
-                      isRtl={isRtl}
-                      onItemClick={onItemClick}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
+          {secondaryGroups.map((group) => (
+            <NavGroupSection
+              key={group.sectionLabel}
+              group={group}
+              pathname={pathname}
+              isCollapsed={isCollapsed}
+              isRtl={isRtl}
+              onItemClick={onItemClick}
+            />
+          ))}
         </nav>
 
         {showFooter ? (
@@ -403,7 +407,7 @@ function buildNavItems(
     {
       id: 'search',
       label: searchLabel,
-      href: '/search',
+      href: '/flights',
       icon: NAV_ICONS.search,
     },
     {
@@ -483,8 +487,6 @@ function buildScheduleAdminNavItems(labels: ScheduleNavLabels): NavItem[] {
 }
 
 const CATALOG_NAV_ICONS = {
-  currencies: Coins,
-  fxRates: ArrowLeftRight,
   properties: Hotel,
   packages: PackageIcon,
   roomTypes: BedDouble,
@@ -493,8 +495,6 @@ const CATALOG_NAV_ICONS = {
 } as const;
 
 interface CatalogNavLabels {
-  currencies: string;
-  fxRates: string;
   properties: string;
   packages: string;
   roomTypes: string;
@@ -504,18 +504,6 @@ interface CatalogNavLabels {
 
 function buildCatalogAdminNavItems(labels: CatalogNavLabels): NavItem[] {
   return [
-    {
-      id: 'catalog-currencies',
-      label: labels.currencies,
-      href: '/catalog/currencies',
-      icon: CATALOG_NAV_ICONS.currencies,
-    },
-    {
-      id: 'catalog-fx-rates',
-      label: labels.fxRates,
-      href: '/catalog/fx-rates',
-      icon: CATALOG_NAV_ICONS.fxRates,
-    },
     {
       id: 'catalog-properties',
       label: labels.properties,
@@ -545,6 +533,62 @@ function buildCatalogAdminNavItems(labels: CatalogNavLabels): NavItem[] {
       label: labels.rateRules,
       href: '/catalog/rate-rules',
       icon: CATALOG_NAV_ICONS.rateRules,
+    },
+  ];
+}
+
+const REFERENCE_NAV_ICONS = {
+  cities: MapPinned,
+  currencies: Coins,
+  fxRates: ArrowLeftRight,
+} as const;
+
+interface ReferenceNavLabels {
+  cities: string;
+  currencies: string;
+  fxRates: string;
+}
+
+function buildReferenceDataNavItems(labels: ReferenceNavLabels): NavItem[] {
+  return [
+    {
+      id: 'reference-cities',
+      label: labels.cities,
+      href: '/reference/cities',
+      icon: REFERENCE_NAV_ICONS.cities,
+    },
+    {
+      id: 'reference-currencies',
+      label: labels.currencies,
+      href: '/reference/currencies',
+      icon: REFERENCE_NAV_ICONS.currencies,
+    },
+    {
+      id: 'reference-fx-rates',
+      label: labels.fxRates,
+      href: '/reference/fx-rates',
+      icon: REFERENCE_NAV_ICONS.fxRates,
+    },
+  ];
+}
+
+const TRAVEL_PACKAGES_NAV_ICONS = {
+  travelPackages: Luggage,
+} as const;
+
+interface TravelPackagesNavLabels {
+  travelPackages: string;
+}
+
+function buildTravelPackagesAdminNavItems(
+  labels: TravelPackagesNavLabels,
+): NavItem[] {
+  return [
+    {
+      id: 'travel-packages-admin',
+      label: labels.travelPackages,
+      href: '/travel-packages/admin',
+      icon: TRAVEL_PACKAGES_NAV_ICONS.travelPackages,
     },
   ];
 }
@@ -593,8 +637,6 @@ export function Sidebar() {
     () =>
       canManageSchedule
         ? buildCatalogAdminNavItems({
-            currencies: t('catalog.nav.currencies'),
-            fxRates: t('catalog.nav.fxRates'),
             properties: t('catalog.nav.properties'),
             packages: t('catalog.nav.packages'),
             roomTypes: t('catalog.nav.roomTypes'),
@@ -605,6 +647,52 @@ export function Sidebar() {
     [canManageSchedule, t],
   );
   const catalogSectionLabel = t('catalog.nav.section');
+
+  const referenceItems = useMemo(
+    () =>
+      canManageSchedule
+        ? buildReferenceDataNavItems({
+            cities: t('reference.nav.cities'),
+            currencies: t('reference.nav.currencies'),
+            fxRates: t('reference.nav.fxRates'),
+          })
+        : [],
+    [canManageSchedule, t],
+  );
+  const referenceSectionLabel = t('reference.nav.section');
+
+  const travelPackagesAdminItems = useMemo(
+    () =>
+      canManageSchedule
+        ? buildTravelPackagesAdminNavItems({
+            travelPackages: t('travelPackagesAdmin.nav.travelPackages'),
+          })
+        : [],
+    [canManageSchedule, t],
+  );
+  const travelPackagesAdminSectionLabel = t('travelPackagesAdmin.nav.section');
+
+  const secondaryGroups = useMemo(
+    () => [
+      { items: adminItems, sectionLabel: adminSectionLabel },
+      { items: catalogItems, sectionLabel: catalogSectionLabel },
+      { items: referenceItems, sectionLabel: referenceSectionLabel },
+      {
+        items: travelPackagesAdminItems,
+        sectionLabel: travelPackagesAdminSectionLabel,
+      },
+    ],
+    [
+      adminItems,
+      adminSectionLabel,
+      catalogItems,
+      catalogSectionLabel,
+      referenceItems,
+      referenceSectionLabel,
+      travelPackagesAdminItems,
+      travelPackagesAdminSectionLabel,
+    ],
+  );
 
   const labels = useMemo(
     () => ({
@@ -662,10 +750,7 @@ export function Sidebar() {
                 pathname={pathname}
                 isRtl={isRtl}
                 items={items}
-                adminItems={adminItems}
-                adminSectionLabel={adminSectionLabel}
-                catalogItems={catalogItems}
-                catalogSectionLabel={catalogSectionLabel}
+                secondaryGroups={secondaryGroups}
                 labels={labels}
                 onLogoutRequest={handleLogoutRequest}
                 onItemClick={() => setMobileOpen(false)}
@@ -701,10 +786,7 @@ export function Sidebar() {
           pathname={pathname}
           isRtl={isRtl}
           items={items}
-          adminItems={adminItems}
-          adminSectionLabel={adminSectionLabel}
-          catalogItems={catalogItems}
-          catalogSectionLabel={catalogSectionLabel}
+          secondaryGroups={secondaryGroups}
           labels={labels}
           onLogoutRequest={handleLogoutRequest}
           isCollapsed={collapsed}

@@ -39,6 +39,7 @@ The mutator (`src/libs/api/mutator.ts`) already sends the session cookie and nor
 
 ## Conventions
 
+- UI patterns: before hand-building a dropdown, picker, overlay, or any other interactive pattern, check whether shadcn/ui has an official component for it and vendor that (`npx shadcn@latest add <name>` from `apps/web` — respects `components.json`) instead of improvising from lower-level Radix primitives. A hand-rolled `combobox.tsx` (Popover + plain `<button>`s instead of the real Popover+Command pattern) shipped a real bug: nested inside a `Dialog`, every option was visible but unclickable, because Radix Dialog sets `pointer-events: none` on `<body>` while open and only the real shadcn components are written to correctly reset that on themselves. Rebuilding it on shadcn's actual `Command` component fixed it outright.
 - Env vars: add to `src/libs/env.ts` (schema + `experimental__runtimeEnv`) AND `.env.example` — never read `process.env` directly; unvalidated env fails at runtime instead of boot.
 - Styling: Tailwind v4 utilities + semantic tokens (`bg-background`, `text-muted-foreground`) with the `cn()` helper — raw colors break dark mode.
 - Every user-facing string goes through `useTranslations` (`messages/`) — hardcoded copy breaks the other five locales.

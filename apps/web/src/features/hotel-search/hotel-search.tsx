@@ -75,7 +75,7 @@ export function HotelSearch({ initialState }: HotelSearchProps) {
   };
 
   return (
-    <div className="hotel-search-theme flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <HotelSearchForm
         value={initialState}
         onSubmit={(form: HotelSearchFormValues) =>

@@ -27,9 +27,11 @@ import type {
 import type {
   AirlineDto,
   AirportDto,
+  CityDto,
   ConnectionResultDto,
   CreateAirlineDto,
   CreateAirportDto,
+  CreateCityDto,
   CreateCurrencyDto,
   CreateFlightDto,
   CreateFlightMarketingDto,
@@ -42,6 +44,7 @@ import type {
   CreateRateRuleDto,
   CreateRoomTypeDto,
   CreateSeasonDto,
+  CreateTravelPackageDto,
   CurrencyDto,
   FlightDto,
   FlightItineraryDto,
@@ -64,8 +67,10 @@ import type {
   SearchFlightsParams,
   SearchHotelsParams,
   SeasonDto,
+  TravelPackageDto,
   UpdateAirlineDto,
   UpdateAirportDto,
+  UpdateCityDto,
   UpdateCurrencyDto,
   UpdateFlightDto,
   UpdateFlightMarketingDto,
@@ -76,6 +81,7 @@ import type {
   UpdateRateRuleDto,
   UpdateRoomTypeDto,
   UpdateSeasonDto,
+  UpdateTravelPackageDto,
   ValidateConnectionChainDto,
   ValidateConnectionDto
 } from './models';
@@ -450,6 +456,424 @@ export const useCreatePost = <TError = unknown,
       > => {
 
       const mutationOptions = getCreatePostMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List cities
+ */
+export const getListCitiesUrl = () => {
+
+
+  
+
+  return `/api/cities`
+}
+
+export const listCities = async ( options?: RequestInit): Promise<CityDto[]> => {
+  
+  return customFetch<CityDto[]>(getListCitiesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListCitiesQueryKey = () => {
+    return [
+    `/api/cities`
+    ] as const;
+    }
+
+    
+export const getListCitiesQueryOptions = <TData = Awaited<ReturnType<typeof listCities>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCitiesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCities>>> = ({ signal }) => listCities({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCitiesQueryResult = NonNullable<Awaited<ReturnType<typeof listCities>>>
+export type ListCitiesQueryError = unknown
+
+
+export function useListCities<TData = Awaited<ReturnType<typeof listCities>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCities>>,
+          TError,
+          Awaited<ReturnType<typeof listCities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCities<TData = Awaited<ReturnType<typeof listCities>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCities>>,
+          TError,
+          Awaited<ReturnType<typeof listCities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCities<TData = Awaited<ReturnType<typeof listCities>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List cities
+ */
+
+export function useListCities<TData = Awaited<ReturnType<typeof listCities>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a city
+ */
+export const getCreateCityUrl = () => {
+
+
+  
+
+  return `/api/cities`
+}
+
+export const createCity = async (createCityDto: CreateCityDto, options?: RequestInit): Promise<CityDto> => {
+  
+  return customFetch<CityDto>(getCreateCityUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCityDto,)
+  }
+);}
+
+
+
+
+export const getCreateCityMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCity>>, TError,{data: CreateCityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createCity>>, TError,{data: CreateCityDto}, TContext> => {
+
+const mutationKey = ['createCity'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCity>>, {data: CreateCityDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createCity(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCityMutationResult = NonNullable<Awaited<ReturnType<typeof createCity>>>
+    export type CreateCityMutationBody = CreateCityDto
+    export type CreateCityMutationError = unknown
+
+    /**
+ * @summary Create a city
+ */
+export const useCreateCity = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCity>>, TError,{data: CreateCityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createCity>>,
+        TError,
+        {data: CreateCityDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateCityMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a city
+ */
+export const getGetCityUrl = (code: string,) => {
+
+
+  
+
+  return `/api/cities/${code}`
+}
+
+export const getCity = async (code: string, options?: RequestInit): Promise<CityDto> => {
+  
+  return customFetch<CityDto>(getGetCityUrl(code),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetCityQueryKey = (code?: string,) => {
+    return [
+    `/api/cities/${code}`
+    ] as const;
+    }
+
+    
+export const getGetCityQueryOptions = <TData = Awaited<ReturnType<typeof getCity>>, TError = unknown>(code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCityQueryKey(code);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCity>>> = ({ signal }) => getCity(code, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(code), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCity>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCityQueryResult = NonNullable<Awaited<ReturnType<typeof getCity>>>
+export type GetCityQueryError = unknown
+
+
+export function useGetCity<TData = Awaited<ReturnType<typeof getCity>>, TError = unknown>(
+ code: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCity>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCity>>,
+          TError,
+          Awaited<ReturnType<typeof getCity>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCity<TData = Awaited<ReturnType<typeof getCity>>, TError = unknown>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCity>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCity>>,
+          TError,
+          Awaited<ReturnType<typeof getCity>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCity<TData = Awaited<ReturnType<typeof getCity>>, TError = unknown>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a city
+ */
+
+export function useGetCity<TData = Awaited<ReturnType<typeof getCity>>, TError = unknown>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCityQueryOptions(code,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a city
+ */
+export const getUpdateCityUrl = (code: string,) => {
+
+
+  
+
+  return `/api/cities/${code}`
+}
+
+export const updateCity = async (code: string,
+    updateCityDto: UpdateCityDto, options?: RequestInit): Promise<CityDto> => {
+  
+  return customFetch<CityDto>(getUpdateCityUrl(code),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCityDto,)
+  }
+);}
+
+
+
+
+export const getUpdateCityMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCity>>, TError,{code: string;data: UpdateCityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCity>>, TError,{code: string;data: UpdateCityDto}, TContext> => {
+
+const mutationKey = ['updateCity'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCity>>, {code: string;data: UpdateCityDto}> = (props) => {
+          const {code,data} = props ?? {};
+
+          return  updateCity(code,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCityMutationResult = NonNullable<Awaited<ReturnType<typeof updateCity>>>
+    export type UpdateCityMutationBody = UpdateCityDto
+    export type UpdateCityMutationError = unknown
+
+    /**
+ * @summary Update a city
+ */
+export const useUpdateCity = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCity>>, TError,{code: string;data: UpdateCityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateCity>>,
+        TError,
+        {code: string;data: UpdateCityDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateCityMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a city
+ */
+export const getDeleteCityUrl = (code: string,) => {
+
+
+  
+
+  return `/api/cities/${code}`
+}
+
+export const deleteCity = async (code: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteCityUrl(code),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteCityMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCity>>, TError,{code: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteCity>>, TError,{code: string}, TContext> => {
+
+const mutationKey = ['deleteCity'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteCity>>, {code: string}> = (props) => {
+          const {code} = props ?? {};
+
+          return  deleteCity(code,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteCityMutationResult = NonNullable<Awaited<ReturnType<typeof deleteCity>>>
+    
+    export type DeleteCityMutationError = unknown
+
+    /**
+ * @summary Delete a city
+ */
+export const useDeleteCity = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteCity>>, TError,{code: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteCity>>,
+        TError,
+        {code: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteCityMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -6502,6 +6926,424 @@ export const useDeleteHotelRateRule = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteHotelRateRuleMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List travel packages
+ */
+export const getListTravelPackagesUrl = () => {
+
+
+  
+
+  return `/api/travel-packages`
+}
+
+export const listTravelPackages = async ( options?: RequestInit): Promise<TravelPackageDto[]> => {
+  
+  return customFetch<TravelPackageDto[]>(getListTravelPackagesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListTravelPackagesQueryKey = () => {
+    return [
+    `/api/travel-packages`
+    ] as const;
+    }
+
+    
+export const getListTravelPackagesQueryOptions = <TData = Awaited<ReturnType<typeof listTravelPackages>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTravelPackagesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTravelPackages>>> = ({ signal }) => listTravelPackages({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTravelPackages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListTravelPackagesQueryResult = NonNullable<Awaited<ReturnType<typeof listTravelPackages>>>
+export type ListTravelPackagesQueryError = unknown
+
+
+export function useListTravelPackages<TData = Awaited<ReturnType<typeof listTravelPackages>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTravelPackages>>,
+          TError,
+          Awaited<ReturnType<typeof listTravelPackages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTravelPackages<TData = Awaited<ReturnType<typeof listTravelPackages>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTravelPackages>>,
+          TError,
+          Awaited<ReturnType<typeof listTravelPackages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTravelPackages<TData = Awaited<ReturnType<typeof listTravelPackages>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List travel packages
+ */
+
+export function useListTravelPackages<TData = Awaited<ReturnType<typeof listTravelPackages>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListTravelPackagesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a travel package
+ */
+export const getCreateTravelPackageUrl = () => {
+
+
+  
+
+  return `/api/travel-packages`
+}
+
+export const createTravelPackage = async (createTravelPackageDto: CreateTravelPackageDto, options?: RequestInit): Promise<TravelPackageDto> => {
+  
+  return customFetch<TravelPackageDto>(getCreateTravelPackageUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createTravelPackageDto,)
+  }
+);}
+
+
+
+
+export const getCreateTravelPackageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTravelPackage>>, TError,{data: CreateTravelPackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTravelPackage>>, TError,{data: CreateTravelPackageDto}, TContext> => {
+
+const mutationKey = ['createTravelPackage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTravelPackage>>, {data: CreateTravelPackageDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTravelPackage(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTravelPackageMutationResult = NonNullable<Awaited<ReturnType<typeof createTravelPackage>>>
+    export type CreateTravelPackageMutationBody = CreateTravelPackageDto
+    export type CreateTravelPackageMutationError = unknown
+
+    /**
+ * @summary Create a travel package
+ */
+export const useCreateTravelPackage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTravelPackage>>, TError,{data: CreateTravelPackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createTravelPackage>>,
+        TError,
+        {data: CreateTravelPackageDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateTravelPackageMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a travel package
+ */
+export const getGetTravelPackageUrl = (id: string,) => {
+
+
+  
+
+  return `/api/travel-packages/${id}`
+}
+
+export const getTravelPackage = async (id: string, options?: RequestInit): Promise<TravelPackageDto> => {
+  
+  return customFetch<TravelPackageDto>(getGetTravelPackageUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetTravelPackageQueryKey = (id?: string,) => {
+    return [
+    `/api/travel-packages/${id}`
+    ] as const;
+    }
+
+    
+export const getGetTravelPackageQueryOptions = <TData = Awaited<ReturnType<typeof getTravelPackage>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTravelPackage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTravelPackageQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTravelPackage>>> = ({ signal }) => getTravelPackage(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTravelPackage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTravelPackageQueryResult = NonNullable<Awaited<ReturnType<typeof getTravelPackage>>>
+export type GetTravelPackageQueryError = unknown
+
+
+export function useGetTravelPackage<TData = Awaited<ReturnType<typeof getTravelPackage>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTravelPackage>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTravelPackage>>,
+          TError,
+          Awaited<ReturnType<typeof getTravelPackage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTravelPackage<TData = Awaited<ReturnType<typeof getTravelPackage>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTravelPackage>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTravelPackage>>,
+          TError,
+          Awaited<ReturnType<typeof getTravelPackage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTravelPackage<TData = Awaited<ReturnType<typeof getTravelPackage>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTravelPackage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a travel package
+ */
+
+export function useGetTravelPackage<TData = Awaited<ReturnType<typeof getTravelPackage>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTravelPackage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTravelPackageQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a travel package
+ */
+export const getUpdateTravelPackageUrl = (id: string,) => {
+
+
+  
+
+  return `/api/travel-packages/${id}`
+}
+
+export const updateTravelPackage = async (id: string,
+    updateTravelPackageDto: UpdateTravelPackageDto, options?: RequestInit): Promise<TravelPackageDto> => {
+  
+  return customFetch<TravelPackageDto>(getUpdateTravelPackageUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTravelPackageDto,)
+  }
+);}
+
+
+
+
+export const getUpdateTravelPackageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTravelPackage>>, TError,{id: string;data: UpdateTravelPackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTravelPackage>>, TError,{id: string;data: UpdateTravelPackageDto}, TContext> => {
+
+const mutationKey = ['updateTravelPackage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTravelPackage>>, {id: string;data: UpdateTravelPackageDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateTravelPackage(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTravelPackageMutationResult = NonNullable<Awaited<ReturnType<typeof updateTravelPackage>>>
+    export type UpdateTravelPackageMutationBody = UpdateTravelPackageDto
+    export type UpdateTravelPackageMutationError = unknown
+
+    /**
+ * @summary Update a travel package
+ */
+export const useUpdateTravelPackage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTravelPackage>>, TError,{id: string;data: UpdateTravelPackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateTravelPackage>>,
+        TError,
+        {id: string;data: UpdateTravelPackageDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateTravelPackageMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a travel package
+ */
+export const getDeleteTravelPackageUrl = (id: string,) => {
+
+
+  
+
+  return `/api/travel-packages/${id}`
+}
+
+export const deleteTravelPackage = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteTravelPackageUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteTravelPackageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTravelPackage>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTravelPackage>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteTravelPackage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTravelPackage>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteTravelPackage(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTravelPackageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTravelPackage>>>
+    
+    export type DeleteTravelPackageMutationError = unknown
+
+    /**
+ * @summary Delete a travel package
+ */
+export const useDeleteTravelPackage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTravelPackage>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTravelPackage>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteTravelPackageMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

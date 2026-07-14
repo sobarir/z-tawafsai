@@ -1,18 +1,18 @@
 import { getTranslations } from 'next-intl/server';
 import { PageHeader, PageLayout } from '@/components/shared/page-header';
 import { requirePermission } from '@/features/auth/rbac/require';
-import { HotelCurrenciesAdmin } from '@/features/hotel-currencies/hotel-currencies-admin';
+import { CitiesAdmin } from '@/features/cities/cities-admin';
 
-const CurrenciesPage = async () => {
+const CitiesPage = async () => {
   await requirePermission('dashboard.view:admin');
-  const t = await getTranslations('catalog.currencies');
+  const t = await getTranslations('reference.cities');
 
   return (
     <PageLayout>
       <PageHeader title={t('title')} subtitle={t('description')} />
-      <HotelCurrenciesAdmin />
+      <CitiesAdmin />
     </PageLayout>
   );
 };
 
-export default CurrenciesPage;
+export default CitiesPage;

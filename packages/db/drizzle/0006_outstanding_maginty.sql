@@ -1,0 +1,2 @@
+ALTER TABLE "airports" ADD CONSTRAINT "airports_city_code_city_city_code_fk" FOREIGN KEY ("city_code") REFERENCES "public"."city"("city_code") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "idx_city_name" ON "city" USING btree ("name");

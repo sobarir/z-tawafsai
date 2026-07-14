@@ -230,7 +230,7 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
                   : undefined,
                 potentialAction: {
                   '@type': 'SearchAction',
-                  target: `${baseUrl}/search?q={search_term_string}`,
+                  target: `${baseUrl}/flights?q={search_term_string}`,
                   'query-input': 'required name=search_term_string',
                 },
                 inLanguage: siteConfig.language,

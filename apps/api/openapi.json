@@ -92,6 +92,153 @@
         ]
       }
     },
+    "/api/cities": {
+      "get": {
+        "operationId": "listCities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CityDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List cities",
+        "tags": [
+          "cities"
+        ]
+      },
+      "post": {
+        "operationId": "createCity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a city",
+        "tags": [
+          "cities"
+        ]
+      }
+    },
+    "/api/cities/{code}": {
+      "get": {
+        "operationId": "getCity",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a city",
+        "tags": [
+          "cities"
+        ]
+      },
+      "patch": {
+        "operationId": "updateCity",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a city",
+        "tags": [
+          "cities"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteCity",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a city",
+        "tags": [
+          "cities"
+        ]
+      }
+    },
     "/api/airports": {
       "get": {
         "operationId": "listAirports",
@@ -1295,7 +1442,7 @@
             "required": false,
             "in": "query",
             "schema": {
-              "default": "both",
+              "default": "property",
               "anyOf": [
                 {
                   "type": "string",
@@ -2424,6 +2571,153 @@
           "hotel-rate-rules"
         ]
       }
+    },
+    "/api/travel-packages": {
+      "get": {
+        "operationId": "listTravelPackages",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TravelPackageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List travel packages",
+        "tags": [
+          "travel-packages"
+        ]
+      },
+      "post": {
+        "operationId": "createTravelPackage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTravelPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TravelPackageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a travel package",
+        "tags": [
+          "travel-packages"
+        ]
+      }
+    },
+    "/api/travel-packages/{id}": {
+      "get": {
+        "operationId": "getTravelPackage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TravelPackageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a travel package",
+        "tags": [
+          "travel-packages"
+        ]
+      },
+      "patch": {
+        "operationId": "updateTravelPackage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTravelPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TravelPackageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a travel package",
+        "tags": [
+          "travel-packages"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteTravelPackage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a travel package",
+        "tags": [
+          "travel-packages"
+        ]
+      }
     }
   },
   "info": {
@@ -2549,6 +2843,81 @@
           "title"
         ]
       },
+      "CityDto": {
+        "type": "object",
+        "properties": {
+          "cityCode": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "cityCode",
+          "name",
+          "countryCode",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateCityDto": {
+        "type": "object",
+        "properties": {
+          "cityCode": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          }
+        },
+        "required": [
+          "cityCode",
+          "name",
+          "countryCode"
+        ]
+      },
+      "UpdateCityDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          }
+        }
+      },
       "AirportDto": {
         "type": "object",
         "properties": {
@@ -2567,8 +2936,7 @@
           },
           "cityCode": {
             "type": "string",
-            "minLength": 3,
-            "maxLength": 3
+            "pattern": "^[A-Z]{3}$"
           },
           "countryCode": {
             "type": "string",
@@ -2629,8 +2997,7 @@
           },
           "cityCode": {
             "type": "string",
-            "minLength": 3,
-            "maxLength": 3
+            "pattern": "^[A-Z]{3}$"
           },
           "countryCode": {
             "type": "string",
@@ -2676,8 +3043,7 @@
           },
           "cityCode": {
             "type": "string",
-            "minLength": 3,
-            "maxLength": 3
+            "pattern": "^[A-Z]{3}$"
           },
           "countryCode": {
             "type": "string",
@@ -4188,7 +4554,6 @@
             "maxLength": 2000
           },
           "isActive": {
-            "default": true,
             "type": "boolean"
           }
         },
@@ -4231,7 +4596,6 @@
             "maxLength": 2000
           },
           "isActive": {
-            "default": true,
             "type": "boolean"
           }
         }
@@ -4337,7 +4701,6 @@
             "maxLength": 2000
           },
           "isActive": {
-            "default": true,
             "type": "boolean"
           }
         },
@@ -4382,7 +4745,6 @@
             "maxLength": 2000
           },
           "isActive": {
-            "default": true,
             "type": "boolean"
           }
         }
@@ -4688,6 +5050,254 @@
           "currency": {
             "type": "string",
             "pattern": "^[A-Z]{3}$"
+          }
+        }
+      },
+      "TravelPackageDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "durationNights": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "flight": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "operatingAirline": {
+                "type": "string",
+                "pattern": "^[A-Z0-9]{2}$"
+              },
+              "airlineName": {
+                "type": "string"
+              },
+              "flightNumber": {
+                "type": "string",
+                "pattern": "^[0-9]{1,4}[A-Z]?$"
+              },
+              "originAirport": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              },
+              "destAirport": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              },
+              "departureTime": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              "arrivalTime": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              "isDirect": {
+                "type": "boolean"
+              },
+              "transitAirport": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$",
+                "nullable": true
+              },
+              "transitCityName": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "operatingAirline",
+              "airlineName",
+              "flightNumber",
+              "originAirport",
+              "destAirport",
+              "departureTime",
+              "arrivalTime",
+              "isDirect",
+              "transitAirport",
+              "transitCityName"
+            ]
+          },
+          "property": {
+            "type": "object",
+            "properties": {
+              "propertyCode": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "destination": {
+                "type": "string"
+              },
+              "starRating": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "nullable": true
+              }
+            },
+            "required": [
+              "propertyCode",
+              "displayName",
+              "destination",
+              "starRating"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "heroImageUrl",
+          "price",
+          "currency",
+          "durationNights",
+          "isActive",
+          "createdAt",
+          "updatedAt",
+          "flight",
+          "property"
+        ]
+      },
+      "CreateTravelPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "flightId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "propertyCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "durationNights": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "title",
+          "flightId",
+          "propertyCode",
+          "durationNights",
+          "price",
+          "currency"
+        ]
+      },
+      "UpdateTravelPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "flightId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "propertyCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "durationNights": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
       }

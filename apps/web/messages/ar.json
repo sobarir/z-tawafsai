@@ -19,6 +19,7 @@
     "filter": "تصفية",
     "reset": "إعادة تعيين",
     "noData": "لا توجد بيانات",
+    "noResultsFound": "لم يتم العثور على نتائج.",
     "toggleTheme": "تبديل المظهر",
     "sidebar": "الشريط الجانبي",
     "toggleSidebar": "تبديل الشريط الجانبي",
@@ -43,7 +44,8 @@
     "searchHotels": "البحث عن الفنادق",
     "logout": "تسجيل الخروج",
     "login": "تسجيل الدخول",
-    "uiComponents": "مكونات الواجهة"
+    "uiComponents": "مكونات الواجهة",
+    "travelPackages": "باقات السفر"
   },
   "auth": {
     "login": {
@@ -202,7 +204,6 @@
         "name": "الاسم",
         "namePlaceholder": "مثال: مطار جون إف كينيدي الدولي",
         "cityCode": "رمز المدينة",
-        "cityCodePlaceholder": "مثال: NYC",
         "countryCode": "رمز البلد",
         "countryCodePlaceholder": "مثال: US",
         "timezone": "المنطقة الزمنية",
@@ -441,8 +442,6 @@
   "catalog": {
     "nav": {
       "section": "إدارة الكتالوج",
-      "currencies": "العملات",
-      "fxRates": "أسعار الصرف",
       "properties": "أماكن الإقامة",
       "packages": "الباقات",
       "roomTypes": "أنواع الغرف",
@@ -461,45 +460,6 @@
     "createSuccess": "تم الإنشاء بنجاح.",
     "updateSuccess": "تم التحديث بنجاح.",
     "deleteSuccess": "تم الحذف بنجاح.",
-    "currencies": {
-      "title": "العملات",
-      "description": "العملات المرجعية المستخدمة في تسعير أماكن الإقامة والباقات.",
-      "createTitle": "عملة جديدة",
-      "editTitle": "تعديل العملة",
-      "columns": {
-        "code": "الرمز",
-        "name": "الاسم",
-        "symbol": "الرمز الاصطلاحي",
-        "minorUnit": "الخانات العشرية"
-      },
-      "fields": {
-        "code": "رمز العملة",
-        "codePlaceholder": "مثال: USD",
-        "minorUnit": "الخانات العشرية",
-        "symbol": "الرمز الاصطلاحي",
-        "symbolPlaceholder": "مثال: $",
-        "name": "الاسم",
-        "namePlaceholder": "مثال: الدولار الأمريكي"
-      }
-    },
-    "fxRates": {
-      "title": "أسعار الصرف",
-      "description": "أسعار تحويل بين أزواج العملات تُستخدم لعرض الأسعار بعملة مختلفة.",
-      "createTitle": "سعر صرف جديد",
-      "editTitle": "تعديل سعر الصرف",
-      "columns": {
-        "baseCurrency": "الأساس",
-        "quoteCurrency": "المقابل",
-        "rate": "السعر",
-        "asOf": "بتاريخ"
-      },
-      "fields": {
-        "baseCurrency": "عملة الأساس",
-        "quoteCurrency": "العملة المقابلة",
-        "rate": "السعر (1 من الأساس = ؟ من المقابل)",
-        "asOf": "بتاريخ"
-      }
-    },
     "properties": {
       "title": "أماكن الإقامة",
       "description": "إقامات بنمط الفنادق، يُحسب سعرها لليلة الواحدة حسب نوع الغرفة.",
@@ -519,7 +479,7 @@
         "displayName": "الاسم المعروض",
         "displayNamePlaceholder": "مثال: فندق جدة الواجهة البحرية",
         "destination": "الوجهة",
-        "destinationPlaceholder": "مثال: جدة",
+        "destinationHint": "لا تراه؟ أضفه أولاً ضمن البيانات المرجعية ← المدن.",
         "countryCode": "رمز الدولة",
         "countryCodePlaceholder": "مثال: SA",
         "heroImageUrl": "رابط الصورة الرئيسية",
@@ -549,7 +509,7 @@
         "displayName": "الاسم المعروض",
         "displayNamePlaceholder": "مثال: باقة عمرة اقتصادية 9 أيام",
         "destination": "الوجهة",
-        "destinationPlaceholder": "مثال: جدة",
+        "destinationHint": "لا تراه؟ أضفه أولاً ضمن البيانات المرجعية ← المدن.",
         "countryCode": "رمز الدولة",
         "countryCodePlaceholder": "مثال: SA",
         "heroImageUrl": "رابط الصورة الرئيسية",
@@ -626,6 +586,84 @@
       }
     }
   },
+  "reference": {
+    "nav": {
+      "section": "إدارة البيانات المرجعية",
+      "cities": "المدن",
+      "currencies": "العملات",
+      "fxRates": "أسعار الصرف"
+    },
+    "actions": "الإجراءات",
+    "openMenu": "فتح القائمة",
+    "createButton": "جديد",
+    "searchPlaceholder": "بحث...",
+    "noResults": "لم يتم العثور على نتائج.",
+    "loadingRows": "جارٍ التحميل...",
+    "pageOf": "صفحة {current} من {total}",
+    "deleteConfirmTitle": "حذف هذا السجل؟",
+    "deleteConfirmDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "createSuccess": "تم الإنشاء بنجاح.",
+    "updateSuccess": "تم التحديث بنجاح.",
+    "deleteSuccess": "تم الحذف بنجاح.",
+    "cities": {
+      "title": "المدن",
+      "description": "مدن مرجعية تُستخدم في المطارات وأماكن الإقامة/الباقات الفندقية.",
+      "createTitle": "مدينة جديدة",
+      "editTitle": "تعديل المدينة",
+      "columns": {
+        "cityCode": "الرمز",
+        "name": "الاسم",
+        "countryCode": "البلد"
+      },
+      "fields": {
+        "cityCode": "رمز المدينة",
+        "cityCodePlaceholder": "مثال: NYC",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: نيويورك",
+        "countryCode": "رمز البلد",
+        "countryCodePlaceholder": "مثال: US"
+      }
+    },
+    "currencies": {
+      "title": "العملات",
+      "description": "العملات المرجعية المستخدمة في تسعير أماكن الإقامة والباقات.",
+      "createTitle": "عملة جديدة",
+      "editTitle": "تعديل العملة",
+      "columns": {
+        "code": "الرمز",
+        "name": "الاسم",
+        "symbol": "الرمز الاصطلاحي",
+        "minorUnit": "الخانات العشرية"
+      },
+      "fields": {
+        "code": "رمز العملة",
+        "codePlaceholder": "مثال: USD",
+        "minorUnit": "الخانات العشرية",
+        "symbol": "الرمز الاصطلاحي",
+        "symbolPlaceholder": "مثال: $",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: الدولار الأمريكي"
+      }
+    },
+    "fxRates": {
+      "title": "أسعار الصرف",
+      "description": "أسعار تحويل بين أزواج العملات تُستخدم لعرض الأسعار بعملة مختلفة.",
+      "createTitle": "سعر صرف جديد",
+      "editTitle": "تعديل سعر الصرف",
+      "columns": {
+        "baseCurrency": "الأساس",
+        "quoteCurrency": "المقابل",
+        "rate": "السعر",
+        "asOf": "بتاريخ"
+      },
+      "fields": {
+        "baseCurrency": "عملة الأساس",
+        "quoteCurrency": "العملة المقابلة",
+        "rate": "السعر (1 من الأساس = ؟ من المقابل)",
+        "asOf": "بتاريخ"
+      }
+    }
+  },
   "errors": {
     "401": "غير مصرح",
     "403": "محظور",
@@ -634,5 +672,62 @@
     "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     "unauthorizedDescription": "ليس لديك إذن للوصول إلى هذه الصفحة.",
     "goToDashboard": "الذهاب إلى لوحة التحكم"
+  },
+  "travelPackages": {
+    "title": "باقات السفر",
+    "description": "رحلة طيران وإقامة فندقية، في رحلة واحدة.",
+    "loading": "جارٍ التحميل...",
+    "noResults": "لا توجد باقات سفر متاحة حاليًا.",
+    "requestThis": "طلب هذا",
+    "requestSubject": "طلب",
+    "durationNights": "{count, plural, one {# ليلة} other {# ليالٍ}}",
+    "direct": "مباشرة",
+    "transitIn": "ترانزيت في {city} ({code})"
+  },
+  "travelPackagesAdmin": {
+    "nav": {
+      "section": "إدارة باقات السفر",
+      "travelPackages": "باقات السفر"
+    },
+    "actions": "الإجراءات",
+    "openMenu": "فتح القائمة",
+    "createButton": "جديد",
+    "searchPlaceholder": "بحث...",
+    "noResults": "لم يتم العثور على نتائج.",
+    "loadingRows": "جارٍ التحميل...",
+    "pageOf": "صفحة {current} من {total}",
+    "deleteConfirmTitle": "حذف هذا السجل؟",
+    "deleteConfirmDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "createSuccess": "تم الإنشاء بنجاح.",
+    "updateSuccess": "تم التحديث بنجاح.",
+    "deleteSuccess": "تم الحذف بنجاح.",
+    "travelPackages": {
+      "title": "باقات السفر",
+      "description": "رحلة طيران وإقامة فندقية، في رحلة واحدة.",
+      "createTitle": "باقة سفر جديدة",
+      "editTitle": "تعديل باقة السفر",
+      "columns": {
+        "title": "العنوان",
+        "flight": "الرحلة",
+        "property": "مكان الإقامة",
+        "durationNights": "الليالي",
+        "price": "السعر",
+        "isActive": "نشط"
+      },
+      "fields": {
+        "title": "العنوان",
+        "titlePlaceholder": "مثال: 5 ليالٍ في جدة",
+        "description": "الوصف",
+        "descriptionPlaceholder": "ملخص قصير يظهر في البطاقة العامة",
+        "flight": "الرحلة",
+        "property": "مكان الإقامة",
+        "heroImageUrl": "رابط الصورة الرئيسية",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "المدة (بالليالي)",
+        "price": "السعر",
+        "currency": "العملة",
+        "isActive": "نشط (يظهر للعامة)"
+      }
+    }
   }
 }

@@ -17,10 +17,7 @@ export interface UpdateAirportDto {
    * @maxLength 100
    */
   name?: string;
-  /**
-   * @minLength 3
-   * @maxLength 3
-   */
+  /** @pattern ^[A-Z]{3}$ */
   cityCode?: string;
   /**
    * @minLength 2

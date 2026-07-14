@@ -12,12 +12,14 @@ import {
   useCreateAirport,
   useDeleteAirport,
   useListAirports,
+  useListCities,
   useUpdateAirport,
 } from '@/libs/api/generated/endpoints';
 import {
   crudMutationOptions,
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
+import { toCityOptions } from '@/libs/combobox-options';
 import { AirportForm } from './airport-form';
 import { getAirportColumns } from './columns';
 
@@ -27,6 +29,8 @@ export function AirportsAdmin() {
   const tCommon = useTranslations('common');
 
   const { data: airports, isLoading } = useListAirports();
+  const { data: cities } = useListCities();
+  const cityOptions = useMemo(() => toCityOptions(cities ?? []), [cities]);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Airport | null>(null);
@@ -106,6 +110,7 @@ export function AirportsAdmin() {
       >
         <AirportForm
           airport={editing ?? undefined}
+          cityOptions={cityOptions}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {

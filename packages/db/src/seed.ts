@@ -200,6 +200,32 @@ const airports: (typeof schema.airports.$inferInsert)[] = [
   },
 ];
 
+// One city per distinct cityCode used by the airports above, plus matching
+// countryCode — backs the City reference dropdown used by both the airport
+// and hotel property/package admin forms.
+const cities: (typeof schema.city.$inferInsert)[] = [
+  { cityCode: 'JKT', name: 'Jakarta', countryCode: 'ID' },
+  { cityCode: 'DPS', name: 'Denpasar', countryCode: 'ID' },
+  { cityCode: 'SIN', name: 'Singapore', countryCode: 'SG' },
+  { cityCode: 'TYO', name: 'Tokyo', countryCode: 'JP' },
+  { cityCode: 'DOH', name: 'Doha', countryCode: 'QA' },
+  { cityCode: 'LON', name: 'London', countryCode: 'GB' },
+  { cityCode: 'ROM', name: 'Rome', countryCode: 'IT' },
+  { cityCode: 'PAR', name: 'Paris', countryCode: 'FR' },
+  { cityCode: 'NYC', name: 'New York', countryCode: 'US' },
+  { cityCode: 'BKK', name: 'Bangkok', countryCode: 'TH' },
+  { cityCode: 'AMS', name: 'Amsterdam', countryCode: 'NL' },
+  { cityCode: 'JED', name: 'Jeddah', countryCode: 'SA' },
+  { cityCode: 'MED', name: 'Madinah', countryCode: 'SA' },
+  { cityCode: 'KUL', name: 'Kuala Lumpur', countryCode: 'MY' },
+  { cityCode: 'DXB', name: 'Dubai', countryCode: 'AE' },
+  { cityCode: 'AUH', name: 'Abu Dhabi', countryCode: 'AE' },
+  { cityCode: 'CAI', name: 'Cairo', countryCode: 'EG' },
+  { cityCode: 'BOM', name: 'Mumbai', countryCode: 'IN' },
+  { cityCode: 'HAK', name: 'Haikou', countryCode: 'CN' },
+  { cityCode: 'MCT', name: 'Muscat', countryCode: 'OM' },
+];
+
 const airlines: (typeof schema.airlines.$inferInsert)[] = [
   {
     airlineCode: 'GA',
@@ -2616,6 +2642,13 @@ async function seed() {
   }
   const db = createDb(databaseUrl);
 
+  for (const cityRow of cities) {
+    await db.insert(schema.city).values(cityRow).onConflictDoUpdate({
+      target: schema.city.cityCode,
+      set: cityRow,
+    });
+  }
+
   for (const airport of airports) {
     await db.insert(schema.airports).values(airport).onConflictDoUpdate({
       target: schema.airports.airportCode,
@@ -2979,6 +3012,46 @@ async function seed() {
     (count, item) => count + item.rateRules.length,
     0,
   );
+
+  // One sample Travel Package (flight + hotel), pairing a real seeded flight
+  // with a real seeded property — gives the public listing real content.
+  const [anchorFlight] = await db
+    .select({ id: schema.flights.id })
+    .from(schema.flights)
+    .where(
+      and(
+        eq(schema.flights.operatingAirline, 'GA'),
+        eq(schema.flights.flightNumber, '402'),
+        eq(schema.flights.departureTime, new Date('2026-08-05T11:50:00+07:00')),
+      ),
+    );
+
+  if (anchorFlight) {
+    const travelPackageValues = {
+      title: '5-Night Jeddah Getaway',
+      description: 'Round-trip flight and a stay at Jeddah Waterfront Hotel.',
+      flightId: anchorFlight.id,
+      propertyCode: 'JED-WFH',
+      durationNights: 5,
+      price: 1200,
+      currency: 'USD',
+      isActive: true,
+    };
+
+    const [existingTravelPackage] = await db
+      .select({ id: schema.flightHotelPackage.id })
+      .from(schema.flightHotelPackage)
+      .where(eq(schema.flightHotelPackage.title, travelPackageValues.title));
+
+    if (existingTravelPackage) {
+      await db
+        .update(schema.flightHotelPackage)
+        .set(travelPackageValues)
+        .where(eq(schema.flightHotelPackage.id, existingTravelPackage.id));
+    } else {
+      await db.insert(schema.flightHotelPackage).values(travelPackageValues);
+    }
+  }
 
   console.log(
     `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows, ${mctRules.length} MCT rules, ${interlineAgreements.length} interline agreements`,

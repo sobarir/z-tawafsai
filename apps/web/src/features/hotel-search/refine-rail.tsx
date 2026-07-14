@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -53,54 +54,53 @@ export function RefineRail({ value, onChange }: RefineRailProps) {
     });
 
   return (
-    <div
-      className="hs-card flex flex-col gap-4 rounded-lg p-4"
-      style={{ fontFamily: 'var(--hs-font-body)' }}
-    >
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="hotel-refine-sort">{t('sort')}</Label>
-        <Select
-          value={value.sort}
-          onValueChange={(next) =>
-            onChange({ ...value, sort: next as HotelSort })
-          }
-        >
-          <SelectTrigger id="hotel-refine-sort">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="price_asc">{t('sortPriceAsc')}</SelectItem>
-            <SelectItem value="price_desc">{t('sortPriceDesc')}</SelectItem>
-            <SelectItem value="name">{t('sortName')}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <Card>
+      <CardContent className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="hotel-refine-sort">{t('sort')}</Label>
+          <Select
+            value={value.sort}
+            onValueChange={(next) =>
+              onChange({ ...value, sort: next as HotelSort })
+            }
+          >
+            <SelectTrigger id="hotel-refine-sort">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="price_asc">{t('sortPriceAsc')}</SelectItem>
+              <SelectItem value="price_desc">{t('sortPriceDesc')}</SelectItem>
+              <SelectItem value="name">{t('sortName')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="hotel-refine-min-price">{t('minPrice')}</Label>
-        <Input
-          id="hotel-refine-min-price"
-          type="number"
-          min={0}
-          value={minPriceText}
-          onChange={(e) => setMinPriceText(e.target.value)}
-          onBlur={commitMinPrice}
-          onKeyDown={(e) => e.key === 'Enter' && commitMinPrice()}
-        />
-      </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="hotel-refine-min-price">{t('minPrice')}</Label>
+          <Input
+            id="hotel-refine-min-price"
+            type="number"
+            min={0}
+            value={minPriceText}
+            onChange={(e) => setMinPriceText(e.target.value)}
+            onBlur={commitMinPrice}
+            onKeyDown={(e) => e.key === 'Enter' && commitMinPrice()}
+          />
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="hotel-refine-max-price">{t('maxPrice')}</Label>
-        <Input
-          id="hotel-refine-max-price"
-          type="number"
-          min={0}
-          value={maxPriceText}
-          onChange={(e) => setMaxPriceText(e.target.value)}
-          onBlur={commitMaxPrice}
-          onKeyDown={(e) => e.key === 'Enter' && commitMaxPrice()}
-        />
-      </div>
-    </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="hotel-refine-max-price">{t('maxPrice')}</Label>
+          <Input
+            id="hotel-refine-max-price"
+            type="number"
+            min={0}
+            value={maxPriceText}
+            onChange={(e) => setMaxPriceText(e.target.value)}
+            onBlur={commitMaxPrice}
+            onKeyDown={(e) => e.key === 'Enter' && commitMaxPrice()}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

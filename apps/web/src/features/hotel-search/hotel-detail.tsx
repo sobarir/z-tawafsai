@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { siteConfig } from '@/features/site/config';
 import { useSearchHotels } from '@/libs/api/generated/endpoints';
 import { useApiErrorToast } from '@/libs/api/use-api-error-toast';
@@ -42,18 +43,12 @@ export function HotelDetail({ listingId, query }: HotelDetailProps) {
   const item = data?.items.find((row) => row.listingId === listingId);
 
   if (isFetching) {
-    return (
-      <p className="text-sm" style={{ color: 'var(--hs-muted)' }}>
-        {t('loading')}
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">{t('loading')}</p>;
   }
 
   if (isFetched && !item) {
     return (
-      <p className="text-sm" style={{ color: 'var(--hs-muted)' }}>
-        {t('detailNotFound')}
-      </p>
+      <p className="text-sm text-muted-foreground">{t('detailNotFound')}</p>
     );
   }
 
@@ -66,29 +61,21 @@ export function HotelDetail({ listingId, query }: HotelDetailProps) {
   );
 
   return (
-    <div className="hotel-search-theme flex flex-col gap-6">
-      <div className="hs-card flex flex-col gap-2 rounded-lg p-4">
-        <p
-          className="text-2xl font-semibold"
-          style={{
-            color: 'var(--hs-ink)',
-            fontFamily: 'var(--hs-font-display)',
-          }}
-        >
-          {item.displayName}
-        </p>
-        <p className="text-sm" style={{ color: 'var(--hs-muted)' }}>
-          {item.destination}
-        </p>
-        {item.kind === 'property' && item.starRating ? (
-          <Badge variant="outline">{'★'.repeat(item.starRating)}</Badge>
-        ) : null}
-        {item.kind === 'package' && item.durationNights ? (
-          <Badge variant="secondary">
-            {t('durationNights', { count: item.durationNights })}
-          </Badge>
-        ) : null}
-      </div>
+    <div className="flex flex-col gap-6">
+      <Card>
+        <CardContent className="flex flex-col gap-2">
+          <p className="text-2xl font-semibold">{item.displayName}</p>
+          <p className="text-sm text-muted-foreground">{item.destination}</p>
+          {item.kind === 'property' && item.starRating ? (
+            <Badge variant="outline">{'★'.repeat(item.starRating)}</Badge>
+          ) : null}
+          {item.kind === 'package' && item.durationNights ? (
+            <Badge variant="secondary">
+              {t('durationNights', { count: item.durationNights })}
+            </Badge>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <PriceBreakdown item={item} />
 
@@ -96,9 +83,7 @@ export function HotelDetail({ listingId, query }: HotelDetailProps) {
         href={`mailto:${siteConfig.contact.supportEmail}?subject=${requestSubject}`}
         className="w-fit"
       >
-        <Button type="button" className="hs-cta">
-          {t('requestThis')}
-        </Button>
+        <Button type="button">{t('requestThis')}</Button>
       </a>
     </div>
   );

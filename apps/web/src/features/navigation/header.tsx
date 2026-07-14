@@ -103,6 +103,17 @@ const Header = () => {
             >
               {t('about')}
             </Link>
+            <Link
+              href="/travel-packages"
+              className={cn(
+                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                pathname === '/travel-packages'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              {t('travelPackages')}
+            </Link>
             {user && (
               <Link
                 href="/dashboard"
@@ -204,6 +215,18 @@ const Header = () => {
                 )}
               >
                 {t('about')}
+              </Link>
+              <Link
+                href="/travel-packages"
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  pathname === '/travel-packages'
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                )}
+              >
+                {t('travelPackages')}
               </Link>
               {user && (
                 <Link

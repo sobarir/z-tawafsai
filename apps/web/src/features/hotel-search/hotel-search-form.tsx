@@ -55,10 +55,7 @@ export function HotelSearchForm({
   ) => setLocal((prev) => ({ ...prev, [key]: fieldValue }));
 
   return (
-    <div
-      className="hs-card flex flex-col gap-4 rounded-lg p-4"
-      style={{ fontFamily: 'var(--hs-font-body)' }}
-    >
+    <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="flex flex-col gap-2 lg:col-span-2">
           <Label htmlFor="hotel-search-destination">{t('destination')}</Label>
@@ -148,7 +145,7 @@ export function HotelSearchForm({
 
         <Button
           type="button"
-          className="hs-cta w-fit"
+          className="w-fit"
           disabled={!canSearch}
           loading={searching}
           onClick={() => onSubmit(local)}

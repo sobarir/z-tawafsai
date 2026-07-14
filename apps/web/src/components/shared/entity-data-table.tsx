@@ -11,7 +11,7 @@ interface EntityDataTableProps<TData, TValue> {
   isLoading?: boolean;
   toolbar?: ReactNode;
   /** Which top-level i18n namespace to pull the shared admin-table labels from. */
-  namespace?: 'schedule' | 'catalog';
+  namespace?: 'schedule' | 'catalog' | 'reference' | 'travelPackagesAdmin';
 }
 
 /** DataTable pre-wired with an admin domain's shared i18n labels (schedule, catalog, ...). */

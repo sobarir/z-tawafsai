@@ -7,6 +7,7 @@ import { AirlinesModule } from './airlines/airlines.module';
 import { AirportsModule } from './airports/airports.module';
 import { AppController } from './app.controller';
 import { auth } from './auth/auth';
+import { CitiesModule } from './cities/cities.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { loggerConfig } from './common/logger/logger.config';
 import { ConnectionsModule } from './connections/connections.module';
@@ -24,6 +25,7 @@ import { HotelsModule } from './hotels/hotels.module';
 import { InterlineAgreementsModule } from './interline-agreements/interline-agreements.module';
 import { MctRulesModule } from './mct-rules/mct-rules.module';
 import { PostsModule } from './posts/posts.module';
+import { TravelPackagesModule } from './travel-packages/travel-packages.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -37,6 +39,7 @@ import { UsersModule } from './users/users.module';
     DatabaseModule,
     UsersModule,
     PostsModule,
+    CitiesModule,
     AirportsModule,
     AirlinesModule,
     FlightsModule,
@@ -52,6 +55,7 @@ import { UsersModule } from './users/users.module';
     HotelRoomTypesModule,
     HotelSeasonsModule,
     HotelRateRulesModule,
+    TravelPackagesModule,
   ],
   controllers: [AppController],
   providers: [

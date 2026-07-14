@@ -23,8 +23,8 @@ import { getFxRateColumns } from './columns';
 import { FxRateForm } from './fx-rate-form';
 
 export function HotelFxRatesAdmin() {
-  const t = useTranslations('catalog.fxRates');
-  const tCatalog = useTranslations('catalog');
+  const t = useTranslations('reference.fxRates');
+  const tReference = useTranslations('reference');
   const tCommon = useTranslations('common');
 
   const { data: fxRates, isLoading } = useListHotelFxRates();
@@ -34,7 +34,7 @@ export function HotelFxRatesAdmin() {
   const [editing, setEditing] = useState<FxRate | null>(null);
   const [deleting, setDeleting] = useState<FxRate | null>(null);
 
-  const feedback = useCrudFeedback(getListHotelFxRatesQueryKey(), 'catalog');
+  const feedback = useCrudFeedback(getListHotelFxRatesQueryKey(), 'reference');
 
   const createMutation = useCreateHotelFxRate({
     mutation: crudMutationOptions(feedback, 'createSuccess', () =>
@@ -62,8 +62,8 @@ export function HotelFxRatesAdmin() {
           ratePpm: t('columns.rate'),
           asOf: t('columns.asOf'),
         },
-        actionsLabel: tCatalog('actions'),
-        openMenuLabel: tCatalog('openMenu'),
+        actionsLabel: tReference('actions'),
+        openMenuLabel: tReference('openMenu'),
         editLabel: tCommon('edit'),
         deleteLabel: tCommon('delete'),
         onEdit: (fxRate) => {
@@ -72,7 +72,7 @@ export function HotelFxRatesAdmin() {
         },
         onDelete: (fxRate) => setDeleting(fxRate),
       }),
-    [t, tCatalog, tCommon],
+    [t, tReference, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -80,7 +80,7 @@ export function HotelFxRatesAdmin() {
   return (
     <div className="flex w-full min-w-0 flex-col gap-4">
       <EntityDataTable
-        namespace="catalog"
+        namespace="reference"
         columns={columns}
         data={fxRates ?? []}
         isLoading={isLoading}
@@ -93,7 +93,7 @@ export function HotelFxRatesAdmin() {
               setFormOpen(true);
             }}
           >
-            {tCatalog('createButton')}
+            {tReference('createButton')}
           </Button>
         }
       />
@@ -135,7 +135,7 @@ export function HotelFxRatesAdmin() {
       </EntityFormDialog>
 
       <EntityDeleteConfirm
-        namespace="catalog"
+        namespace="reference"
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
         name={

@@ -30,7 +30,7 @@ function parseState(
     kind:
       kind && KINDS.includes(kind as HotelSearchKind)
         ? (kind as HotelSearchKind)
-        : 'both',
+        : 'property',
     sort:
       sort && SORTS.includes(sort as HotelSort)
         ? (sort as HotelSort)
