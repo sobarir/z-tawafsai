@@ -378,12 +378,14 @@ const NAV_ICONS = {
   dashboard: LayoutDashboard,
   profile: UserCircle,
   search: PlaneTakeoff,
+  searchHotels: Hotel,
 } as const;
 
 function buildNavItems(
   dashboardLabel: string,
   profileLabel: string,
   searchLabel: string,
+  searchHotelsLabel: string,
 ): NavItem[] {
   return [
     {
@@ -403,6 +405,12 @@ function buildNavItems(
       label: searchLabel,
       href: '/search',
       icon: NAV_ICONS.search,
+    },
+    {
+      id: 'search-hotels',
+      label: searchHotelsLabel,
+      href: '/hotels',
+      icon: NAV_ICONS.searchHotels,
     },
   ];
 }
@@ -558,6 +566,7 @@ export function Sidebar() {
         t('navigation.dashboard'),
         t('navigation.profile'),
         t('navigation.searchFlights'),
+        t('navigation.searchHotels'),
       ),
     [t],
   );
