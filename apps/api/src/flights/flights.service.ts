@@ -15,7 +15,7 @@ import type {
   SearchFlightsQuery,
   UpdateFlightInput,
 } from '@repo/shared';
-import { and, asc, eq, gte, inArray, lt } from 'drizzle-orm';
+import { and, asc, eq, gt, gte, inArray, lt, lte, ne } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type FlightRow = typeof schema.flights.$inferSelect;
@@ -104,20 +104,31 @@ export function buildFlightLegs(
 export class FlightsService {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  async list(): Promise<Flight[]> {
-    const rows = await this.db
-      .select()
-      .from(schema.flights)
-      .orderBy(asc(schema.flights.departureTime));
+  /** Fetches legs for `rows` and assembles them into `Flight[]` — shared by list/search/*. */
+  private async attachLegs(rows: FlightRow[]): Promise<Flight[]> {
     if (rows.length === 0) {
       return [];
     }
     const legRows = await this.db
       .select()
       .from(schema.flightLegs)
+      .where(
+        inArray(
+          schema.flightLegs.flightId,
+          rows.map((row) => row.id),
+        ),
+      )
       .orderBy(asc(schema.flightLegs.legSequence));
     const legsByFlight = groupLegsByFlight(legRows);
     return rows.map((row) => toFlight(row, legsByFlight.get(row.id) ?? []));
+  }
+
+  async list(): Promise<Flight[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.flights)
+      .orderBy(asc(schema.flights.departureTime));
+    return this.attachLegs(rows);
   }
 
   /**
@@ -144,21 +155,64 @@ export class FlightsService {
         ),
       )
       .orderBy(asc(schema.flights.price));
-    if (rows.length === 0) {
+    return this.attachLegs(rows);
+  }
+
+  /**
+   * Candidate first legs for itinerary search (ConnectionsService.searchItineraries):
+   * flights departing originAirport on the UTC calendar day of `date`, to
+   * anywhere except excludeDestAirport (which is covered by `search()` directly).
+   */
+  async searchOutboundExcluding(
+    originAirport: string,
+    excludeDestAirport: string,
+    date: string,
+  ): Promise<Flight[]> {
+    const dayStart = new Date(`${date}T00:00:00.000Z`);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+    const rows = await this.db
+      .select()
+      .from(schema.flights)
+      .where(
+        and(
+          eq(schema.flights.originAirport, originAirport),
+          ne(schema.flights.destAirport, excludeDestAirport),
+          eq(schema.flights.status, 'ACTIVE'),
+          gte(schema.flights.departureTime, dayStart),
+          lt(schema.flights.departureTime, dayEnd),
+        ),
+      );
+    return this.attachLegs(rows);
+  }
+
+  /**
+   * Candidate second legs for itinerary search: flights from any of
+   * `originAirports` to destAirport, departing within (after, before].
+   */
+  async searchInboundFromHubs(
+    originAirports: string[],
+    destAirport: string,
+    after: Date,
+    before: Date,
+  ): Promise<Flight[]> {
+    if (originAirports.length === 0) {
       return [];
     }
-    const legRows = await this.db
+    const rows = await this.db
       .select()
-      .from(schema.flightLegs)
+      .from(schema.flights)
       .where(
-        inArray(
-          schema.flightLegs.flightId,
-          rows.map((row) => row.id),
+        and(
+          inArray(schema.flights.originAirport, originAirports),
+          eq(schema.flights.destAirport, destAirport),
+          eq(schema.flights.status, 'ACTIVE'),
+          gt(schema.flights.departureTime, after),
+          lte(schema.flights.departureTime, before),
         ),
-      )
-      .orderBy(asc(schema.flightLegs.legSequence));
-    const legsByFlight = groupLegsByFlight(legRows);
-    return rows.map((row) => toFlight(row, legsByFlight.get(row.id) ?? []));
+      );
+    return this.attachLegs(rows);
   }
 
   async findById(id: string): Promise<Flight> {

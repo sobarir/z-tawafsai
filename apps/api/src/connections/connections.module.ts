@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AirportsModule } from '../airports/airports.module';
 import { FlightsModule } from '../flights/flights.module';
 import { InterlineAgreementsModule } from '../interline-agreements/interline-agreements.module';
@@ -8,12 +8,13 @@ import { ConnectionsService } from './connections.service';
 
 @Module({
   imports: [
-    FlightsModule,
+    forwardRef(() => FlightsModule),
     AirportsModule,
     MctRulesModule,
     InterlineAgreementsModule,
   ],
   controllers: [ConnectionsController],
   providers: [ConnectionsService],
+  exports: [ConnectionsService],
 })
 export class ConnectionsModule {}

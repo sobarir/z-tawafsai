@@ -5,6 +5,31 @@
 
 ## Current step
 
+> **Step 11 (v1.3) — OTA-style connecting-itinerary search: done.** `GET /flights/search`
+> previously matched a single `flights` row by origin+dest+UTC-day only (see the Step 10 note
+> below) — a route with no direct flight (e.g. CGK→JED on a date only served by one-stop hub
+> routings) returned empty even though valid connections existed in the seed data. This step
+> replaces the endpoint's response in place: it now returns `FlightItinerary[]` — direct flights
+> *and* 1-stop itineraries gated by the existing `ConnectionsService.classify()` (Step 8's MCT +
+> interline engine, reused as-is, zero duplicated validation logic). New shared type
+> `flightItinerarySchema`/`FlightItinerary` (`flights`, `connections`, `stopCount`, `totalPrice`,
+> `currency`, `departureTime`, `arrivalTime`, `totalDurationMinutes`). New
+> `ConnectionsService.searchItineraries()` orchestrates two new `FlightsService` query helpers
+> (`searchOutboundExcluding`, `searchInboundFromHubs`) plus `classify()` per candidate pair;
+> `FlightsController`'s `search` route now calls `ConnectionsService` (wired via `forwardRef()`
+> between `FlightsModule` and `ConnectionsModule` — no other consumer of the old direct-only
+> shape existed, so this is a clean breaking change, not a second parallel endpoint). Only
+> `connection` and `stopover` kinds are surfaced (`open_jaw`/`invalid`/`transit` are not valid
+> single itineraries). **v1 scope limits (documented, not hard requirements):** max 1 stop (2
+> flights) per itinerary; second-leg candidates are only considered within 72h of the first leg's
+> arrival (`CONNECTION_SEARCH_WINDOW_HOURS`); legs must share currency (no conversion exists in
+> this system — a non-issue today since all seed data is USD). Verified against live Postgres:
+> CGK-JED 2026-08-05 now returns the 2 known directs plus a cheaper one-stop via CAI (MS977+MS653,
+> $750 vs $775/$805 direct); CGK-JED 2026-08-08 (previously empty) now returns 6 one-stop
+> itineraries via BOM/SIN/KUL/DXB/AUH/DOH. `/search` page rewritten to render itineraries with a
+> connection divider (hub, layover duration, connection/stopover badge, interline + bag-through-
+> check indicators); i18n keys added to all 6 locales. All quality gates green.
+>
 > **Step 10 (v1.2) — Realistic CGK↔JED/MED Umrah-corridor seed data: done.** Added 9 airports
 > (JED, MED, KUL, DXB, AUH, CAI, BOM, HAK, MCT), 10 airlines (SV, MH, EK, EY, MS, AI, HU, WY, TR,
 > 6E), 180 new `flights` rows across 26 route-patterns (direct GA/SV CGK-JED/CGK-MED, 9 transit
@@ -111,6 +136,7 @@
 - [x] Step 8 — Connection-validation service (classify gap + interline gate + bagThroughChecked) — **backend v1 done, all S1-S18 green**
 - [x] Step 9 (v1.1) — Flight pricing + OTA-style search (price/currency columns, `GET /flights/search`, public `/search` page, admin price management)
 - [x] Step 10 (v1.2) — CGK↔JED/MED realistic seed data (26 route-patterns, 9 airports, 10 airlines, 180 flights, 8 MCT rules, 8 interline agreements)
+- [x] Step 11 (v1.3) — OTA-style connecting-itinerary search (`GET /flights/search` returns direct + 1-stop `FlightItinerary[]`, gated by the existing `ConnectionsService.classify()`)
 
 ## Open questions (resolve before the step that needs them)
 

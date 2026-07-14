@@ -398,7 +398,12 @@
     "duration": "飞行时长",
     "direct": "直飞",
     "stopsCount": "{count} 次中转",
-    "viaAirports": "经停 {airports}"
+    "viaAirports": "经停 {airports}",
+    "connection": "转机",
+    "stopover": "长时间停留",
+    "layoverIn": "在{airport}停留{duration}",
+    "interlineConnection": "跨航司联程",
+    "bagThroughChecked": "行李直挂"
   },
   "errors": {
     "401": "未授权",

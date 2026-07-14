@@ -1,5 +1,6 @@
 import {
   createFlightSchema,
+  flightItinerarySchema,
   flightSchema,
   searchFlightsQuerySchema,
   updateFlightSchema,
@@ -10,3 +11,4 @@ export class FlightDto extends createZodDto(flightSchema) {}
 export class CreateFlightDto extends createZodDto(createFlightSchema) {}
 export class UpdateFlightDto extends createZodDto(updateFlightSchema) {}
 export class SearchFlightsDto extends createZodDto(searchFlightsQuerySchema) {}
+export class FlightItineraryDto extends createZodDto(flightItinerarySchema) {}

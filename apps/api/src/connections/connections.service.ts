@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import type { Airport, ConnectionResult, Flight, MctScope } from '@repo/shared';
+import type {
+  Airport,
+  ConnectionResult,
+  Flight,
+  FlightItinerary,
+  MctScope,
+  SearchFlightsQuery,
+} from '@repo/shared';
 import { AirportsService } from '../airports/airports.service';
 import { FlightsService } from '../flights/flights.service';
 import { InterlineAgreementsService } from '../interline-agreements/interline-agreements.service';
@@ -8,6 +15,49 @@ import { MctRulesService } from '../mct-rules/mct-rules.service';
 /** Whole-journey domestic/international: same country on both ends = domestic. */
 const isDomestic = (origin: Airport, dest: Airport): boolean =>
   origin.countryCode === dest.countryCode;
+
+/**
+ * v1 simplification for itinerary search (/prd/flights/CONTEXT.md Step 11):
+ * only second legs departing within this many hours of the first leg's
+ * arrival are considered — bounds the connection/stopover search space.
+ */
+const CONNECTION_SEARCH_WINDOW_HOURS = 72;
+
+const toDirectItinerary = (flight: Flight): FlightItinerary => ({
+  flights: [flight],
+  connections: [],
+  stopCount: 0,
+  totalPrice: flight.price,
+  currency: flight.currency,
+  departureTime: flight.departureTime,
+  arrivalTime: flight.arrivalTime,
+  totalDurationMinutes: minutesBetween(
+    flight.departureTime,
+    flight.arrivalTime,
+  ),
+});
+
+const toConnectingItinerary = (
+  first: Flight,
+  second: Flight,
+  connection: ConnectionResult,
+): FlightItinerary => ({
+  flights: [first, second],
+  connections: [connection],
+  stopCount: 1,
+  totalPrice: first.price + second.price,
+  currency: first.currency,
+  departureTime: first.departureTime,
+  arrivalTime: second.arrivalTime,
+  totalDurationMinutes: minutesBetween(first.departureTime, second.arrivalTime),
+});
+
+const sortItineraries = (itineraries: FlightItinerary[]): FlightItinerary[] =>
+  itineraries.sort(
+    (a, b) =>
+      a.totalPrice - b.totalPrice ||
+      a.totalDurationMinutes - b.totalDurationMinutes,
+  );
 
 /**
  * Determines the mct_rules scope for a candidate connection, per
@@ -177,6 +227,65 @@ export class ConnectionsService {
       appliedInterlineId: interline.agreementId,
       reason: kind === 'connection' ? 'CONNECTION' : 'STOPOVER',
     });
+  }
+
+  /**
+   * OTA-style search: direct flights plus 1-stop itineraries gated by
+   * classify() (MCT + interline), matching /prd/flights/CONTEXT.md Step 11.
+   * Only 'connection' and 'stopover' kinds are surfaced; 'open_jaw' and
+   * 'invalid' pairs are not valid single itineraries.
+   */
+  async searchItineraries(
+    query: SearchFlightsQuery,
+  ): Promise<FlightItinerary[]> {
+    const directFlights = await this.flights.search(query);
+    const itineraries: FlightItinerary[] = directFlights.map(toDirectItinerary);
+
+    const firstLegs = await this.flights.searchOutboundExcluding(
+      query.originAirport,
+      query.destAirport,
+      query.date,
+    );
+    if (firstLegs.length === 0) {
+      return sortItineraries(itineraries);
+    }
+
+    const hubAirports = [...new Set(firstLegs.map((leg) => leg.destAirport))];
+    const windowMs = CONNECTION_SEARCH_WINDOW_HOURS * 60 * 60 * 1000;
+    const arrivalMillis = firstLegs.map((leg) =>
+      new Date(leg.arrivalTime).getTime(),
+    );
+    const windowStart = new Date(Math.min(...arrivalMillis));
+    const windowEnd = new Date(Math.max(...arrivalMillis) + windowMs);
+
+    const secondLegs = await this.flights.searchInboundFromHubs(
+      hubAirports,
+      query.destAirport,
+      windowStart,
+      windowEnd,
+    );
+
+    for (const first of firstLegs) {
+      const firstArrivalMillis = new Date(first.arrivalTime).getTime();
+      const candidates = secondLegs.filter((second) => {
+        const secondDepartureMillis = new Date(second.departureTime).getTime();
+        return (
+          second.originAirport === first.destAirport &&
+          second.currency === first.currency &&
+          secondDepartureMillis > firstArrivalMillis &&
+          secondDepartureMillis <= firstArrivalMillis + windowMs
+        );
+      });
+
+      for (const second of candidates) {
+        const result = await this.classify(first.id, second.id);
+        if (result.kind === 'connection' || result.kind === 'stopover') {
+          itineraries.push(toConnectingItinerary(first, second, result));
+        }
+      }
+    }
+
+    return sortItineraries(itineraries);
   }
 
   async validateChain(flightIds: string[]): Promise<ConnectionResult[]> {

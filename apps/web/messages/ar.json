@@ -398,7 +398,12 @@
     "duration": "المدة",
     "direct": "مباشر",
     "stopsCount": "{count} توقف",
-    "viaAirports": "عبر {airports}"
+    "viaAirports": "عبر {airports}",
+    "connection": "اتصال",
+    "stopover": "توقف طويل",
+    "layoverIn": "توقف لمدة {duration} في {airport}",
+    "interlineConnection": "اتصال بين شركات الطيران",
+    "bagThroughChecked": "تسجيل الأمتعة حتى الوجهة النهائية"
   },
   "errors": {
     "401": "غير مصرح",

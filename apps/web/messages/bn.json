@@ -400,7 +400,12 @@
     "duration": "সময়কাল",
     "direct": "সরাসরি",
     "stopsCount": "{count}টি স্টপ",
-    "viaAirports": "{airports} হয়ে"
+    "viaAirports": "{airports} হয়ে",
+    "connection": "সংযোগ",
+    "stopover": "দীর্ঘ যাত্রাবিরতি",
+    "layoverIn": "{airport}-এ {duration} যাত্রাবিরতি",
+    "interlineConnection": "ইন্টারলাইন সংযোগ",
+    "bagThroughChecked": "ব্যাগেজ সরাসরি চেক করা হয়েছে"
   },
   "errors": {
     "401": "অননুমোদিত",

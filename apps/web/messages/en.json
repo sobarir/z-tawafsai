@@ -169,7 +169,12 @@
     "duration": "Duration",
     "direct": "Direct",
     "stopsCount": "{count, plural, one {# stop} other {# stops}}",
-    "viaAirports": "via {airports}"
+    "viaAirports": "via {airports}",
+    "connection": "Connection",
+    "stopover": "Stopover",
+    "layoverIn": "{duration} layover in {airport}",
+    "interlineConnection": "Interline connection",
+    "bagThroughChecked": "Bags checked through"
   },
   "errors": {
     "404": "Page not found",

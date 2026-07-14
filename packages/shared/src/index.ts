@@ -386,6 +386,23 @@ export const connectionResultSchema = z.object({
 });
 export type ConnectionResult = z.infer<typeof connectionResultSchema>;
 
+/**
+ * One OTA-style search result: a direct flight (1 leg) or a one-stop
+ * itinerary (2 legs) gated by ConnectionsService.classify() — see
+ * /prd/flights/CONTEXT.md Step 11. `connections` has length `flights.length - 1`.
+ */
+export const flightItinerarySchema = z.object({
+  flights: z.array(flightSchema).min(1).max(2),
+  connections: z.array(connectionResultSchema),
+  stopCount: z.number().int().nonnegative(),
+  totalPrice: z.number().nonnegative(),
+  currency: currencyCodeSchema,
+  departureTime: offsetDateTimeSchema,
+  arrivalTime: offsetDateTimeSchema,
+  totalDurationMinutes: z.number().int().nonnegative(),
+});
+export type FlightItinerary = z.infer<typeof flightItinerarySchema>;
+
 export const validateConnectionSchema = z.object({
   prevFlightId: ulidSchema,
   nextFlightId: ulidSchema,

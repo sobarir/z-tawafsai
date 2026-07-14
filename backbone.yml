@@ -88,7 +88,6 @@ structure:
     workspace: pnpm-workspace.yaml
     pipeline: turbo.json
     lint_format: biome.json                        # replaces ESLint+Prettier repo-wide
-    local_infra: docker-compose.yml                # Postgres 17
     env_template: .env.example                     # root .env feeds api + drizzle-kit
     git_hooks: lefthook.yml                        # pre-commit: biome + backbone check; commit-msg: commitlint
     ci: .github/workflows/ci.yml                   # install, backbone, lint, build, typecheck, test, contract drift
@@ -162,4 +161,4 @@ commands:
   dupes_check: pnpm check:dupes                     # DRY gate — runs in pre-commit and CI
   db: "pnpm db:generate | db:migrate | db:push (dev only) | db:studio | db:seed"
   single_app: "pnpm --filter web|api|@repo/db <script>"
-  local_db: docker compose up -d
+  local_db: already running at localhost:5432 (no Docker)

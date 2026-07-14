@@ -398,7 +398,12 @@
     "duration": "Duración",
     "direct": "Directo",
     "stopsCount": "{count, plural, one {# escala} other {# escalas}}",
-    "viaAirports": "vía {airports}"
+    "viaAirports": "vía {airports}",
+    "connection": "Conexión",
+    "stopover": "Escala larga",
+    "layoverIn": "Escala de {duration} en {airport}",
+    "interlineConnection": "Conexión interlínea",
+    "bagThroughChecked": "Equipaje facturado hasta destino"
   },
   "errors": {
     "401": "No autorizado",

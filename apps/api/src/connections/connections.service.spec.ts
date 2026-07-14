@@ -300,3 +300,91 @@ describe('ConnectionsService — golden scenarios (prd/flights/14-scenarios.md)'
     expect(result.appliedInterlineId).toBe(agreement.id);
   });
 });
+
+function legLabel(flight: {
+  operatingAirline: string;
+  flightNumber: string;
+  originAirport: string;
+  destAirport: string;
+}): string {
+  return `${flight.operatingAirline}${flight.flightNumber} ${flight.originAirport}->${flight.destAirport}`;
+}
+
+describe('ConnectionsService.searchItineraries (Umrah-corridor seed data)', () => {
+  it('CGK-JED 2026-08-05: 2 directs plus a cheaper one-stop via CAI, sorted by price', async () => {
+    const results = await connections.searchItineraries({
+      originAirport: 'CGK',
+      destAirport: 'JED',
+      date: '2026-08-05',
+    });
+
+    expect(results.map((r) => r.flights.map(legLabel))).toEqual([
+      ['MS977 CGK->CAI', 'MS653 CAI->JED'],
+      ['SV816 CGK->JED'],
+      ['GA402 CGK->JED'],
+    ]);
+    expect(results.map((r) => r.stopCount)).toEqual([1, 0, 0]);
+    expect(results.map((r) => r.totalPrice)).toEqual([750, 775, 805]);
+    expect(results[0].connections[0].kind).toBe('connection');
+    expect(results[0].currency).toBe('USD');
+  });
+
+  it('CGK-JED 2026-08-08: no direct flight exists, but 6 one-stop itineraries do (the gap this feature fixes)', async () => {
+    const results = await connections.searchItineraries({
+      originAirport: 'CGK',
+      destAirport: 'JED',
+      date: '2026-08-08',
+    });
+
+    expect(results).toHaveLength(6);
+    expect(results.every((r) => r.stopCount === 1)).toBe(true);
+    expect(results.every((r) => r.connections[0].kind === 'connection')).toBe(
+      true,
+    );
+    expect(results.map((r) => r.flights.map(legLabel))).toEqual([
+      ['6E1975 CGK->BOM', 'AI931 BOM->JED'],
+      ['SQ936 CGK->SIN', 'TR2118 SIN->JED'],
+      ['MH725 CGK->KUL', 'MH152 KUL->JED'],
+      ['EK359 CGK->DXB', 'EK815 DXB->JED'],
+      ['EY475 CGK->AUH', 'EY233 AUH->JED'],
+      ['QR956 CGK->DOH', 'QR1105 DOH->JED'],
+    ]);
+    // Sorted by price ascending, and each total equals the sum of its legs.
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i].totalPrice).toBeGreaterThanOrEqual(
+        results[i - 1].totalPrice,
+      );
+    }
+    for (const result of results) {
+      const [first, second] = result.flights;
+      expect(result.totalPrice).toBe(first.price + second.price);
+    }
+  });
+
+  it('CGK-MED 2026-08-15: 2 directs plus a one-stop via JED (SV816/GA402 + SV1422)', async () => {
+    const results = await connections.searchItineraries({
+      originAirport: 'CGK',
+      destAirport: 'MED',
+      date: '2026-08-15',
+    });
+
+    expect(results.map((r) => r.flights.map(legLabel))).toEqual([
+      ['SV818 CGK->MED'],
+      ['GA404 CGK->MED'],
+      ['SV816 CGK->JED', 'SV1422 JED->MED'],
+    ]);
+    expect(results[2].stopCount).toBe(1);
+  });
+
+  it('excludes a pair that fails the interline gate (S15 fixture: GA100 CGK-SIN + AF400 SIN-CDG)', async () => {
+    const results = await connections.searchItineraries({
+      originAirport: 'CGK',
+      destAirport: 'CDG',
+      date: '2026-06-03',
+    });
+
+    expect(
+      results.some((r) => r.flights.map(legLabel).includes('AF400 SIN->CDG')),
+    ).toBe(false);
+  });
+});

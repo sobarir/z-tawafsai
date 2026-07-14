@@ -482,14 +482,14 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FlightDto"
+                    "$ref": "#/components/schemas/FlightItineraryDto"
                   }
                 }
               }
             }
           }
         },
-        "summary": "OTA-style flight search by route and date, sorted by price",
+        "summary": "OTA-style search for direct and one-stop connecting/stopover itineraries by route and date, sorted by price",
         "tags": [
           "flights"
         ]
@@ -587,19 +587,52 @@
         ]
       }
     },
-    "/api/flight-marketing": {
-      "get": {
-        "operationId": "listFlightMarketing",
-        "parameters": [
-          {
-            "name": "flightId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
+    "/api/connections/validate": {
+      "post": {
+        "operationId": "validateConnection",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateConnectionDto"
+              }
             }
           }
-        ],
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Classify the connection between two consecutive flights",
+        "tags": [
+          "connections"
+        ]
+      }
+    },
+    "/api/connections/validate-chain": {
+      "post": {
+        "operationId": "validateConnectionChain",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateConnectionChainDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -608,177 +641,16 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FlightMarketingDto"
+                    "$ref": "#/components/schemas/ConnectionResultDto"
                   }
                 }
               }
             }
           }
         },
-        "summary": "List marketing flights",
+        "summary": "Classify every consecutive connection in an itinerary",
         "tags": [
-          "flight-marketing"
-        ]
-      },
-      "post": {
-        "operationId": "createFlightMarketing",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateFlightMarketingDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FlightMarketingDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create a marketing flight",
-        "tags": [
-          "flight-marketing"
-        ]
-      }
-    },
-    "/api/flight-marketing/resolve": {
-      "get": {
-        "operationId": "getOperatingFlightByMarketing",
-        "parameters": [
-          {
-            "name": "marketingAirline",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "marketingNumber",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FlightDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Resolve a marketing flight to its operating flight",
-        "tags": [
-          "flight-marketing"
-        ]
-      }
-    },
-    "/api/flight-marketing/{id}": {
-      "get": {
-        "operationId": "getFlightMarketing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FlightMarketingDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get a marketing flight",
-        "tags": [
-          "flight-marketing"
-        ]
-      },
-      "patch": {
-        "operationId": "updateFlightMarketing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateFlightMarketingDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FlightMarketingDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Update a marketing flight",
-        "tags": [
-          "flight-marketing"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteFlightMarketing",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "summary": "Delete a marketing flight",
-        "tags": [
-          "flight-marketing"
+          "connections"
         ]
       }
     },
@@ -1171,52 +1043,19 @@
         ]
       }
     },
-    "/api/connections/validate": {
-      "post": {
-        "operationId": "validateConnection",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateConnectionDto"
-              }
+    "/api/flight-marketing": {
+      "get": {
+        "operationId": "listFlightMarketing",
+        "parameters": [
+          {
+            "name": "flightId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectionResultDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Classify the connection between two consecutive flights",
-        "tags": [
-          "connections"
-        ]
-      }
-    },
-    "/api/connections/validate-chain": {
-      "post": {
-        "operationId": "validateConnectionChain",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateConnectionChainDto"
-              }
-            }
-          }
-        },
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1225,16 +1064,177 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ConnectionResultDto"
+                    "$ref": "#/components/schemas/FlightMarketingDto"
                   }
                 }
               }
             }
           }
         },
-        "summary": "Classify every consecutive connection in an itinerary",
+        "summary": "List marketing flights",
         "tags": [
-          "connections"
+          "flight-marketing"
+        ]
+      },
+      "post": {
+        "operationId": "createFlightMarketing",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFlightMarketingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightMarketingDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a marketing flight",
+        "tags": [
+          "flight-marketing"
+        ]
+      }
+    },
+    "/api/flight-marketing/resolve": {
+      "get": {
+        "operationId": "getOperatingFlightByMarketing",
+        "parameters": [
+          {
+            "name": "marketingAirline",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "marketingNumber",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resolve a marketing flight to its operating flight",
+        "tags": [
+          "flight-marketing"
+        ]
+      }
+    },
+    "/api/flight-marketing/{id}": {
+      "get": {
+        "operationId": "getFlightMarketing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightMarketingDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a marketing flight",
+        "tags": [
+          "flight-marketing"
+        ]
+      },
+      "patch": {
+        "operationId": "updateFlightMarketing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFlightMarketingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightMarketingDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a marketing flight",
+        "tags": [
+          "flight-marketing"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteFlightMarketing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a marketing flight",
+        "tags": [
+          "flight-marketing"
         ]
       }
     }
@@ -1754,6 +1754,270 @@
           "updatedAt"
         ]
       },
+      "FlightItineraryDto": {
+        "type": "object",
+        "properties": {
+          "flights": {
+            "minItems": 1,
+            "maxItems": 2,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "operatingAirline": {
+                  "type": "string",
+                  "pattern": "^[A-Z0-9]{2}$"
+                },
+                "flightNumber": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,4}[A-Z]?$"
+                },
+                "originAirport": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "destAirport": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "departureTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "arrivalTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "aircraftType": {
+                  "type": "string",
+                  "maxLength": 10,
+                  "nullable": true
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "ACTIVE",
+                    "SUSPENDED",
+                    "SEASONAL"
+                  ]
+                },
+                "price": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "legs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                      },
+                      "flightId": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                      },
+                      "legSequence": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "FULL",
+                          "TECHNICAL_STOP"
+                        ]
+                      },
+                      "depAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "arrAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "departureTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      "arrivalTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "flightId",
+                      "legSequence",
+                      "role",
+                      "depAirport",
+                      "arrAirport",
+                      "departureTime",
+                      "arrivalTime",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                }
+              },
+              "required": [
+                "id",
+                "operatingAirline",
+                "flightNumber",
+                "originAirport",
+                "destAirport",
+                "departureTime",
+                "arrivalTime",
+                "aircraftType",
+                "status",
+                "price",
+                "currency",
+                "legs",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "connections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "prevFlightId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "nextFlightId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "connection",
+                    "stopover",
+                    "open_jaw",
+                    "transit",
+                    "invalid"
+                  ]
+                },
+                "gapMinutes": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991,
+                  "nullable": true
+                },
+                "sameMetroInterAirport": {
+                  "type": "boolean"
+                },
+                "isInterline": {
+                  "type": "boolean"
+                },
+                "bagThroughChecked": {
+                  "type": "boolean"
+                },
+                "appliedMctRuleId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+                  "nullable": true
+                },
+                "appliedInterlineId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+                  "nullable": true
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "prevFlightId",
+                "nextFlightId",
+                "kind",
+                "gapMinutes",
+                "sameMetroInterAirport",
+                "isInterline",
+                "bagThroughChecked",
+                "appliedMctRuleId",
+                "appliedInterlineId",
+                "reason"
+              ]
+            }
+          },
+          "stopCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "totalPrice": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "departureTime": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "arrivalTime": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
+          "totalDurationMinutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "flights",
+          "connections",
+          "stopCount",
+          "totalPrice",
+          "currency",
+          "departureTime",
+          "arrivalTime",
+          "totalDurationMinutes"
+        ]
+      },
       "CreateFlightDto": {
         "type": "object",
         "properties": {
@@ -1881,85 +2145,101 @@
           }
         }
       },
-      "FlightMarketingDto": {
+      "ValidateConnectionDto": {
         "type": "object",
         "properties": {
-          "id": {
+          "prevFlightId": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "flightId": {
+          "nextFlightId": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "marketingAirline": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
-          },
-          "marketingNumber": {
-            "type": "string",
-            "pattern": "^[0-9]{1,4}[A-Z]?$"
-          },
-          "isOperatingCarrier": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           }
         },
         "required": [
-          "id",
-          "flightId",
-          "marketingAirline",
-          "marketingNumber",
-          "isOperatingCarrier",
-          "createdAt",
-          "updatedAt"
+          "prevFlightId",
+          "nextFlightId"
         ]
       },
-      "CreateFlightMarketingDto": {
+      "ConnectionResultDto": {
         "type": "object",
         "properties": {
-          "flightId": {
+          "prevFlightId": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "marketingAirline": {
+          "nextFlightId": {
             "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "marketingNumber": {
+          "kind": {
             "type": "string",
-            "pattern": "^[0-9]{1,4}[A-Z]?$"
+            "enum": [
+              "connection",
+              "stopover",
+              "open_jaw",
+              "transit",
+              "invalid"
+            ]
           },
-          "isOperatingCarrier": {
+          "gapMinutes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          },
+          "sameMetroInterAirport": {
             "type": "boolean"
+          },
+          "isInterline": {
+            "type": "boolean"
+          },
+          "bagThroughChecked": {
+            "type": "boolean"
+          },
+          "appliedMctRuleId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "nullable": true
+          },
+          "appliedInterlineId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string"
           }
         },
         "required": [
-          "flightId",
-          "marketingAirline",
-          "marketingNumber"
+          "prevFlightId",
+          "nextFlightId",
+          "kind",
+          "gapMinutes",
+          "sameMetroInterAirport",
+          "isInterline",
+          "bagThroughChecked",
+          "appliedMctRuleId",
+          "appliedInterlineId",
+          "reason"
         ]
       },
-      "UpdateFlightMarketingDto": {
+      "ValidateConnectionChainDto": {
         "type": "object",
         "properties": {
-          "marketingNumber": {
-            "type": "string",
-            "pattern": "^[0-9]{1,4}[A-Z]?$"
-          },
-          "isOperatingCarrier": {
-            "type": "boolean"
+          "flightIds": {
+            "minItems": 2,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            }
           }
-        }
+        },
+        "required": [
+          "flightIds"
+        ]
       },
       "MctRuleDto": {
         "type": "object",
@@ -2221,101 +2501,85 @@
           "outboundAirline"
         ]
       },
-      "ValidateConnectionDto": {
+      "FlightMarketingDto": {
         "type": "object",
         "properties": {
-          "prevFlightId": {
+          "id": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "nextFlightId": {
+          "flightId": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "marketingAirline": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{2}$"
+          },
+          "marketingNumber": {
+            "type": "string",
+            "pattern": "^[0-9]{1,4}[A-Z]?$"
+          },
+          "isOperatingCarrier": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           }
         },
         "required": [
-          "prevFlightId",
-          "nextFlightId"
+          "id",
+          "flightId",
+          "marketingAirline",
+          "marketingNumber",
+          "isOperatingCarrier",
+          "createdAt",
+          "updatedAt"
         ]
       },
-      "ConnectionResultDto": {
+      "CreateFlightMarketingDto": {
         "type": "object",
         "properties": {
-          "prevFlightId": {
+          "flightId": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "nextFlightId": {
+          "marketingAirline": {
             "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            "pattern": "^[A-Z0-9]{2}$"
           },
-          "kind": {
+          "marketingNumber": {
             "type": "string",
-            "enum": [
-              "connection",
-              "stopover",
-              "open_jaw",
-              "transit",
-              "invalid"
-            ]
+            "pattern": "^[0-9]{1,4}[A-Z]?$"
           },
-          "gapMinutes": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "nullable": true
-          },
-          "sameMetroInterAirport": {
+          "isOperatingCarrier": {
             "type": "boolean"
-          },
-          "isInterline": {
-            "type": "boolean"
-          },
-          "bagThroughChecked": {
-            "type": "boolean"
-          },
-          "appliedMctRuleId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-            "nullable": true
-          },
-          "appliedInterlineId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-            "nullable": true
-          },
-          "reason": {
-            "type": "string"
           }
         },
         "required": [
-          "prevFlightId",
-          "nextFlightId",
-          "kind",
-          "gapMinutes",
-          "sameMetroInterAirport",
-          "isInterline",
-          "bagThroughChecked",
-          "appliedMctRuleId",
-          "appliedInterlineId",
-          "reason"
+          "flightId",
+          "marketingAirline",
+          "marketingNumber"
         ]
       },
-      "ValidateConnectionChainDto": {
+      "UpdateFlightMarketingDto": {
         "type": "object",
         "properties": {
-          "flightIds": {
-            "minItems": 2,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-            }
+          "marketingNumber": {
+            "type": "string",
+            "pattern": "^[0-9]{1,4}[A-Z]?$"
+          },
+          "isOperatingCarrier": {
+            "type": "boolean"
           }
-        },
-        "required": [
-          "flightIds"
-        ]
+        }
       }
     }
   }

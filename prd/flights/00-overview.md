@@ -30,6 +30,9 @@ legality. It does one thing well and exposes clean data + a validation API.
    results sorted by price, OTA-results-page style. Read-only: no booking, PNR, payment, or seat
    selection — see the amended Non-Goals below. Added 2026-07-13 at explicit user request; this
    scope change was flagged against the original Non-Goals before being adopted.
+   **(v1.3, Step 11)** results now include 1-stop connecting/stopover itineraries, not just
+   direct flights — gated by the existing Goal 5 connection-validation engine (MCT + interline),
+   reused as-is rather than re-derived. Still read-only search; still not a booking engine.
 
 ## Non-Goals (explicitly OUT of scope for v1)
 

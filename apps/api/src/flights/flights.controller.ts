@@ -16,10 +16,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import type { Flight } from '@repo/shared';
+import type { Flight, FlightItinerary } from '@repo/shared';
+import { ConnectionsService } from '../connections/connections.service';
 import {
   CreateFlightDto,
   FlightDto,
+  FlightItineraryDto,
   SearchFlightsDto,
   UpdateFlightDto,
 } from './flights.dto';
@@ -28,7 +30,10 @@ import { FlightsService } from './flights.service';
 @ApiTags('flights')
 @Controller('flights')
 export class FlightsController {
-  constructor(private readonly flights: FlightsService) {}
+  constructor(
+    private readonly flights: FlightsService,
+    private readonly connections: ConnectionsService,
+  ) {}
 
   @Get()
   @ApiOperation({ operationId: 'listFlights', summary: 'List flights' })
@@ -40,14 +45,15 @@ export class FlightsController {
   @Get('search')
   @ApiOperation({
     operationId: 'searchFlights',
-    summary: 'OTA-style flight search by route and date, sorted by price',
+    summary:
+      'OTA-style search for direct and one-stop connecting/stopover itineraries by route and date, sorted by price',
   })
-  @ApiOkResponse({ type: [FlightDto] })
+  @ApiOkResponse({ type: [FlightItineraryDto] })
   search(
     // Validated by the global ZodValidationPipe against searchFlightsQuerySchema
     @Query() query: SearchFlightsDto,
-  ): Promise<Flight[]> {
-    return this.flights.search(query);
+  ): Promise<FlightItinerary[]> {
+    return this.connections.searchItineraries(query);
   }
 
   @Get(':id')
