@@ -5,10 +5,59 @@
 
 ## Current step
 
-**All of Steps 3–8 (backend) and F1–F5 (frontend) done, browser-verified, and
-all repo-wide quality gates green.** Nothing is committed yet (working tree
-only) — next session should commit and open a PR, or the user will direct
-otherwise. Backend: all 8 tables + 2 enums live in
+**Search (Steps 3–8 backend, F1–F5 frontend) is done, browser-verified, and
+committed.** A second build pass then added **full admin CRUD for the
+catalog** (all 7 manageable entities: currency, fx_rate, property, package,
+room_type, season, rate_rule) at explicit user request — "I've checked the
+hotel feature is just for searching... I need to also be able to manage all
+the data for hotel feature." This mirrors flights' Schedule Admin exactly:
+`apps/api/src/hotel-{currencies,fx-rates,properties,packages,room-types,
+seasons,rate-rules}/` (controller/service/dto/module each), 7 matching
+`apps/web/src/features/hotel-*` admin screens under a new "Catalog Admin"
+sidebar section (`(protected)/@admin/catalog/*`, admin-only — no `@user`
+counterpart, matching `schedule/*` precedent), full `catalog` i18n namespace
+across all 6 locales. `EntityDataTable`/`useCrudFeedback` were generalized
+with a `namespace: 'schedule' | 'catalog'` parameter to serve both sections.
+
+**Found and fixed a real, pre-existing, app-wide bug during this pass**: 
+`apps/api/src/main.ts`'s `app.enableCors()` never set `methods`, and
+`@fastify/cors` defaults to `GET,HEAD,POST` only — every PATCH/DELETE
+endpoint in the *entire app* (not just hotels) silently failed in the browser
+after a passing OPTIONS preflight. Fixed with an explicit `methods` array.
+This had been broken for every existing admin screen (airports, airlines,
+flights, mct-rules, interline-agreements, flight-marketing) the whole time;
+none of it was hotels-specific.
+
+**`pnpm check:dupes` went over threshold (3.28%, gate is 2.0%)** once the 7
+new admin screens landed — they (and 5 pre-existing schedule-admin screens)
+shared two near-identical blocks: the create/update/delete `useMutation`
+wiring, and the Dialog/ConfirmDialog JSX shell. Fixed by extracting shared
+primitives and applying them to **all 13** admin screens (not just the 7 new
+ones — partial extraction wouldn't have cleared the gate, and the pattern
+was already past the rule-of-three before this session):
+`crudMutationOptions()` in `use-crud-feedback.ts` (collapses the 3x
+`{ onSuccess: onSuccess(key, after), onError }` boilerplate into one call),
+`EntityFormDialog` + `EntityDeleteConfirm` in `components/shared/` (collapse
+the Dialog/ConfirmDialog shells), and `actionsColumn()` in
+`components/shared/actions-column.tsx` (collapses the repeated
+`RowActionsCell` actions-column `cell` definition across every `columns.tsx`
+except `flights` (has an extra "view" action) and
+`interline-agreements` (delete-only), which keep bespoke `RowActionsCell`
+usage since their shape doesn't match the plain edit+delete pattern.
+Duplication dropped to 1.97%, under gate.
+
+All repo-root quality gates are green again (`typecheck`, `lint`, `test`
+94+127, `check:dupes` 1.97%, `check:backbone`, `check:instructions`). This
+Catalog Admin work is **not yet committed** — next session (or later in this
+one) should review the diff and commit, per the repo's "only commit when
+asked" rule.
+
+---
+
+Below this line: the original search-feature build log (Steps 3–8, F1–F5),
+committed and unchanged since.
+
+Backend: all 8 tables + 2 enums live in
 `packages/db/src/schema/app.ts`, migration `0003_powerful_killer_shrike.sql` +
 a hand-written custom migration `0004_hotels_season_no_overlap.sql` (Drizzle
 has no schema-builder API for Postgres `EXCLUDE` constraints — this is the
@@ -96,16 +145,20 @@ extraction yet), `pnpm check:backbone` (90 paths verified).
 
 ## Entity table (8 entities: 8 tables, 0 derived)
 
-| # | Entity              | Table                 | Key            | Notes |
-|---|---------------------|-----------------------|----------------|-------|
-| 1 | Listing             | `listing`             | ULID           | Spine. `kind` ∈ {property, package}. Search operates here. |
-| 2 | Property            | `property`            | property code  | 1:1 with a `kind=property` listing. |
-| 3 | Package             | `package`             | package code   | 1:1 with a `kind=package` listing. |
-| 4 | Room Type           | `room_type`           | ULID           | Child of property. Occupancy capacity lives here. |
-| 5 | Season              | `season`              | ULID           | Named date window scoped to a listing. |
-| 6 | Rate Rule           | `rate_rule`           | ULID           | (listing, season, occupancy band) → price in a currency. |
-| 7 | Currency            | `currency`            | ISO-4217 code  | Reference table. |
-| 8 | FX Rate             | `fx_rate`             | ULID           | (base, quote) → rate. For display conversion only. |
+| # | Entity              | Table                 | Key            | Admin CRUD                            | Notes |
+|---|---------------------|-----------------------|----------------|----------------------------------------|-------|
+| 1 | Listing             | `listing`             | ULID           | via Property/Package (1:1, no own screen) | Spine. `kind` ∈ {property, package}. Search operates here. |
+| 2 | Property            | `property`            | property code  | `catalog/properties` | 1:1 with a `kind=property` listing. |
+| 3 | Package             | `package`             | package code   | `catalog/packages` | 1:1 with a `kind=package` listing. |
+| 4 | Room Type           | `room_type`           | ULID           | `catalog/room-types` | Child of property. Occupancy capacity lives here. |
+| 5 | Season              | `season`              | ULID           | `catalog/seasons` | Named date window scoped to a listing. |
+| 6 | Rate Rule           | `rate_rule`           | ULID           | `catalog/rate-rules` | (listing, season, occupancy band) → price in a currency. |
+| 7 | Currency            | `currency`            | ISO-4217 code  | `catalog/currencies` | Reference table. |
+| 8 | FX Rate             | `fx_rate`             | ULID           | `catalog/fx-rates` | (base, quote) → rate. For display conversion only. |
+
+All 7 manageable entities (Listing has no standalone screen — it's created/edited as part of
+Property or Package) have full create/edit/delete admin screens under
+`(protected)/@admin/catalog/*`, added in the Catalog Admin build pass above.
 
 ## Confirmed decisions
 
@@ -154,11 +207,17 @@ extraction yet), `pnpm check:backbone` (90 paths verified).
 - [x] Step F4 — refine rail + empty/error states + detail page (browser-verified, incl. not-found case)
 - [x] Step F5 — mizan price signature + motion/a11y/responsive verification (browser-verified)
 - [x] Final — repo-root quality gates (`typecheck`/`lint`/`test`/`check:dupes`/`check:backbone`) all green
+- [x] Catalog Admin — backend CRUD modules for all 7 manageable entities
+- [x] Catalog Admin — frontend admin screens, routes, sidebar nav, i18n (6 locales)
+- [x] Catalog Admin — browser-verified CRUD round-trip (create/edit/delete)
+- [x] Catalog Admin — app-wide CORS PATCH/DELETE bug found and fixed
+- [x] Catalog Admin — `check:dupes` regression (3.28%) fixed via shared extraction (1.97%)
+- [x] Catalog Admin — full quality gates green
 
 ## Definition of done: met
 
 All backend steps (3–8) and frontend steps (F1–F5) per `20-steps.md` /
-`32-frontend-steps.md` are complete. Nothing has been committed — this was a
-pure build session on the working tree. Suggested next step: review the diff,
-commit (likely as several commits mirroring the step boundaries, matching
-flights' history style), and decide whether to open a PR.
+`32-frontend-steps.md` are complete and committed. The Catalog Admin build
+pass (full CRUD for all 7 manageable entities) is also complete and
+quality-gated, but **not yet committed** — next step is to review that diff
+and commit it, then decide whether to open a PR.

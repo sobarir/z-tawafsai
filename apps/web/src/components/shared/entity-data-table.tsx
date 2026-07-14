@@ -10,16 +10,19 @@ interface EntityDataTableProps<TData, TValue> {
   data: TData[];
   isLoading?: boolean;
   toolbar?: ReactNode;
+  /** Which top-level i18n namespace to pull the shared admin-table labels from. */
+  namespace?: 'schedule' | 'catalog';
 }
 
-/** DataTable pre-wired with the schedule admin screens' shared i18n labels. */
+/** DataTable pre-wired with an admin domain's shared i18n labels (schedule, catalog, ...). */
 export function EntityDataTable<TData, TValue>({
   columns,
   data,
   isLoading,
   toolbar,
+  namespace = 'schedule',
 }: EntityDataTableProps<TData, TValue>) {
-  const tSchedule = useTranslations('schedule');
+  const tNamespace = useTranslations(namespace);
   const tCommon = useTranslations('common');
 
   return (
@@ -27,12 +30,12 @@ export function EntityDataTable<TData, TValue>({
       columns={columns}
       data={data}
       isLoading={isLoading}
-      loadingMessage={tSchedule('loadingRows')}
-      emptyMessage={tSchedule('noResults')}
-      searchPlaceholder={tSchedule('searchPlaceholder')}
+      loadingMessage={tNamespace('loadingRows')}
+      emptyMessage={tNamespace('noResults')}
+      searchPlaceholder={tNamespace('searchPlaceholder')}
       previousLabel={tCommon('previous')}
       nextLabel={tCommon('next')}
-      pageLabel={(current, total) => tSchedule('pageOf', { current, total })}
+      pageLabel={(current, total) => tNamespace('pageOf', { current, total })}
       toolbar={toolbar}
     />
   );

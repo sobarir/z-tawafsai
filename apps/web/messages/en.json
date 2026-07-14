@@ -208,6 +208,194 @@
     "requestThis": "Request this",
     "requestSubject": "Request"
   },
+  "catalog": {
+    "nav": {
+      "section": "Catalog Admin",
+      "currencies": "Currencies",
+      "fxRates": "FX Rates",
+      "properties": "Properties",
+      "packages": "Packages",
+      "roomTypes": "Room Types",
+      "seasons": "Seasons",
+      "rateRules": "Rate Rules"
+    },
+    "actions": "Actions",
+    "openMenu": "Open menu",
+    "createButton": "New",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "loadingRows": "Loading...",
+    "pageOf": "Page {current} of {total}",
+    "deleteConfirmTitle": "Delete this record?",
+    "deleteConfirmDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+    "createSuccess": "Created successfully.",
+    "updateSuccess": "Updated successfully.",
+    "deleteSuccess": "Deleted successfully.",
+    "currencies": {
+      "title": "Currencies",
+      "description": "Reference currencies used for hotel and package pricing.",
+      "createTitle": "New currency",
+      "editTitle": "Edit currency",
+      "columns": {
+        "code": "Code",
+        "name": "Name",
+        "symbol": "Symbol",
+        "minorUnit": "Minor unit"
+      },
+      "fields": {
+        "code": "Currency code",
+        "codePlaceholder": "e.g. USD",
+        "minorUnit": "Minor unit (decimal digits)",
+        "symbol": "Symbol",
+        "symbolPlaceholder": "e.g. $",
+        "name": "Name",
+        "namePlaceholder": "e.g. US Dollar"
+      }
+    },
+    "fxRates": {
+      "title": "FX Rates",
+      "description": "Currency-pair conversion rates used to display prices in a different currency.",
+      "createTitle": "New FX rate",
+      "editTitle": "Edit FX rate",
+      "columns": {
+        "baseCurrency": "Base",
+        "quoteCurrency": "Quote",
+        "rate": "Rate",
+        "asOf": "As of"
+      },
+      "fields": {
+        "baseCurrency": "Base currency",
+        "quoteCurrency": "Quote currency",
+        "rate": "Rate (1 base = ? quote)",
+        "asOf": "As of"
+      }
+    },
+    "properties": {
+      "title": "Properties",
+      "description": "Hotel-style stays, priced per night per room type.",
+      "createTitle": "New property",
+      "editTitle": "Edit property",
+      "columns": {
+        "propertyCode": "Code",
+        "displayName": "Name",
+        "destination": "Destination",
+        "countryCode": "Country",
+        "starRating": "Stars",
+        "isActive": "Active"
+      },
+      "fields": {
+        "propertyCode": "Property code",
+        "propertyCodePlaceholder": "e.g. JED-WFH",
+        "displayName": "Display name",
+        "displayNamePlaceholder": "e.g. Jeddah Waterfront Hotel",
+        "destination": "Destination",
+        "destinationPlaceholder": "e.g. Jeddah",
+        "countryCode": "Country code",
+        "countryCodePlaceholder": "e.g. SA",
+        "heroImageUrl": "Hero image URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "starRating": "Star rating (1-5)",
+        "address": "Address",
+        "addressPlaceholder": "Street address",
+        "isActive": "Active (shown in search)"
+      }
+    },
+    "packages": {
+      "title": "Packages",
+      "description": "Bundled fixed-scope products, priced as a total per departure.",
+      "createTitle": "New package",
+      "editTitle": "Edit package",
+      "columns": {
+        "packageCode": "Code",
+        "displayName": "Name",
+        "destination": "Destination",
+        "countryCode": "Country",
+        "durationNights": "Nights",
+        "isActive": "Active"
+      },
+      "fields": {
+        "packageCode": "Package code",
+        "packageCodePlaceholder": "e.g. UMR-9D-ECO",
+        "displayName": "Display name",
+        "displayNamePlaceholder": "e.g. 9-Day Umrah Economy",
+        "destination": "Destination",
+        "destinationPlaceholder": "e.g. Jeddah",
+        "countryCode": "Country code",
+        "countryCodePlaceholder": "e.g. SA",
+        "heroImageUrl": "Hero image URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "Duration (nights)",
+        "includes": "Includes",
+        "includesPlaceholder": "Free-text summary of what's bundled",
+        "isActive": "Active (shown in search)"
+      }
+    },
+    "roomTypes": {
+      "title": "Room Types",
+      "description": "Bookable room classes under a property, with an occupancy capacity.",
+      "createTitle": "New room type",
+      "editTitle": "Edit room type",
+      "columns": {
+        "propertyCode": "Property",
+        "name": "Name",
+        "maxOccupancy": "Max occupancy"
+      },
+      "fields": {
+        "propertyCode": "Property",
+        "name": "Name",
+        "namePlaceholder": "e.g. Double, Quad",
+        "maxOccupancy": "Max occupancy"
+      }
+    },
+    "seasons": {
+      "title": "Seasons",
+      "description": "Named date windows scoped to a property or package that select which rate applies.",
+      "createTitle": "New season",
+      "editTitle": "Edit season",
+      "columns": {
+        "listing": "Property / package",
+        "name": "Season",
+        "startDate": "Start date",
+        "endDate": "End date"
+      },
+      "fields": {
+        "listingId": "Property / package",
+        "name": "Season",
+        "startDate": "Start date",
+        "endDate": "End date"
+      },
+      "names": {
+        "standard": "Standard",
+        "peak": "Peak",
+        "ramadan": "Ramadan",
+        "hajj": "Hajj",
+        "promo": "Promo"
+      }
+    },
+    "rateRules": {
+      "title": "Rate Rules",
+      "description": "The atomic price fact: (property/package, season, occupancy band) -> price in a currency.",
+      "createTitle": "New rate rule",
+      "editTitle": "Edit rate rule",
+      "columns": {
+        "listing": "Property / package",
+        "season": "Season",
+        "roomType": "Room type",
+        "band": "Occupancy band",
+        "amount": "Amount"
+      },
+      "fields": {
+        "listingId": "Property / package",
+        "seasonId": "Season",
+        "roomTypeId": "Room type",
+        "noRoomType": "— None (package) —",
+        "minOccupancy": "Min occupancy",
+        "maxOccupancy": "Max occupancy",
+        "amount": "Amount (minor units)",
+        "currency": "Currency"
+      }
+    }
+  },
   "errors": {
     "404": "Page not found",
     "401": "Unauthorized",

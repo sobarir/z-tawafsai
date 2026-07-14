@@ -35,6 +35,12 @@ where you find something and see what it costs, and nothing after that.
 - **Seasonal/tiered:** the date range selects a season, which selects the rate.
 - **Per-occupancy:** occupancy selects the price band.
 - Idempotent seed data for a demo dataset.
+- **(Scope amendment) Full admin CRUD for the catalog** — currency, fx_rate, property,
+  package, room_type, season, rate_rule are all manageable from a live "Catalog Admin" UI
+  (`(protected)/@admin/catalog/*`), mirroring flights' Schedule Admin exactly: same
+  `EntityDataTable`/`useCrudFeedback` primitives, natural-key or ULID identity per entity,
+  same create/edit/delete dialog pattern. Added 2026-07-13 at explicit user request ("I need
+  to also be able to manage all the data for hotel feature") — see amended Personas below.
 
 ## Non-goals (hard)
 
@@ -54,8 +60,10 @@ where you find something and see what it costs, and nothing after that.
 - **Traveler (end user):** signs in like any dashboard user, then searches, compares, and
   sees prices. Search is a gated page under both `@admin` and `@user` (same permission-slot
   pattern as flights' `/search`) — not a public, sign-in-free page.
-- **Ops/content (internal):** owns the seed data; not a live admin UI in this
-  scope — they edit seed files.
+- **Ops/content (internal):** manages the catalog through the live Catalog Admin UI
+  (`(protected)/@admin/catalog/*`) — currency, fx_rate, property, package, room_type,
+  season, rate_rule are all editable there, not just via seed files. Seed data still seeds
+  the initial demo dataset; the admin UI is how it's maintained afterward.
 - **Downstream integrator (future):** will later attach a real pricing API and a
   booking service. This PRD's job is to not make that painful.
 

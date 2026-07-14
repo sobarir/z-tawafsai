@@ -41,10 +41,14 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: ['health'] });
 
   // CORS for the REST API (auth routes get their own CORS from
-  // nestjs-better-auth based on trustedOrigins).
+  // nestjs-better-auth based on trustedOrigins). @fastify/cors defaults to
+  // GET,HEAD,POST only — every PATCH/PUT/DELETE route (i.e. every update or
+  // delete endpoint in this app) needs its method listed explicitly or the
+  // browser silently drops the request after a passing preflight.
   app.enableCors({
     origin: [env.WEB_URL],
     credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
   });
 
   // Swagger UI at /docs, spec at /docs/openapi.json

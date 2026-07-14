@@ -30,14 +30,23 @@ import type {
   ConnectionResultDto,
   CreateAirlineDto,
   CreateAirportDto,
+  CreateCurrencyDto,
   CreateFlightDto,
   CreateFlightMarketingDto,
+  CreateFxRateDto,
   CreateInterlineAgreementDto,
   CreateMctRuleDto,
+  CreatePackageDto,
   CreatePostDto,
+  CreatePropertyDto,
+  CreateRateRuleDto,
+  CreateRoomTypeDto,
+  CreateSeasonDto,
+  CurrencyDto,
   FlightDto,
   FlightItineraryDto,
   FlightMarketingDto,
+  FxRateDto,
   GetOperatingFlightByMarketingParams,
   HotelSearchResponseDto,
   InterlineAgreementDto,
@@ -45,16 +54,28 @@ import type {
   ListFlightMarketingParams,
   MctRuleDto,
   MeResponseDto,
+  PackageDto,
   PostDto,
+  PropertyDto,
+  RateRuleDto,
   ResolveInterlineParams,
   ResolveMctRuleParams,
+  RoomTypeDto,
   SearchFlightsParams,
   SearchHotelsParams,
+  SeasonDto,
   UpdateAirlineDto,
   UpdateAirportDto,
+  UpdateCurrencyDto,
   UpdateFlightDto,
   UpdateFlightMarketingDto,
+  UpdateFxRateDto,
   UpdateMctRuleDto,
+  UpdatePackageDto,
+  UpdatePropertyDto,
+  UpdateRateRuleDto,
+  UpdateRoomTypeDto,
+  UpdateSeasonDto,
   ValidateConnectionChainDto,
   ValidateConnectionDto
 } from './models';
@@ -3554,3 +3575,2933 @@ export function useSearchHotels<TData = Awaited<ReturnType<typeof searchHotels>>
 
   return query;
 }
+
+
+
+
+
+/**
+ * @summary List currencies
+ */
+export const getListHotelCurrenciesUrl = () => {
+
+
+  
+
+  return `/api/hotel-currencies`
+}
+
+export const listHotelCurrencies = async ( options?: RequestInit): Promise<CurrencyDto[]> => {
+  
+  return customFetch<CurrencyDto[]>(getListHotelCurrenciesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelCurrenciesQueryKey = () => {
+    return [
+    `/api/hotel-currencies`
+    ] as const;
+    }
+
+    
+export const getListHotelCurrenciesQueryOptions = <TData = Awaited<ReturnType<typeof listHotelCurrencies>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelCurrencies>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelCurrenciesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelCurrencies>>> = ({ signal }) => listHotelCurrencies({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelCurrencies>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelCurrenciesQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelCurrencies>>>
+export type ListHotelCurrenciesQueryError = unknown
+
+
+export function useListHotelCurrencies<TData = Awaited<ReturnType<typeof listHotelCurrencies>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelCurrencies>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelCurrencies>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelCurrencies>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelCurrencies<TData = Awaited<ReturnType<typeof listHotelCurrencies>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelCurrencies>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelCurrencies>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelCurrencies>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelCurrencies<TData = Awaited<ReturnType<typeof listHotelCurrencies>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelCurrencies>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List currencies
+ */
+
+export function useListHotelCurrencies<TData = Awaited<ReturnType<typeof listHotelCurrencies>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelCurrencies>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelCurrenciesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a currency
+ */
+export const getCreateHotelCurrencyUrl = () => {
+
+
+  
+
+  return `/api/hotel-currencies`
+}
+
+export const createHotelCurrency = async (createCurrencyDto: CreateCurrencyDto, options?: RequestInit): Promise<CurrencyDto> => {
+  
+  return customFetch<CurrencyDto>(getCreateHotelCurrencyUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createCurrencyDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelCurrencyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelCurrency>>, TError,{data: CreateCurrencyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelCurrency>>, TError,{data: CreateCurrencyDto}, TContext> => {
+
+const mutationKey = ['createHotelCurrency'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelCurrency>>, {data: CreateCurrencyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelCurrency(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelCurrencyMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelCurrency>>>
+    export type CreateHotelCurrencyMutationBody = CreateCurrencyDto
+    export type CreateHotelCurrencyMutationError = unknown
+
+    /**
+ * @summary Create a currency
+ */
+export const useCreateHotelCurrency = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelCurrency>>, TError,{data: CreateCurrencyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelCurrency>>,
+        TError,
+        {data: CreateCurrencyDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelCurrencyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a currency
+ */
+export const getGetHotelCurrencyUrl = (code: string,) => {
+
+
+  
+
+  return `/api/hotel-currencies/${code}`
+}
+
+export const getHotelCurrency = async (code: string, options?: RequestInit): Promise<CurrencyDto> => {
+  
+  return customFetch<CurrencyDto>(getGetHotelCurrencyUrl(code),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelCurrencyQueryKey = (code?: string,) => {
+    return [
+    `/api/hotel-currencies/${code}`
+    ] as const;
+    }
+
+    
+export const getGetHotelCurrencyQueryOptions = <TData = Awaited<ReturnType<typeof getHotelCurrency>>, TError = unknown>(code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelCurrency>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelCurrencyQueryKey(code);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelCurrency>>> = ({ signal }) => getHotelCurrency(code, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(code), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelCurrency>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelCurrencyQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelCurrency>>>
+export type GetHotelCurrencyQueryError = unknown
+
+
+export function useGetHotelCurrency<TData = Awaited<ReturnType<typeof getHotelCurrency>>, TError = unknown>(
+ code: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelCurrency>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelCurrency>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelCurrency>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelCurrency<TData = Awaited<ReturnType<typeof getHotelCurrency>>, TError = unknown>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelCurrency>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelCurrency>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelCurrency>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelCurrency<TData = Awaited<ReturnType<typeof getHotelCurrency>>, TError = unknown>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelCurrency>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a currency
+ */
+
+export function useGetHotelCurrency<TData = Awaited<ReturnType<typeof getHotelCurrency>>, TError = unknown>(
+ code: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelCurrency>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelCurrencyQueryOptions(code,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a currency
+ */
+export const getUpdateHotelCurrencyUrl = (code: string,) => {
+
+
+  
+
+  return `/api/hotel-currencies/${code}`
+}
+
+export const updateHotelCurrency = async (code: string,
+    updateCurrencyDto: UpdateCurrencyDto, options?: RequestInit): Promise<CurrencyDto> => {
+  
+  return customFetch<CurrencyDto>(getUpdateHotelCurrencyUrl(code),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCurrencyDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelCurrencyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelCurrency>>, TError,{code: string;data: UpdateCurrencyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelCurrency>>, TError,{code: string;data: UpdateCurrencyDto}, TContext> => {
+
+const mutationKey = ['updateHotelCurrency'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelCurrency>>, {code: string;data: UpdateCurrencyDto}> = (props) => {
+          const {code,data} = props ?? {};
+
+          return  updateHotelCurrency(code,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelCurrencyMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelCurrency>>>
+    export type UpdateHotelCurrencyMutationBody = UpdateCurrencyDto
+    export type UpdateHotelCurrencyMutationError = unknown
+
+    /**
+ * @summary Update a currency
+ */
+export const useUpdateHotelCurrency = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelCurrency>>, TError,{code: string;data: UpdateCurrencyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelCurrency>>,
+        TError,
+        {code: string;data: UpdateCurrencyDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelCurrencyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a currency
+ */
+export const getDeleteHotelCurrencyUrl = (code: string,) => {
+
+
+  
+
+  return `/api/hotel-currencies/${code}`
+}
+
+export const deleteHotelCurrency = async (code: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelCurrencyUrl(code),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelCurrencyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelCurrency>>, TError,{code: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelCurrency>>, TError,{code: string}, TContext> => {
+
+const mutationKey = ['deleteHotelCurrency'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelCurrency>>, {code: string}> = (props) => {
+          const {code} = props ?? {};
+
+          return  deleteHotelCurrency(code,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelCurrencyMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelCurrency>>>
+    
+    export type DeleteHotelCurrencyMutationError = unknown
+
+    /**
+ * @summary Delete a currency
+ */
+export const useDeleteHotelCurrency = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelCurrency>>, TError,{code: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelCurrency>>,
+        TError,
+        {code: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelCurrencyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List FX rates
+ */
+export const getListHotelFxRatesUrl = () => {
+
+
+  
+
+  return `/api/hotel-fx-rates`
+}
+
+export const listHotelFxRates = async ( options?: RequestInit): Promise<FxRateDto[]> => {
+  
+  return customFetch<FxRateDto[]>(getListHotelFxRatesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelFxRatesQueryKey = () => {
+    return [
+    `/api/hotel-fx-rates`
+    ] as const;
+    }
+
+    
+export const getListHotelFxRatesQueryOptions = <TData = Awaited<ReturnType<typeof listHotelFxRates>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelFxRates>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelFxRatesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelFxRates>>> = ({ signal }) => listHotelFxRates({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelFxRates>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelFxRatesQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelFxRates>>>
+export type ListHotelFxRatesQueryError = unknown
+
+
+export function useListHotelFxRates<TData = Awaited<ReturnType<typeof listHotelFxRates>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelFxRates>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelFxRates>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelFxRates>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelFxRates<TData = Awaited<ReturnType<typeof listHotelFxRates>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelFxRates>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelFxRates>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelFxRates>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelFxRates<TData = Awaited<ReturnType<typeof listHotelFxRates>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelFxRates>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List FX rates
+ */
+
+export function useListHotelFxRates<TData = Awaited<ReturnType<typeof listHotelFxRates>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelFxRates>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelFxRatesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create an FX rate
+ */
+export const getCreateHotelFxRateUrl = () => {
+
+
+  
+
+  return `/api/hotel-fx-rates`
+}
+
+export const createHotelFxRate = async (createFxRateDto: CreateFxRateDto, options?: RequestInit): Promise<FxRateDto> => {
+  
+  return customFetch<FxRateDto>(getCreateHotelFxRateUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createFxRateDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelFxRateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelFxRate>>, TError,{data: CreateFxRateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelFxRate>>, TError,{data: CreateFxRateDto}, TContext> => {
+
+const mutationKey = ['createHotelFxRate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelFxRate>>, {data: CreateFxRateDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelFxRate(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelFxRateMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelFxRate>>>
+    export type CreateHotelFxRateMutationBody = CreateFxRateDto
+    export type CreateHotelFxRateMutationError = unknown
+
+    /**
+ * @summary Create an FX rate
+ */
+export const useCreateHotelFxRate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelFxRate>>, TError,{data: CreateFxRateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelFxRate>>,
+        TError,
+        {data: CreateFxRateDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelFxRateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get an FX rate
+ */
+export const getGetHotelFxRateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-fx-rates/${id}`
+}
+
+export const getHotelFxRate = async (id: string, options?: RequestInit): Promise<FxRateDto> => {
+  
+  return customFetch<FxRateDto>(getGetHotelFxRateUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelFxRateQueryKey = (id?: string,) => {
+    return [
+    `/api/hotel-fx-rates/${id}`
+    ] as const;
+    }
+
+    
+export const getGetHotelFxRateQueryOptions = <TData = Awaited<ReturnType<typeof getHotelFxRate>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelFxRate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelFxRateQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelFxRate>>> = ({ signal }) => getHotelFxRate(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelFxRate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelFxRateQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelFxRate>>>
+export type GetHotelFxRateQueryError = unknown
+
+
+export function useGetHotelFxRate<TData = Awaited<ReturnType<typeof getHotelFxRate>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelFxRate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelFxRate>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelFxRate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelFxRate<TData = Awaited<ReturnType<typeof getHotelFxRate>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelFxRate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelFxRate>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelFxRate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelFxRate<TData = Awaited<ReturnType<typeof getHotelFxRate>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelFxRate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get an FX rate
+ */
+
+export function useGetHotelFxRate<TData = Awaited<ReturnType<typeof getHotelFxRate>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelFxRate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelFxRateQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update an FX rate
+ */
+export const getUpdateHotelFxRateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-fx-rates/${id}`
+}
+
+export const updateHotelFxRate = async (id: string,
+    updateFxRateDto: UpdateFxRateDto, options?: RequestInit): Promise<FxRateDto> => {
+  
+  return customFetch<FxRateDto>(getUpdateHotelFxRateUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateFxRateDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelFxRateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelFxRate>>, TError,{id: string;data: UpdateFxRateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelFxRate>>, TError,{id: string;data: UpdateFxRateDto}, TContext> => {
+
+const mutationKey = ['updateHotelFxRate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelFxRate>>, {id: string;data: UpdateFxRateDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateHotelFxRate(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelFxRateMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelFxRate>>>
+    export type UpdateHotelFxRateMutationBody = UpdateFxRateDto
+    export type UpdateHotelFxRateMutationError = unknown
+
+    /**
+ * @summary Update an FX rate
+ */
+export const useUpdateHotelFxRate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelFxRate>>, TError,{id: string;data: UpdateFxRateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelFxRate>>,
+        TError,
+        {id: string;data: UpdateFxRateDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelFxRateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete an FX rate
+ */
+export const getDeleteHotelFxRateUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-fx-rates/${id}`
+}
+
+export const deleteHotelFxRate = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelFxRateUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelFxRateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelFxRate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelFxRate>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteHotelFxRate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelFxRate>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteHotelFxRate(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelFxRateMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelFxRate>>>
+    
+    export type DeleteHotelFxRateMutationError = unknown
+
+    /**
+ * @summary Delete an FX rate
+ */
+export const useDeleteHotelFxRate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelFxRate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelFxRate>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelFxRateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List properties
+ */
+export const getListHotelPropertiesUrl = () => {
+
+
+  
+
+  return `/api/hotel-properties`
+}
+
+export const listHotelProperties = async ( options?: RequestInit): Promise<PropertyDto[]> => {
+  
+  return customFetch<PropertyDto[]>(getListHotelPropertiesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelPropertiesQueryKey = () => {
+    return [
+    `/api/hotel-properties`
+    ] as const;
+    }
+
+    
+export const getListHotelPropertiesQueryOptions = <TData = Awaited<ReturnType<typeof listHotelProperties>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelProperties>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelPropertiesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelProperties>>> = ({ signal }) => listHotelProperties({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelProperties>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelPropertiesQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelProperties>>>
+export type ListHotelPropertiesQueryError = unknown
+
+
+export function useListHotelProperties<TData = Awaited<ReturnType<typeof listHotelProperties>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelProperties>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelProperties>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelProperties>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelProperties<TData = Awaited<ReturnType<typeof listHotelProperties>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelProperties>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelProperties>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelProperties>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelProperties<TData = Awaited<ReturnType<typeof listHotelProperties>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelProperties>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List properties
+ */
+
+export function useListHotelProperties<TData = Awaited<ReturnType<typeof listHotelProperties>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelProperties>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelPropertiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a property
+ */
+export const getCreateHotelPropertyUrl = () => {
+
+
+  
+
+  return `/api/hotel-properties`
+}
+
+export const createHotelProperty = async (createPropertyDto: CreatePropertyDto, options?: RequestInit): Promise<PropertyDto> => {
+  
+  return customFetch<PropertyDto>(getCreateHotelPropertyUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createPropertyDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelPropertyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelProperty>>, TError,{data: CreatePropertyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelProperty>>, TError,{data: CreatePropertyDto}, TContext> => {
+
+const mutationKey = ['createHotelProperty'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelProperty>>, {data: CreatePropertyDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelProperty(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelPropertyMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelProperty>>>
+    export type CreateHotelPropertyMutationBody = CreatePropertyDto
+    export type CreateHotelPropertyMutationError = unknown
+
+    /**
+ * @summary Create a property
+ */
+export const useCreateHotelProperty = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelProperty>>, TError,{data: CreatePropertyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelProperty>>,
+        TError,
+        {data: CreatePropertyDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelPropertyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a property
+ */
+export const getGetHotelPropertyUrl = (propertyCode: string,) => {
+
+
+  
+
+  return `/api/hotel-properties/${propertyCode}`
+}
+
+export const getHotelProperty = async (propertyCode: string, options?: RequestInit): Promise<PropertyDto> => {
+  
+  return customFetch<PropertyDto>(getGetHotelPropertyUrl(propertyCode),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelPropertyQueryKey = (propertyCode?: string,) => {
+    return [
+    `/api/hotel-properties/${propertyCode}`
+    ] as const;
+    }
+
+    
+export const getGetHotelPropertyQueryOptions = <TData = Awaited<ReturnType<typeof getHotelProperty>>, TError = unknown>(propertyCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelProperty>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelPropertyQueryKey(propertyCode);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelProperty>>> = ({ signal }) => getHotelProperty(propertyCode, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(propertyCode), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelProperty>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelPropertyQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelProperty>>>
+export type GetHotelPropertyQueryError = unknown
+
+
+export function useGetHotelProperty<TData = Awaited<ReturnType<typeof getHotelProperty>>, TError = unknown>(
+ propertyCode: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelProperty>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelProperty>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelProperty>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelProperty<TData = Awaited<ReturnType<typeof getHotelProperty>>, TError = unknown>(
+ propertyCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelProperty>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelProperty>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelProperty>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelProperty<TData = Awaited<ReturnType<typeof getHotelProperty>>, TError = unknown>(
+ propertyCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelProperty>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a property
+ */
+
+export function useGetHotelProperty<TData = Awaited<ReturnType<typeof getHotelProperty>>, TError = unknown>(
+ propertyCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelProperty>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelPropertyQueryOptions(propertyCode,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a property
+ */
+export const getUpdateHotelPropertyUrl = (propertyCode: string,) => {
+
+
+  
+
+  return `/api/hotel-properties/${propertyCode}`
+}
+
+export const updateHotelProperty = async (propertyCode: string,
+    updatePropertyDto: UpdatePropertyDto, options?: RequestInit): Promise<PropertyDto> => {
+  
+  return customFetch<PropertyDto>(getUpdateHotelPropertyUrl(propertyCode),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePropertyDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelPropertyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelProperty>>, TError,{propertyCode: string;data: UpdatePropertyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelProperty>>, TError,{propertyCode: string;data: UpdatePropertyDto}, TContext> => {
+
+const mutationKey = ['updateHotelProperty'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelProperty>>, {propertyCode: string;data: UpdatePropertyDto}> = (props) => {
+          const {propertyCode,data} = props ?? {};
+
+          return  updateHotelProperty(propertyCode,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelPropertyMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelProperty>>>
+    export type UpdateHotelPropertyMutationBody = UpdatePropertyDto
+    export type UpdateHotelPropertyMutationError = unknown
+
+    /**
+ * @summary Update a property
+ */
+export const useUpdateHotelProperty = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelProperty>>, TError,{propertyCode: string;data: UpdatePropertyDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelProperty>>,
+        TError,
+        {propertyCode: string;data: UpdatePropertyDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelPropertyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a property
+ */
+export const getDeleteHotelPropertyUrl = (propertyCode: string,) => {
+
+
+  
+
+  return `/api/hotel-properties/${propertyCode}`
+}
+
+export const deleteHotelProperty = async (propertyCode: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelPropertyUrl(propertyCode),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelPropertyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelProperty>>, TError,{propertyCode: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelProperty>>, TError,{propertyCode: string}, TContext> => {
+
+const mutationKey = ['deleteHotelProperty'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelProperty>>, {propertyCode: string}> = (props) => {
+          const {propertyCode} = props ?? {};
+
+          return  deleteHotelProperty(propertyCode,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelPropertyMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelProperty>>>
+    
+    export type DeleteHotelPropertyMutationError = unknown
+
+    /**
+ * @summary Delete a property
+ */
+export const useDeleteHotelProperty = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelProperty>>, TError,{propertyCode: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelProperty>>,
+        TError,
+        {propertyCode: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelPropertyMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List packages
+ */
+export const getListHotelPackagesUrl = () => {
+
+
+  
+
+  return `/api/hotel-packages`
+}
+
+export const listHotelPackages = async ( options?: RequestInit): Promise<PackageDto[]> => {
+  
+  return customFetch<PackageDto[]>(getListHotelPackagesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelPackagesQueryKey = () => {
+    return [
+    `/api/hotel-packages`
+    ] as const;
+    }
+
+    
+export const getListHotelPackagesQueryOptions = <TData = Awaited<ReturnType<typeof listHotelPackages>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelPackages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelPackagesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelPackages>>> = ({ signal }) => listHotelPackages({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelPackages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelPackagesQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelPackages>>>
+export type ListHotelPackagesQueryError = unknown
+
+
+export function useListHotelPackages<TData = Awaited<ReturnType<typeof listHotelPackages>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelPackages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelPackages>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelPackages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelPackages<TData = Awaited<ReturnType<typeof listHotelPackages>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelPackages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelPackages>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelPackages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelPackages<TData = Awaited<ReturnType<typeof listHotelPackages>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelPackages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List packages
+ */
+
+export function useListHotelPackages<TData = Awaited<ReturnType<typeof listHotelPackages>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelPackages>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelPackagesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a package
+ */
+export const getCreateHotelPackageUrl = () => {
+
+
+  
+
+  return `/api/hotel-packages`
+}
+
+export const createHotelPackage = async (createPackageDto: CreatePackageDto, options?: RequestInit): Promise<PackageDto> => {
+  
+  return customFetch<PackageDto>(getCreateHotelPackageUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createPackageDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelPackageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelPackage>>, TError,{data: CreatePackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelPackage>>, TError,{data: CreatePackageDto}, TContext> => {
+
+const mutationKey = ['createHotelPackage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelPackage>>, {data: CreatePackageDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelPackage(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelPackageMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelPackage>>>
+    export type CreateHotelPackageMutationBody = CreatePackageDto
+    export type CreateHotelPackageMutationError = unknown
+
+    /**
+ * @summary Create a package
+ */
+export const useCreateHotelPackage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelPackage>>, TError,{data: CreatePackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelPackage>>,
+        TError,
+        {data: CreatePackageDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelPackageMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a package
+ */
+export const getGetHotelPackageUrl = (packageCode: string,) => {
+
+
+  
+
+  return `/api/hotel-packages/${packageCode}`
+}
+
+export const getHotelPackage = async (packageCode: string, options?: RequestInit): Promise<PackageDto> => {
+  
+  return customFetch<PackageDto>(getGetHotelPackageUrl(packageCode),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelPackageQueryKey = (packageCode?: string,) => {
+    return [
+    `/api/hotel-packages/${packageCode}`
+    ] as const;
+    }
+
+    
+export const getGetHotelPackageQueryOptions = <TData = Awaited<ReturnType<typeof getHotelPackage>>, TError = unknown>(packageCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelPackage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelPackageQueryKey(packageCode);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelPackage>>> = ({ signal }) => getHotelPackage(packageCode, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(packageCode), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelPackage>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelPackageQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelPackage>>>
+export type GetHotelPackageQueryError = unknown
+
+
+export function useGetHotelPackage<TData = Awaited<ReturnType<typeof getHotelPackage>>, TError = unknown>(
+ packageCode: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelPackage>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelPackage>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelPackage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelPackage<TData = Awaited<ReturnType<typeof getHotelPackage>>, TError = unknown>(
+ packageCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelPackage>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelPackage>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelPackage>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelPackage<TData = Awaited<ReturnType<typeof getHotelPackage>>, TError = unknown>(
+ packageCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelPackage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a package
+ */
+
+export function useGetHotelPackage<TData = Awaited<ReturnType<typeof getHotelPackage>>, TError = unknown>(
+ packageCode: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelPackage>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelPackageQueryOptions(packageCode,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a package
+ */
+export const getUpdateHotelPackageUrl = (packageCode: string,) => {
+
+
+  
+
+  return `/api/hotel-packages/${packageCode}`
+}
+
+export const updateHotelPackage = async (packageCode: string,
+    updatePackageDto: UpdatePackageDto, options?: RequestInit): Promise<PackageDto> => {
+  
+  return customFetch<PackageDto>(getUpdateHotelPackageUrl(packageCode),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updatePackageDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelPackageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelPackage>>, TError,{packageCode: string;data: UpdatePackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelPackage>>, TError,{packageCode: string;data: UpdatePackageDto}, TContext> => {
+
+const mutationKey = ['updateHotelPackage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelPackage>>, {packageCode: string;data: UpdatePackageDto}> = (props) => {
+          const {packageCode,data} = props ?? {};
+
+          return  updateHotelPackage(packageCode,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelPackageMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelPackage>>>
+    export type UpdateHotelPackageMutationBody = UpdatePackageDto
+    export type UpdateHotelPackageMutationError = unknown
+
+    /**
+ * @summary Update a package
+ */
+export const useUpdateHotelPackage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelPackage>>, TError,{packageCode: string;data: UpdatePackageDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelPackage>>,
+        TError,
+        {packageCode: string;data: UpdatePackageDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelPackageMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a package
+ */
+export const getDeleteHotelPackageUrl = (packageCode: string,) => {
+
+
+  
+
+  return `/api/hotel-packages/${packageCode}`
+}
+
+export const deleteHotelPackage = async (packageCode: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelPackageUrl(packageCode),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelPackageMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelPackage>>, TError,{packageCode: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelPackage>>, TError,{packageCode: string}, TContext> => {
+
+const mutationKey = ['deleteHotelPackage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelPackage>>, {packageCode: string}> = (props) => {
+          const {packageCode} = props ?? {};
+
+          return  deleteHotelPackage(packageCode,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelPackageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelPackage>>>
+    
+    export type DeleteHotelPackageMutationError = unknown
+
+    /**
+ * @summary Delete a package
+ */
+export const useDeleteHotelPackage = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelPackage>>, TError,{packageCode: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelPackage>>,
+        TError,
+        {packageCode: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelPackageMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List room types
+ */
+export const getListHotelRoomTypesUrl = () => {
+
+
+  
+
+  return `/api/hotel-room-types`
+}
+
+export const listHotelRoomTypes = async ( options?: RequestInit): Promise<RoomTypeDto[]> => {
+  
+  return customFetch<RoomTypeDto[]>(getListHotelRoomTypesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelRoomTypesQueryKey = () => {
+    return [
+    `/api/hotel-room-types`
+    ] as const;
+    }
+
+    
+export const getListHotelRoomTypesQueryOptions = <TData = Awaited<ReturnType<typeof listHotelRoomTypes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRoomTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelRoomTypesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelRoomTypes>>> = ({ signal }) => listHotelRoomTypes({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelRoomTypes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelRoomTypesQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelRoomTypes>>>
+export type ListHotelRoomTypesQueryError = unknown
+
+
+export function useListHotelRoomTypes<TData = Awaited<ReturnType<typeof listHotelRoomTypes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRoomTypes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelRoomTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelRoomTypes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelRoomTypes<TData = Awaited<ReturnType<typeof listHotelRoomTypes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRoomTypes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelRoomTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelRoomTypes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelRoomTypes<TData = Awaited<ReturnType<typeof listHotelRoomTypes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRoomTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List room types
+ */
+
+export function useListHotelRoomTypes<TData = Awaited<ReturnType<typeof listHotelRoomTypes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRoomTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelRoomTypesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a room type
+ */
+export const getCreateHotelRoomTypeUrl = () => {
+
+
+  
+
+  return `/api/hotel-room-types`
+}
+
+export const createHotelRoomType = async (createRoomTypeDto: CreateRoomTypeDto, options?: RequestInit): Promise<RoomTypeDto> => {
+  
+  return customFetch<RoomTypeDto>(getCreateHotelRoomTypeUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createRoomTypeDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelRoomTypeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelRoomType>>, TError,{data: CreateRoomTypeDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelRoomType>>, TError,{data: CreateRoomTypeDto}, TContext> => {
+
+const mutationKey = ['createHotelRoomType'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelRoomType>>, {data: CreateRoomTypeDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelRoomType(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelRoomTypeMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelRoomType>>>
+    export type CreateHotelRoomTypeMutationBody = CreateRoomTypeDto
+    export type CreateHotelRoomTypeMutationError = unknown
+
+    /**
+ * @summary Create a room type
+ */
+export const useCreateHotelRoomType = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelRoomType>>, TError,{data: CreateRoomTypeDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelRoomType>>,
+        TError,
+        {data: CreateRoomTypeDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelRoomTypeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a room type
+ */
+export const getGetHotelRoomTypeUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-room-types/${id}`
+}
+
+export const getHotelRoomType = async (id: string, options?: RequestInit): Promise<RoomTypeDto> => {
+  
+  return customFetch<RoomTypeDto>(getGetHotelRoomTypeUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelRoomTypeQueryKey = (id?: string,) => {
+    return [
+    `/api/hotel-room-types/${id}`
+    ] as const;
+    }
+
+    
+export const getGetHotelRoomTypeQueryOptions = <TData = Awaited<ReturnType<typeof getHotelRoomType>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRoomType>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelRoomTypeQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelRoomType>>> = ({ signal }) => getHotelRoomType(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelRoomType>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelRoomTypeQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelRoomType>>>
+export type GetHotelRoomTypeQueryError = unknown
+
+
+export function useGetHotelRoomType<TData = Awaited<ReturnType<typeof getHotelRoomType>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRoomType>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelRoomType>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelRoomType>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelRoomType<TData = Awaited<ReturnType<typeof getHotelRoomType>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRoomType>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelRoomType>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelRoomType>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelRoomType<TData = Awaited<ReturnType<typeof getHotelRoomType>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRoomType>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a room type
+ */
+
+export function useGetHotelRoomType<TData = Awaited<ReturnType<typeof getHotelRoomType>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRoomType>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelRoomTypeQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a room type
+ */
+export const getUpdateHotelRoomTypeUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-room-types/${id}`
+}
+
+export const updateHotelRoomType = async (id: string,
+    updateRoomTypeDto: UpdateRoomTypeDto, options?: RequestInit): Promise<RoomTypeDto> => {
+  
+  return customFetch<RoomTypeDto>(getUpdateHotelRoomTypeUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateRoomTypeDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelRoomTypeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelRoomType>>, TError,{id: string;data: UpdateRoomTypeDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelRoomType>>, TError,{id: string;data: UpdateRoomTypeDto}, TContext> => {
+
+const mutationKey = ['updateHotelRoomType'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelRoomType>>, {id: string;data: UpdateRoomTypeDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateHotelRoomType(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelRoomTypeMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelRoomType>>>
+    export type UpdateHotelRoomTypeMutationBody = UpdateRoomTypeDto
+    export type UpdateHotelRoomTypeMutationError = unknown
+
+    /**
+ * @summary Update a room type
+ */
+export const useUpdateHotelRoomType = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelRoomType>>, TError,{id: string;data: UpdateRoomTypeDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelRoomType>>,
+        TError,
+        {id: string;data: UpdateRoomTypeDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelRoomTypeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a room type
+ */
+export const getDeleteHotelRoomTypeUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-room-types/${id}`
+}
+
+export const deleteHotelRoomType = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelRoomTypeUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelRoomTypeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelRoomType>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelRoomType>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteHotelRoomType'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelRoomType>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteHotelRoomType(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelRoomTypeMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelRoomType>>>
+    
+    export type DeleteHotelRoomTypeMutationError = unknown
+
+    /**
+ * @summary Delete a room type
+ */
+export const useDeleteHotelRoomType = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelRoomType>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelRoomType>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelRoomTypeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List seasons
+ */
+export const getListHotelSeasonsUrl = () => {
+
+
+  
+
+  return `/api/hotel-seasons`
+}
+
+export const listHotelSeasons = async ( options?: RequestInit): Promise<SeasonDto[]> => {
+  
+  return customFetch<SeasonDto[]>(getListHotelSeasonsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelSeasonsQueryKey = () => {
+    return [
+    `/api/hotel-seasons`
+    ] as const;
+    }
+
+    
+export const getListHotelSeasonsQueryOptions = <TData = Awaited<ReturnType<typeof listHotelSeasons>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasons>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelSeasonsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelSeasons>>> = ({ signal }) => listHotelSeasons({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasons>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelSeasonsQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelSeasons>>>
+export type ListHotelSeasonsQueryError = unknown
+
+
+export function useListHotelSeasons<TData = Awaited<ReturnType<typeof listHotelSeasons>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasons>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelSeasons>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelSeasons>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelSeasons<TData = Awaited<ReturnType<typeof listHotelSeasons>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasons>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelSeasons>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelSeasons>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelSeasons<TData = Awaited<ReturnType<typeof listHotelSeasons>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasons>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List seasons
+ */
+
+export function useListHotelSeasons<TData = Awaited<ReturnType<typeof listHotelSeasons>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasons>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelSeasonsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a season
+ */
+export const getCreateHotelSeasonUrl = () => {
+
+
+  
+
+  return `/api/hotel-seasons`
+}
+
+export const createHotelSeason = async (createSeasonDto: CreateSeasonDto, options?: RequestInit): Promise<SeasonDto> => {
+  
+  return customFetch<SeasonDto>(getCreateHotelSeasonUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSeasonDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelSeasonMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelSeason>>, TError,{data: CreateSeasonDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelSeason>>, TError,{data: CreateSeasonDto}, TContext> => {
+
+const mutationKey = ['createHotelSeason'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelSeason>>, {data: CreateSeasonDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelSeason(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelSeasonMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelSeason>>>
+    export type CreateHotelSeasonMutationBody = CreateSeasonDto
+    export type CreateHotelSeasonMutationError = unknown
+
+    /**
+ * @summary Create a season
+ */
+export const useCreateHotelSeason = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelSeason>>, TError,{data: CreateSeasonDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelSeason>>,
+        TError,
+        {data: CreateSeasonDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelSeasonMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a season
+ */
+export const getGetHotelSeasonUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-seasons/${id}`
+}
+
+export const getHotelSeason = async (id: string, options?: RequestInit): Promise<SeasonDto> => {
+  
+  return customFetch<SeasonDto>(getGetHotelSeasonUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelSeasonQueryKey = (id?: string,) => {
+    return [
+    `/api/hotel-seasons/${id}`
+    ] as const;
+    }
+
+    
+export const getGetHotelSeasonQueryOptions = <TData = Awaited<ReturnType<typeof getHotelSeason>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeason>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelSeasonQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelSeason>>> = ({ signal }) => getHotelSeason(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelSeason>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelSeasonQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelSeason>>>
+export type GetHotelSeasonQueryError = unknown
+
+
+export function useGetHotelSeason<TData = Awaited<ReturnType<typeof getHotelSeason>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeason>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelSeason>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelSeason>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelSeason<TData = Awaited<ReturnType<typeof getHotelSeason>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeason>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelSeason>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelSeason>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelSeason<TData = Awaited<ReturnType<typeof getHotelSeason>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeason>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a season
+ */
+
+export function useGetHotelSeason<TData = Awaited<ReturnType<typeof getHotelSeason>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeason>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelSeasonQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a season
+ */
+export const getUpdateHotelSeasonUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-seasons/${id}`
+}
+
+export const updateHotelSeason = async (id: string,
+    updateSeasonDto: UpdateSeasonDto, options?: RequestInit): Promise<SeasonDto> => {
+  
+  return customFetch<SeasonDto>(getUpdateHotelSeasonUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSeasonDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelSeasonMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelSeason>>, TError,{id: string;data: UpdateSeasonDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelSeason>>, TError,{id: string;data: UpdateSeasonDto}, TContext> => {
+
+const mutationKey = ['updateHotelSeason'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelSeason>>, {id: string;data: UpdateSeasonDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateHotelSeason(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelSeasonMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelSeason>>>
+    export type UpdateHotelSeasonMutationBody = UpdateSeasonDto
+    export type UpdateHotelSeasonMutationError = unknown
+
+    /**
+ * @summary Update a season
+ */
+export const useUpdateHotelSeason = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelSeason>>, TError,{id: string;data: UpdateSeasonDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelSeason>>,
+        TError,
+        {id: string;data: UpdateSeasonDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelSeasonMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a season
+ */
+export const getDeleteHotelSeasonUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-seasons/${id}`
+}
+
+export const deleteHotelSeason = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelSeasonUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelSeasonMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelSeason>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelSeason>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteHotelSeason'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelSeason>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteHotelSeason(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelSeasonMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelSeason>>>
+    
+    export type DeleteHotelSeasonMutationError = unknown
+
+    /**
+ * @summary Delete a season
+ */
+export const useDeleteHotelSeason = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelSeason>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelSeason>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelSeasonMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List rate rules
+ */
+export const getListHotelRateRulesUrl = () => {
+
+
+  
+
+  return `/api/hotel-rate-rules`
+}
+
+export const listHotelRateRules = async ( options?: RequestInit): Promise<RateRuleDto[]> => {
+  
+  return customFetch<RateRuleDto[]>(getListHotelRateRulesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelRateRulesQueryKey = () => {
+    return [
+    `/api/hotel-rate-rules`
+    ] as const;
+    }
+
+    
+export const getListHotelRateRulesQueryOptions = <TData = Awaited<ReturnType<typeof listHotelRateRules>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRateRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelRateRulesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelRateRules>>> = ({ signal }) => listHotelRateRules({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelRateRules>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelRateRulesQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelRateRules>>>
+export type ListHotelRateRulesQueryError = unknown
+
+
+export function useListHotelRateRules<TData = Awaited<ReturnType<typeof listHotelRateRules>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRateRules>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelRateRules>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelRateRules>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelRateRules<TData = Awaited<ReturnType<typeof listHotelRateRules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRateRules>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelRateRules>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelRateRules>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelRateRules<TData = Awaited<ReturnType<typeof listHotelRateRules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRateRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List rate rules
+ */
+
+export function useListHotelRateRules<TData = Awaited<ReturnType<typeof listHotelRateRules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelRateRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelRateRulesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a rate rule
+ */
+export const getCreateHotelRateRuleUrl = () => {
+
+
+  
+
+  return `/api/hotel-rate-rules`
+}
+
+export const createHotelRateRule = async (createRateRuleDto: CreateRateRuleDto, options?: RequestInit): Promise<RateRuleDto> => {
+  
+  return customFetch<RateRuleDto>(getCreateHotelRateRuleUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createRateRuleDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelRateRuleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelRateRule>>, TError,{data: CreateRateRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelRateRule>>, TError,{data: CreateRateRuleDto}, TContext> => {
+
+const mutationKey = ['createHotelRateRule'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelRateRule>>, {data: CreateRateRuleDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelRateRule(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelRateRuleMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelRateRule>>>
+    export type CreateHotelRateRuleMutationBody = CreateRateRuleDto
+    export type CreateHotelRateRuleMutationError = unknown
+
+    /**
+ * @summary Create a rate rule
+ */
+export const useCreateHotelRateRule = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelRateRule>>, TError,{data: CreateRateRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelRateRule>>,
+        TError,
+        {data: CreateRateRuleDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelRateRuleMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a rate rule
+ */
+export const getGetHotelRateRuleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-rate-rules/${id}`
+}
+
+export const getHotelRateRule = async (id: string, options?: RequestInit): Promise<RateRuleDto> => {
+  
+  return customFetch<RateRuleDto>(getGetHotelRateRuleUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelRateRuleQueryKey = (id?: string,) => {
+    return [
+    `/api/hotel-rate-rules/${id}`
+    ] as const;
+    }
+
+    
+export const getGetHotelRateRuleQueryOptions = <TData = Awaited<ReturnType<typeof getHotelRateRule>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRateRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelRateRuleQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelRateRule>>> = ({ signal }) => getHotelRateRule(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelRateRule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelRateRuleQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelRateRule>>>
+export type GetHotelRateRuleQueryError = unknown
+
+
+export function useGetHotelRateRule<TData = Awaited<ReturnType<typeof getHotelRateRule>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRateRule>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelRateRule>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelRateRule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelRateRule<TData = Awaited<ReturnType<typeof getHotelRateRule>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRateRule>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelRateRule>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelRateRule>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelRateRule<TData = Awaited<ReturnType<typeof getHotelRateRule>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRateRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a rate rule
+ */
+
+export function useGetHotelRateRule<TData = Awaited<ReturnType<typeof getHotelRateRule>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelRateRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelRateRuleQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a rate rule
+ */
+export const getUpdateHotelRateRuleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-rate-rules/${id}`
+}
+
+export const updateHotelRateRule = async (id: string,
+    updateRateRuleDto: UpdateRateRuleDto, options?: RequestInit): Promise<RateRuleDto> => {
+  
+  return customFetch<RateRuleDto>(getUpdateHotelRateRuleUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateRateRuleDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelRateRuleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelRateRule>>, TError,{id: string;data: UpdateRateRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelRateRule>>, TError,{id: string;data: UpdateRateRuleDto}, TContext> => {
+
+const mutationKey = ['updateHotelRateRule'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelRateRule>>, {id: string;data: UpdateRateRuleDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateHotelRateRule(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelRateRuleMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelRateRule>>>
+    export type UpdateHotelRateRuleMutationBody = UpdateRateRuleDto
+    export type UpdateHotelRateRuleMutationError = unknown
+
+    /**
+ * @summary Update a rate rule
+ */
+export const useUpdateHotelRateRule = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelRateRule>>, TError,{id: string;data: UpdateRateRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelRateRule>>,
+        TError,
+        {id: string;data: UpdateRateRuleDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelRateRuleMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a rate rule
+ */
+export const getDeleteHotelRateRuleUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-rate-rules/${id}`
+}
+
+export const deleteHotelRateRule = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelRateRuleUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelRateRuleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelRateRule>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelRateRule>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteHotelRateRule'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelRateRule>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteHotelRateRule(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelRateRuleMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelRateRule>>>
+    
+    export type DeleteHotelRateRuleMutationError = unknown
+
+    /**
+ * @summary Delete a rate rule
+ */
+export const useDeleteHotelRateRule = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelRateRule>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelRateRule>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelRateRuleMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }

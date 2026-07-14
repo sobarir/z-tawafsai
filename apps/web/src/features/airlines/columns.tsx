@@ -2,7 +2,7 @@
 
 import type { Airline } from '@repo/shared';
 import type { ColumnDef } from '@tanstack/react-table';
-import { RowActionsCell } from '@/components/shared/row-actions-cell';
+import { actionsColumn } from '@/components/shared/actions-column';
 
 interface AirlineColumnsOptions {
   columnLabels: {
@@ -37,22 +37,13 @@ export function getAirlineColumns({
     },
     { accessorKey: 'name', header: columnLabels.name },
     { accessorKey: 'countryCode', header: columnLabels.countryCode },
-    {
-      id: 'actions',
-      header: actionsLabel,
-      cell: ({ row }) => (
-        <RowActionsCell
-          openMenuLabel={openMenuLabel}
-          actions={[
-            { label: editLabel, onClick: () => onEdit(row.original) },
-            {
-              label: deleteLabel,
-              onClick: () => onDelete(row.original),
-              destructive: true,
-            },
-          ]}
-        />
-      ),
-    },
+    actionsColumn({
+      actionsLabel,
+      openMenuLabel,
+      editLabel,
+      deleteLabel,
+      onEdit,
+      onDelete,
+    }),
   ];
 }

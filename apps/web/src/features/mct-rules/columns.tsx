@@ -2,7 +2,7 @@
 
 import type { MctRule } from '@repo/shared';
 import type { ColumnDef } from '@tanstack/react-table';
-import { RowActionsCell } from '@/components/shared/row-actions-cell';
+import { actionsColumn } from '@/components/shared/actions-column';
 
 interface MctRuleColumnsOptions {
   columnLabels: {
@@ -62,22 +62,13 @@ export function getMctRuleColumns({
       accessorKey: 'maxConnectionMinutes',
       header: columnLabels.maxConnectionMinutes,
     },
-    {
-      id: 'actions',
-      header: actionsLabel,
-      cell: ({ row }) => (
-        <RowActionsCell
-          openMenuLabel={openMenuLabel}
-          actions={[
-            { label: editLabel, onClick: () => onEdit(row.original) },
-            {
-              label: deleteLabel,
-              onClick: () => onDelete(row.original),
-              destructive: true,
-            },
-          ]}
-        />
-      ),
-    },
+    actionsColumn({
+      actionsLabel,
+      openMenuLabel,
+      editLabel,
+      deleteLabel,
+      onEdit,
+      onDelete,
+    }),
   ];
 }

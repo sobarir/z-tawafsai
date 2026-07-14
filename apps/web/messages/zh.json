@@ -437,6 +437,194 @@
     "requestThis": "发送咨询",
     "requestSubject": "咨询"
   },
+  "catalog": {
+    "nav": {
+      "section": "目录管理",
+      "currencies": "货币",
+      "fxRates": "汇率",
+      "properties": "酒店",
+      "packages": "套餐",
+      "roomTypes": "房型",
+      "seasons": "季节",
+      "rateRules": "价格规则"
+    },
+    "actions": "操作",
+    "openMenu": "打开菜单",
+    "createButton": "新建",
+    "searchPlaceholder": "搜索...",
+    "noResults": "未找到结果。",
+    "loadingRows": "加载中...",
+    "pageOf": "第 {current} 页，共 {total} 页",
+    "deleteConfirmTitle": "删除此记录？",
+    "deleteConfirmDescription": "这将永久删除“{name}”。此操作无法撤销。",
+    "createSuccess": "创建成功。",
+    "updateSuccess": "更新成功。",
+    "deleteSuccess": "删除成功。",
+    "currencies": {
+      "title": "货币",
+      "description": "用于酒店和套餐定价的参考货币。",
+      "createTitle": "新建货币",
+      "editTitle": "编辑货币",
+      "columns": {
+        "code": "代码",
+        "name": "名称",
+        "symbol": "符号",
+        "minorUnit": "小数位数"
+      },
+      "fields": {
+        "code": "货币代码",
+        "codePlaceholder": "例如 USD",
+        "minorUnit": "小数位数",
+        "symbol": "符号",
+        "symbolPlaceholder": "例如 $",
+        "name": "名称",
+        "namePlaceholder": "例如 美元"
+      }
+    },
+    "fxRates": {
+      "title": "汇率",
+      "description": "用于以其他货币显示价格的货币对换算汇率。",
+      "createTitle": "新建汇率",
+      "editTitle": "编辑汇率",
+      "columns": {
+        "baseCurrency": "基础货币",
+        "quoteCurrency": "报价货币",
+        "rate": "汇率",
+        "asOf": "截至日期"
+      },
+      "fields": {
+        "baseCurrency": "基础货币",
+        "quoteCurrency": "报价货币",
+        "rate": "汇率（1 基础 = ? 报价）",
+        "asOf": "截至日期"
+      }
+    },
+    "properties": {
+      "title": "酒店",
+      "description": "酒店式住宿，按房型每晚定价。",
+      "createTitle": "新建酒店",
+      "editTitle": "编辑酒店",
+      "columns": {
+        "propertyCode": "代码",
+        "displayName": "名称",
+        "destination": "目的地",
+        "countryCode": "国家",
+        "starRating": "星级",
+        "isActive": "启用"
+      },
+      "fields": {
+        "propertyCode": "酒店代码",
+        "propertyCodePlaceholder": "例如 JED-WFH",
+        "displayName": "显示名称",
+        "displayNamePlaceholder": "例如 吉达海滨酒店",
+        "destination": "目的地",
+        "destinationPlaceholder": "例如 吉达",
+        "countryCode": "国家代码",
+        "countryCodePlaceholder": "例如 SA",
+        "heroImageUrl": "主图 URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "starRating": "星级（1-5 星）",
+        "address": "地址",
+        "addressPlaceholder": "街道地址",
+        "isActive": "启用（在搜索中显示）"
+      }
+    },
+    "packages": {
+      "title": "套餐",
+      "description": "固定范围的组合产品，按每次出发总价定价。",
+      "createTitle": "新建套餐",
+      "editTitle": "编辑套餐",
+      "columns": {
+        "packageCode": "代码",
+        "displayName": "名称",
+        "destination": "目的地",
+        "countryCode": "国家",
+        "durationNights": "晚数",
+        "isActive": "启用"
+      },
+      "fields": {
+        "packageCode": "套餐代码",
+        "packageCodePlaceholder": "例如 UMR-9D-ECO",
+        "displayName": "显示名称",
+        "displayNamePlaceholder": "例如 9天经济朝觐套餐",
+        "destination": "目的地",
+        "destinationPlaceholder": "例如 吉达",
+        "countryCode": "国家代码",
+        "countryCodePlaceholder": "例如 SA",
+        "heroImageUrl": "主图 URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "时长（晚）",
+        "includes": "包含内容",
+        "includesPlaceholder": "套餐包含内容的简要说明",
+        "isActive": "启用（在搜索中显示）"
+      }
+    },
+    "roomTypes": {
+      "title": "房型",
+      "description": "酒店下可预订的房间类型，包含最大入住人数。",
+      "createTitle": "新建房型",
+      "editTitle": "编辑房型",
+      "columns": {
+        "propertyCode": "酒店",
+        "name": "名称",
+        "maxOccupancy": "最大入住人数"
+      },
+      "fields": {
+        "propertyCode": "酒店",
+        "name": "名称",
+        "namePlaceholder": "例如 双人间、四人间",
+        "maxOccupancy": "最大入住人数"
+      }
+    },
+    "seasons": {
+      "title": "季节",
+      "description": "关联到某个酒店或套餐的日期区间，用于决定适用价格。",
+      "createTitle": "新建季节",
+      "editTitle": "编辑季节",
+      "columns": {
+        "listing": "酒店 / 套餐",
+        "name": "季节",
+        "startDate": "开始日期",
+        "endDate": "结束日期"
+      },
+      "fields": {
+        "listingId": "酒店 / 套餐",
+        "name": "季节",
+        "startDate": "开始日期",
+        "endDate": "结束日期"
+      },
+      "names": {
+        "standard": "标准",
+        "peak": "旺季",
+        "ramadan": "斋月",
+        "hajj": "朝觐",
+        "promo": "促销"
+      }
+    },
+    "rateRules": {
+      "title": "价格规则",
+      "description": "最基本的价格事实：（酒店/套餐、季节、入住人数区间）-> 以某种货币计的价格。",
+      "createTitle": "新建价格规则",
+      "editTitle": "编辑价格规则",
+      "columns": {
+        "listing": "酒店 / 套餐",
+        "season": "季节",
+        "roomType": "房型",
+        "band": "入住人数区间",
+        "amount": "金额"
+      },
+      "fields": {
+        "listingId": "酒店 / 套餐",
+        "seasonId": "季节",
+        "roomTypeId": "房型",
+        "noRoomType": "— 无（套餐）—",
+        "minOccupancy": "最小入住人数",
+        "maxOccupancy": "最大入住人数",
+        "amount": "金额（最小货币单位）",
+        "currency": "货币"
+      }
+    }
+  },
   "errors": {
     "401": "未授权",
     "403": "禁止访问",

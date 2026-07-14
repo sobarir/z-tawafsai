@@ -437,6 +437,194 @@
     "requestThis": "Solicitar",
     "requestSubject": "Solicitud"
   },
+  "catalog": {
+    "nav": {
+      "section": "Administración del catálogo",
+      "currencies": "Monedas",
+      "fxRates": "Tipos de cambio",
+      "properties": "Alojamientos",
+      "packages": "Paquetes",
+      "roomTypes": "Tipos de habitación",
+      "seasons": "Temporadas",
+      "rateRules": "Reglas de tarifas"
+    },
+    "actions": "Acciones",
+    "openMenu": "Abrir menú",
+    "createButton": "Nuevo",
+    "searchPlaceholder": "Buscar...",
+    "noResults": "No se encontraron resultados.",
+    "loadingRows": "Cargando...",
+    "pageOf": "Página {current} de {total}",
+    "deleteConfirmTitle": "¿Eliminar este registro?",
+    "deleteConfirmDescription": "Esto eliminará permanentemente \"{name}\". Esta acción no se puede deshacer.",
+    "createSuccess": "Creado correctamente.",
+    "updateSuccess": "Actualizado correctamente.",
+    "deleteSuccess": "Eliminado correctamente.",
+    "currencies": {
+      "title": "Monedas",
+      "description": "Monedas de referencia usadas para los precios de alojamientos y paquetes.",
+      "createTitle": "Nueva moneda",
+      "editTitle": "Editar moneda",
+      "columns": {
+        "code": "Código",
+        "name": "Nombre",
+        "symbol": "Símbolo",
+        "minorUnit": "Decimales"
+      },
+      "fields": {
+        "code": "Código de moneda",
+        "codePlaceholder": "p. ej. USD",
+        "minorUnit": "Decimales (unidad menor)",
+        "symbol": "Símbolo",
+        "symbolPlaceholder": "p. ej. $",
+        "name": "Nombre",
+        "namePlaceholder": "p. ej. Dólar estadounidense"
+      }
+    },
+    "fxRates": {
+      "title": "Tipos de cambio",
+      "description": "Tasas de conversión entre monedas usadas para mostrar precios en otra moneda.",
+      "createTitle": "Nuevo tipo de cambio",
+      "editTitle": "Editar tipo de cambio",
+      "columns": {
+        "baseCurrency": "Base",
+        "quoteCurrency": "Cotizada",
+        "rate": "Tasa",
+        "asOf": "Fecha"
+      },
+      "fields": {
+        "baseCurrency": "Moneda base",
+        "quoteCurrency": "Moneda cotizada",
+        "rate": "Tasa (1 base = ? cotizada)",
+        "asOf": "Fecha"
+      }
+    },
+    "properties": {
+      "title": "Alojamientos",
+      "description": "Estancias tipo hotel, con precio por noche según el tipo de habitación.",
+      "createTitle": "Nuevo alojamiento",
+      "editTitle": "Editar alojamiento",
+      "columns": {
+        "propertyCode": "Código",
+        "displayName": "Nombre",
+        "destination": "Destino",
+        "countryCode": "País",
+        "starRating": "Estrellas",
+        "isActive": "Activo"
+      },
+      "fields": {
+        "propertyCode": "Código del alojamiento",
+        "propertyCodePlaceholder": "p. ej. JED-WFH",
+        "displayName": "Nombre visible",
+        "displayNamePlaceholder": "p. ej. Jeddah Waterfront Hotel",
+        "destination": "Destino",
+        "destinationPlaceholder": "p. ej. Jeddah",
+        "countryCode": "Código de país",
+        "countryCodePlaceholder": "p. ej. SA",
+        "heroImageUrl": "URL de imagen principal",
+        "heroImageUrlPlaceholder": "https://...",
+        "starRating": "Categoría (1-5 estrellas)",
+        "address": "Dirección",
+        "addressPlaceholder": "Dirección postal",
+        "isActive": "Activo (visible en la búsqueda)"
+      }
+    },
+    "packages": {
+      "title": "Paquetes",
+      "description": "Productos combinados de alcance fijo, con precio total por salida.",
+      "createTitle": "Nuevo paquete",
+      "editTitle": "Editar paquete",
+      "columns": {
+        "packageCode": "Código",
+        "displayName": "Nombre",
+        "destination": "Destino",
+        "countryCode": "País",
+        "durationNights": "Noches",
+        "isActive": "Activo"
+      },
+      "fields": {
+        "packageCode": "Código del paquete",
+        "packageCodePlaceholder": "p. ej. UMR-9D-ECO",
+        "displayName": "Nombre visible",
+        "displayNamePlaceholder": "p. ej. Umrah Económico de 9 días",
+        "destination": "Destino",
+        "destinationPlaceholder": "p. ej. Jeddah",
+        "countryCode": "Código de país",
+        "countryCodePlaceholder": "p. ej. SA",
+        "heroImageUrl": "URL de imagen principal",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "Duración (noches)",
+        "includes": "Incluye",
+        "includesPlaceholder": "Resumen libre de lo que incluye el paquete",
+        "isActive": "Activo (visible en la búsqueda)"
+      }
+    },
+    "roomTypes": {
+      "title": "Tipos de habitación",
+      "description": "Clases de habitación reservables dentro de un alojamiento, con su capacidad máxima.",
+      "createTitle": "Nuevo tipo de habitación",
+      "editTitle": "Editar tipo de habitación",
+      "columns": {
+        "propertyCode": "Alojamiento",
+        "name": "Nombre",
+        "maxOccupancy": "Ocupación máx."
+      },
+      "fields": {
+        "propertyCode": "Alojamiento",
+        "name": "Nombre",
+        "namePlaceholder": "p. ej. Doble, Cuádruple",
+        "maxOccupancy": "Ocupación máxima"
+      }
+    },
+    "seasons": {
+      "title": "Temporadas",
+      "description": "Periodos de fechas asociados a un alojamiento o paquete que determinan la tarifa aplicable.",
+      "createTitle": "Nueva temporada",
+      "editTitle": "Editar temporada",
+      "columns": {
+        "listing": "Alojamiento / paquete",
+        "name": "Temporada",
+        "startDate": "Fecha de inicio",
+        "endDate": "Fecha de fin"
+      },
+      "fields": {
+        "listingId": "Alojamiento / paquete",
+        "name": "Temporada",
+        "startDate": "Fecha de inicio",
+        "endDate": "Fecha de fin"
+      },
+      "names": {
+        "standard": "Estándar",
+        "peak": "Alta",
+        "ramadan": "Ramadán",
+        "hajj": "Hajj",
+        "promo": "Promoción"
+      }
+    },
+    "rateRules": {
+      "title": "Reglas de tarifas",
+      "description": "El dato atómico de precio: (alojamiento/paquete, temporada, franja de ocupación) -> precio en una moneda.",
+      "createTitle": "Nueva regla de tarifa",
+      "editTitle": "Editar regla de tarifa",
+      "columns": {
+        "listing": "Alojamiento / paquete",
+        "season": "Temporada",
+        "roomType": "Tipo de habitación",
+        "band": "Franja de ocupación",
+        "amount": "Importe"
+      },
+      "fields": {
+        "listingId": "Alojamiento / paquete",
+        "seasonId": "Temporada",
+        "roomTypeId": "Tipo de habitación",
+        "noRoomType": "— Ninguno (paquete) —",
+        "minOccupancy": "Ocupación mínima",
+        "maxOccupancy": "Ocupación máxima",
+        "amount": "Importe (unidad menor)",
+        "currency": "Moneda"
+      }
+    }
+  },
   "errors": {
     "401": "No autorizado",
     "403": "Prohibido",

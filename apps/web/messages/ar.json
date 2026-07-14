@@ -437,6 +437,194 @@
     "requestThis": "طلب هذا",
     "requestSubject": "طلب"
   },
+  "catalog": {
+    "nav": {
+      "section": "إدارة الكتالوج",
+      "currencies": "العملات",
+      "fxRates": "أسعار الصرف",
+      "properties": "أماكن الإقامة",
+      "packages": "الباقات",
+      "roomTypes": "أنواع الغرف",
+      "seasons": "المواسم",
+      "rateRules": "قواعد التسعير"
+    },
+    "actions": "الإجراءات",
+    "openMenu": "فتح القائمة",
+    "createButton": "جديد",
+    "searchPlaceholder": "بحث...",
+    "noResults": "لم يتم العثور على نتائج.",
+    "loadingRows": "جارٍ التحميل...",
+    "pageOf": "صفحة {current} من {total}",
+    "deleteConfirmTitle": "حذف هذا السجل؟",
+    "deleteConfirmDescription": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "createSuccess": "تم الإنشاء بنجاح.",
+    "updateSuccess": "تم التحديث بنجاح.",
+    "deleteSuccess": "تم الحذف بنجاح.",
+    "currencies": {
+      "title": "العملات",
+      "description": "العملات المرجعية المستخدمة في تسعير أماكن الإقامة والباقات.",
+      "createTitle": "عملة جديدة",
+      "editTitle": "تعديل العملة",
+      "columns": {
+        "code": "الرمز",
+        "name": "الاسم",
+        "symbol": "الرمز الاصطلاحي",
+        "minorUnit": "الخانات العشرية"
+      },
+      "fields": {
+        "code": "رمز العملة",
+        "codePlaceholder": "مثال: USD",
+        "minorUnit": "الخانات العشرية",
+        "symbol": "الرمز الاصطلاحي",
+        "symbolPlaceholder": "مثال: $",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: الدولار الأمريكي"
+      }
+    },
+    "fxRates": {
+      "title": "أسعار الصرف",
+      "description": "أسعار تحويل بين أزواج العملات تُستخدم لعرض الأسعار بعملة مختلفة.",
+      "createTitle": "سعر صرف جديد",
+      "editTitle": "تعديل سعر الصرف",
+      "columns": {
+        "baseCurrency": "الأساس",
+        "quoteCurrency": "المقابل",
+        "rate": "السعر",
+        "asOf": "بتاريخ"
+      },
+      "fields": {
+        "baseCurrency": "عملة الأساس",
+        "quoteCurrency": "العملة المقابلة",
+        "rate": "السعر (1 من الأساس = ؟ من المقابل)",
+        "asOf": "بتاريخ"
+      }
+    },
+    "properties": {
+      "title": "أماكن الإقامة",
+      "description": "إقامات بنمط الفنادق، يُحسب سعرها لليلة الواحدة حسب نوع الغرفة.",
+      "createTitle": "مكان إقامة جديد",
+      "editTitle": "تعديل مكان الإقامة",
+      "columns": {
+        "propertyCode": "الرمز",
+        "displayName": "الاسم",
+        "destination": "الوجهة",
+        "countryCode": "الدولة",
+        "starRating": "النجوم",
+        "isActive": "نشط"
+      },
+      "fields": {
+        "propertyCode": "رمز مكان الإقامة",
+        "propertyCodePlaceholder": "مثال: JED-WFH",
+        "displayName": "الاسم المعروض",
+        "displayNamePlaceholder": "مثال: فندق جدة الواجهة البحرية",
+        "destination": "الوجهة",
+        "destinationPlaceholder": "مثال: جدة",
+        "countryCode": "رمز الدولة",
+        "countryCodePlaceholder": "مثال: SA",
+        "heroImageUrl": "رابط الصورة الرئيسية",
+        "heroImageUrlPlaceholder": "https://...",
+        "starRating": "تصنيف النجوم (1-5)",
+        "address": "العنوان",
+        "addressPlaceholder": "العنوان البريدي",
+        "isActive": "نشط (يظهر في نتائج البحث)"
+      }
+    },
+    "packages": {
+      "title": "الباقات",
+      "description": "منتجات مجمّعة بنطاق ثابت، يُحسب سعرها كإجمالي لكل رحلة مغادرة.",
+      "createTitle": "باقة جديدة",
+      "editTitle": "تعديل الباقة",
+      "columns": {
+        "packageCode": "الرمز",
+        "displayName": "الاسم",
+        "destination": "الوجهة",
+        "countryCode": "الدولة",
+        "durationNights": "الليالي",
+        "isActive": "نشط"
+      },
+      "fields": {
+        "packageCode": "رمز الباقة",
+        "packageCodePlaceholder": "مثال: UMR-9D-ECO",
+        "displayName": "الاسم المعروض",
+        "displayNamePlaceholder": "مثال: باقة عمرة اقتصادية 9 أيام",
+        "destination": "الوجهة",
+        "destinationPlaceholder": "مثال: جدة",
+        "countryCode": "رمز الدولة",
+        "countryCodePlaceholder": "مثال: SA",
+        "heroImageUrl": "رابط الصورة الرئيسية",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "المدة (بالليالي)",
+        "includes": "تشمل",
+        "includesPlaceholder": "ملخص حر لما تتضمنه الباقة",
+        "isActive": "نشط (يظهر في نتائج البحث)"
+      }
+    },
+    "roomTypes": {
+      "title": "أنواع الغرف",
+      "description": "فئات الغرف القابلة للحجز ضمن مكان إقامة، مع سعتها القصوى.",
+      "createTitle": "نوع غرفة جديد",
+      "editTitle": "تعديل نوع الغرفة",
+      "columns": {
+        "propertyCode": "مكان الإقامة",
+        "name": "الاسم",
+        "maxOccupancy": "أقصى إشغال"
+      },
+      "fields": {
+        "propertyCode": "مكان الإقامة",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: مزدوجة، رباعية",
+        "maxOccupancy": "أقصى إشغال"
+      }
+    },
+    "seasons": {
+      "title": "المواسم",
+      "description": "فترات تاريخ مرتبطة بمكان إقامة أو باقة تحدد السعر المطبَّق.",
+      "createTitle": "موسم جديد",
+      "editTitle": "تعديل الموسم",
+      "columns": {
+        "listing": "مكان الإقامة / الباقة",
+        "name": "الموسم",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء"
+      },
+      "fields": {
+        "listingId": "مكان الإقامة / الباقة",
+        "name": "الموسم",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء"
+      },
+      "names": {
+        "standard": "عادي",
+        "peak": "ذروة",
+        "ramadan": "رمضان",
+        "hajj": "الحج",
+        "promo": "عرض ترويجي"
+      }
+    },
+    "rateRules": {
+      "title": "قواعد التسعير",
+      "description": "حقيقة السعر الأساسية: (مكان الإقامة/الباقة، الموسم، نطاق الإشغال) -> السعر بعملة معينة.",
+      "createTitle": "قاعدة تسعير جديدة",
+      "editTitle": "تعديل قاعدة التسعير",
+      "columns": {
+        "listing": "مكان الإقامة / الباقة",
+        "season": "الموسم",
+        "roomType": "نوع الغرفة",
+        "band": "نطاق الإشغال",
+        "amount": "المبلغ"
+      },
+      "fields": {
+        "listingId": "مكان الإقامة / الباقة",
+        "seasonId": "الموسم",
+        "roomTypeId": "نوع الغرفة",
+        "noRoomType": "— بلا (باقة) —",
+        "minOccupancy": "أدنى إشغال",
+        "maxOccupancy": "أقصى إشغال",
+        "amount": "المبلغ (بالوحدة الصغرى)",
+        "currency": "العملة"
+      }
+    }
+  },
   "errors": {
     "401": "غير مصرح",
     "403": "محظور",

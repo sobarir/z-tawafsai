@@ -2,16 +2,23 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import {
+  ArrowLeftRight,
+  BedDouble,
   Building2,
+  CalendarRange,
   Clock,
+  Coins,
   Handshake,
+  Hotel,
   LayoutDashboard,
   Link2,
   LogOut,
   type LucideIcon,
   MapPin,
   Menu,
+  Package as PackageIcon,
   PlaneTakeoff,
+  Tags,
   Ticket,
   UserCircle,
   Waypoints,
@@ -59,6 +66,8 @@ interface SidebarContentProps {
   items: NavItem[];
   adminItems?: NavItem[];
   adminSectionLabel?: string;
+  catalogItems?: NavItem[];
+  catalogSectionLabel?: string;
   labels: {
     theme: string;
     language: string;
@@ -148,6 +157,8 @@ function SidebarContent({
   items,
   adminItems,
   adminSectionLabel,
+  catalogItems,
+  catalogSectionLabel,
   labels,
   onLogoutRequest,
   onItemClick,
@@ -208,6 +219,30 @@ function SidebarContent({
               ) : null}
               <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
                 {adminItems.map((item) => (
+                  <li key={item.id}>
+                    <NavLinkItem
+                      item={item}
+                      pathname={pathname}
+                      isCollapsed={isCollapsed}
+                      isRtl={isRtl}
+                      onItemClick={onItemClick}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+          {catalogItems?.length ? (
+            <>
+              <div className="my-2 border-t border-sidebar-glass-edge" />
+              {!isCollapsed && catalogSectionLabel ? (
+                <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">
+                  {catalogSectionLabel}
+                </p>
+              ) : null}
+              <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
+                {catalogItems.map((item) => (
                   <li key={item.id}>
                     <NavLinkItem
                       item={item}
@@ -439,6 +474,73 @@ function buildScheduleAdminNavItems(labels: ScheduleNavLabels): NavItem[] {
   ];
 }
 
+const CATALOG_NAV_ICONS = {
+  currencies: Coins,
+  fxRates: ArrowLeftRight,
+  properties: Hotel,
+  packages: PackageIcon,
+  roomTypes: BedDouble,
+  seasons: CalendarRange,
+  rateRules: Tags,
+} as const;
+
+interface CatalogNavLabels {
+  currencies: string;
+  fxRates: string;
+  properties: string;
+  packages: string;
+  roomTypes: string;
+  seasons: string;
+  rateRules: string;
+}
+
+function buildCatalogAdminNavItems(labels: CatalogNavLabels): NavItem[] {
+  return [
+    {
+      id: 'catalog-currencies',
+      label: labels.currencies,
+      href: '/catalog/currencies',
+      icon: CATALOG_NAV_ICONS.currencies,
+    },
+    {
+      id: 'catalog-fx-rates',
+      label: labels.fxRates,
+      href: '/catalog/fx-rates',
+      icon: CATALOG_NAV_ICONS.fxRates,
+    },
+    {
+      id: 'catalog-properties',
+      label: labels.properties,
+      href: '/catalog/properties',
+      icon: CATALOG_NAV_ICONS.properties,
+    },
+    {
+      id: 'catalog-packages',
+      label: labels.packages,
+      href: '/catalog/packages',
+      icon: CATALOG_NAV_ICONS.packages,
+    },
+    {
+      id: 'catalog-room-types',
+      label: labels.roomTypes,
+      href: '/catalog/room-types',
+      icon: CATALOG_NAV_ICONS.roomTypes,
+    },
+    {
+      id: 'catalog-seasons',
+      label: labels.seasons,
+      href: '/catalog/seasons',
+      icon: CATALOG_NAV_ICONS.seasons,
+    },
+    {
+      id: 'catalog-rate-rules',
+      label: labels.rateRules,
+      href: '/catalog/rate-rules',
+      icon: CATALOG_NAV_ICONS.rateRules,
+    },
+  ];
+}
+
 export function Sidebar() {
   const t = useTranslations();
   const { user, signOut, hasPermission } = useAuth();
@@ -477,6 +579,23 @@ export function Sidebar() {
     [canManageSchedule, t],
   );
   const adminSectionLabel = t('schedule.nav.section');
+
+  const catalogItems = useMemo(
+    () =>
+      canManageSchedule
+        ? buildCatalogAdminNavItems({
+            currencies: t('catalog.nav.currencies'),
+            fxRates: t('catalog.nav.fxRates'),
+            properties: t('catalog.nav.properties'),
+            packages: t('catalog.nav.packages'),
+            roomTypes: t('catalog.nav.roomTypes'),
+            seasons: t('catalog.nav.seasons'),
+            rateRules: t('catalog.nav.rateRules'),
+          })
+        : [],
+    [canManageSchedule, t],
+  );
+  const catalogSectionLabel = t('catalog.nav.section');
 
   const labels = useMemo(
     () => ({
@@ -536,6 +655,8 @@ export function Sidebar() {
                 items={items}
                 adminItems={adminItems}
                 adminSectionLabel={adminSectionLabel}
+                catalogItems={catalogItems}
+                catalogSectionLabel={catalogSectionLabel}
                 labels={labels}
                 onLogoutRequest={handleLogoutRequest}
                 onItemClick={() => setMobileOpen(false)}
@@ -573,6 +694,8 @@ export function Sidebar() {
           items={items}
           adminItems={adminItems}
           adminSectionLabel={adminSectionLabel}
+          catalogItems={catalogItems}
+          catalogSectionLabel={catalogSectionLabel}
           labels={labels}
           onLogoutRequest={handleLogoutRequest}
           isCollapsed={collapsed}

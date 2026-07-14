@@ -439,6 +439,194 @@
     "requestThis": "অনুরোধ করুন",
     "requestSubject": "অনুরোধ"
   },
+  "catalog": {
+    "nav": {
+      "section": "ক্যাটালগ অ্যাডমিন",
+      "currencies": "মুদ্রা",
+      "fxRates": "বিনিময় হার",
+      "properties": "থাকার জায়গা",
+      "packages": "প্যাকেজ",
+      "roomTypes": "রুম টাইপ",
+      "seasons": "মৌসুম",
+      "rateRules": "মূল্য নিয়ম"
+    },
+    "actions": "কার্যক্রম",
+    "openMenu": "মেনু খুলুন",
+    "createButton": "নতুন",
+    "searchPlaceholder": "অনুসন্ধান করুন...",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি।",
+    "loadingRows": "লোড হচ্ছে...",
+    "pageOf": "পৃষ্ঠা {current} এর {total}",
+    "deleteConfirmTitle": "এই রেকর্ডটি মুছবেন?",
+    "deleteConfirmDescription": "এটি স্থায়ীভাবে \"{name}\" মুছে ফেলবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।",
+    "createSuccess": "সফলভাবে তৈরি হয়েছে।",
+    "updateSuccess": "সফলভাবে আপডেট হয়েছে।",
+    "deleteSuccess": "সফলভাবে মুছে ফেলা হয়েছে।",
+    "currencies": {
+      "title": "মুদ্রা",
+      "description": "থাকার জায়গা ও প্যাকেজের মূল্য নির্ধারণে ব্যবহৃত রেফারেন্স মুদ্রা।",
+      "createTitle": "নতুন মুদ্রা",
+      "editTitle": "মুদ্রা সম্পাদনা করুন",
+      "columns": {
+        "code": "কোড",
+        "name": "নাম",
+        "symbol": "প্রতীক",
+        "minorUnit": "দশমিক ঘর"
+      },
+      "fields": {
+        "code": "মুদ্রা কোড",
+        "codePlaceholder": "যেমন USD",
+        "minorUnit": "দশমিক ঘর সংখ্যা",
+        "symbol": "প্রতীক",
+        "symbolPlaceholder": "যেমন $",
+        "name": "নাম",
+        "namePlaceholder": "যেমন মার্কিন ডলার"
+      }
+    },
+    "fxRates": {
+      "title": "বিনিময় হার",
+      "description": "ভিন্ন মুদ্রায় মূল্য দেখানোর জন্য ব্যবহৃত মুদ্রা-জোড়া রূপান্তর হার।",
+      "createTitle": "নতুন বিনিময় হার",
+      "editTitle": "বিনিময় হার সম্পাদনা করুন",
+      "columns": {
+        "baseCurrency": "মূল",
+        "quoteCurrency": "লক্ষ্য",
+        "rate": "হার",
+        "asOf": "তারিখ"
+      },
+      "fields": {
+        "baseCurrency": "মূল মুদ্রা",
+        "quoteCurrency": "লক্ষ্য মুদ্রা",
+        "rate": "হার (১ মূল = ? লক্ষ্য)",
+        "asOf": "তারিখ"
+      }
+    },
+    "properties": {
+      "title": "থাকার জায়গা",
+      "description": "হোটেল-স্টাইল থাকার জায়গা, রুম টাইপ অনুযায়ী প্রতি রাতে মূল্য নির্ধারিত।",
+      "createTitle": "নতুন থাকার জায়গা",
+      "editTitle": "থাকার জায়গা সম্পাদনা করুন",
+      "columns": {
+        "propertyCode": "কোড",
+        "displayName": "নাম",
+        "destination": "গন্তব্য",
+        "countryCode": "দেশ",
+        "starRating": "তারকা",
+        "isActive": "সক্রিয়"
+      },
+      "fields": {
+        "propertyCode": "প্রপার্টি কোড",
+        "propertyCodePlaceholder": "যেমন JED-WFH",
+        "displayName": "প্রদর্শিত নাম",
+        "displayNamePlaceholder": "যেমন জেদ্দা ওয়াটারফ্রন্ট হোটেল",
+        "destination": "গন্তব্য",
+        "destinationPlaceholder": "যেমন জেদ্দা",
+        "countryCode": "দেশের কোড",
+        "countryCodePlaceholder": "যেমন SA",
+        "heroImageUrl": "প্রধান ছবির URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "starRating": "তারকা মান (১-৫)",
+        "address": "ঠিকানা",
+        "addressPlaceholder": "রাস্তার ঠিকানা",
+        "isActive": "সক্রিয় (অনুসন্ধানে দেখানো হবে)"
+      }
+    },
+    "packages": {
+      "title": "প্যাকেজ",
+      "description": "নির্দিষ্ট পরিসরের বান্ডল করা পণ্য, প্রতি যাত্রায় মোট মূল্য নির্ধারিত।",
+      "createTitle": "নতুন প্যাকেজ",
+      "editTitle": "প্যাকেজ সম্পাদনা করুন",
+      "columns": {
+        "packageCode": "কোড",
+        "displayName": "নাম",
+        "destination": "গন্তব্য",
+        "countryCode": "দেশ",
+        "durationNights": "রাত",
+        "isActive": "সক্রিয়"
+      },
+      "fields": {
+        "packageCode": "প্যাকেজ কোড",
+        "packageCodePlaceholder": "যেমন UMR-9D-ECO",
+        "displayName": "প্রদর্শিত নাম",
+        "displayNamePlaceholder": "যেমন ৯-দিনের ইকোনমি উমরাহ",
+        "destination": "গন্তব্য",
+        "destinationPlaceholder": "যেমন জেদ্দা",
+        "countryCode": "দেশের কোড",
+        "countryCodePlaceholder": "যেমন SA",
+        "heroImageUrl": "প্রধান ছবির URL",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "সময়কাল (রাত)",
+        "includes": "অন্তর্ভুক্ত",
+        "includesPlaceholder": "প্যাকেজে কী অন্তর্ভুক্ত তার সংক্ষিপ্ত বিবরণ",
+        "isActive": "সক্রিয় (অনুসন্ধানে দেখানো হবে)"
+      }
+    },
+    "roomTypes": {
+      "title": "রুম টাইপ",
+      "description": "একটি প্রপার্টির অধীনে বুকযোগ্য রুম শ্রেণি, সর্বোচ্চ ধারণক্ষমতাসহ।",
+      "createTitle": "নতুন রুম টাইপ",
+      "editTitle": "রুম টাইপ সম্পাদনা করুন",
+      "columns": {
+        "propertyCode": "প্রপার্টি",
+        "name": "নাম",
+        "maxOccupancy": "সর্বোচ্চ ধারণক্ষমতা"
+      },
+      "fields": {
+        "propertyCode": "প্রপার্টি",
+        "name": "নাম",
+        "namePlaceholder": "যেমন ডাবল, কোয়াড",
+        "maxOccupancy": "সর্বোচ্চ ধারণক্ষমতা"
+      }
+    },
+    "seasons": {
+      "title": "মৌসুম",
+      "description": "একটি প্রপার্টি বা প্যাকেজের সাথে যুক্ত তারিখের পরিসর যা প্রযোজ্য মূল্য নির্ধারণ করে।",
+      "createTitle": "নতুন মৌসুম",
+      "editTitle": "মৌসুম সম্পাদনা করুন",
+      "columns": {
+        "listing": "প্রপার্টি / প্যাকেজ",
+        "name": "মৌসুম",
+        "startDate": "শুরুর তারিখ",
+        "endDate": "শেষের তারিখ"
+      },
+      "fields": {
+        "listingId": "প্রপার্টি / প্যাকেজ",
+        "name": "মৌসুম",
+        "startDate": "শুরুর তারিখ",
+        "endDate": "শেষের তারিখ"
+      },
+      "names": {
+        "standard": "স্ট্যান্ডার্ড",
+        "peak": "পিক",
+        "ramadan": "রমজান",
+        "hajj": "হজ্জ",
+        "promo": "প্রোমো"
+      }
+    },
+    "rateRules": {
+      "title": "মূল্য নিয়ম",
+      "description": "মূল্যের মূল তথ্য: (প্রপার্টি/প্যাকেজ, মৌসুম, ধারণক্ষমতার পরিসর) -> একটি মুদ্রায় মূল্য।",
+      "createTitle": "নতুন মূল্য নিয়ম",
+      "editTitle": "মূল্য নিয়ম সম্পাদনা করুন",
+      "columns": {
+        "listing": "প্রপার্টি / প্যাকেজ",
+        "season": "মৌসুম",
+        "roomType": "রুম টাইপ",
+        "band": "ধারণক্ষমতার পরিসর",
+        "amount": "পরিমাণ"
+      },
+      "fields": {
+        "listingId": "প্রপার্টি / প্যাকেজ",
+        "seasonId": "মৌসুম",
+        "roomTypeId": "রুম টাইপ",
+        "noRoomType": "— কোনোটি নয় (প্যাকেজ) —",
+        "minOccupancy": "সর্বনিম্ন ধারণক্ষমতা",
+        "maxOccupancy": "সর্বোচ্চ ধারণক্ষমতা",
+        "amount": "পরিমাণ (ক্ষুদ্রতম একক)",
+        "currency": "মুদ্রা"
+      }
+    }
+  },
   "errors": {
     "401": "অননুমোদিত",
     "403": "নিষিদ্ধ",

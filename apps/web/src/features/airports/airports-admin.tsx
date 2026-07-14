@@ -3,15 +3,10 @@
 import type { Airport } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { EntityDataTable } from '@/components/shared/entity-data-table';
+import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
+import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   getListAirportsQueryKey,
   useCreateAirport,
@@ -19,7 +14,10 @@ import {
   useListAirports,
   useUpdateAirport,
 } from '@/libs/api/generated/endpoints';
-import { useCrudFeedback } from '@/libs/api/use-crud-feedback';
+import {
+  crudMutationOptions,
+  useCrudFeedback,
+} from '@/libs/api/use-crud-feedback';
 import { AirportForm } from './airport-form';
 import { getAirportColumns } from './columns';
 
@@ -34,30 +32,25 @@ export function AirportsAdmin() {
   const [editing, setEditing] = useState<Airport | null>(null);
   const [deleting, setDeleting] = useState<Airport | null>(null);
 
-  const { onSuccess, onError } = useCrudFeedback(getListAirportsQueryKey());
+  const feedback = useCrudFeedback(getListAirportsQueryKey());
 
   const createMutation = useCreateAirport({
-    mutation: {
-      onSuccess: onSuccess('createSuccess', () => setFormOpen(false)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'createSuccess', () =>
+      setFormOpen(false),
+    ),
   });
 
   const updateMutation = useUpdateAirport({
-    mutation: {
-      onSuccess: onSuccess('updateSuccess', () => {
-        setFormOpen(false);
-        setEditing(null);
-      }),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'updateSuccess', () => {
+      setFormOpen(false);
+      setEditing(null);
+    }),
   });
 
   const deleteMutation = useDeleteAirport({
-    mutation: {
-      onSuccess: onSuccess('deleteSuccess', () => setDeleting(null)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'deleteSuccess', () =>
+      setDeleting(null),
+    ),
   });
 
   const columns = useMemo(
@@ -106,48 +99,40 @@ export function AirportsAdmin() {
         }
       />
 
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>
-              {editing ? t('editTitle') : t('createTitle')}
-            </DialogTitle>
-          </DialogHeader>
-          <AirportForm
-            airport={editing ?? undefined}
-            submitting={submitting}
-            onCancel={() => setFormOpen(false)}
-            onSubmit={async (values) => {
-              if (editing) {
-                await updateMutation.mutateAsync({
-                  code: editing.airportCode,
-                  data: {
-                    icaoCode: values.icaoCode,
-                    name: values.name,
-                    cityCode: values.cityCode,
-                    countryCode: values.countryCode,
-                    timezone: values.timezone,
-                    latitude: values.latitude,
-                    longitude: values.longitude,
-                  },
-                });
-              } else {
-                await createMutation.mutateAsync({ data: values });
-              }
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <EntityFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        title={editing ? t('editTitle') : t('createTitle')}
+      >
+        <AirportForm
+          airport={editing ?? undefined}
+          submitting={submitting}
+          onCancel={() => setFormOpen(false)}
+          onSubmit={async (values) => {
+            if (editing) {
+              await updateMutation.mutateAsync({
+                code: editing.airportCode,
+                data: {
+                  icaoCode: values.icaoCode,
+                  name: values.name,
+                  cityCode: values.cityCode,
+                  countryCode: values.countryCode,
+                  timezone: values.timezone,
+                  latitude: values.latitude,
+                  longitude: values.longitude,
+                },
+              });
+            } else {
+              await createMutation.mutateAsync({ data: values });
+            }
+          }}
+        />
+      </EntityFormDialog>
 
-      <ConfirmDialog
+      <EntityDeleteConfirm
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
-        title={tSchedule('deleteConfirmTitle')}
-        description={tSchedule('deleteConfirmDescription', {
-          name: deleting?.airportCode ?? '',
-        })}
-        confirmLabel={tCommon('delete')}
-        cancelLabel={tCommon('cancel')}
+        name={deleting?.airportCode ?? ''}
         loading={deleteMutation.isPending}
         onConfirm={() => {
           if (deleting) deleteMutation.mutate({ code: deleting.airportCode });

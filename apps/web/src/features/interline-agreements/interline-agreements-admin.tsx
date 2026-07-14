@@ -3,15 +3,10 @@
 import type { InterlineAgreement } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { EntityDataTable } from '@/components/shared/entity-data-table';
+import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
+import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   getListInterlineAgreementsQueryKey,
   useCreateInterlineAgreement,
@@ -19,7 +14,10 @@ import {
   useListAirlines,
   useListInterlineAgreements,
 } from '@/libs/api/generated/endpoints';
-import { useCrudFeedback } from '@/libs/api/use-crud-feedback';
+import {
+  crudMutationOptions,
+  useCrudFeedback,
+} from '@/libs/api/use-crud-feedback';
 import { getInterlineAgreementColumns } from './columns';
 import { InterlineAgreementForm } from './interline-agreement-form';
 import { InterlineResolver } from './interline-resolver';
@@ -35,22 +33,18 @@ export function InterlineAgreementsAdmin() {
   const [formOpen, setFormOpen] = useState(false);
   const [deleting, setDeleting] = useState<InterlineAgreement | null>(null);
 
-  const { onSuccess, onError } = useCrudFeedback(
-    getListInterlineAgreementsQueryKey(),
-  );
+  const feedback = useCrudFeedback(getListInterlineAgreementsQueryKey());
 
   const createMutation = useCreateInterlineAgreement({
-    mutation: {
-      onSuccess: onSuccess('createSuccess', () => setFormOpen(false)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'createSuccess', () =>
+      setFormOpen(false),
+    ),
   });
 
   const deleteMutation = useDeleteInterlineAgreement({
-    mutation: {
-      onSuccess: onSuccess('deleteSuccess', () => setDeleting(null)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'deleteSuccess', () =>
+      setDeleting(null),
+    ),
   });
 
   const columns = useMemo(
@@ -86,33 +80,29 @@ export function InterlineAgreementsAdmin() {
 
       <InterlineResolver airlines={airlines ?? []} />
 
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>{t('createTitle')}</DialogTitle>
-          </DialogHeader>
-          <InterlineAgreementForm
-            airlines={airlines ?? []}
-            submitting={createMutation.isPending}
-            onCancel={() => setFormOpen(false)}
-            onSubmit={async (values) => {
-              await createMutation.mutateAsync({ data: values });
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <EntityFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        title={t('createTitle')}
+      >
+        <InterlineAgreementForm
+          airlines={airlines ?? []}
+          submitting={createMutation.isPending}
+          onCancel={() => setFormOpen(false)}
+          onSubmit={async (values) => {
+            await createMutation.mutateAsync({ data: values });
+          }}
+        />
+      </EntityFormDialog>
 
-      <ConfirmDialog
+      <EntityDeleteConfirm
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
-        title={tSchedule('deleteConfirmTitle')}
-        description={tSchedule('deleteConfirmDescription', {
-          name: deleting
+        name={
+          deleting
             ? `${deleting.inboundAirline} → ${deleting.outboundAirline}`
-            : '',
-        })}
-        confirmLabel={tCommon('delete')}
-        cancelLabel={tCommon('cancel')}
+            : ''
+        }
         loading={deleteMutation.isPending}
         onConfirm={() => {
           if (deleting) deleteMutation.mutate({ id: deleting.id });

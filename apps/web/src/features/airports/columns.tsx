@@ -2,7 +2,7 @@
 
 import type { Airport } from '@repo/shared';
 import type { ColumnDef } from '@tanstack/react-table';
-import { RowActionsCell } from '@/components/shared/row-actions-cell';
+import { actionsColumn } from '@/components/shared/actions-column';
 
 interface AirportColumnsOptions {
   columnLabels: {
@@ -45,22 +45,13 @@ export function getAirportColumns({
         return `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
       },
     },
-    {
-      id: 'actions',
-      header: actionsLabel,
-      cell: ({ row }) => (
-        <RowActionsCell
-          openMenuLabel={openMenuLabel}
-          actions={[
-            { label: editLabel, onClick: () => onEdit(row.original) },
-            {
-              label: deleteLabel,
-              onClick: () => onDelete(row.original),
-              destructive: true,
-            },
-          ]}
-        />
-      ),
-    },
+    actionsColumn({
+      actionsLabel,
+      openMenuLabel,
+      editLabel,
+      deleteLabel,
+      onEdit,
+      onDelete,
+    }),
   ];
 }

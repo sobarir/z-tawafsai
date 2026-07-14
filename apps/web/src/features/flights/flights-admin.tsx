@@ -3,15 +3,10 @@
 import type { Flight } from '@repo/shared';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { EntityDataTable } from '@/components/shared/entity-data-table';
+import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
+import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   getListFlightsQueryKey,
   useCreateFlight,
@@ -21,7 +16,10 @@ import {
   useListFlights,
   useUpdateFlight,
 } from '@/libs/api/generated/endpoints';
-import { useCrudFeedback } from '@/libs/api/use-crud-feedback';
+import {
+  crudMutationOptions,
+  useCrudFeedback,
+} from '@/libs/api/use-crud-feedback';
 import { getFlightColumns } from './columns';
 import { FlightCreateForm } from './flight-create-form';
 import { FlightEditForm } from './flight-edit-form';
@@ -43,27 +41,24 @@ export function FlightsAdmin() {
   const [viewing, setViewing] = useState<Flight | null>(null);
   const [deleting, setDeleting] = useState<Flight | null>(null);
 
-  const { onSuccess, onError } = useCrudFeedback(getListFlightsQueryKey());
+  const feedback = useCrudFeedback(getListFlightsQueryKey());
 
   const createMutation = useCreateFlight({
-    mutation: {
-      onSuccess: onSuccess('createSuccess', () => setCreateOpen(false)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'createSuccess', () =>
+      setCreateOpen(false),
+    ),
   });
 
   const updateMutation = useUpdateFlight({
-    mutation: {
-      onSuccess: onSuccess('updateSuccess', () => setEditing(null)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'updateSuccess', () =>
+      setEditing(null),
+    ),
   });
 
   const deleteMutation = useDeleteFlight({
-    mutation: {
-      onSuccess: onSuccess('deleteSuccess', () => setDeleting(null)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'deleteSuccess', () =>
+      setDeleting(null),
+    ),
   });
 
   const columns = useMemo(
@@ -112,63 +107,55 @@ export function FlightsAdmin() {
         }
       />
 
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t('createTitle')}</DialogTitle>
-          </DialogHeader>
-          <FlightCreateForm
-            airports={airports ?? []}
-            airlines={airlines ?? []}
-            submitting={createMutation.isPending}
-            onCancel={() => setCreateOpen(false)}
-            onSubmit={async (values) => {
-              await createMutation.mutateAsync({ data: values });
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <EntityFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        title={t('createTitle')}
+        contentClassName="sm:max-w-2xl"
+      >
+        <FlightCreateForm
+          airports={airports ?? []}
+          airlines={airlines ?? []}
+          submitting={createMutation.isPending}
+          onCancel={() => setCreateOpen(false)}
+          onSubmit={async (values) => {
+            await createMutation.mutateAsync({ data: values });
+          }}
+        />
+      </EntityFormDialog>
 
-      <Dialog
+      <EntityFormDialog
         open={!!editing}
         onOpenChange={(open) => !open && setEditing(null)}
+        title={t('editTitle')}
+        contentClassName="sm:max-w-md"
       >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('editTitle')}</DialogTitle>
-          </DialogHeader>
-          {editing ? (
-            <FlightEditForm
-              flight={editing}
-              submitting={updateMutation.isPending}
-              onCancel={() => setEditing(null)}
-              onSubmit={async (values) => {
-                await updateMutation.mutateAsync({
-                  id: editing.id,
-                  data: values,
-                });
-              }}
-            />
-          ) : null}
-        </DialogContent>
-      </Dialog>
+        {editing ? (
+          <FlightEditForm
+            flight={editing}
+            submitting={updateMutation.isPending}
+            onCancel={() => setEditing(null)}
+            onSubmit={async (values) => {
+              await updateMutation.mutateAsync({
+                id: editing.id,
+                data: values,
+              });
+            }}
+          />
+        ) : null}
+      </EntityFormDialog>
 
       <FlightLegsDialog
         flight={viewing}
         onOpenChange={(open) => !open && setViewing(null)}
       />
 
-      <ConfirmDialog
+      <EntityDeleteConfirm
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
-        title={tSchedule('deleteConfirmTitle')}
-        description={tSchedule('deleteConfirmDescription', {
-          name: deleting
-            ? `${deleting.operatingAirline}${deleting.flightNumber}`
-            : '',
-        })}
-        confirmLabel={tCommon('delete')}
-        cancelLabel={tCommon('cancel')}
+        name={
+          deleting ? `${deleting.operatingAirline}${deleting.flightNumber}` : ''
+        }
         loading={deleteMutation.isPending}
         onConfirm={() => {
           if (deleting) deleteMutation.mutate({ id: deleting.id });

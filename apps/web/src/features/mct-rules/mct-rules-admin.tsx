@@ -3,15 +3,10 @@
 import type { MctRule } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { EntityDataTable } from '@/components/shared/entity-data-table';
+import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
+import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   getListMctRulesQueryKey,
   useCreateMctRule,
@@ -21,7 +16,10 @@ import {
   useListMctRules,
   useUpdateMctRule,
 } from '@/libs/api/generated/endpoints';
-import { useCrudFeedback } from '@/libs/api/use-crud-feedback';
+import {
+  crudMutationOptions,
+  useCrudFeedback,
+} from '@/libs/api/use-crud-feedback';
 import { getMctRuleColumns } from './columns';
 import { MctRuleForm } from './mct-rule-form';
 import { MctRuleResolver } from './mct-rule-resolver';
@@ -39,30 +37,25 @@ export function MctRulesAdmin() {
   const [editing, setEditing] = useState<MctRule | null>(null);
   const [deleting, setDeleting] = useState<MctRule | null>(null);
 
-  const { onSuccess, onError } = useCrudFeedback(getListMctRulesQueryKey());
+  const feedback = useCrudFeedback(getListMctRulesQueryKey());
 
   const createMutation = useCreateMctRule({
-    mutation: {
-      onSuccess: onSuccess('createSuccess', () => setFormOpen(false)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'createSuccess', () =>
+      setFormOpen(false),
+    ),
   });
 
   const updateMutation = useUpdateMctRule({
-    mutation: {
-      onSuccess: onSuccess('updateSuccess', () => {
-        setFormOpen(false);
-        setEditing(null);
-      }),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'updateSuccess', () => {
+      setFormOpen(false);
+      setEditing(null);
+    }),
   });
 
   const deleteMutation = useDeleteMctRule({
-    mutation: {
-      onSuccess: onSuccess('deleteSuccess', () => setDeleting(null)),
-      onError,
-    },
+    mutation: crudMutationOptions(feedback, 'deleteSuccess', () =>
+      setDeleting(null),
+    ),
   });
 
   const columns = useMemo(
@@ -116,51 +109,45 @@ export function MctRulesAdmin() {
 
       <MctRuleResolver airports={airports ?? []} airlines={airlines ?? []} />
 
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>
-              {editing ? t('editTitle') : t('createTitle')}
-            </DialogTitle>
-          </DialogHeader>
-          <MctRuleForm
-            rule={editing ?? undefined}
-            airports={airports ?? []}
-            airlines={airlines ?? []}
-            submitting={submitting}
-            onCancel={() => setFormOpen(false)}
-            onSubmit={async (values) => {
-              if (editing) {
-                await updateMutation.mutateAsync({
-                  id: editing.id,
-                  data: {
-                    arrivalAirline: values.arrivalAirline,
-                    departureAirline: values.departureAirline,
-                    arrivalTerminal: values.arrivalTerminal,
-                    departureTerminal: values.departureTerminal,
-                    mctMinutes: values.mctMinutes,
-                    maxConnectionMinutes: values.maxConnectionMinutes,
-                  },
-                });
-              } else {
-                await createMutation.mutateAsync({ data: values });
-              }
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      <EntityFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        title={editing ? t('editTitle') : t('createTitle')}
+      >
+        <MctRuleForm
+          rule={editing ?? undefined}
+          airports={airports ?? []}
+          airlines={airlines ?? []}
+          submitting={submitting}
+          onCancel={() => setFormOpen(false)}
+          onSubmit={async (values) => {
+            if (editing) {
+              await updateMutation.mutateAsync({
+                id: editing.id,
+                data: {
+                  arrivalAirline: values.arrivalAirline,
+                  departureAirline: values.departureAirline,
+                  arrivalTerminal: values.arrivalTerminal,
+                  departureTerminal: values.departureTerminal,
+                  mctMinutes: values.mctMinutes,
+                  maxConnectionMinutes: values.maxConnectionMinutes,
+                },
+              });
+            } else {
+              await createMutation.mutateAsync({ data: values });
+            }
+          }}
+        />
+      </EntityFormDialog>
 
-      <ConfirmDialog
+      <EntityDeleteConfirm
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
-        title={tSchedule('deleteConfirmTitle')}
-        description={tSchedule('deleteConfirmDescription', {
-          name: deleting
+        name={
+          deleting
             ? `${deleting.departureAirport}→${deleting.arrivalAirport}`
-            : '',
-        })}
-        confirmLabel={tCommon('delete')}
-        cancelLabel={tCommon('cancel')}
+            : ''
+        }
         loading={deleteMutation.isPending}
         onConfirm={() => {
           if (deleting) deleteMutation.mutate({ id: deleting.id });

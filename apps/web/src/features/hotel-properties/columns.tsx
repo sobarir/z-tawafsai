@@ -1,0 +1,61 @@
+'use client';
+
+import type { Property } from '@repo/shared';
+import type { ColumnDef } from '@tanstack/react-table';
+import { actionsColumn } from '@/components/shared/actions-column';
+
+interface PropertyColumnsOptions {
+  columnLabels: {
+    propertyCode: string;
+    displayName: string;
+    destination: string;
+    countryCode: string;
+    starRating: string;
+    isActive: string;
+  };
+  activeLabel: string;
+  inactiveLabel: string;
+  actionsLabel: string;
+  openMenuLabel: string;
+  editLabel: string;
+  deleteLabel: string;
+  onEdit: (property: Property) => void;
+  onDelete: (property: Property) => void;
+}
+
+export function getPropertyColumns({
+  columnLabels,
+  activeLabel,
+  inactiveLabel,
+  actionsLabel,
+  openMenuLabel,
+  editLabel,
+  deleteLabel,
+  onEdit,
+  onDelete,
+}: PropertyColumnsOptions): ColumnDef<Property>[] {
+  return [
+    { accessorKey: 'propertyCode', header: columnLabels.propertyCode },
+    { accessorKey: 'displayName', header: columnLabels.displayName },
+    { accessorKey: 'destination', header: columnLabels.destination },
+    { accessorKey: 'countryCode', header: columnLabels.countryCode },
+    {
+      id: 'starRating',
+      header: columnLabels.starRating,
+      cell: ({ row }) => row.original.starRating ?? '—',
+    },
+    {
+      id: 'isActive',
+      header: columnLabels.isActive,
+      cell: ({ row }) => (row.original.isActive ? activeLabel : inactiveLabel),
+    },
+    actionsColumn({
+      actionsLabel,
+      openMenuLabel,
+      editLabel,
+      deleteLabel,
+      onEdit,
+      onDelete,
+    }),
+  ];
+}

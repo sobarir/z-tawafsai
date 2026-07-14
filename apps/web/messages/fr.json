@@ -437,6 +437,194 @@
     "requestThis": "Faire une demande",
     "requestSubject": "Demande"
   },
+  "catalog": {
+    "nav": {
+      "section": "Administration du catalogue",
+      "currencies": "Devises",
+      "fxRates": "Taux de change",
+      "properties": "Hébergements",
+      "packages": "Forfaits",
+      "roomTypes": "Types de chambre",
+      "seasons": "Saisons",
+      "rateRules": "Règles tarifaires"
+    },
+    "actions": "Actions",
+    "openMenu": "Ouvrir le menu",
+    "createButton": "Nouveau",
+    "searchPlaceholder": "Rechercher...",
+    "noResults": "Aucun résultat trouvé.",
+    "loadingRows": "Chargement...",
+    "pageOf": "Page {current} sur {total}",
+    "deleteConfirmTitle": "Supprimer cet enregistrement ?",
+    "deleteConfirmDescription": "Cette action supprimera définitivement \"{name}\". Cette action est irréversible.",
+    "createSuccess": "Créé avec succès.",
+    "updateSuccess": "Mis à jour avec succès.",
+    "deleteSuccess": "Supprimé avec succès.",
+    "currencies": {
+      "title": "Devises",
+      "description": "Devises de référence utilisées pour les prix des hébergements et forfaits.",
+      "createTitle": "Nouvelle devise",
+      "editTitle": "Modifier la devise",
+      "columns": {
+        "code": "Code",
+        "name": "Nom",
+        "symbol": "Symbole",
+        "minorUnit": "Décimales"
+      },
+      "fields": {
+        "code": "Code devise",
+        "codePlaceholder": "ex. USD",
+        "minorUnit": "Décimales (unité mineure)",
+        "symbol": "Symbole",
+        "symbolPlaceholder": "ex. $",
+        "name": "Nom",
+        "namePlaceholder": "ex. Dollar américain"
+      }
+    },
+    "fxRates": {
+      "title": "Taux de change",
+      "description": "Taux de conversion entre devises utilisés pour afficher les prix dans une autre devise.",
+      "createTitle": "Nouveau taux de change",
+      "editTitle": "Modifier le taux de change",
+      "columns": {
+        "baseCurrency": "Base",
+        "quoteCurrency": "Cotée",
+        "rate": "Taux",
+        "asOf": "Date"
+      },
+      "fields": {
+        "baseCurrency": "Devise de base",
+        "quoteCurrency": "Devise cotée",
+        "rate": "Taux (1 base = ? cotée)",
+        "asOf": "Date"
+      }
+    },
+    "properties": {
+      "title": "Hébergements",
+      "description": "Séjours de type hôtel, facturés à la nuit selon le type de chambre.",
+      "createTitle": "Nouvel hébergement",
+      "editTitle": "Modifier l'hébergement",
+      "columns": {
+        "propertyCode": "Code",
+        "displayName": "Nom",
+        "destination": "Destination",
+        "countryCode": "Pays",
+        "starRating": "Étoiles",
+        "isActive": "Actif"
+      },
+      "fields": {
+        "propertyCode": "Code de l'hébergement",
+        "propertyCodePlaceholder": "ex. JED-WFH",
+        "displayName": "Nom affiché",
+        "displayNamePlaceholder": "ex. Jeddah Waterfront Hotel",
+        "destination": "Destination",
+        "destinationPlaceholder": "ex. Jeddah",
+        "countryCode": "Code pays",
+        "countryCodePlaceholder": "ex. SA",
+        "heroImageUrl": "URL de l'image principale",
+        "heroImageUrlPlaceholder": "https://...",
+        "starRating": "Classement (1-5 étoiles)",
+        "address": "Adresse",
+        "addressPlaceholder": "Adresse postale",
+        "isActive": "Actif (visible dans la recherche)"
+      }
+    },
+    "packages": {
+      "title": "Forfaits",
+      "description": "Produits combinés à périmètre fixe, facturés en un total par départ.",
+      "createTitle": "Nouveau forfait",
+      "editTitle": "Modifier le forfait",
+      "columns": {
+        "packageCode": "Code",
+        "displayName": "Nom",
+        "destination": "Destination",
+        "countryCode": "Pays",
+        "durationNights": "Nuits",
+        "isActive": "Actif"
+      },
+      "fields": {
+        "packageCode": "Code du forfait",
+        "packageCodePlaceholder": "ex. UMR-9D-ECO",
+        "displayName": "Nom affiché",
+        "displayNamePlaceholder": "ex. Omra Économique 9 jours",
+        "destination": "Destination",
+        "destinationPlaceholder": "ex. Jeddah",
+        "countryCode": "Code pays",
+        "countryCodePlaceholder": "ex. SA",
+        "heroImageUrl": "URL de l'image principale",
+        "heroImageUrlPlaceholder": "https://...",
+        "durationNights": "Durée (nuits)",
+        "includes": "Inclus",
+        "includesPlaceholder": "Résumé libre de ce qui est inclus",
+        "isActive": "Actif (visible dans la recherche)"
+      }
+    },
+    "roomTypes": {
+      "title": "Types de chambre",
+      "description": "Catégories de chambres réservables au sein d'un hébergement, avec leur capacité maximale.",
+      "createTitle": "Nouveau type de chambre",
+      "editTitle": "Modifier le type de chambre",
+      "columns": {
+        "propertyCode": "Hébergement",
+        "name": "Nom",
+        "maxOccupancy": "Occupation max."
+      },
+      "fields": {
+        "propertyCode": "Hébergement",
+        "name": "Nom",
+        "namePlaceholder": "ex. Double, Quadruple",
+        "maxOccupancy": "Occupation maximale"
+      }
+    },
+    "seasons": {
+      "title": "Saisons",
+      "description": "Périodes de dates rattachées à un hébergement ou forfait, qui déterminent le tarif applicable.",
+      "createTitle": "Nouvelle saison",
+      "editTitle": "Modifier la saison",
+      "columns": {
+        "listing": "Hébergement / forfait",
+        "name": "Saison",
+        "startDate": "Date de début",
+        "endDate": "Date de fin"
+      },
+      "fields": {
+        "listingId": "Hébergement / forfait",
+        "name": "Saison",
+        "startDate": "Date de début",
+        "endDate": "Date de fin"
+      },
+      "names": {
+        "standard": "Standard",
+        "peak": "Haute saison",
+        "ramadan": "Ramadan",
+        "hajj": "Hajj",
+        "promo": "Promotion"
+      }
+    },
+    "rateRules": {
+      "title": "Règles tarifaires",
+      "description": "La donnée de prix atomique : (hébergement/forfait, saison, tranche d'occupation) -> prix dans une devise.",
+      "createTitle": "Nouvelle règle tarifaire",
+      "editTitle": "Modifier la règle tarifaire",
+      "columns": {
+        "listing": "Hébergement / forfait",
+        "season": "Saison",
+        "roomType": "Type de chambre",
+        "band": "Tranche d'occupation",
+        "amount": "Montant"
+      },
+      "fields": {
+        "listingId": "Hébergement / forfait",
+        "seasonId": "Saison",
+        "roomTypeId": "Type de chambre",
+        "noRoomType": "— Aucun (forfait) —",
+        "minOccupancy": "Occupation minimale",
+        "maxOccupancy": "Occupation maximale",
+        "amount": "Montant (unité mineure)",
+        "currency": "Devise"
+      }
+    }
+  },
   "errors": {
     "401": "Non autorisé",
     "403": "Interdit",

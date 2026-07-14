@@ -497,3 +497,199 @@ export const hotelSearchResponseSchema = z.object({
   total: z.number().int().nonnegative(),
 });
 export type HotelSearchResponse = z.infer<typeof hotelSearchResponseSchema>;
+
+/**
+ * Hotel & package catalog admin — CRUD contracts for the 7 manageable
+ * entities (packages/db/src/schema/app.ts). Most hotel tables have no
+ * created_at/updated_at columns — don't add them here just to match other
+ * domains' shape.
+ */
+
+export const currencySchema = z.object({
+  code: currencyCodeSchema,
+  minorUnit: z.number().int().min(0).max(6),
+  symbol: z.string().min(1).max(10),
+  name: z.string().min(1).max(100),
+});
+export type Currency = z.infer<typeof currencySchema>;
+
+export const createCurrencySchema = currencySchema;
+export type CreateCurrencyInput = z.infer<typeof createCurrencySchema>;
+
+export const updateCurrencySchema = createCurrencySchema
+  .omit({ code: true })
+  .partial();
+export type UpdateCurrencyInput = z.infer<typeof updateCurrencySchema>;
+
+export const fxRateSchema = z.object({
+  id: ulidSchema,
+  baseCurrency: currencyCodeSchema,
+  quoteCurrency: currencyCodeSchema,
+  /** rate x 1_000_000 (parts per million) — see /prd/hotels/13-resolver-and-search.md. */
+  ratePpm: z.number().int().positive(),
+  asOf: z.iso.datetime(),
+});
+export type FxRate = z.infer<typeof fxRateSchema>;
+
+export const createFxRateSchema = z.object({
+  baseCurrency: currencyCodeSchema,
+  quoteCurrency: currencyCodeSchema,
+  ratePpm: z.number().int().positive(),
+  asOf: z.iso.datetime(),
+});
+export type CreateFxRateInput = z.infer<typeof createFxRateSchema>;
+
+export const updateFxRateSchema = createFxRateSchema.partial();
+export type UpdateFxRateInput = z.infer<typeof updateFxRateSchema>;
+
+/**
+ * A property is a `listing` (kind='property') 1:1 with a `property` row —
+ * managed as one combined form/transaction, never as two separate screens.
+ */
+export const propertySchema = z.object({
+  propertyCode: z.string().min(1).max(50),
+  listingId: ulidSchema,
+  starRating: z.number().int().min(1).max(5).nullable(),
+  address: z.string().nullable(),
+  displayName: z.string().min(1).max(200),
+  destination: z.string().min(1).max(100),
+  countryCode: z.string().length(2),
+  heroImageUrl: z.string().nullable(),
+  isActive: z.boolean(),
+  createdAt: z.iso.datetime(),
+});
+export type Property = z.infer<typeof propertySchema>;
+
+export const createPropertySchema = z.object({
+  propertyCode: z.string().min(1).max(50),
+  starRating: z.number().int().min(1).max(5).optional(),
+  address: z.string().max(500).optional(),
+  displayName: z.string().min(1).max(200),
+  destination: z.string().min(1).max(100),
+  countryCode: z.string().length(2),
+  heroImageUrl: z.string().max(2000).optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreatePropertyInput = z.infer<typeof createPropertySchema>;
+
+export const updatePropertySchema = createPropertySchema
+  .omit({ propertyCode: true })
+  .partial();
+export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
+
+/**
+ * A package is a `listing` (kind='package') 1:1 with a `package` row —
+ * same combined-form/transaction shape as property.
+ */
+export const packageSchema = z.object({
+  packageCode: z.string().min(1).max(50),
+  listingId: ulidSchema,
+  durationNights: z.number().int().positive(),
+  includes: z.string().nullable(),
+  displayName: z.string().min(1).max(200),
+  destination: z.string().min(1).max(100),
+  countryCode: z.string().length(2),
+  heroImageUrl: z.string().nullable(),
+  isActive: z.boolean(),
+  createdAt: z.iso.datetime(),
+});
+export type Package = z.infer<typeof packageSchema>;
+
+export const createPackageSchema = z.object({
+  packageCode: z.string().min(1).max(50),
+  durationNights: z.number().int().positive(),
+  includes: z.string().max(2000).optional(),
+  displayName: z.string().min(1).max(200),
+  destination: z.string().min(1).max(100),
+  countryCode: z.string().length(2),
+  heroImageUrl: z.string().max(2000).optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreatePackageInput = z.infer<typeof createPackageSchema>;
+
+export const updatePackageSchema = createPackageSchema
+  .omit({ packageCode: true })
+  .partial();
+export type UpdatePackageInput = z.infer<typeof updatePackageSchema>;
+
+export const roomTypeSchema = z.object({
+  id: ulidSchema,
+  propertyCode: z.string(),
+  name: z.string().min(1).max(100),
+  maxOccupancy: z.number().int().positive(),
+});
+export type RoomType = z.infer<typeof roomTypeSchema>;
+
+export const createRoomTypeSchema = z.object({
+  propertyCode: z.string().min(1).max(50),
+  name: z.string().min(1).max(100),
+  maxOccupancy: z.number().int().positive(),
+});
+export type CreateRoomTypeInput = z.infer<typeof createRoomTypeSchema>;
+
+export const updateRoomTypeSchema = createRoomTypeSchema
+  .omit({ propertyCode: true })
+  .partial();
+export type UpdateRoomTypeInput = z.infer<typeof updateRoomTypeSchema>;
+
+/** Label only — the date window on `season` is what actually selects it. */
+export const seasonNameSchema = z.enum([
+  'standard',
+  'peak',
+  'ramadan',
+  'hajj',
+  'promo',
+]);
+export type SeasonName = z.infer<typeof seasonNameSchema>;
+
+export const seasonSchema = z.object({
+  id: ulidSchema,
+  listingId: ulidSchema,
+  name: seasonNameSchema,
+  startDate: z.iso.date(),
+  endDate: z.iso.date(),
+});
+export type Season = z.infer<typeof seasonSchema>;
+
+export const createSeasonSchema = z.object({
+  listingId: ulidSchema,
+  name: seasonNameSchema,
+  startDate: z.iso.date(),
+  endDate: z.iso.date(),
+});
+export type CreateSeasonInput = z.infer<typeof createSeasonSchema>;
+
+export const updateSeasonSchema = createSeasonSchema
+  .omit({ listingId: true })
+  .partial();
+export type UpdateSeasonInput = z.infer<typeof updateSeasonSchema>;
+
+export const rateRuleSchema = z.object({
+  id: ulidSchema,
+  listingId: ulidSchema,
+  seasonId: ulidSchema,
+  /** NULL for packages, required for properties. */
+  roomTypeId: ulidSchema.nullable(),
+  minOccupancy: z.number().int().positive(),
+  maxOccupancy: z.number().int().positive(),
+  /** Minor units. Per-night for properties, total for packages. */
+  amount: z.number().int().nonnegative(),
+  currency: currencyCodeSchema,
+});
+export type RateRule = z.infer<typeof rateRuleSchema>;
+
+export const createRateRuleSchema = z.object({
+  listingId: ulidSchema,
+  seasonId: ulidSchema,
+  roomTypeId: ulidSchema.optional(),
+  minOccupancy: z.number().int().positive(),
+  maxOccupancy: z.number().int().positive(),
+  amount: z.number().int().nonnegative(),
+  currency: currencyCodeSchema,
+});
+export type CreateRateRuleInput = z.infer<typeof createRateRuleSchema>;
+
+export const updateRateRuleSchema = createRateRuleSchema
+  .omit({ listingId: true })
+  .partial();
+export type UpdateRateRuleInput = z.infer<typeof updateRateRuleSchema>;

@@ -13,6 +13,13 @@ import { ConnectionsModule } from './connections/connections.module';
 import { DatabaseModule } from './database/database.module';
 import { FlightMarketingModule } from './flight-marketing/flight-marketing.module';
 import { FlightsModule } from './flights/flights.module';
+import { HotelCurrenciesModule } from './hotel-currencies/hotel-currencies.module';
+import { HotelFxRatesModule } from './hotel-fx-rates/hotel-fx-rates.module';
+import { HotelPackagesModule } from './hotel-packages/hotel-packages.module';
+import { HotelPropertiesModule } from './hotel-properties/hotel-properties.module';
+import { HotelRateRulesModule } from './hotel-rate-rules/hotel-rate-rules.module';
+import { HotelRoomTypesModule } from './hotel-room-types/hotel-room-types.module';
+import { HotelSeasonsModule } from './hotel-seasons/hotel-seasons.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { InterlineAgreementsModule } from './interline-agreements/interline-agreements.module';
 import { MctRulesModule } from './mct-rules/mct-rules.module';
@@ -38,6 +45,13 @@ import { UsersModule } from './users/users.module';
     InterlineAgreementsModule,
     ConnectionsModule,
     HotelsModule,
+    HotelCurrenciesModule,
+    HotelFxRatesModule,
+    HotelPropertiesModule,
+    HotelPackagesModule,
+    HotelRoomTypesModule,
+    HotelSeasonsModule,
+    HotelRateRulesModule,
   ],
   controllers: [AppController],
   providers: [

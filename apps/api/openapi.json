@@ -1395,6 +1395,1035 @@
           "hotels"
         ]
       }
+    },
+    "/api/hotel-currencies": {
+      "get": {
+        "operationId": "listHotelCurrencies",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CurrencyDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List currencies",
+        "tags": [
+          "hotel-currencies"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelCurrency",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCurrencyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a currency",
+        "tags": [
+          "hotel-currencies"
+        ]
+      }
+    },
+    "/api/hotel-currencies/{code}": {
+      "get": {
+        "operationId": "getHotelCurrency",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a currency",
+        "tags": [
+          "hotel-currencies"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelCurrency",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCurrencyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a currency",
+        "tags": [
+          "hotel-currencies"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelCurrency",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a currency",
+        "tags": [
+          "hotel-currencies"
+        ]
+      }
+    },
+    "/api/hotel-fx-rates": {
+      "get": {
+        "operationId": "listHotelFxRates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FxRateDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List FX rates",
+        "tags": [
+          "hotel-fx-rates"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelFxRate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFxRateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FxRateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create an FX rate",
+        "tags": [
+          "hotel-fx-rates"
+        ]
+      }
+    },
+    "/api/hotel-fx-rates/{id}": {
+      "get": {
+        "operationId": "getHotelFxRate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FxRateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get an FX rate",
+        "tags": [
+          "hotel-fx-rates"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelFxRate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFxRateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FxRateDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update an FX rate",
+        "tags": [
+          "hotel-fx-rates"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelFxRate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete an FX rate",
+        "tags": [
+          "hotel-fx-rates"
+        ]
+      }
+    },
+    "/api/hotel-properties": {
+      "get": {
+        "operationId": "listHotelProperties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List properties",
+        "tags": [
+          "hotel-properties"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelProperty",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePropertyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a property",
+        "tags": [
+          "hotel-properties"
+        ]
+      }
+    },
+    "/api/hotel-properties/{propertyCode}": {
+      "get": {
+        "operationId": "getHotelProperty",
+        "parameters": [
+          {
+            "name": "propertyCode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a property",
+        "tags": [
+          "hotel-properties"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelProperty",
+        "parameters": [
+          {
+            "name": "propertyCode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePropertyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a property",
+        "tags": [
+          "hotel-properties"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelProperty",
+        "parameters": [
+          {
+            "name": "propertyCode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a property",
+        "tags": [
+          "hotel-properties"
+        ]
+      }
+    },
+    "/api/hotel-packages": {
+      "get": {
+        "operationId": "listHotelPackages",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PackageDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List packages",
+        "tags": [
+          "hotel-packages"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelPackage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a package",
+        "tags": [
+          "hotel-packages"
+        ]
+      }
+    },
+    "/api/hotel-packages/{packageCode}": {
+      "get": {
+        "operationId": "getHotelPackage",
+        "parameters": [
+          {
+            "name": "packageCode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a package",
+        "tags": [
+          "hotel-packages"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelPackage",
+        "parameters": [
+          {
+            "name": "packageCode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a package",
+        "tags": [
+          "hotel-packages"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelPackage",
+        "parameters": [
+          {
+            "name": "packageCode",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a package",
+        "tags": [
+          "hotel-packages"
+        ]
+      }
+    },
+    "/api/hotel-room-types": {
+      "get": {
+        "operationId": "listHotelRoomTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List room types",
+        "tags": [
+          "hotel-room-types"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelRoomType",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a room type",
+        "tags": [
+          "hotel-room-types"
+        ]
+      }
+    },
+    "/api/hotel-room-types/{id}": {
+      "get": {
+        "operationId": "getHotelRoomType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a room type",
+        "tags": [
+          "hotel-room-types"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelRoomType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoomTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a room type",
+        "tags": [
+          "hotel-room-types"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelRoomType",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a room type",
+        "tags": [
+          "hotel-room-types"
+        ]
+      }
+    },
+    "/api/hotel-seasons": {
+      "get": {
+        "operationId": "listHotelSeasons",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SeasonDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List seasons",
+        "tags": [
+          "hotel-seasons"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelSeason",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSeasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a season",
+        "tags": [
+          "hotel-seasons"
+        ]
+      }
+    },
+    "/api/hotel-seasons/{id}": {
+      "get": {
+        "operationId": "getHotelSeason",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a season",
+        "tags": [
+          "hotel-seasons"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelSeason",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSeasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a season",
+        "tags": [
+          "hotel-seasons"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelSeason",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a season",
+        "tags": [
+          "hotel-seasons"
+        ]
+      }
+    },
+    "/api/hotel-rate-rules": {
+      "get": {
+        "operationId": "listHotelRateRules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RateRuleDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List rate rules",
+        "tags": [
+          "hotel-rate-rules"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelRateRule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRateRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateRuleDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a rate rule",
+        "tags": [
+          "hotel-rate-rules"
+        ]
+      }
+    },
+    "/api/hotel-rate-rules/{id}": {
+      "get": {
+        "operationId": "getHotelRateRule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateRuleDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a rate rule",
+        "tags": [
+          "hotel-rate-rules"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelRateRule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRateRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateRuleDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a rate rule",
+        "tags": [
+          "hotel-rate-rules"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelRateRule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a rate rule",
+        "tags": [
+          "hotel-rate-rules"
+        ]
+      }
     }
   },
   "info": {
@@ -2889,6 +3918,778 @@
           "items",
           "total"
         ]
+      },
+      "CurrencyDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "minorUnit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "code",
+          "minorUnit",
+          "symbol",
+          "name"
+        ]
+      },
+      "CreateCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "minorUnit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "code",
+          "minorUnit",
+          "symbol",
+          "name"
+        ]
+      },
+      "UpdateCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "minorUnit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "FxRateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "quoteCurrency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "ratePpm": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "baseCurrency",
+          "quoteCurrency",
+          "ratePpm",
+          "asOf"
+        ]
+      },
+      "CreateFxRateDto": {
+        "type": "object",
+        "properties": {
+          "baseCurrency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "quoteCurrency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "ratePpm": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "baseCurrency",
+          "quoteCurrency",
+          "ratePpm",
+          "asOf"
+        ]
+      },
+      "UpdateFxRateDto": {
+        "type": "object",
+        "properties": {
+          "baseCurrency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "quoteCurrency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "ratePpm": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        }
+      },
+      "PropertyDto": {
+        "type": "object",
+        "properties": {
+          "propertyCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "listingId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "starRating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "propertyCode",
+          "listingId",
+          "starRating",
+          "address",
+          "displayName",
+          "destination",
+          "countryCode",
+          "heroImageUrl",
+          "isActive",
+          "createdAt"
+        ]
+      },
+      "CreatePropertyDto": {
+        "type": "object",
+        "properties": {
+          "propertyCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "starRating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "isActive": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "propertyCode",
+          "displayName",
+          "destination",
+          "countryCode"
+        ]
+      },
+      "UpdatePropertyDto": {
+        "type": "object",
+        "properties": {
+          "starRating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "isActive": {
+            "default": true,
+            "type": "boolean"
+          }
+        }
+      },
+      "PackageDto": {
+        "type": "object",
+        "properties": {
+          "packageCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "listingId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "durationNights": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "includes": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "packageCode",
+          "listingId",
+          "durationNights",
+          "includes",
+          "displayName",
+          "destination",
+          "countryCode",
+          "heroImageUrl",
+          "isActive",
+          "createdAt"
+        ]
+      },
+      "CreatePackageDto": {
+        "type": "object",
+        "properties": {
+          "packageCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "durationNights": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "includes": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "isActive": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "packageCode",
+          "durationNights",
+          "displayName",
+          "destination",
+          "countryCode"
+        ]
+      },
+      "UpdatePackageDto": {
+        "type": "object",
+        "properties": {
+          "durationNights": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "includes": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "heroImageUrl": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "isActive": {
+            "default": true,
+            "type": "boolean"
+          }
+        }
+      },
+      "RoomTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "propertyCode": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "propertyCode",
+          "name",
+          "maxOccupancy"
+        ]
+      },
+      "CreateRoomTypeDto": {
+        "type": "object",
+        "properties": {
+          "propertyCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "propertyCode",
+          "name",
+          "maxOccupancy"
+        ]
+      },
+      "UpdateRoomTypeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          }
+        }
+      },
+      "SeasonDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "listingId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "peak",
+              "ramadan",
+              "hajj",
+              "promo"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "id",
+          "listingId",
+          "name",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "CreateSeasonDto": {
+        "type": "object",
+        "properties": {
+          "listingId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "peak",
+              "ramadan",
+              "hajj",
+              "promo"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "listingId",
+          "name",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "UpdateSeasonDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "peak",
+              "ramadan",
+              "hajj",
+              "promo"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        }
+      },
+      "RateRuleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "listingId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "seasonId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "roomTypeId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "nullable": true
+          },
+          "minOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        "required": [
+          "id",
+          "listingId",
+          "seasonId",
+          "roomTypeId",
+          "minOccupancy",
+          "maxOccupancy",
+          "amount",
+          "currency"
+        ]
+      },
+      "CreateRateRuleDto": {
+        "type": "object",
+        "properties": {
+          "listingId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "seasonId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "roomTypeId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "minOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          }
+        },
+        "required": [
+          "listingId",
+          "seasonId",
+          "minOccupancy",
+          "maxOccupancy",
+          "amount",
+          "currency"
+        ]
+      },
+      "UpdateRateRuleDto": {
+        "type": "object",
+        "properties": {
+          "seasonId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "roomTypeId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "minOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "maxOccupancy": {
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          }
+        }
       }
     }
   }
