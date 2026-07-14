@@ -21,12 +21,12 @@ const toSeason = (row: SeasonRow): Season => ({ ...row });
 /** Postgres exclusion-constraint violation — see season_no_overlap in drizzle/0004_hotels_season_no_overlap.sql. */
 const EXCLUSION_VIOLATION = '23P01';
 
+/** Drizzle wraps the raw pg error in DrizzleQueryError.cause — the pg error code lives there, not on the top-level error. */
 function isExclusionViolation(error: unknown): boolean {
+  const err = error as { code?: string; cause?: { code?: string } };
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: string }).code === EXCLUSION_VIOLATION
+    err?.code === EXCLUSION_VIOLATION ||
+    err?.cause?.code === EXCLUSION_VIOLATION
   );
 }
 
