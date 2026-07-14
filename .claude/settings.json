@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node scripts/hooks/block-generated.mjs"
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/block-generated.mjs\""
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node scripts/hooks/format-edited.mjs"
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/format-edited.mjs\""
           }
         ]
       }

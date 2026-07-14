@@ -23,7 +23,7 @@ try {
   execFileSync(
     'pnpm',
     ['exec', 'biome', 'check', '--write', '--no-errors-on-unmatched', filePath],
-    { stdio: 'ignore', timeout: 10_000 },
+    { stdio: 'ignore', timeout: 10_000, shell: true },
   );
 } catch {
   // formatting failures must never break the agent's edit loop

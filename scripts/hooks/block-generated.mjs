@@ -23,7 +23,11 @@ try {
   process.exit(0); // malformed payload — do not break the session
 }
 
-const filePath = input.tool_input?.file_path ?? input.tool_input?.path ?? '';
+const filePath = (
+  input.tool_input?.file_path ??
+  input.tool_input?.path ??
+  ''
+).replace(/\\/g, '/');
 
 for (const [pattern, regen] of BLOCKED) {
   if (pattern.test(filePath)) {

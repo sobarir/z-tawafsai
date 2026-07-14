@@ -20,12 +20,11 @@ flowchart LR
 
 ## Quick start
 
-Prerequisites: Node.js ≥ 22.12, pnpm ≥ 10 (`corepack enable`), Docker.
+Prerequisites: Node.js ≥ 22.12, pnpm ≥ 10 (`corepack enable`), Postgres 17 running locally on `:5432`.
 
 ```bash
 pnpm install
 cp .env.example .env            # set BETTER_AUTH_SECRET (openssl rand -base64 32)
-docker compose up -d            # Postgres 17 on :5432
 pnpm db:push                    # apply the Drizzle schema (dev)
 pnpm dev                        # web :3000, api :3001, Swagger at :3001/docs
 ```

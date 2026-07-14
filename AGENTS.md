@@ -36,7 +36,7 @@ Run from the repo root:
 - `pnpm typecheck && pnpm lint && pnpm test` — quality gates
 - `pnpm db:generate | db:migrate | db:push | db:studio` — Drizzle workflows
 - `pnpm check:backbone && pnpm check:instructions && pnpm check:dupes` — governance + DRY gates (also in pre-commit and CI)
-- `docker compose up -d` — local Postgres 17
+Local Postgres 17 runs directly at `localhost:5432` (not via Docker) — connect straight away, don't check for the `docker` CLI or run `docker compose`.
 
 Local env: `cp .env.example .env`, then set `BETTER_AUTH_SECRET`.
 
