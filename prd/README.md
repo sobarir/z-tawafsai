@@ -12,7 +12,8 @@ ask before picking one.
 | Domain | Folder | Status | Start here |
 | --- | --- | --- | --- |
 | Flight schedule & inventory | `prd/flights/` | v1 + v1.1 (pricing/search) complete | `prd/flights/CONTEXT.md` |
-| Hotel search & pricing | `prd/hotels/` | not started | `prd/hotels/CONTEXT.md` |
+| Hotel search & pricing | `prd/hotels/` | search + Catalog Admin complete | `prd/hotels/CONTEXT.md` |
+| Travel Packages (flight+hotel bundles) | `prd/travel-packages/` | complete (docs scaffolded retroactively 2026-07-16) | `prd/travel-packages/CONTEXT.md` |
 
 ## Adding a new domain
 

@@ -5,19 +5,51 @@
 
 ## Current step
 
-**Hotel search's bespoke "umrah/pilgrimage" visual identity (see `31-design.md`,
-now marked superseded) has been removed.** The user noticed Search Flights and
-Search Hotels looked like two different products and asked for one consistent
-design system; decision was to unify hotel search onto the app's default
-semantic tokens and shadcn `Card`/`Badge`/`Button` — the same primitives
-`flight-search` already used correctly — rather than keep two brands. Removed:
-`globals.css`'s `.hotel-search-theme`/`.hs-card`/`.hs-cta`/`.hs-mizan`/
-`.hs-reveal` block, the unused `fontHotelDisplay`/`fontHotelBody` exports in
-`fonts.ts` (these were never actually wired into `layout.tsx`, so the brief's
-serif display font had silently never been loading). All `hotel-search/*`
-components now match `flight-search`'s exact patterns (bare form, `Card`-based
-results/detail, `text-primary` price, `text-muted-foreground` secondary text).
-No business logic, data-fetching, or copy changed — styling only.
+All work below is **committed** (as of `5e0b3a6`, 2026-07-14). Repo working
+tree is clean; nothing from this domain is pending.
+
+**Latest pass (`5e0b3a6`): City reference entity, Travel Packages domain,
+hotel-search UI unification, catalog/reference rename.** Highlights that
+touch this domain specifically:
+- Hotel search's bespoke "umrah/pilgrimage" visual identity (see
+  `31-design.md`, now marked superseded) was removed and replaced with the
+  app's default design system, as described below — this landed in the same
+  commit as the other changes, not a separate pass.
+- **New City reference-data entity** (`apps/api/src/cities/`, admin UI under
+  a "Reference Data" sidebar section) now backs the `destination` field on
+  both Property and Package admin forms — `destination` changed from free
+  text to a `ComboboxFormField` populated by `useListCities()` /
+  `toCityNameOptions()`, so hotel listings' destinations are constrained to
+  known cities rather than arbitrary strings.
+- **`catalog/currencies` and `catalog/fx-rates` routes renamed to
+  `reference/currencies` and `reference/fx-rates`**, joining the new
+  `reference/cities` screen. **`catalog/properties`, `catalog/packages`,
+  `catalog/room-types`, `catalog/seasons`, `catalog/rate-rules` were *not*
+  renamed** — they remain under `(protected)/@admin/catalog/*`. The "Catalog
+  Admin" section in the sidebar and this doc now spans both `catalog/*` (the
+  5 listing-scoped entities) and `reference/*` (currency, fx-rate, city —
+  cross-domain reference data reused by flights too).
+- The shared `Combobox` primitive was rebuilt on real shadcn `Command`
+  (fixing a pointer-events-inherited-from-Dialog bug — see
+  `[[feedback_use_shadcn_components]]`), which the new city comboboxes on
+  the Property/Package forms depend on.
+- A `/code-review` pass across the hotel catalog and search flows found and
+  fixed additional issues on top of the ones logged below (see `git show
+  5e0b3a6` for the full diff if a specific fix needs to be traced).
+
+**Hotel-search UI unification** (part of the same commit): the user noticed
+Search Flights and Search Hotels looked like two different products and
+asked for one consistent design system; decision was to unify hotel search
+onto the app's default semantic tokens and shadcn `Card`/`Badge`/`Button` —
+the same primitives `flight-search` already used correctly — rather than
+keep two brands. Removed: `globals.css`'s `.hotel-search-theme`/`.hs-card`/
+`.hs-cta`/`.hs-mizan`/`.hs-reveal` block, the unused `fontHotelDisplay`/
+`fontHotelBody` exports in `fonts.ts` (these were never actually wired into
+`layout.tsx`, so the brief's serif display font had silently never been
+loading). All `hotel-search/*` components now match `flight-search`'s exact
+patterns (bare form, `Card`-based results/detail, `text-primary` price,
+`text-muted-foreground` secondary text). No business logic or data-fetching
+changed — styling only.
 
 **Search (Steps 3–8 backend, F1–F5 frontend) is done, browser-verified, and
 committed.** A second build pass then added **full admin CRUD for the
@@ -27,11 +59,11 @@ hotel feature is just for searching... I need to also be able to manage all
 the data for hotel feature." This mirrors flights' Schedule Admin exactly:
 `apps/api/src/hotel-{currencies,fx-rates,properties,packages,room-types,
 seasons,rate-rules}/` (controller/service/dto/module each), 7 matching
-`apps/web/src/features/hotel-*` admin screens under a new "Catalog Admin"
-sidebar section (`(protected)/@admin/catalog/*`, admin-only — no `@user`
-counterpart, matching `schedule/*` precedent), full `catalog` i18n namespace
-across all 6 locales. `EntityDataTable`/`useCrudFeedback` were generalized
-with a `namespace: 'schedule' | 'catalog'` parameter to serve both sections.
+`apps/web/src/features/hotel-*` admin screens under a "Catalog Admin"
+sidebar section (admin-only — no `@user` counterpart, matching `schedule/*`
+precedent; routes now split across `catalog/*` and `reference/*` per
+above), full i18n across all 6 locales. `EntityDataTable`/`useCrudFeedback`
+were generalized with a `namespace` parameter to serve both sections.
 
 **Found and fixed a real, pre-existing, app-wide bug during this pass**: 
 `apps/api/src/main.ts`'s `app.enableCors()` never set `methods`, and
@@ -62,9 +94,8 @@ Duplication dropped to 1.97%, under gate.
 
 All repo-root quality gates are green again (`typecheck`, `lint`, `test`
 94+127, `check:dupes` 1.97%, `check:backbone`, `check:instructions`). This
-Catalog Admin work is **not yet committed** — next session (or later in this
-one) should review the diff and commit, per the repo's "only commit when
-asked" rule.
+Catalog Admin work, and the later City/Travel-Packages/rename/UI-unification
+pass, are all **committed** — see "Current step" above for the latest state.
 
 ---
 
@@ -162,17 +193,20 @@ extraction yet), `pnpm check:backbone` (90 paths verified).
 | # | Entity              | Table                 | Key            | Admin CRUD                            | Notes |
 |---|---------------------|-----------------------|----------------|----------------------------------------|-------|
 | 1 | Listing             | `listing`             | ULID           | via Property/Package (1:1, no own screen) | Spine. `kind` ∈ {property, package}. Search operates here. |
-| 2 | Property            | `property`            | property code  | `catalog/properties` | 1:1 with a `kind=property` listing. |
-| 3 | Package             | `package`             | package code   | `catalog/packages` | 1:1 with a `kind=package` listing. |
+| 2 | Property            | `property`            | property code  | `catalog/properties` | 1:1 with a `kind=property` listing. `destination` is a city-name combobox backed by the City entity. |
+| 3 | Package             | `package`             | package code   | `catalog/packages` | 1:1 with a `kind=package` listing. `destination` is a city-name combobox backed by the City entity. |
 | 4 | Room Type           | `room_type`           | ULID           | `catalog/room-types` | Child of property. Occupancy capacity lives here. |
 | 5 | Season              | `season`              | ULID           | `catalog/seasons` | Named date window scoped to a listing. |
 | 6 | Rate Rule           | `rate_rule`           | ULID           | `catalog/rate-rules` | (listing, season, occupancy band) → price in a currency. |
-| 7 | Currency            | `currency`            | ISO-4217 code  | `catalog/currencies` | Reference table. |
-| 8 | FX Rate             | `fx_rate`             | ULID           | `catalog/fx-rates` | (base, quote) → rate. For display conversion only. |
+| 7 | Currency            | `currency`            | ISO-4217 code  | `reference/currencies` | Reference table, shared with flights. Renamed from `catalog/currencies` in `5e0b3a6`. |
+| 8 | FX Rate             | `fx_rate`             | ULID           | `reference/fx-rates` | (base, quote) → rate. For display conversion only. Renamed from `catalog/fx-rates` in `5e0b3a6`. |
 
 All 7 manageable entities (Listing has no standalone screen — it's created/edited as part of
-Property or Package) have full create/edit/delete admin screens under
-`(protected)/@admin/catalog/*`, added in the Catalog Admin build pass above.
+Property or Package) have full create/edit/delete admin screens, added in the Catalog Admin
+build pass above and split across `(protected)/@admin/catalog/*` (the 5 listing-scoped entities)
+and `(protected)/@admin/reference/*` (currency, fx-rate — reference data shared with other
+domains) as of `5e0b3a6`. The City entity (not part of this domain's original 8, but now a
+dependency of Property/Package forms) lives at `reference/cities`; see `apps/api/src/cities/`.
 
 ## Confirmed decisions
 
@@ -232,6 +266,11 @@ Property or Package) have full create/edit/delete admin screens under
 
 All backend steps (3–8) and frontend steps (F1–F5) per `20-steps.md` /
 `32-frontend-steps.md` are complete and committed. The Catalog Admin build
-pass (full CRUD for all 7 manageable entities) is also complete and
-quality-gated, but **not yet committed** — next step is to review that diff
-and commit it, then decide whether to open a PR.
+pass (full CRUD for all 7 manageable entities) is also complete,
+quality-gated, and committed, along with the later City-entity/reference-
+rename/UI-unification pass — nothing from this domain is currently
+uncommitted. Note: **this domain has no `prd/` folder entry of its own for
+the City or Travel Packages work** — City reference data and the Travel
+Packages domain landed in the same commit as hotels UI unification but
+belong to their own (currently undocumented) domains; `prd/README.md` and
+`backbone.yml`'s `prd.domains` map still only list `flights` and `hotels`.

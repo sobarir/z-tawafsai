@@ -36,7 +36,8 @@ prd:
   index: prd/README.md               # domain list + how to add a new one
   domains:
     flights: prd/flights/            # flight schedule & inventory — v1 + v1.1 (pricing/search) complete
-    hotels: prd/hotels/              # hotel & package search — not started
+    hotels: prd/hotels/              # hotel & package search — search + Catalog Admin complete
+    travel-packages: prd/travel-packages/  # flight+hotel bundle admin CRUD + public listing — complete
 
 structure:
   apps:
