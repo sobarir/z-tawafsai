@@ -1,28 +1,20 @@
 'use client';
 
-import type {
-  Package,
-  Property,
-  RateRule,
-  RoomType,
-  Season,
-} from '@repo/shared';
+import type { Property, RateRule, RoomType, Season } from '@repo/shared';
 import type { ColumnDef } from '@tanstack/react-table';
 import { actionsColumn } from '@/components/shared/actions-column';
 
 interface RateRuleColumnsOptions {
   columnLabels: {
-    listing: string;
+    property: string;
     season: string;
     roomType: string;
     band: string;
     amount: string;
   };
   properties: Property[];
-  packages: Package[];
   seasons: Season[];
   roomTypes: RoomType[];
-  noneLabel: string;
   actionsLabel: string;
   openMenuLabel: string;
   editLabel: string;
@@ -34,10 +26,8 @@ interface RateRuleColumnsOptions {
 export function getRateRuleColumns({
   columnLabels,
   properties,
-  packages,
   seasons,
   roomTypes,
-  noneLabel,
   actionsLabel,
   openMenuLabel,
   editLabel,
@@ -45,24 +35,19 @@ export function getRateRuleColumns({
   onEdit,
   onDelete,
 }: RateRuleColumnsOptions): ColumnDef<RateRule>[] {
-  const listingName = (listingId: string): string => {
-    const property = properties.find((p) => p.listingId === listingId);
-    if (property) return property.displayName;
-    const pkg = packages.find((p) => p.listingId === listingId);
-    return pkg?.displayName ?? listingId;
-  };
+  const propertyName = (propertyCode: string): string =>
+    properties.find((p) => p.propertyCode === propertyCode)?.displayName ??
+    propertyCode;
   const seasonName = (seasonId: string): string =>
     seasons.find((s) => s.id === seasonId)?.name ?? seasonId;
-  const roomTypeName = (roomTypeId: string | null): string => {
-    if (!roomTypeId) return noneLabel;
-    return roomTypes.find((r) => r.id === roomTypeId)?.name ?? roomTypeId;
-  };
+  const roomTypeName = (roomTypeId: string): string =>
+    roomTypes.find((r) => r.id === roomTypeId)?.name ?? roomTypeId;
 
   return [
     {
-      id: 'listing',
-      header: columnLabels.listing,
-      cell: ({ row }) => listingName(row.original.listingId),
+      id: 'property',
+      header: columnLabels.property,
+      cell: ({ row }) => propertyName(row.original.propertyCode),
     },
     {
       id: 'season',

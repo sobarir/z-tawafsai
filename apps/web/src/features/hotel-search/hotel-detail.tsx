@@ -19,16 +19,16 @@ export interface HotelDetailQuery {
 }
 
 interface HotelDetailProps {
-  listingId: string;
+  propertyCode: string;
   query: HotelDetailQuery;
 }
 
-export function HotelDetail({ listingId, query }: HotelDetailProps) {
+export function HotelDetail({ propertyCode, query }: HotelDetailProps) {
   const t = useTranslations('hotelSearch');
   const handleError = useApiErrorToast();
 
   const { data, error, isFetching, isFetched } = useSearchHotels(
-    { ...query, kind: 'both', limit: 100 },
+    { ...query, limit: 100 },
     {
       query: {
         enabled: !!query.destination && !!query.checkIn && !!query.checkOut,
@@ -40,7 +40,7 @@ export function HotelDetail({ listingId, query }: HotelDetailProps) {
     if (error) handleError(error);
   }, [error, handleError]);
 
-  const item = data?.items.find((row) => row.listingId === listingId);
+  const item = data?.items.find((row) => row.propertyCode === propertyCode);
 
   if (isFetching) {
     return <p className="text-sm text-muted-foreground">{t('loading')}</p>;
@@ -66,13 +66,8 @@ export function HotelDetail({ listingId, query }: HotelDetailProps) {
         <CardContent className="flex flex-col gap-2">
           <p className="text-2xl font-semibold">{item.displayName}</p>
           <p className="text-sm text-muted-foreground">{item.destination}</p>
-          {item.kind === 'property' && item.starRating ? (
+          {item.starRating ? (
             <Badge variant="outline">{'★'.repeat(item.starRating)}</Badge>
-          ) : null}
-          {item.kind === 'package' && item.durationNights ? (
-            <Badge variant="secondary">
-              {t('durationNights', { count: item.durationNights })}
-            </Badge>
           ) : null}
         </CardContent>
       </Card>

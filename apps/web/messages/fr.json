@@ -416,17 +416,13 @@
     "bagThroughChecked": "Bagages enregistrés jusqu'à destination"
   },
   "hotelSearch": {
-    "title": "Rechercher hébergements et forfaits",
-    "description": "Trouvez un hébergement ou un forfait par destination et dates, avec le prix dans votre devise.",
+    "title": "Rechercher des hébergements",
+    "description": "Trouvez un hébergement par destination et dates, avec le prix dans votre devise.",
     "destination": "Destination",
     "destinationPlaceholder": "Jeddah, Médine...",
     "checkIn": "Arrivée",
     "checkOut": "Départ",
     "occupancy": "Voyageurs",
-    "kind": "Afficher",
-    "kindBoth": "Les deux",
-    "kindProperty": "Hébergements",
-    "kindPackage": "Forfaits",
     "currency": "Devise",
     "searchButton": "Rechercher",
     "sort": "Trier par",
@@ -436,7 +432,7 @@
     "minPrice": "Prix minimum",
     "maxPrice": "Prix maximum",
     "loading": "Recherche en cours...",
-    "noResults": "Aucun hébergement ou forfait ne correspond à ces dates. Essayez d'élargir vos dates ou de changer ce que vous recherchez.",
+    "noResults": "Aucun hébergement ne correspond à ces dates. Essayez d'élargir vos dates.",
     "resultsCount": "{count, plural, one {# résultat trouvé} other {# résultats trouvés}}",
     "converted": "converti",
     "durationNights": "{count, plural, one {# nuit} other {# nuits}}",
@@ -451,7 +447,6 @@
     "nav": {
       "section": "Administration du catalogue",
       "properties": "Hébergements",
-      "packages": "Forfaits",
       "roomTypes": "Types de chambre",
       "seasons": "Saisons",
       "rateRules": "Règles tarifaires"
@@ -476,6 +471,7 @@
       "columns": {
         "propertyCode": "Code",
         "displayName": "Nom",
+        "type": "Type",
         "destination": "Destination",
         "countryCode": "Pays",
         "starRating": "Étoiles",
@@ -486,6 +482,7 @@
         "propertyCodePlaceholder": "ex. JED-WFH",
         "displayName": "Nom affiché",
         "displayNamePlaceholder": "ex. Jeddah Waterfront Hotel",
+        "type": "Type",
         "destination": "Destination",
         "destinationHint": "Vous ne le voyez pas ? Ajoutez-le d'abord dans Données de référence → Villes.",
         "countryCode": "Code pays",
@@ -496,36 +493,11 @@
         "address": "Adresse",
         "addressPlaceholder": "Adresse postale",
         "isActive": "Actif (visible dans la recherche)"
-      }
-    },
-    "packages": {
-      "title": "Forfaits",
-      "description": "Produits combinés à périmètre fixe, facturés en un total par départ.",
-      "createTitle": "Nouveau forfait",
-      "editTitle": "Modifier le forfait",
-      "columns": {
-        "packageCode": "Code",
-        "displayName": "Nom",
-        "destination": "Destination",
-        "countryCode": "Pays",
-        "durationNights": "Nuits",
-        "isActive": "Actif"
       },
-      "fields": {
-        "packageCode": "Code du forfait",
-        "packageCodePlaceholder": "ex. UMR-9D-ECO",
-        "displayName": "Nom affiché",
-        "displayNamePlaceholder": "ex. Omra Économique 9 jours",
-        "destination": "Destination",
-        "destinationHint": "Vous ne le voyez pas ? Ajoutez-le d'abord dans Données de référence → Villes.",
-        "countryCode": "Code pays",
-        "countryCodePlaceholder": "ex. SA",
-        "heroImageUrl": "URL de l'image principale",
-        "heroImageUrlPlaceholder": "https://...",
-        "durationNights": "Durée (nuits)",
-        "includes": "Inclus",
-        "includesPlaceholder": "Résumé libre de ce qui est inclus",
-        "isActive": "Actif (visible dans la recherche)"
+      "types": {
+        "hotel": "Hôtel",
+        "apartment": "Appartement",
+        "house": "Maison"
       }
     },
     "roomTypes": {
@@ -547,17 +519,17 @@
     },
     "seasons": {
       "title": "Saisons",
-      "description": "Périodes de dates rattachées à un hébergement ou forfait, qui déterminent le tarif applicable.",
+      "description": "Périodes de dates rattachées à un hébergement, qui déterminent le tarif applicable.",
       "createTitle": "Nouvelle saison",
       "editTitle": "Modifier la saison",
       "columns": {
-        "listing": "Hébergement / forfait",
+        "property": "Hébergement",
         "name": "Saison",
         "startDate": "Date de début",
         "endDate": "Date de fin"
       },
       "fields": {
-        "listingId": "Hébergement / forfait",
+        "propertyCode": "Hébergement",
         "name": "Saison",
         "startDate": "Date de début",
         "endDate": "Date de fin"
@@ -572,21 +544,20 @@
     },
     "rateRules": {
       "title": "Règles tarifaires",
-      "description": "La donnée de prix atomique : (hébergement/forfait, saison, tranche d'occupation) -> prix dans une devise.",
+      "description": "La donnée de prix atomique : (hébergement, saison, tranche d'occupation) -> prix dans une devise.",
       "createTitle": "Nouvelle règle tarifaire",
       "editTitle": "Modifier la règle tarifaire",
       "columns": {
-        "listing": "Hébergement / forfait",
+        "property": "Hébergement",
         "season": "Saison",
         "roomType": "Type de chambre",
         "band": "Tranche d'occupation",
         "amount": "Montant"
       },
       "fields": {
-        "listingId": "Hébergement / forfait",
+        "propertyCode": "Hébergement",
         "seasonId": "Saison",
         "roomTypeId": "Type de chambre",
-        "noRoomType": "— Aucun (forfait) —",
         "minOccupancy": "Occupation minimale",
         "maxOccupancy": "Occupation maximale",
         "amount": "Montant (unité mineure)",
@@ -615,7 +586,7 @@
     "deleteSuccess": "Supprimé avec succès.",
     "cities": {
       "title": "Villes",
-      "description": "Villes de référence utilisées pour les aéroports et les hébergements/forfaits hôteliers.",
+      "description": "Villes de référence utilisées pour les aéroports et les hébergements hôteliers.",
       "createTitle": "Nouvelle ville",
       "editTitle": "Modifier la ville",
       "columns": {
@@ -634,7 +605,7 @@
     },
     "currencies": {
       "title": "Devises",
-      "description": "Devises de référence utilisées pour les prix des hébergements et forfaits.",
+      "description": "Devises de référence utilisées pour les prix des hébergements.",
       "createTitle": "Nouvelle devise",
       "editTitle": "Modifier la devise",
       "columns": {

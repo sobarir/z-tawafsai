@@ -18,7 +18,6 @@ import {
   MapPin,
   MapPinned,
   Menu,
-  Package as PackageIcon,
   PlaneTakeoff,
   Tags,
   Ticket,
@@ -488,7 +487,6 @@ function buildScheduleAdminNavItems(labels: ScheduleNavLabels): NavItem[] {
 
 const CATALOG_NAV_ICONS = {
   properties: Hotel,
-  packages: PackageIcon,
   roomTypes: BedDouble,
   seasons: CalendarRange,
   rateRules: Tags,
@@ -496,7 +494,6 @@ const CATALOG_NAV_ICONS = {
 
 interface CatalogNavLabels {
   properties: string;
-  packages: string;
   roomTypes: string;
   seasons: string;
   rateRules: string;
@@ -509,12 +506,6 @@ function buildCatalogAdminNavItems(labels: CatalogNavLabels): NavItem[] {
       label: labels.properties,
       href: '/catalog/properties',
       icon: CATALOG_NAV_ICONS.properties,
-    },
-    {
-      id: 'catalog-packages',
-      label: labels.packages,
-      href: '/catalog/packages',
-      icon: CATALOG_NAV_ICONS.packages,
     },
     {
       id: 'catalog-room-types',
@@ -638,7 +629,6 @@ export function Sidebar() {
       canManageSchedule
         ? buildCatalogAdminNavItems({
             properties: t('catalog.nav.properties'),
-            packages: t('catalog.nav.packages'),
             roomTypes: t('catalog.nav.roomTypes'),
             seasons: t('catalog.nav.seasons'),
             rateRules: t('catalog.nav.rateRules'),

@@ -29,32 +29,29 @@ export type SeasonRow = {
 
 export type RateRuleRow = {
   seasonId: string;
-  /** NULL for packages, a specific room type for properties. */
-  roomTypeId: string | null;
+  roomTypeId: string;
   minOccupancy: number;
   maxOccupancy: number;
-  /** Minor units. Per-night for properties, total for packages. */
+  /** Minor units, always per-night. */
   amount: number;
   currency: string;
 };
 
-export type PropertyBreakdown = {
+export type PriceBreakdown = {
   perNight: Money;
   nights: number;
   total: Money;
 };
-export type PackageBreakdown = { total: Money };
 
 export type ResolveInput = {
-  listing: { kind: 'property' | 'package'; isActive: boolean };
+  listing: { isActive: boolean };
   seasons: SeasonRow[];
   rateRules: RateRuleRow[];
   checkIn: string;
   checkOut: string;
   occupancy: number;
   displayCurrency: string;
-  /** Required for property listings (a specific room type); ignored for packages. */
-  roomTypeId?: string | null;
+  roomTypeId: string;
   fxRates: FxRateRow[];
   currencies: CurrencyInfo[];
 };
@@ -65,28 +62,23 @@ export type ResolveResult =
       outcome: 'OK';
       native: Money;
       converted: Money;
-      breakdown: PropertyBreakdown | PackageBreakdown;
+      breakdown: PriceBreakdown;
     };
 
 function matchSeason(input: ResolveInput): SeasonRow | undefined {
-  const { listing, seasons, checkIn, checkOut } = input;
-  if (listing.kind === 'property') {
-    // The whole stay must fall within a single season window.
-    return seasons.find((s) => checkIn >= s.startDate && checkOut <= s.endDate);
-  }
-  // Package: the departure date (checkIn) must fall within the season window.
-  return seasons.find((s) => checkIn >= s.startDate && checkIn < s.endDate);
+  const { seasons, checkIn, checkOut } = input;
+  // The whole stay must fall within a single season window.
+  return seasons.find((s) => checkIn >= s.startDate && checkOut <= s.endDate);
 }
 
 function matchBand(
   input: ResolveInput,
   seasonId: string,
 ): RateRuleRow | undefined {
-  const targetRoomTypeId = input.roomTypeId ?? null;
   return input.rateRules.find(
     (r) =>
       r.seasonId === seasonId &&
-      r.roomTypeId === targetRoomTypeId &&
+      r.roomTypeId === input.roomTypeId &&
       input.occupancy >= r.minOccupancy &&
       input.occupancy <= r.maxOccupancy,
   );
@@ -107,20 +99,13 @@ export function resolvePrice(input: ResolveInput): ResolveResult {
     return { outcome: 'NO_BAND' };
   }
 
-  let nativeAmount: number;
-  let breakdown: PropertyBreakdown | PackageBreakdown;
-  if (input.listing.kind === 'property') {
-    const n = nights(input.checkIn, input.checkOut);
-    nativeAmount = band.amount * n;
-    breakdown = {
-      perNight: { amount: band.amount, currency: band.currency },
-      nights: n,
-      total: { amount: nativeAmount, currency: band.currency },
-    };
-  } else {
-    nativeAmount = band.amount;
-    breakdown = { total: { amount: nativeAmount, currency: band.currency } };
-  }
+  const n = nights(input.checkIn, input.checkOut);
+  const nativeAmount = band.amount * n;
+  const breakdown: PriceBreakdown = {
+    perNight: { amount: band.amount, currency: band.currency },
+    nights: n,
+    total: { amount: nativeAmount, currency: band.currency },
+  };
 
   const native: Money = { amount: nativeAmount, currency: band.currency };
 

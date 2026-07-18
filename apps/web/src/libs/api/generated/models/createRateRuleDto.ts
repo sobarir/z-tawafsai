@@ -7,12 +7,15 @@
  */
 
 export interface CreateRateRuleDto {
-  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  listingId: string;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  propertyCode: string;
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   seasonId: string;
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  roomTypeId?: string;
+  roomTypeId: string;
   /**
    * @minimum 0
    * @maximum 9007199254740991

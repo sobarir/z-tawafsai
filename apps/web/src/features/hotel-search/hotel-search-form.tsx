@@ -12,9 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-
-export type HotelSearchKind = 'property' | 'package' | 'both';
 
 export interface HotelSearchFormValues {
   destination: string;
@@ -22,7 +19,6 @@ export interface HotelSearchFormValues {
   checkOut: string;
   occupancy: number;
   currency: string;
-  kind: HotelSearchKind;
 }
 
 const CURRENCIES = ['USD', 'SAR', 'IDR'];
@@ -103,27 +99,6 @@ export function HotelSearchForm({
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <Label id="hotel-search-kind-label">{t('kind')}</Label>
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            value={local.kind}
-            onValueChange={(next) =>
-              next && set('kind', next as HotelSearchKind)
-            }
-            aria-labelledby="hotel-search-kind-label"
-          >
-            <ToggleGroupItem value="both">{t('kindBoth')}</ToggleGroupItem>
-            <ToggleGroupItem value="property">
-              {t('kindProperty')}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="package">
-              {t('kindPackage')}
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-
         <div className="flex flex-col gap-2">
           <Label htmlFor="hotel-search-currency">{t('currency')}</Label>
           <Select

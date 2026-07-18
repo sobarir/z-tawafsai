@@ -9,15 +9,11 @@
 export interface RateRuleDto {
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   id: string;
-  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  listingId: string;
+  propertyCode: string;
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   seasonId: string;
-  /**
-   * @nullable
-   * @pattern ^[0-9A-HJKMNP-TV-Z]{26}$
-   */
-  roomTypeId: string | null;
+  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
+  roomTypeId: string;
   /**
    * @minimum 0
    * @maximum 9007199254740991

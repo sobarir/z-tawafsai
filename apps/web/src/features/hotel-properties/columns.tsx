@@ -8,11 +8,13 @@ interface PropertyColumnsOptions {
   columnLabels: {
     propertyCode: string;
     displayName: string;
+    type: string;
     destination: string;
     countryCode: string;
     starRating: string;
     isActive: string;
   };
+  typeLabels: Record<Property['type'], string>;
   activeLabel: string;
   inactiveLabel: string;
   actionsLabel: string;
@@ -25,6 +27,7 @@ interface PropertyColumnsOptions {
 
 export function getPropertyColumns({
   columnLabels,
+  typeLabels,
   activeLabel,
   inactiveLabel,
   actionsLabel,
@@ -37,6 +40,11 @@ export function getPropertyColumns({
   return [
     { accessorKey: 'propertyCode', header: columnLabels.propertyCode },
     { accessorKey: 'displayName', header: columnLabels.displayName },
+    {
+      id: 'type',
+      header: columnLabels.type,
+      cell: ({ row }) => typeLabels[row.original.type],
+    },
     { accessorKey: 'destination', header: columnLabels.destination },
     { accessorKey: 'countryCode', header: columnLabels.countryCode },
     {

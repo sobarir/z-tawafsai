@@ -1,6 +1,7 @@
 'use client';
 
 import type { Property } from '@repo/shared';
+import { propertyTypeSchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { EntityDataTable } from '@/components/shared/entity-data-table';
@@ -25,6 +26,7 @@ import { PropertyForm } from './property-form';
 
 export function HotelPropertiesAdmin() {
   const t = useTranslations('catalog.properties');
+  const tPropertyType = useTranslations('catalog.properties.types');
   const tCatalog = useTranslations('catalog');
   const tCommon = useTranslations('common');
 
@@ -64,11 +66,15 @@ export function HotelPropertiesAdmin() {
         columnLabels: {
           propertyCode: t('columns.propertyCode'),
           displayName: t('columns.displayName'),
+          type: t('columns.type'),
           destination: t('columns.destination'),
           countryCode: t('columns.countryCode'),
           starRating: t('columns.starRating'),
           isActive: t('columns.isActive'),
         },
+        typeLabels: Object.fromEntries(
+          propertyTypeSchema.options.map((type) => [type, tPropertyType(type)]),
+        ) as Record<Property['type'], string>,
         activeLabel: tCommon('yes'),
         inactiveLabel: tCommon('no'),
         actionsLabel: tCatalog('actions'),
@@ -81,7 +87,7 @@ export function HotelPropertiesAdmin() {
         },
         onDelete: (property) => setDeleting(property),
       }),
-    [t, tCatalog, tCommon],
+    [t, tPropertyType, tCatalog, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -122,6 +128,7 @@ export function HotelPropertiesAdmin() {
               await updateMutation.mutateAsync({
                 propertyCode: editing.propertyCode,
                 data: {
+                  type: values.type,
                   displayName: values.displayName,
                   destination: values.destination,
                   countryCode: values.countryCode,

@@ -9,9 +9,9 @@ import type {
 import { and, eq, ilike } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 import type { CurrencyInfo, FxRateRow } from './money';
-import { type RateRuleRow, resolvePrice, type SeasonRow } from './resolver';
+import { resolvePrice } from './resolver';
 
-type ListingRow = typeof schema.listing.$inferSelect;
+type PropertyRow = typeof schema.property.$inferSelect;
 type RoomTypeRow = typeof schema.roomType.$inferSelect;
 
 @Injectable()
@@ -34,25 +34,24 @@ export class HotelsService {
       })
       .from(schema.fxRate);
 
-    const listings = await this.db
+    const properties = await this.db
       .select()
-      .from(schema.listing)
+      .from(schema.property)
       .where(
         and(
-          eq(schema.listing.isActive, true),
-          ilike(schema.listing.destination, `%${query.destination}%`),
-          query.kind === 'both'
-            ? undefined
-            : eq(schema.listing.kind, query.kind),
+          eq(schema.property.isActive, true),
+          ilike(schema.property.destination, `%${query.destination}%`),
         ),
       );
 
     const results: HotelSearchResult[] = [];
-    for (const listing of listings) {
-      const result =
-        listing.kind === 'property'
-          ? await this.resolveProperty(listing, query, currencies, fxRates)
-          : await this.resolvePackage(listing, query, currencies, fxRates);
+    for (const property of properties) {
+      const result = await this.resolveProperty(
+        property,
+        query,
+        currencies,
+        fxRates,
+      );
       if (result) {
         results.push(result);
       }
@@ -77,9 +76,18 @@ export class HotelsService {
     };
   }
 
-  private async loadSeasonsAndRates(
-    listingId: string,
-  ): Promise<{ seasons: SeasonRow[]; rateRules: RateRuleRow[] }> {
+  private async resolveProperty(
+    property: PropertyRow,
+    query: HotelSearchQuery,
+    currencies: CurrencyInfo[],
+    fxRates: FxRateRow[],
+  ): Promise<HotelSearchResult | undefined> {
+    const roomTypes = await this.db
+      .select()
+      .from(schema.roomType)
+      .where(eq(schema.roomType.propertyCode, property.propertyCode));
+    if (roomTypes.length === 0) return undefined;
+
     const seasons = await this.db
       .select({
         id: schema.season.id,
@@ -87,7 +95,7 @@ export class HotelsService {
         endDate: schema.season.endDate,
       })
       .from(schema.season)
-      .where(eq(schema.season.listingId, listingId));
+      .where(eq(schema.season.propertyCode, property.propertyCode));
 
     const rateRules = await this.db
       .select({
@@ -99,30 +107,7 @@ export class HotelsService {
         currency: schema.rateRule.currency,
       })
       .from(schema.rateRule)
-      .where(eq(schema.rateRule.listingId, listingId));
-
-    return { seasons, rateRules };
-  }
-
-  private async resolveProperty(
-    listing: ListingRow,
-    query: HotelSearchQuery,
-    currencies: CurrencyInfo[],
-    fxRates: FxRateRow[],
-  ): Promise<HotelSearchResult | undefined> {
-    const [propertyRow] = await this.db
-      .select()
-      .from(schema.property)
-      .where(eq(schema.property.listingId, listing.id));
-    if (!propertyRow) return undefined;
-
-    const roomTypes = await this.db
-      .select()
-      .from(schema.roomType)
-      .where(eq(schema.roomType.propertyCode, propertyRow.propertyCode));
-    if (roomTypes.length === 0) return undefined;
-
-    const { seasons, rateRules } = await this.loadSeasonsAndRates(listing.id);
+      .where(eq(schema.rateRule.propertyCode, property.propertyCode));
 
     // Room type selection: the hint if given and it matches one of this
     // property's room types, else try every room type and keep the
@@ -142,7 +127,7 @@ export class HotelsService {
       | undefined;
     for (const roomType of candidates) {
       const outcome = resolvePrice({
-        listing: { kind: 'property', isActive: listing.isActive },
+        listing: { isActive: property.isActive },
         seasons,
         rateRules,
         checkIn: query.checkIn,
@@ -166,55 +151,14 @@ export class HotelsService {
     if (!best) return undefined;
 
     return {
-      listingId: listing.id,
-      kind: 'property',
-      displayName: listing.displayName,
-      destination: listing.destination,
-      heroImageUrl: listing.heroImageUrl,
+      propertyCode: property.propertyCode,
+      displayName: property.displayName,
+      destination: property.destination,
+      heroImageUrl: property.heroImageUrl,
       price: best.converted,
       nativePrice: best.native,
       breakdown: best.breakdown,
-      starRating: propertyRow.starRating,
-    };
-  }
-
-  private async resolvePackage(
-    listing: ListingRow,
-    query: HotelSearchQuery,
-    currencies: CurrencyInfo[],
-    fxRates: FxRateRow[],
-  ): Promise<HotelSearchResult | undefined> {
-    const [packageRow] = await this.db
-      .select()
-      .from(schema.travelPackage)
-      .where(eq(schema.travelPackage.listingId, listing.id));
-    if (!packageRow) return undefined;
-
-    const { seasons, rateRules } = await this.loadSeasonsAndRates(listing.id);
-
-    const outcome = resolvePrice({
-      listing: { kind: 'package', isActive: listing.isActive },
-      seasons,
-      rateRules,
-      checkIn: query.checkIn,
-      checkOut: query.checkOut,
-      occupancy: query.occupancy,
-      displayCurrency: query.currency,
-      fxRates,
-      currencies,
-    });
-    if (outcome.outcome !== 'OK') return undefined;
-
-    return {
-      listingId: listing.id,
-      kind: 'package',
-      displayName: listing.displayName,
-      destination: listing.destination,
-      heroImageUrl: listing.heroImageUrl,
-      price: outcome.converted,
-      nativePrice: outcome.native,
-      breakdown: outcome.breakdown,
-      durationNights: packageRow.durationNights,
+      starRating: property.starRating,
     };
   }
 }

@@ -5,7 +5,6 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
-import type { SearchHotelsKind } from './searchHotelsKind';
 import type { SearchHotelsSort } from './searchHotelsSort';
 
 export type SearchHotelsParams = {
@@ -30,7 +29,6 @@ occupancy: number;
  * @pattern ^[A-Z]{3}$
  */
 currency: string;
-kind?: typeof SearchHotelsKind[keyof typeof SearchHotelsKind] ;
 roomType?: string;
 /**
  * @minimum 0

@@ -461,7 +461,7 @@ export const meResponseSchema = z.object({
 export type MeResponse = z.infer<typeof meResponseSchema>;
 
 /**
- * Hotel & package search domain — see /prd/hotels/11-data-model.md and
+ * Hotel search domain — see /prd/hotels/11-data-model.md and
  * /prd/hotels/13-resolver-and-search.md. Money is always integer minor units
  * + an ISO currency code — never a bare number, never a float.
  */
@@ -471,17 +471,12 @@ export const moneySchema = z.object({
 });
 export type Money = z.infer<typeof moneySchema>;
 
-export const listingKindSchema = z.enum(['property', 'package']);
-export type ListingKind = z.infer<typeof listingKindSchema>;
+export const propertyTypeSchema = z.enum(['hotel', 'apartment', 'house']);
+export type PropertyType = z.infer<typeof propertyTypeSchema>;
 
-/**
- * Mirrors the resolver's outcome for a single listing: `perNight`/`nights`
- * are present for properties, absent for packages — `total` is always
- * present. See /prd/hotels/01-glossary.md's "5 golden rules" #5.
- */
 export const hotelPriceBreakdownSchema = z.object({
-  perNight: moneySchema.optional(),
-  nights: z.number().int().positive().optional(),
+  perNight: moneySchema,
+  nights: z.number().int().positive(),
   total: moneySchema,
 });
 export type HotelPriceBreakdown = z.infer<typeof hotelPriceBreakdownSchema>;
@@ -492,7 +487,6 @@ export const hotelSearchQuerySchema = z.object({
   checkOut: z.iso.date(),
   occupancy: z.coerce.number().int().min(1),
   currency: currencyCodeSchema,
-  kind: listingKindSchema.or(z.literal('both')).optional().default('property'),
   roomType: z.string().optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
@@ -506,8 +500,7 @@ export const hotelSearchQuerySchema = z.object({
 export type HotelSearchQuery = z.infer<typeof hotelSearchQuerySchema>;
 
 export const hotelSearchResultSchema = z.object({
-  listingId: ulidSchema,
-  kind: listingKindSchema,
+  propertyCode: z.string(),
   displayName: z.string(),
   destination: z.string(),
   heroImageUrl: z.string().nullable(),
@@ -515,7 +508,6 @@ export const hotelSearchResultSchema = z.object({
   nativePrice: moneySchema,
   breakdown: hotelPriceBreakdownSchema,
   starRating: z.number().int().min(1).max(5).nullable().optional(),
-  durationNights: z.number().int().positive().optional(),
 });
 export type HotelSearchResult = z.infer<typeof hotelSearchResultSchema>;
 
@@ -526,8 +518,8 @@ export const hotelSearchResponseSchema = z.object({
 export type HotelSearchResponse = z.infer<typeof hotelSearchResponseSchema>;
 
 /**
- * Hotel & package catalog admin — CRUD contracts for the 7 manageable
- * entities (packages/db/src/schema/app.ts). Most hotel tables have no
+ * Hotel catalog admin — CRUD contracts for the manageable entities
+ * (packages/db/src/schema/app.ts). Most hotel tables have no
  * created_at/updated_at columns — don't add them here just to match other
  * domains' shape.
  */
@@ -569,13 +561,9 @@ export type CreateFxRateInput = z.infer<typeof createFxRateSchema>;
 export const updateFxRateSchema = createFxRateSchema.partial();
 export type UpdateFxRateInput = z.infer<typeof updateFxRateSchema>;
 
-/**
- * A property is a `listing` (kind='property') 1:1 with a `property` row —
- * managed as one combined form/transaction, never as two separate screens.
- */
 export const propertySchema = z.object({
   propertyCode: z.string().min(1).max(50),
-  listingId: ulidSchema,
+  type: propertyTypeSchema,
   starRating: z.number().int().min(1).max(5).nullable(),
   address: z.string().nullable(),
   displayName: z.string().min(1).max(200),
@@ -589,6 +577,7 @@ export type Property = z.infer<typeof propertySchema>;
 
 export const createPropertySchema = z.object({
   propertyCode: z.string().min(1).max(50),
+  type: propertyTypeSchema,
   starRating: z.number().int().min(1).max(5).optional(),
   address: z.string().max(500).optional(),
   displayName: z.string().min(1).max(200),
@@ -603,41 +592,6 @@ export const updatePropertySchema = createPropertySchema
   .omit({ propertyCode: true })
   .partial();
 export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
-
-/**
- * A package is a `listing` (kind='package') 1:1 with a `package` row —
- * same combined-form/transaction shape as property.
- */
-export const packageSchema = z.object({
-  packageCode: z.string().min(1).max(50),
-  listingId: ulidSchema,
-  durationNights: z.number().int().positive(),
-  includes: z.string().nullable(),
-  displayName: z.string().min(1).max(200),
-  destination: z.string().min(1).max(100),
-  countryCode: z.string().length(2),
-  heroImageUrl: z.string().nullable(),
-  isActive: z.boolean(),
-  createdAt: z.iso.datetime(),
-});
-export type Package = z.infer<typeof packageSchema>;
-
-export const createPackageSchema = z.object({
-  packageCode: z.string().min(1).max(50),
-  durationNights: z.number().int().positive(),
-  includes: z.string().max(2000).optional(),
-  displayName: z.string().min(1).max(200),
-  destination: z.string().min(1).max(100),
-  countryCode: z.string().length(2),
-  heroImageUrl: z.string().max(2000).optional(),
-  isActive: z.boolean().optional(),
-});
-export type CreatePackageInput = z.infer<typeof createPackageSchema>;
-
-export const updatePackageSchema = createPackageSchema
-  .omit({ packageCode: true })
-  .partial();
-export type UpdatePackageInput = z.infer<typeof updatePackageSchema>;
 
 export const roomTypeSchema = z.object({
   id: ulidSchema,
@@ -671,7 +625,7 @@ export type SeasonName = z.infer<typeof seasonNameSchema>;
 
 export const seasonSchema = z.object({
   id: ulidSchema,
-  listingId: ulidSchema,
+  propertyCode: z.string(),
   name: seasonNameSchema,
   startDate: z.iso.date(),
   endDate: z.iso.date(),
@@ -679,7 +633,7 @@ export const seasonSchema = z.object({
 export type Season = z.infer<typeof seasonSchema>;
 
 export const createSeasonSchema = z.object({
-  listingId: ulidSchema,
+  propertyCode: z.string().min(1).max(50),
   name: seasonNameSchema,
   startDate: z.iso.date(),
   endDate: z.iso.date(),
@@ -687,28 +641,27 @@ export const createSeasonSchema = z.object({
 export type CreateSeasonInput = z.infer<typeof createSeasonSchema>;
 
 export const updateSeasonSchema = createSeasonSchema
-  .omit({ listingId: true })
+  .omit({ propertyCode: true })
   .partial();
 export type UpdateSeasonInput = z.infer<typeof updateSeasonSchema>;
 
 export const rateRuleSchema = z.object({
   id: ulidSchema,
-  listingId: ulidSchema,
+  propertyCode: z.string(),
   seasonId: ulidSchema,
-  /** NULL for packages, required for properties. */
-  roomTypeId: ulidSchema.nullable(),
+  roomTypeId: ulidSchema,
   minOccupancy: z.number().int().positive(),
   maxOccupancy: z.number().int().positive(),
-  /** Minor units. Per-night for properties, total for packages. */
+  /** Minor units, always per-night. */
   amount: z.number().int().nonnegative(),
   currency: currencyCodeSchema,
 });
 export type RateRule = z.infer<typeof rateRuleSchema>;
 
 export const createRateRuleSchema = z.object({
-  listingId: ulidSchema,
+  propertyCode: z.string().min(1).max(50),
   seasonId: ulidSchema,
-  roomTypeId: ulidSchema.optional(),
+  roomTypeId: ulidSchema,
   minOccupancy: z.number().int().positive(),
   maxOccupancy: z.number().int().positive(),
   amount: z.number().int().nonnegative(),
@@ -717,7 +670,7 @@ export const createRateRuleSchema = z.object({
 export type CreateRateRuleInput = z.infer<typeof createRateRuleSchema>;
 
 export const updateRateRuleSchema = createRateRuleSchema
-  .omit({ listingId: true })
+  .omit({ propertyCode: true })
   .partial();
 export type UpdateRateRuleInput = z.infer<typeof updateRateRuleSchema>;
 

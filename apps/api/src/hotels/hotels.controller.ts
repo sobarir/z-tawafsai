@@ -13,7 +13,7 @@ export class HotelsController {
   @ApiOperation({
     operationId: 'searchHotels',
     summary:
-      'Search properties and packages by destination/dates/occupancy, priced in the requested display currency',
+      'Search hotel properties by destination/dates/occupancy, priced in the requested display currency',
   })
   @ApiOkResponse({ type: HotelSearchResponseDto })
   search(

@@ -6,11 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type HotelSearchResponseDtoItemsItemKind = typeof HotelSearchResponseDtoItemsItemKind[keyof typeof HotelSearchResponseDtoItemsItemKind];
+export type UpdatePropertyDtoType = typeof UpdatePropertyDtoType[keyof typeof UpdatePropertyDtoType];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const HotelSearchResponseDtoItemsItemKind = {
-  property: 'property',
-  package: 'package',
+export const UpdatePropertyDtoType = {
+  hotel: 'hotel',
+  apartment: 'apartment',
+  house: 'house',
 } as const;

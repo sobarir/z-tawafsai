@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { createDb, createId, schema } from '@repo/db';
+import { createDb, schema } from '@repo/db';
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { HotelRoomTypesService } from './hotel-room-types.service';
@@ -16,8 +16,6 @@ const service = new HotelRoomTypesService(db);
 const FIXTURE_PROPERTY_CODE = 'ZZZ-RT-FIXTURE';
 const TEST_NAME = 'Test Room';
 
-let fixtureListingId: string;
-
 async function cleanupRoomTypes() {
   await db
     .delete(schema.roomType)
@@ -26,17 +24,12 @@ async function cleanupRoomTypes() {
 
 describe('HotelRoomTypesService', () => {
   beforeAll(async () => {
-    fixtureListingId = createId();
-    await db.insert(schema.listing).values({
-      id: fixtureListingId,
-      kind: 'property',
+    await db.insert(schema.property).values({
+      propertyCode: FIXTURE_PROPERTY_CODE,
+      type: 'hotel',
       displayName: 'Room Type Fixture Property',
       destination: 'Test City',
       countryCode: 'ZZ',
-    });
-    await db.insert(schema.property).values({
-      propertyCode: FIXTURE_PROPERTY_CODE,
-      listingId: fixtureListingId,
     });
   });
 
@@ -45,9 +38,6 @@ describe('HotelRoomTypesService', () => {
     await db
       .delete(schema.property)
       .where(eq(schema.property.propertyCode, FIXTURE_PROPERTY_CODE));
-    await db
-      .delete(schema.listing)
-      .where(eq(schema.listing.id, fixtureListingId));
   });
 
   beforeEach(cleanupRoomTypes);

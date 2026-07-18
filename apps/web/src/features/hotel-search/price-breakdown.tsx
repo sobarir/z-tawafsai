@@ -10,9 +10,9 @@ interface PriceBreakdownProps {
 }
 
 /**
- * Mirrors the API's `breakdown` exactly (perNight/nights for properties,
- * total always) — no season/band labels, since the response doesn't carry
- * them; this reads what the API actually returns, not an aspirational shape.
+ * Mirrors the API's `breakdown` exactly — no season/band labels, since the
+ * response doesn't carry them; this reads what the API actually returns, not
+ * an aspirational shape.
  */
 export function PriceBreakdown({ item }: PriceBreakdownProps) {
   const t = useTranslations('hotelSearch');
@@ -22,16 +22,12 @@ export function PriceBreakdown({ item }: PriceBreakdownProps) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-2">
-        {item.kind === 'property' &&
-        item.breakdown.perNight &&
-        item.breakdown.nights ? (
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
-              {formatHotelMoney(item.breakdown.perNight, locale)} ×{' '}
-              {t('durationNights', { count: item.breakdown.nights })}
-            </span>
-          </div>
-        ) : null}
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            {formatHotelMoney(item.breakdown.perNight, locale)} ×{' '}
+            {t('durationNights', { count: item.breakdown.nights })}
+          </span>
+        </div>
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">{t('total')}</span>
           <span className="text-2xl font-bold text-primary">

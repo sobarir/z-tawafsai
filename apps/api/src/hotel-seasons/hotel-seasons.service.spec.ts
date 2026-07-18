@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { createDb, createId, schema } from '@repo/db';
+import { createDb, schema } from '@repo/db';
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { HotelSeasonsService } from './hotel-seasons.service';
@@ -11,24 +11,23 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new HotelSeasonsService(db);
 
-// Own isolated listing fixture — never touches the seeded L1/L2/L3 listings
-// that hotels.service.spec.ts's golden scenarios (and their season windows)
-// depend on.
-let fixtureListingId: string;
+// Own isolated property fixture — never touches the seeded JED-WFH/MAD-CIN
+// properties that hotels.service.spec.ts's golden scenarios (and their
+// season windows) depend on.
+const FIXTURE_CODE = 'ZZZ-SEASON';
 
 async function cleanupSeasons() {
   await db
     .delete(schema.season)
-    .where(eq(schema.season.listingId, fixtureListingId));
+    .where(eq(schema.season.propertyCode, FIXTURE_CODE));
 }
 
 describe('HotelSeasonsService', () => {
   beforeAll(async () => {
-    fixtureListingId = createId();
-    await db.insert(schema.listing).values({
-      id: fixtureListingId,
-      kind: 'property',
-      displayName: 'Season Fixture Listing',
+    await db.insert(schema.property).values({
+      propertyCode: FIXTURE_CODE,
+      type: 'hotel',
+      displayName: 'Season Fixture Property',
       destination: 'Test City',
       countryCode: 'ZZ',
     });
@@ -37,15 +36,15 @@ describe('HotelSeasonsService', () => {
   afterAll(async () => {
     await cleanupSeasons();
     await db
-      .delete(schema.listing)
-      .where(eq(schema.listing.id, fixtureListingId));
+      .delete(schema.property)
+      .where(eq(schema.property.propertyCode, FIXTURE_CODE));
   });
 
   beforeEach(cleanupSeasons);
 
   it('creates, reads, updates, and deletes a season', async () => {
     const created = await service.create({
-      listingId: fixtureListingId,
+      propertyCode: FIXTURE_CODE,
       name: 'standard',
       startDate: '2027-01-01',
       endDate: '2027-03-01',
@@ -64,9 +63,9 @@ describe('HotelSeasonsService', () => {
     );
   });
 
-  it('rejects an overlapping date range for the same listing (EXCLUDE constraint)', async () => {
+  it('rejects an overlapping date range for the same property (EXCLUDE constraint)', async () => {
     await service.create({
-      listingId: fixtureListingId,
+      propertyCode: FIXTURE_CODE,
       name: 'standard',
       startDate: '2027-01-01',
       endDate: '2027-03-01',
@@ -74,7 +73,7 @@ describe('HotelSeasonsService', () => {
 
     await expect(
       service.create({
-        listingId: fixtureListingId,
+        propertyCode: FIXTURE_CODE,
         name: 'peak',
         startDate: '2027-02-01',
         endDate: '2027-04-01',
@@ -82,16 +81,16 @@ describe('HotelSeasonsService', () => {
     ).rejects.toThrow(ConflictException);
   });
 
-  it('allows adjacent, non-overlapping date ranges for the same listing', async () => {
+  it('allows adjacent, non-overlapping date ranges for the same property', async () => {
     await service.create({
-      listingId: fixtureListingId,
+      propertyCode: FIXTURE_CODE,
       name: 'standard',
       startDate: '2027-01-01',
       endDate: '2027-03-01',
     });
 
     const second = await service.create({
-      listingId: fixtureListingId,
+      propertyCode: FIXTURE_CODE,
       name: 'peak',
       startDate: '2027-03-01',
       endDate: '2027-04-01',

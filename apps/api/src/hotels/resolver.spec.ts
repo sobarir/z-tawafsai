@@ -11,7 +11,7 @@ const fxRates = [
 ];
 
 const propertyBase: ResolveInput = {
-  listing: { kind: 'property', isActive: true },
+  listing: { isActive: true },
   seasons: [
     { id: 's-standard', startDate: '2026-01-01', endDate: '2026-05-01' },
   ],
@@ -34,31 +34,8 @@ const propertyBase: ResolveInput = {
   currencies,
 };
 
-const packageBase: ResolveInput = {
-  listing: { kind: 'package', isActive: true },
-  seasons: [
-    { id: 's-standard', startDate: '2026-01-01', endDate: '2026-05-01' },
-  ],
-  rateRules: [
-    {
-      seasonId: 's-standard',
-      roomTypeId: null,
-      minOccupancy: 1,
-      maxOccupancy: 2,
-      amount: 180_000,
-      currency: 'USD',
-    },
-  ],
-  checkIn: '2026-02-01',
-  checkOut: '2026-02-10',
-  occupancy: 2,
-  displayCurrency: 'USD',
-  fxRates,
-  currencies,
-};
-
 describe('resolvePrice', () => {
-  it('property: multiplies per-night amount by nights', () => {
+  it('multiplies per-night amount by nights', () => {
     const result = resolvePrice(propertyBase);
     expect(result.outcome).toBe('OK');
     if (result.outcome !== 'OK') throw new Error('unreachable');
@@ -67,16 +44,6 @@ describe('resolvePrice', () => {
       perNight: { amount: 40_000, currency: 'SAR' },
       nights: 3,
       total: { amount: 120_000, currency: 'SAR' },
-    });
-  });
-
-  it('package: uses the season total, ignoring nights', () => {
-    const result = resolvePrice(packageBase);
-    expect(result.outcome).toBe('OK');
-    if (result.outcome !== 'OK') throw new Error('unreachable');
-    expect(result.native).toEqual({ amount: 180_000, currency: 'USD' });
-    expect(result.breakdown).toEqual({
-      total: { amount: 180_000, currency: 'USD' },
     });
   });
 

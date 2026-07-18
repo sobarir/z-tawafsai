@@ -416,17 +416,13 @@
     "bagThroughChecked": "Equipaje facturado hasta destino"
   },
   "hotelSearch": {
-    "title": "Buscar alojamientos y paquetes",
-    "description": "Encuentra un alojamiento o paquete por destino y fechas, con el precio en tu moneda.",
+    "title": "Buscar alojamientos",
+    "description": "Encuentra un alojamiento por destino y fechas, con el precio en tu moneda.",
     "destination": "Destino",
     "destinationPlaceholder": "Jeddah, Medina...",
     "checkIn": "Entrada",
     "checkOut": "Salida",
     "occupancy": "Huéspedes",
-    "kind": "Mostrar",
-    "kindBoth": "Ambos",
-    "kindProperty": "Alojamientos",
-    "kindPackage": "Paquetes",
     "currency": "Moneda",
     "searchButton": "Buscar",
     "sort": "Ordenar por",
@@ -436,7 +432,7 @@
     "minPrice": "Precio mínimo",
     "maxPrice": "Precio máximo",
     "loading": "Buscando...",
-    "noResults": "Ningún alojamiento o paquete coincide con estas fechas. Prueba a ampliar las fechas o cambiar lo que estás viendo.",
+    "noResults": "Ningún alojamiento coincide con estas fechas. Prueba a ampliar las fechas.",
     "resultsCount": "{count, plural, one {# resultado encontrado} other {# resultados encontrados}}",
     "converted": "convertido",
     "durationNights": "{count, plural, one {# noche} other {# noches}}",
@@ -451,7 +447,6 @@
     "nav": {
       "section": "Administración del catálogo",
       "properties": "Alojamientos",
-      "packages": "Paquetes",
       "roomTypes": "Tipos de habitación",
       "seasons": "Temporadas",
       "rateRules": "Reglas de tarifas"
@@ -476,6 +471,7 @@
       "columns": {
         "propertyCode": "Código",
         "displayName": "Nombre",
+        "type": "Tipo",
         "destination": "Destino",
         "countryCode": "País",
         "starRating": "Estrellas",
@@ -486,6 +482,7 @@
         "propertyCodePlaceholder": "p. ej. JED-WFH",
         "displayName": "Nombre visible",
         "displayNamePlaceholder": "p. ej. Jeddah Waterfront Hotel",
+        "type": "Tipo",
         "destination": "Destino",
         "destinationHint": "¿No lo ves? Agrégalo primero en Datos de referencia → Ciudades.",
         "countryCode": "Código de país",
@@ -496,36 +493,11 @@
         "address": "Dirección",
         "addressPlaceholder": "Dirección postal",
         "isActive": "Activo (visible en la búsqueda)"
-      }
-    },
-    "packages": {
-      "title": "Paquetes",
-      "description": "Productos combinados de alcance fijo, con precio total por salida.",
-      "createTitle": "Nuevo paquete",
-      "editTitle": "Editar paquete",
-      "columns": {
-        "packageCode": "Código",
-        "displayName": "Nombre",
-        "destination": "Destino",
-        "countryCode": "País",
-        "durationNights": "Noches",
-        "isActive": "Activo"
       },
-      "fields": {
-        "packageCode": "Código del paquete",
-        "packageCodePlaceholder": "p. ej. UMR-9D-ECO",
-        "displayName": "Nombre visible",
-        "displayNamePlaceholder": "p. ej. Umrah Económico de 9 días",
-        "destination": "Destino",
-        "destinationHint": "¿No lo ves? Agrégalo primero en Datos de referencia → Ciudades.",
-        "countryCode": "Código de país",
-        "countryCodePlaceholder": "p. ej. SA",
-        "heroImageUrl": "URL de imagen principal",
-        "heroImageUrlPlaceholder": "https://...",
-        "durationNights": "Duración (noches)",
-        "includes": "Incluye",
-        "includesPlaceholder": "Resumen libre de lo que incluye el paquete",
-        "isActive": "Activo (visible en la búsqueda)"
+      "types": {
+        "hotel": "Hotel",
+        "apartment": "Apartamento",
+        "house": "Casa"
       }
     },
     "roomTypes": {
@@ -547,17 +519,17 @@
     },
     "seasons": {
       "title": "Temporadas",
-      "description": "Periodos de fechas asociados a un alojamiento o paquete que determinan la tarifa aplicable.",
+      "description": "Periodos de fechas asociados a un alojamiento que determinan la tarifa aplicable.",
       "createTitle": "Nueva temporada",
       "editTitle": "Editar temporada",
       "columns": {
-        "listing": "Alojamiento / paquete",
+        "property": "Alojamiento",
         "name": "Temporada",
         "startDate": "Fecha de inicio",
         "endDate": "Fecha de fin"
       },
       "fields": {
-        "listingId": "Alojamiento / paquete",
+        "propertyCode": "Alojamiento",
         "name": "Temporada",
         "startDate": "Fecha de inicio",
         "endDate": "Fecha de fin"
@@ -572,21 +544,20 @@
     },
     "rateRules": {
       "title": "Reglas de tarifas",
-      "description": "El dato atómico de precio: (alojamiento/paquete, temporada, franja de ocupación) -> precio en una moneda.",
+      "description": "El dato atómico de precio: (alojamiento, temporada, franja de ocupación) -> precio en una moneda.",
       "createTitle": "Nueva regla de tarifa",
       "editTitle": "Editar regla de tarifa",
       "columns": {
-        "listing": "Alojamiento / paquete",
+        "property": "Alojamiento",
         "season": "Temporada",
         "roomType": "Tipo de habitación",
         "band": "Franja de ocupación",
         "amount": "Importe"
       },
       "fields": {
-        "listingId": "Alojamiento / paquete",
+        "propertyCode": "Alojamiento",
         "seasonId": "Temporada",
         "roomTypeId": "Tipo de habitación",
-        "noRoomType": "— Ninguno (paquete) —",
         "minOccupancy": "Ocupación mínima",
         "maxOccupancy": "Ocupación máxima",
         "amount": "Importe (unidad menor)",
@@ -615,7 +586,7 @@
     "deleteSuccess": "Eliminado correctamente.",
     "cities": {
       "title": "Ciudades",
-      "description": "Ciudades de referencia utilizadas en aeropuertos y alojamientos/paquetes hoteleros.",
+      "description": "Ciudades de referencia utilizadas en aeropuertos y alojamientos hoteleros.",
       "createTitle": "Nueva ciudad",
       "editTitle": "Editar ciudad",
       "columns": {
@@ -634,7 +605,7 @@
     },
     "currencies": {
       "title": "Monedas",
-      "description": "Monedas de referencia usadas para los precios de alojamientos y paquetes.",
+      "description": "Monedas de referencia usadas para los precios de alojamientos.",
       "createTitle": "Nueva moneda",
       "editTitle": "Editar moneda",
       "columns": {

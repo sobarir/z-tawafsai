@@ -57,6 +57,41 @@
       "when": 1784037031778,
       "tag": "0007_lonely_bromley",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784354098498,
+      "tag": "0008_hotels_add_property_type_enum",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1784354177003,
+      "tag": "0009_hotels_property_merge_add_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784354194550,
+      "tag": "0010_hotels_property_merge_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1784354262723,
+      "tag": "0011_hotels_property_merge_finalize",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1784355107334,
+      "tag": "0012_hotels_season_no_overlap_property_code",
+      "breakpoints": true
     }
   ]
 }

@@ -14,65 +14,39 @@ import type {
 import { eq } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
-type ListingRow = typeof schema.listing.$inferSelect;
 type PropertyRow = typeof schema.property.$inferSelect;
 
-const toProperty = (
-  listingRow: ListingRow,
-  propertyRow: PropertyRow,
-): Property => ({
-  propertyCode: propertyRow.propertyCode,
-  listingId: listingRow.id,
-  starRating: propertyRow.starRating,
-  address: propertyRow.address,
-  displayName: listingRow.displayName,
-  destination: listingRow.destination,
-  countryCode: listingRow.countryCode,
-  heroImageUrl: listingRow.heroImageUrl,
-  isActive: listingRow.isActive,
-  createdAt: listingRow.createdAt.toISOString(),
+const toProperty = (row: PropertyRow): Property => ({
+  propertyCode: row.propertyCode,
+  type: row.type,
+  starRating: row.starRating,
+  address: row.address,
+  displayName: row.displayName,
+  destination: row.destination,
+  countryCode: row.countryCode,
+  heroImageUrl: row.heroImageUrl,
+  isActive: row.isActive,
+  createdAt: row.createdAt.toISOString(),
 });
 
-/**
- * A property is a `listing` (kind='property') 1:1 with a `property` row —
- * always read/written together, never as two separate admin screens. See
- * /prd/hotels/11-data-model.md.
- */
 @Injectable()
 export class HotelPropertiesService {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
   async list(): Promise<Property[]> {
-    const rows = await this.db
-      .select({ listing: schema.listing, property: schema.property })
-      .from(schema.property)
-      .innerJoin(
-        schema.listing,
-        eq(schema.property.listingId, schema.listing.id),
-      );
-    return rows.map((row) => toProperty(row.listing, row.property));
+    const rows = await this.db.select().from(schema.property);
+    return rows.map(toProperty);
   }
 
-  private async findRows(
-    propertyCode: string,
-  ): Promise<{ listing: ListingRow; property: PropertyRow }> {
+  async findByCode(propertyCode: string): Promise<Property> {
     const [row] = await this.db
-      .select({ listing: schema.listing, property: schema.property })
+      .select()
       .from(schema.property)
-      .innerJoin(
-        schema.listing,
-        eq(schema.property.listingId, schema.listing.id),
-      )
       .where(eq(schema.property.propertyCode, propertyCode));
     if (!row) {
       throw new NotFoundException(`Property ${propertyCode} not found`);
     }
-    return row;
-  }
-
-  async findByCode(propertyCode: string): Promise<Property> {
-    const { listing, property } = await this.findRows(propertyCode);
-    return toProperty(listing, property);
+    return toProperty(row);
   }
 
   async create(input: CreatePropertyInput): Promise<Property> {
@@ -86,81 +60,41 @@ export class HotelPropertiesService {
       );
     }
 
-    return this.db.transaction(async (tx) => {
-      const [listingRow] = await tx
-        .insert(schema.listing)
-        .values({
-          kind: 'property',
-          displayName: input.displayName,
-          destination: input.destination,
-          countryCode: input.countryCode,
-          heroImageUrl: input.heroImageUrl ?? null,
-          isActive: input.isActive ?? true,
-        })
-        .returning();
-      const [propertyRow] = await tx
-        .insert(schema.property)
-        .values({
-          propertyCode: input.propertyCode,
-          listingId: listingRow.id,
-          starRating: input.starRating ?? null,
-          address: input.address ?? null,
-        })
-        .returning();
-      return toProperty(listingRow, propertyRow);
-    });
+    const [row] = await this.db
+      .insert(schema.property)
+      .values({
+        propertyCode: input.propertyCode,
+        type: input.type,
+        starRating: input.starRating ?? null,
+        address: input.address ?? null,
+        displayName: input.displayName,
+        destination: input.destination,
+        countryCode: input.countryCode,
+        heroImageUrl: input.heroImageUrl ?? null,
+        isActive: input.isActive ?? true,
+      })
+      .returning();
+    return toProperty(row);
   }
 
   async update(
     propertyCode: string,
     input: UpdatePropertyInput,
   ): Promise<Property> {
-    const { listing, property } = await this.findRows(propertyCode);
+    await this.findByCode(propertyCode);
 
-    return this.db.transaction(async (tx) => {
-      let updatedListing = listing;
-      if (
-        input.displayName !== undefined ||
-        input.destination !== undefined ||
-        input.countryCode !== undefined ||
-        input.heroImageUrl !== undefined ||
-        input.isActive !== undefined
-      ) {
-        const [row] = await tx
-          .update(schema.listing)
-          .set({
-            displayName: input.displayName,
-            destination: input.destination,
-            countryCode: input.countryCode,
-            heroImageUrl: input.heroImageUrl,
-            isActive: input.isActive,
-          })
-          .where(eq(schema.listing.id, listing.id))
-          .returning();
-        updatedListing = row;
-      }
-
-      let updatedProperty = property;
-      if (input.starRating !== undefined || input.address !== undefined) {
-        const [row] = await tx
-          .update(schema.property)
-          .set({ starRating: input.starRating, address: input.address })
-          .where(eq(schema.property.propertyCode, propertyCode))
-          .returning();
-        updatedProperty = row;
-      }
-
-      return toProperty(updatedListing, updatedProperty);
-    });
+    const [row] = await this.db
+      .update(schema.property)
+      .set(input)
+      .where(eq(schema.property.propertyCode, propertyCode))
+      .returning();
+    return toProperty(row);
   }
 
   async remove(propertyCode: string): Promise<void> {
-    const { listing } = await this.findRows(propertyCode);
-    await this.db.transaction(async (tx) => {
-      await tx
-        .delete(schema.property)
-        .where(eq(schema.property.propertyCode, propertyCode));
-      await tx.delete(schema.listing).where(eq(schema.listing.id, listing.id));
-    });
+    await this.findByCode(propertyCode);
+    await this.db
+      .delete(schema.property)
+      .where(eq(schema.property.propertyCode, propertyCode));
   }
 }

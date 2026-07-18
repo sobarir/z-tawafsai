@@ -188,17 +188,13 @@
     "bagThroughChecked": "Bags checked through"
   },
   "hotelSearch": {
-    "title": "Search Stays & Packages",
-    "description": "Find a property or package by destination and dates, priced in your currency.",
+    "title": "Search Stays",
+    "description": "Find a property by destination and dates, priced in your currency.",
     "destination": "Destination",
     "destinationPlaceholder": "Jeddah, Madinah...",
     "checkIn": "Check-in",
     "checkOut": "Check-out",
     "occupancy": "Guests",
-    "kind": "Show",
-    "kindBoth": "Both",
-    "kindProperty": "Stays",
-    "kindPackage": "Packages",
     "currency": "Currency",
     "searchButton": "Search",
     "sort": "Sort by",
@@ -208,7 +204,7 @@
     "minPrice": "Min price",
     "maxPrice": "Max price",
     "loading": "Searching...",
-    "noResults": "No stays or packages match these dates. Try widening your dates or switching what you're browsing.",
+    "noResults": "No stays match these dates. Try widening your dates.",
     "resultsCount": "{count, plural, one {# result found} other {# results found}}",
     "converted": "converted",
     "durationNights": "{count, plural, one {# night} other {# nights}}",
@@ -223,7 +219,6 @@
     "nav": {
       "section": "Catalog Admin",
       "properties": "Properties",
-      "packages": "Packages",
       "roomTypes": "Room Types",
       "seasons": "Seasons",
       "rateRules": "Rate Rules"
@@ -248,6 +243,7 @@
       "columns": {
         "propertyCode": "Code",
         "displayName": "Name",
+        "type": "Type",
         "destination": "Destination",
         "countryCode": "Country",
         "starRating": "Stars",
@@ -258,6 +254,7 @@
         "propertyCodePlaceholder": "e.g. JED-WFH",
         "displayName": "Display name",
         "displayNamePlaceholder": "e.g. Jeddah Waterfront Hotel",
+        "type": "Type",
         "destination": "Destination",
         "destinationHint": "Don't see it? Add it under Reference Data → Cities first.",
         "countryCode": "Country code",
@@ -268,36 +265,11 @@
         "address": "Address",
         "addressPlaceholder": "Street address",
         "isActive": "Active (shown in search)"
-      }
-    },
-    "packages": {
-      "title": "Packages",
-      "description": "Bundled fixed-scope products, priced as a total per departure.",
-      "createTitle": "New package",
-      "editTitle": "Edit package",
-      "columns": {
-        "packageCode": "Code",
-        "displayName": "Name",
-        "destination": "Destination",
-        "countryCode": "Country",
-        "durationNights": "Nights",
-        "isActive": "Active"
       },
-      "fields": {
-        "packageCode": "Package code",
-        "packageCodePlaceholder": "e.g. UMR-9D-ECO",
-        "displayName": "Display name",
-        "displayNamePlaceholder": "e.g. 9-Day Umrah Economy",
-        "destination": "Destination",
-        "destinationHint": "Don't see it? Add it under Reference Data → Cities first.",
-        "countryCode": "Country code",
-        "countryCodePlaceholder": "e.g. SA",
-        "heroImageUrl": "Hero image URL",
-        "heroImageUrlPlaceholder": "https://...",
-        "durationNights": "Duration (nights)",
-        "includes": "Includes",
-        "includesPlaceholder": "Free-text summary of what's bundled",
-        "isActive": "Active (shown in search)"
+      "types": {
+        "hotel": "Hotel",
+        "apartment": "Apartment",
+        "house": "House"
       }
     },
     "roomTypes": {
@@ -319,17 +291,17 @@
     },
     "seasons": {
       "title": "Seasons",
-      "description": "Named date windows scoped to a property or package that select which rate applies.",
+      "description": "Named date windows scoped to a property that select which rate applies.",
       "createTitle": "New season",
       "editTitle": "Edit season",
       "columns": {
-        "listing": "Property / package",
+        "property": "Property",
         "name": "Season",
         "startDate": "Start date",
         "endDate": "End date"
       },
       "fields": {
-        "listingId": "Property / package",
+        "propertyCode": "Property",
         "name": "Season",
         "startDate": "Start date",
         "endDate": "End date"
@@ -344,21 +316,20 @@
     },
     "rateRules": {
       "title": "Rate Rules",
-      "description": "The atomic price fact: (property/package, season, occupancy band) -> price in a currency.",
+      "description": "The atomic price fact: (property, season, occupancy band) -> price in a currency.",
       "createTitle": "New rate rule",
       "editTitle": "Edit rate rule",
       "columns": {
-        "listing": "Property / package",
+        "property": "Property",
         "season": "Season",
         "roomType": "Room type",
         "band": "Occupancy band",
         "amount": "Amount"
       },
       "fields": {
-        "listingId": "Property / package",
+        "propertyCode": "Property",
         "seasonId": "Season",
         "roomTypeId": "Room type",
-        "noRoomType": "— None (package) —",
         "minOccupancy": "Min occupancy",
         "maxOccupancy": "Max occupancy",
         "amount": "Amount (minor units)",
@@ -387,7 +358,7 @@
     "deleteSuccess": "Deleted successfully.",
     "cities": {
       "title": "Cities",
-      "description": "Reference cities used across airports and hotel properties/packages.",
+      "description": "Reference cities used across airports and hotel properties.",
       "createTitle": "New city",
       "editTitle": "Edit city",
       "columns": {
@@ -406,7 +377,7 @@
     },
     "currencies": {
       "title": "Currencies",
-      "description": "Reference currencies used for hotel and package pricing.",
+      "description": "Reference currencies used for hotel pricing.",
       "createTitle": "New currency",
       "editTitle": "Edit currency",
       "columns": {

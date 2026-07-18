@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { createDb } from './client';
 import * as schema from './schema';
 
@@ -2447,7 +2447,7 @@ const interlineAgreements: InterlineAgreementSeed[] = [
   { inboundAirline: 'HU', outboundAirline: 'SV', bagThroughChecked: false },
 ];
 
-// Hotel & package search domain — see /prd/hotels/15-seed-data.md for the full spec.
+// Hotel search domain — see /prd/hotels/15-seed-data.md for the full spec.
 
 const currencies: (typeof schema.currency.$inferInsert)[] = [
   { code: 'USD', minorUnit: 2, symbol: '$', name: 'US Dollar' },
@@ -2478,18 +2478,17 @@ type SeasonSeed = {
 };
 type RateRuleSeed = {
   seasonName: SeasonSeed['name'];
-  /** Property rate rules only — omit for packages (room_type_id stays NULL). */
-  roomTypeName?: string;
+  roomTypeName: string;
   minOccupancy: number;
   maxOccupancy: number;
-  /** Integer minor units. Per-night for properties, total for packages. */
+  /** Integer minor units, per-night. */
   amount: number;
   currency: string;
 };
 
-type PropertyListingSeed = {
-  kind: 'property';
+type PropertySeed = {
   code: string;
+  type: 'hotel' | 'apartment' | 'house';
   displayName: string;
   destination: string;
   countryCode: string;
@@ -2500,27 +2499,11 @@ type PropertyListingSeed = {
   rateRules: RateRuleSeed[];
 };
 
-type PackageListingSeed = {
-  kind: 'package';
-  code: string;
-  displayName: string;
-  destination: string;
-  countryCode: string;
-  durationNights: number;
-  includes?: string;
-  seasons: SeasonSeed[];
-  rateRules: RateRuleSeed[];
-};
-
-type HotelListingSeed = PropertyListingSeed | PackageListingSeed;
-
-// L1/L2/L3 exactly as specified in prd/hotels/15-seed-data.md (L2's season
-// windows use the doc's own non-overlapping revision to satisfy the season
-// EXCLUDE constraint).
-const hotelListings: HotelListingSeed[] = [
+// L1/L3 exactly as specified in prd/hotels/15-seed-data.md.
+const properties: PropertySeed[] = [
   {
-    kind: 'property',
     code: 'JED-WFH',
+    type: 'hotel',
     displayName: 'Jeddah Waterfront Hotel',
     destination: 'Jeddah',
     countryCode: 'SA',
@@ -2568,53 +2551,10 @@ const hotelListings: HotelListingSeed[] = [
     ],
   },
   {
-    kind: 'package',
-    code: 'UMR-9D-ECO',
-    displayName: '9-Day Umrah Economy',
-    destination: 'Jeddah',
-    countryCode: 'SA',
-    durationNights: 9,
-    seasons: [
-      { name: 'standard', startDate: '2026-01-01', endDate: '2026-02-18' },
-      { name: 'ramadan', startDate: '2026-02-18', endDate: '2026-03-20' },
-      { name: 'peak', startDate: '2026-03-20', endDate: '2026-07-01' },
-    ],
-    rateRules: [
-      {
-        seasonName: 'standard',
-        minOccupancy: 1,
-        maxOccupancy: 2,
-        amount: 180_000,
-        currency: 'USD',
-      },
-      {
-        seasonName: 'standard',
-        minOccupancy: 3,
-        maxOccupancy: 4,
-        amount: 340_000,
-        currency: 'USD',
-      },
-      {
-        seasonName: 'ramadan',
-        minOccupancy: 1,
-        maxOccupancy: 2,
-        amount: 260_000,
-        currency: 'USD',
-      },
-      {
-        seasonName: 'ramadan',
-        minOccupancy: 3,
-        maxOccupancy: 4,
-        amount: 480_000,
-        currency: 'USD',
-      },
-    ],
-  },
-  {
     // Exists so a NO_SEASON case (S9) is easy: query dates outside this
-    // listing's single season window.
-    kind: 'property',
+    // property's single season window.
     code: 'MAD-CIN',
+    type: 'hotel',
     displayName: 'Madinah Central Inn',
     destination: 'Madinah',
     countryCode: 'SA',
@@ -2831,98 +2771,46 @@ async function seed() {
       });
   }
 
-  for (const item of hotelListings) {
-    const existingListingId =
-      item.kind === 'property'
-        ? (
-            await db
-              .select({ listingId: schema.property.listingId })
-              .from(schema.property)
-              .where(eq(schema.property.propertyCode, item.code))
-          )[0]?.listingId
-        : (
-            await db
-              .select({ listingId: schema.travelPackage.listingId })
-              .from(schema.travelPackage)
-              .where(eq(schema.travelPackage.packageCode, item.code))
-          )[0]?.listingId;
-
-    const listingValues = {
-      kind: item.kind,
-      displayName: item.displayName,
-      destination: item.destination,
-      countryCode: item.countryCode,
-      isActive: true,
-    };
-
-    let listingId: string;
-    if (existingListingId) {
-      listingId = existingListingId;
-      await db
-        .update(schema.listing)
-        .set(listingValues)
-        .where(eq(schema.listing.id, listingId));
-    } else {
-      const [row] = await db
-        .insert(schema.listing)
-        .values(listingValues)
-        .returning();
-      listingId = row.id;
-    }
-
-    if (item.kind === 'property') {
-      await db
-        .insert(schema.property)
-        .values({
-          propertyCode: item.code,
-          listingId,
+  for (const item of properties) {
+    await db
+      .insert(schema.property)
+      .values({
+        propertyCode: item.code,
+        type: item.type,
+        displayName: item.displayName,
+        destination: item.destination,
+        countryCode: item.countryCode,
+        starRating: item.starRating ?? null,
+        address: item.address ?? null,
+        isActive: true,
+      })
+      .onConflictDoUpdate({
+        target: schema.property.propertyCode,
+        set: {
+          type: item.type,
+          displayName: item.displayName,
+          destination: item.destination,
+          countryCode: item.countryCode,
           starRating: item.starRating ?? null,
           address: item.address ?? null,
-        })
-        .onConflictDoUpdate({
-          target: schema.property.propertyCode,
-          set: {
-            listingId,
-            starRating: item.starRating ?? null,
-            address: item.address ?? null,
-          },
-        });
-    } else {
-      await db
-        .insert(schema.travelPackage)
-        .values({
-          packageCode: item.code,
-          listingId,
-          durationNights: item.durationNights,
-          includes: item.includes ?? null,
-        })
-        .onConflictDoUpdate({
-          target: schema.travelPackage.packageCode,
-          set: {
-            listingId,
-            durationNights: item.durationNights,
-            includes: item.includes ?? null,
-          },
-        });
-    }
+        },
+      });
 
     const roomTypeIdByName = new Map<string, string>();
-    if (item.kind === 'property') {
-      for (const roomType of item.roomTypes) {
-        const [row] = await db
-          .insert(schema.roomType)
-          .values({
-            propertyCode: item.code,
-            name: roomType.name,
-            maxOccupancy: roomType.maxOccupancy,
-          })
-          .onConflictDoUpdate({
-            target: [schema.roomType.propertyCode, schema.roomType.name],
-            set: { maxOccupancy: roomType.maxOccupancy },
-          })
-          .returning();
-        roomTypeIdByName.set(roomType.name, row.id);
-      }
+    for (const roomType of item.roomTypes) {
+      const [row] = await db
+        .insert(schema.roomType)
+        .values({
+          propertyCode: item.code,
+          name: roomType.name,
+          maxOccupancy: roomType.maxOccupancy,
+        })
+        .onConflictDoUpdate({
+          target: [schema.roomType.propertyCode, schema.roomType.name],
+          set: { maxOccupancy: roomType.maxOccupancy },
+        })
+        .returning();
+      roomTypeIdByName.set(roomType.name, row.id);
     }
 
     const seasonIdByName = new Map<string, string>();
@@ -2932,7 +2820,7 @@ async function seed() {
         .from(schema.season)
         .where(
           and(
-            eq(schema.season.listingId, listingId),
+            eq(schema.season.propertyCode, item.code),
             eq(schema.season.name, season.name),
           ),
         );
@@ -2946,7 +2834,7 @@ async function seed() {
         const [row] = await db
           .insert(schema.season)
           .values({
-            listingId,
+            propertyCode: item.code,
             name: season.name,
             startDate: season.startDate,
             endDate: season.endDate,
@@ -2963,10 +2851,8 @@ async function seed() {
           `Seed error: rate rule for ${item.code} references unknown season "${rule.seasonName}"`,
         );
       }
-      const roomTypeId = rule.roomTypeName
-        ? (roomTypeIdByName.get(rule.roomTypeName) ?? null)
-        : null;
-      if (rule.roomTypeName && !roomTypeId) {
+      const roomTypeId = roomTypeIdByName.get(rule.roomTypeName);
+      if (!roomTypeId) {
         throw new Error(
           `Seed error: rate rule for ${item.code} references unknown room type "${rule.roomTypeName}"`,
         );
@@ -2977,18 +2863,16 @@ async function seed() {
         .from(schema.rateRule)
         .where(
           and(
-            eq(schema.rateRule.listingId, listingId),
+            eq(schema.rateRule.propertyCode, item.code),
             eq(schema.rateRule.seasonId, seasonId),
-            roomTypeId
-              ? eq(schema.rateRule.roomTypeId, roomTypeId)
-              : isNull(schema.rateRule.roomTypeId),
+            eq(schema.rateRule.roomTypeId, roomTypeId),
             eq(schema.rateRule.minOccupancy, rule.minOccupancy),
             eq(schema.rateRule.maxOccupancy, rule.maxOccupancy),
           ),
         );
 
       const values = {
-        listingId,
+        propertyCode: item.code,
         seasonId,
         roomTypeId,
         minOccupancy: rule.minOccupancy,
@@ -3008,7 +2892,7 @@ async function seed() {
     }
   }
 
-  const rateRuleCount = hotelListings.reduce(
+  const rateRuleCount = properties.reduce(
     (count, item) => count + item.rateRules.length,
     0,
   );
@@ -3106,7 +2990,7 @@ async function seed() {
     `Seeded ${airports.length} airports, ${airlines.length} airlines, ${flights.length} flights, ${marketingCount} marketing rows, ${mctRules.length} MCT rules, ${interlineAgreements.length} interline agreements`,
   );
   console.log(
-    `Seeded ${currencies.length} currencies, ${fxRates.length} fx rates, ${hotelListings.length} hotel listings, ${rateRuleCount} rate rules`,
+    `Seeded ${currencies.length} currencies, ${fxRates.length} fx rates, ${properties.length} properties, ${rateRuleCount} rate rules`,
   );
 }
 

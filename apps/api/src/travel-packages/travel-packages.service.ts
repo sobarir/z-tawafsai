@@ -126,21 +126,8 @@ export class TravelPackagesService {
       .select()
       .from(schema.property)
       .where(inArray(schema.property.propertyCode, propertyCodes));
-    const listingIds = properties.map((property) => property.listingId);
-    const listings = listingIds.length
-      ? await this.db
-          .select()
-          .from(schema.listing)
-          .where(inArray(schema.listing.id, listingIds))
-      : [];
-    const listingById = new Map(
-      listings.map((listing) => [listing.id, listing]),
-    );
     return new Map(
-      properties.map((property) => [
-        property.propertyCode,
-        { property, listing: listingById.get(property.listingId) },
-      ]),
+      properties.map((property) => [property.propertyCode, property]),
     );
   }
 
@@ -163,9 +150,8 @@ export class TravelPackagesService {
     const result: FlightHotelPackage[] = [];
     for (const row of rows) {
       const flight = flightById.get(row.flightId);
-      const propertyEntry = propertyByCode.get(row.propertyCode);
-      if (!flight || !propertyEntry?.listing) continue;
-      const { property, listing } = propertyEntry;
+      const property = propertyByCode.get(row.propertyCode);
+      if (!flight || !property) continue;
       const summary = flightSummaryById.get(flight.id);
 
       result.push({
@@ -194,8 +180,8 @@ export class TravelPackagesService {
         },
         property: {
           propertyCode: property.propertyCode,
-          displayName: listing.displayName,
-          destination: listing.destination,
+          displayName: property.displayName,
+          destination: property.destination,
           starRating: property.starRating,
         },
       });

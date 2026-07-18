@@ -5,8 +5,40 @@
 
 ## Current step
 
-All work below is **committed** (as of `5e0b3a6`, 2026-07-14). Repo working
-tree is clean; nothing from this domain is pending.
+**2026-07-18 — hotel-domain `package` concept removed; `listing`+`property` merged.**
+The domain's original `listing` spine (`kind = 'property' | 'package'`) modeled two
+different sellable things: a hotel/lodging unit, and a self-contained,
+season-total-priced multi-night deal with no flight attached. At the user's
+request, the `package` concept is gone — this domain is lodging-only now.
+`listing.kind` is repurposed into `property.type`, a lodging-type
+classification (`hotel` | `apartment` | `house`), not a search-polymorphism
+discriminant. Since `listing` and `property` are now 1:1 forever, they were
+merged into a single `property` table (confirmed with the user — this removes
+the indirection that only existed to support the property/package split):
+`season`/`rate_rule` now FK to `property_code` (natural key) instead of a
+ULID `listing_id`, `rate_rule.room_type_id` is `NOT NULL` (no more
+nullable-for-packages), and the partial "no room type" unique index /
+`NO_ROOM_TYPE` frontend sentinel are gone. This is **unrelated** to the
+separate travel-packages domain's `flightHotelPackage` table (DB name
+`travel_package`, flight+property bundle) — that table, its API, and its
+admin/public UI were not touched.
+
+Full change: DB schema + a 3-stage migration (`0008`–`0012`, staged to avoid
+drizzle-kit's interactive rename-resolution prompt, which requires a TTY this
+environment doesn't have), `packages/db/src/seed.ts`, the Zod contracts in
+`packages/shared`, the `apps/api/src/hotel-packages/` module deleted outright,
+`apps/api/src/hotels/`+`hotel-properties/`+`hotel-seasons/`+`hotel-rate-rules/`
+simplified, `apps/web/src/features/hotel-packages/` deleted, the hotel-search
+property/package toggle and `hotel-properties` admin form's new `type` field,
+and i18n across all 6 locales. `pnpm typecheck`/`lint`/`test` all green
+(106 API tests, 127 web tests). `11-data-model.md` was rewritten to the new
+6-table shape; `00-overview.md`, `01-glossary.md`, `13-resolver-and-search.md`,
+`14-scenarios.md`, `15-seed-data.md`, `30-frontend.md`, and
+`32-frontend-steps.md` still describe the **original build including the now-
+removed package concept** — treat them as historical record of that build, not
+current spec; `11-data-model.md` + this file are authoritative going forward.
+
+Prior work below is **committed** (as of `5e0b3a6`, 2026-07-14).
 
 **Latest pass (`5e0b3a6`): City reference entity, Travel Packages domain,
 hotel-search UI unification, catalog/reference rename.** Highlights that
@@ -188,34 +220,36 @@ exists between `hotel-detail.tsx` and `hotel-search-results.tsx`'s card
 header block, left alone per the rule-of-three: two copies don't warrant
 extraction yet), `pnpm check:backbone` (90 paths verified).
 
-## Entity table (8 entities: 8 tables, 0 derived)
+## Entity table (current, as of 2026-07-18: 6 entities, 6 tables, 0 derived)
+
+`listing` and `package` no longer exist — see "Current step" above. This supersedes the
+historical "8 entities" table this section used to carry (kept in the domain's build history
+via git, not restated here).
 
 | # | Entity              | Table                 | Key            | Admin CRUD                            | Notes |
 |---|---------------------|-----------------------|----------------|----------------------------------------|-------|
-| 1 | Listing             | `listing`             | ULID           | via Property/Package (1:1, no own screen) | Spine. `kind` ∈ {property, package}. Search operates here. |
-| 2 | Property            | `property`            | property code  | `catalog/properties` | 1:1 with a `kind=property` listing. `destination` is a city-name combobox backed by the City entity. |
-| 3 | Package             | `package`             | package code   | `catalog/packages` | 1:1 with a `kind=package` listing. `destination` is a city-name combobox backed by the City entity. |
-| 4 | Room Type           | `room_type`           | ULID           | `catalog/room-types` | Child of property. Occupancy capacity lives here. |
-| 5 | Season              | `season`              | ULID           | `catalog/seasons` | Named date window scoped to a listing. |
-| 6 | Rate Rule           | `rate_rule`           | ULID           | `catalog/rate-rules` | (listing, season, occupancy band) → price in a currency. |
-| 7 | Currency            | `currency`            | ISO-4217 code  | `reference/currencies` | Reference table, shared with flights. Renamed from `catalog/currencies` in `5e0b3a6`. |
-| 8 | FX Rate             | `fx_rate`             | ULID           | `reference/fx-rates` | (base, quote) → rate. For display conversion only. Renamed from `catalog/fx-rates` in `5e0b3a6`. |
+| 1 | Property            | `property`            | property code  | `catalog/properties` | Spine + property fields merged into one table. `type` ∈ {hotel, apartment, house}. `destination` is a city-name combobox backed by the City entity. |
+| 2 | Room Type           | `room_type`           | ULID           | `catalog/room-types` | Child of property. Occupancy capacity lives here. |
+| 3 | Season              | `season`              | ULID           | `catalog/seasons` | Named date window scoped to a property. |
+| 4 | Rate Rule           | `rate_rule`           | ULID           | `catalog/rate-rules` | (property, season, occupancy band) → price in a currency. `room_type_id` is always set. |
+| 5 | Currency            | `currency`            | ISO-4217 code  | `reference/currencies` | Reference table, shared with flights. |
+| 6 | FX Rate             | `fx_rate`             | ULID           | `reference/fx-rates` | (base, quote) → rate. For display conversion only. |
 
-All 7 manageable entities (Listing has no standalone screen — it's created/edited as part of
-Property or Package) have full create/edit/delete admin screens, added in the Catalog Admin
-build pass above and split across `(protected)/@admin/catalog/*` (the 5 listing-scoped entities)
-and `(protected)/@admin/reference/*` (currency, fx-rate — reference data shared with other
-domains) as of `5e0b3a6`. The City entity (not part of this domain's original 8, but now a
-dependency of Property/Package forms) lives at `reference/cities`; see `apps/api/src/cities/`.
+All 5 manageable entities (Property included — the merge gave it a standalone screen where
+Listing never had one) have full create/edit/delete admin screens under
+`(protected)/@admin/catalog/*` (the 4 property-scoped entities) and
+`(protected)/@admin/reference/*` (currency, fx-rate — reference data shared with other domains).
+The City entity (dependency of the Property form) lives at `reference/cities`; see
+`apps/api/src/cities/`.
 
 ## Confirmed decisions
 
-- Scope: **search-only**, both properties and packages, one unified result set.
+- Scope: **search-only**, lodging properties (hotel/apartment/house).
 - Pricing source: **static, seeded in our DB**. No external API.
 - Pricing behaviors required day one: **date-range/nightly, per-occupancy,
   seasonal/tiered, multi-currency**. All four.
 - Money = integer minor units + ISO currency. ULID/natural keys, never UUID.
-- Property price = **nightly × nights**. Package price = **season total**.
+- Price = **nightly × nights**, always.
 - FX is display-side conversion only; rate rules store a native currency each.
 - Frontend: **Next.js 16 App Router** (existing `apps/web`, no scaffold), read-only client
   over `GET /hotels/search` via the generated `useSearchHotels()` hook, URL = state, all

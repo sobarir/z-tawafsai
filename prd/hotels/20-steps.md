@@ -81,3 +81,11 @@ idempotent, in a tx.
 
 All 8 steps committed, S1–S12 green, sweep clean, CONTEXT.md checklist all
 checked. No booking/payment/inventory code anywhere.
+
+---
+
+**2026-07-18 addendum**: the `package` concept these steps built (the `kind='package'` listing
+variant, S3/S8/S11/S12) was later removed and `listing` merged into `property` — see
+`CONTEXT.md`'s "Current step" and the rewritten `11-data-model.md`. The steps above are left
+unedited as a historical record of the original build; they no longer describe the current
+schema.

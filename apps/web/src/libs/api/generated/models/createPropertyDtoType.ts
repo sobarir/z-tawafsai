@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export type CreatePropertyDtoType = typeof CreatePropertyDtoType[keyof typeof CreatePropertyDtoType];
+
+
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const SearchHotelsKind = {  property: 'property',
-  package: 'package',
-  both: 'both',
-} as const
+export const CreatePropertyDtoType = {
+  hotel: 'hotel',
+  apartment: 'apartment',
+  house: 'house',
+} as const;

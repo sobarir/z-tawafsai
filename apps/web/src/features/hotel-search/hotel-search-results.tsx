@@ -26,7 +26,7 @@ interface HotelSearchResultsProps {
 
 type Translate = ReturnType<typeof useTranslations>;
 
-function detailHref(listingId: string, query: HotelResultsQuery): string {
+function detailHref(propertyCode: string, query: HotelResultsQuery): string {
   const params = new URLSearchParams({
     destination: query.destination,
     checkIn: query.checkIn,
@@ -34,7 +34,7 @@ function detailHref(listingId: string, query: HotelResultsQuery): string {
     occupancy: String(query.occupancy),
     currency: query.currency,
   });
-  return `/hotels/${listingId}?${params.toString()}`;
+  return `/hotels/${propertyCode}?${params.toString()}`;
 }
 
 function PriceLine({
@@ -50,14 +50,10 @@ function PriceLine({
 
   return (
     <div className="flex flex-col items-end gap-0.5">
-      {item.kind === 'property' &&
-      item.breakdown.perNight &&
-      item.breakdown.nights ? (
-        <p className="text-xs text-muted-foreground">
-          {formatHotelMoney(item.breakdown.perNight, locale)} ×{' '}
-          {item.breakdown.nights}
-        </p>
-      ) : null}
+      <p className="text-xs text-muted-foreground">
+        {formatHotelMoney(item.breakdown.perNight, locale)} ×{' '}
+        {item.breakdown.nights}
+      </p>
       <p className="text-xl font-bold text-primary">
         {formatHotelMoney(item.price, locale)}
       </p>
@@ -87,16 +83,11 @@ function ResultCard({
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <p className="text-lg font-semibold">{item.displayName}</p>
           <p className="text-sm text-muted-foreground">{item.destination}</p>
-          {item.kind === 'property' && item.starRating ? (
+          {item.starRating ? (
             <Badge variant="outline">{'★'.repeat(item.starRating)}</Badge>
           ) : null}
-          {item.kind === 'package' && item.durationNights ? (
-            <Badge variant="secondary">
-              {t('durationNights', { count: item.durationNights })}
-            </Badge>
-          ) : null}
           <Link
-            href={detailHref(item.listingId, query)}
+            href={detailHref(item.propertyCode, query)}
             className="w-fit"
             aria-label={`${t('viewDetails')} — ${item.displayName}`}
           >
@@ -141,7 +132,7 @@ export function HotelSearchResults({
       <div className="flex flex-col gap-3">
         {results.map((item) => (
           <ResultCard
-            key={item.listingId}
+            key={item.propertyCode}
             item={item}
             locale={locale}
             t={t}

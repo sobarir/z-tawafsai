@@ -1,0 +1,1 @@
+CREATE TYPE "public"."property_type" AS ENUM('hotel', 'apartment', 'house');

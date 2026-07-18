@@ -12,7 +12,6 @@ import {
   useCreateHotelRateRule,
   useDeleteHotelRateRule,
   useListHotelCurrencies,
-  useListHotelPackages,
   useListHotelProperties,
   useListHotelRateRules,
   useListHotelRoomTypes,
@@ -33,7 +32,6 @@ export function HotelRateRulesAdmin() {
 
   const { data: rateRules, isLoading } = useListHotelRateRules();
   const { data: properties } = useListHotelProperties();
-  const { data: packages } = useListHotelPackages();
   const { data: seasons } = useListHotelSeasons();
   const { data: roomTypes } = useListHotelRoomTypes();
   const { data: currencies } = useListHotelCurrencies();
@@ -65,17 +63,15 @@ export function HotelRateRulesAdmin() {
     () =>
       getRateRuleColumns({
         columnLabels: {
-          listing: t('columns.listing'),
+          property: t('columns.property'),
           season: t('columns.season'),
           roomType: t('columns.roomType'),
           band: t('columns.band'),
           amount: t('columns.amount'),
         },
         properties: properties ?? [],
-        packages: packages ?? [],
         seasons: seasons ?? [],
         roomTypes: roomTypes ?? [],
-        noneLabel: tCommon('no'),
         actionsLabel: tCatalog('actions'),
         openMenuLabel: tCatalog('openMenu'),
         editLabel: tCommon('edit'),
@@ -86,7 +82,7 @@ export function HotelRateRulesAdmin() {
         },
         onDelete: (rateRule) => setDeleting(rateRule),
       }),
-    [t, properties, packages, seasons, roomTypes, tCatalog, tCommon],
+    [t, properties, seasons, roomTypes, tCatalog, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -120,7 +116,6 @@ export function HotelRateRulesAdmin() {
         <RateRuleForm
           rateRule={editing ?? undefined}
           properties={properties ?? []}
-          packages={packages ?? []}
           seasons={seasons ?? []}
           roomTypes={roomTypes ?? []}
           currencies={currencies ?? []}

@@ -32,7 +32,7 @@ export async function HotelDetailPageContent({
   return (
     <PageLayout>
       <PageHeader title={t('detailTitle')} />
-      <HotelDetail listingId={id} query={query} />
+      <HotelDetail propertyCode={id} query={query} />
     </PageLayout>
   );
 }

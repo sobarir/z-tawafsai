@@ -11,32 +11,24 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new HotelPropertiesService(db);
 
-// A code not in prd/hotels/15-seed-data.md's listing set (JED-WFH/UMR-9D-ECO/...),
+// A code not in prd/hotels/15-seed-data.md's property set (JED-WFH/MAD-CIN),
 // so tests never collide with seeded rows.
 const TEST_CODE = 'ZZZ-PROP';
 
 async function cleanup() {
-  const [existing] = await db
-    .select({ listingId: schema.property.listingId })
-    .from(schema.property)
-    .where(eq(schema.property.propertyCode, TEST_CODE));
   await db
     .delete(schema.property)
     .where(eq(schema.property.propertyCode, TEST_CODE));
-  if (existing) {
-    await db
-      .delete(schema.listing)
-      .where(eq(schema.listing.id, existing.listingId));
-  }
 }
 
 describe('HotelPropertiesService', () => {
   beforeEach(cleanup);
   afterAll(cleanup);
 
-  it('creates, reads, updates, and deletes a property (listing + property in one transaction)', async () => {
+  it('creates, reads, updates, and deletes a property', async () => {
     const created = await service.create({
       propertyCode: TEST_CODE,
+      type: 'hotel',
       displayName: 'Test Property',
       destination: 'Test City',
       countryCode: 'ZZ',
@@ -58,17 +50,12 @@ describe('HotelPropertiesService', () => {
     await expect(service.findByCode(TEST_CODE)).rejects.toThrow(
       NotFoundException,
     );
-
-    const [listingRow] = await db
-      .select({ id: schema.listing.id })
-      .from(schema.listing)
-      .where(eq(schema.listing.id, created.listingId));
-    expect(listingRow).toBeUndefined();
   });
 
   it('rejects creating a duplicate property code', async () => {
     await service.create({
       propertyCode: TEST_CODE,
+      type: 'hotel',
       displayName: 'Test Property',
       destination: 'Test City',
       countryCode: 'ZZ',
@@ -77,6 +64,7 @@ describe('HotelPropertiesService', () => {
     await expect(
       service.create({
         propertyCode: TEST_CODE,
+        type: 'hotel',
         displayName: 'Duplicate Property',
         destination: 'Test City',
         countryCode: 'ZZ',

@@ -5,15 +5,12 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
-import type { HotelSearchResponseDtoItemsItemKind } from './hotelSearchResponseDtoItemsItemKind';
 import type { HotelSearchResponseDtoItemsItemPrice } from './hotelSearchResponseDtoItemsItemPrice';
 import type { HotelSearchResponseDtoItemsItemNativePrice } from './hotelSearchResponseDtoItemsItemNativePrice';
 import type { HotelSearchResponseDtoItemsItemBreakdown } from './hotelSearchResponseDtoItemsItemBreakdown';
 
 export type HotelSearchResponseDtoItemsItem = {
-  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  listingId: string;
-  kind: HotelSearchResponseDtoItemsItemKind;
+  propertyCode: string;
   displayName: string;
   destination: string;
   /** @nullable */
@@ -27,10 +24,4 @@ export type HotelSearchResponseDtoItemsItem = {
    * @nullable
    */
   starRating?: number | null;
-  /**
-   * @minimum 0
-   * @maximum 9007199254740991
-   * @exclusiveMinimum
-   */
-  durationNights?: number;
 };

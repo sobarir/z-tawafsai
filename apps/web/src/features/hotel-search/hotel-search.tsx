@@ -4,10 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSearchHotels } from '@/libs/api/generated/endpoints';
 import { useApiErrorToast } from '@/libs/api/use-api-error-toast';
-import type {
-  HotelSearchFormValues,
-  HotelSearchKind,
-} from './hotel-search-form';
+import type { HotelSearchFormValues } from './hotel-search-form';
 import { HotelSearchForm } from './hotel-search-form';
 import { HotelSearchResults } from './hotel-search-results';
 import type { HotelSort, RefineRailValue } from './refine-rail';
@@ -28,7 +25,6 @@ function toSearchParams(state: HotelSearchState): URLSearchParams {
   if (state.checkOut) params.set('checkOut', state.checkOut);
   params.set('occupancy', String(state.occupancy));
   params.set('currency', state.currency);
-  params.set('kind', state.kind);
   params.set('sort', state.sort);
   if (state.minPrice !== undefined)
     params.set('minPrice', String(state.minPrice));
@@ -54,7 +50,6 @@ export function HotelSearch({ initialState }: HotelSearchProps) {
       checkOut: initialState.checkOut,
       occupancy: initialState.occupancy,
       currency: initialState.currency,
-      kind: initialState.kind,
       sort: initialState.sort,
       minPrice: initialState.minPrice,
       maxPrice: initialState.maxPrice,
@@ -112,4 +107,4 @@ export function HotelSearch({ initialState }: HotelSearchProps) {
   );
 }
 
-export type { HotelSearchKind, HotelSort };
+export type { HotelSort };

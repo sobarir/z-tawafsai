@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CreatePropertyInput, Property } from '@repo/shared';
-import { createPropertySchema } from '@repo/shared';
+import { createPropertySchema, propertyTypeSchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { CheckboxFormField } from '@/components/shared/checkbox-form-field';
@@ -11,7 +11,21 @@ import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
 import type { ComboboxOption } from '@/components/ui/combobox';
-import { Form } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface PropertyFormProps {
   property?: Property;
@@ -29,6 +43,7 @@ export function PropertyForm({
   submitting,
 }: PropertyFormProps) {
   const t = useTranslations('catalog.properties.fields');
+  const tPropertyType = useTranslations('catalog.properties.types');
   const tCommon = useTranslations('common');
   const isEdit = !!property;
 
@@ -36,6 +51,7 @@ export function PropertyForm({
     resolver: zodResolver(createPropertySchema),
     defaultValues: {
       propertyCode: property?.propertyCode ?? '',
+      type: property?.type ?? 'hotel',
       displayName: property?.displayName ?? '',
       destination: property?.destination ?? '',
       countryCode: property?.countryCode ?? '',
@@ -69,6 +85,31 @@ export function PropertyForm({
             placeholder={t('displayNamePlaceholder')}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('type')}</FormLabel>
+              <FormControl>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertyTypeSchema.options.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {tPropertyType(type)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">

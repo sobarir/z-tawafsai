@@ -1438,29 +1438,6 @@
             }
           },
           {
-            "name": "kind",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "property",
-              "anyOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "property",
-                    "package"
-                  ]
-                },
-                {
-                  "type": "string",
-                  "enum": [
-                    "both"
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "name": "roomType",
             "required": false,
             "in": "query",
@@ -1537,7 +1514,7 @@
             }
           }
         },
-        "summary": "Search properties and packages by destination/dates/occupancy, priced in the requested display currency",
+        "summary": "Search hotel properties by destination/dates/occupancy, priced in the requested display currency",
         "tags": [
           "hotels"
         ]
@@ -1981,153 +1958,6 @@
         "summary": "Delete a property",
         "tags": [
           "hotel-properties"
-        ]
-      }
-    },
-    "/api/hotel-packages": {
-      "get": {
-        "operationId": "listHotelPackages",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PackageDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "List packages",
-        "tags": [
-          "hotel-packages"
-        ]
-      },
-      "post": {
-        "operationId": "createHotelPackage",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePackageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PackageDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create a package",
-        "tags": [
-          "hotel-packages"
-        ]
-      }
-    },
-    "/api/hotel-packages/{packageCode}": {
-      "get": {
-        "operationId": "getHotelPackage",
-        "parameters": [
-          {
-            "name": "packageCode",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PackageDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get a package",
-        "tags": [
-          "hotel-packages"
-        ]
-      },
-      "patch": {
-        "operationId": "updateHotelPackage",
-        "parameters": [
-          {
-            "name": "packageCode",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePackageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PackageDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Update a package",
-        "tags": [
-          "hotel-packages"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteHotelPackage",
-        "parameters": [
-          {
-            "name": "packageCode",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "summary": "Delete a package",
-        "tags": [
-          "hotel-packages"
         ]
       }
     },
@@ -4142,16 +3972,8 @@
             "items": {
               "type": "object",
               "properties": {
-                "listingId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-                },
-                "kind": {
-                  "type": "string",
-                  "enum": [
-                    "property",
-                    "package"
-                  ]
+                "propertyCode": {
+                  "type": "string"
                 },
                 "displayName": {
                   "type": "string"
@@ -4246,6 +4068,8 @@
                     }
                   },
                   "required": [
+                    "perNight",
+                    "nights",
                     "total"
                   ]
                 },
@@ -4254,17 +4078,10 @@
                   "minimum": 1,
                   "maximum": 5,
                   "nullable": true
-                },
-                "durationNights": {
-                  "type": "integer",
-                  "exclusiveMinimum": true,
-                  "maximum": 9007199254740991,
-                  "minimum": 0
                 }
               },
               "required": [
-                "listingId",
-                "kind",
+                "propertyCode",
                 "displayName",
                 "destination",
                 "heroImageUrl",
@@ -4462,9 +4279,13 @@
             "minLength": 1,
             "maxLength": 50
           },
-          "listingId": {
+          "type": {
             "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            "enum": [
+              "hotel",
+              "apartment",
+              "house"
+            ]
           },
           "starRating": {
             "type": "integer",
@@ -4506,7 +4327,7 @@
         },
         "required": [
           "propertyCode",
-          "listingId",
+          "type",
           "starRating",
           "address",
           "displayName",
@@ -4524,6 +4345,14 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 50
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hotel",
+              "apartment",
+              "house"
+            ]
           },
           "starRating": {
             "type": "integer",
@@ -4559,6 +4388,7 @@
         },
         "required": [
           "propertyCode",
+          "type",
           "displayName",
           "destination",
           "countryCode"
@@ -4567,6 +4397,14 @@
       "UpdatePropertyDto": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "hotel",
+              "apartment",
+              "house"
+            ]
+          },
           "starRating": {
             "type": "integer",
             "minimum": 1,
@@ -4575,155 +4413,6 @@
           "address": {
             "type": "string",
             "maxLength": 500
-          },
-          "displayName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "destination": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100
-          },
-          "countryCode": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 2
-          },
-          "heroImageUrl": {
-            "type": "string",
-            "maxLength": 2000
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        }
-      },
-      "PackageDto": {
-        "type": "object",
-        "properties": {
-          "packageCode": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 50
-          },
-          "listingId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "durationNights": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
-          },
-          "includes": {
-            "type": "string",
-            "nullable": true
-          },
-          "displayName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "destination": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100
-          },
-          "countryCode": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 2
-          },
-          "heroImageUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-          }
-        },
-        "required": [
-          "packageCode",
-          "listingId",
-          "durationNights",
-          "includes",
-          "displayName",
-          "destination",
-          "countryCode",
-          "heroImageUrl",
-          "isActive",
-          "createdAt"
-        ]
-      },
-      "CreatePackageDto": {
-        "type": "object",
-        "properties": {
-          "packageCode": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 50
-          },
-          "durationNights": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
-          },
-          "includes": {
-            "type": "string",
-            "maxLength": 2000
-          },
-          "displayName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "destination": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100
-          },
-          "countryCode": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 2
-          },
-          "heroImageUrl": {
-            "type": "string",
-            "maxLength": 2000
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "packageCode",
-          "durationNights",
-          "displayName",
-          "destination",
-          "countryCode"
-        ]
-      },
-      "UpdatePackageDto": {
-        "type": "object",
-        "properties": {
-          "durationNights": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
-          },
-          "includes": {
-            "type": "string",
-            "maxLength": 2000
           },
           "displayName": {
             "type": "string",
@@ -4827,9 +4516,8 @@
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "listingId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          "propertyCode": {
+            "type": "string"
           },
           "name": {
             "type": "string",
@@ -4854,7 +4542,7 @@
         },
         "required": [
           "id",
-          "listingId",
+          "propertyCode",
           "name",
           "startDate",
           "endDate"
@@ -4863,9 +4551,10 @@
       "CreateSeasonDto": {
         "type": "object",
         "properties": {
-          "listingId": {
+          "propertyCode": {
             "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            "minLength": 1,
+            "maxLength": 50
           },
           "name": {
             "type": "string",
@@ -4889,7 +4578,7 @@
           }
         },
         "required": [
-          "listingId",
+          "propertyCode",
           "name",
           "startDate",
           "endDate"
@@ -4927,9 +4616,8 @@
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "listingId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          "propertyCode": {
+            "type": "string"
           },
           "seasonId": {
             "type": "string",
@@ -4937,8 +4625,7 @@
           },
           "roomTypeId": {
             "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-            "nullable": true
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
           "minOccupancy": {
             "type": "integer",
@@ -4964,7 +4651,7 @@
         },
         "required": [
           "id",
-          "listingId",
+          "propertyCode",
           "seasonId",
           "roomTypeId",
           "minOccupancy",
@@ -4976,9 +4663,10 @@
       "CreateRateRuleDto": {
         "type": "object",
         "properties": {
-          "listingId": {
+          "propertyCode": {
             "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+            "minLength": 1,
+            "maxLength": 50
           },
           "seasonId": {
             "type": "string",
@@ -5011,8 +4699,9 @@
           }
         },
         "required": [
-          "listingId",
+          "propertyCode",
           "seasonId",
+          "roomTypeId",
           "minOccupancy",
           "maxOccupancy",
           "amount",

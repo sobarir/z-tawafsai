@@ -11,7 +11,6 @@ import {
   getListHotelSeasonsQueryKey,
   useCreateHotelSeason,
   useDeleteHotelSeason,
-  useListHotelPackages,
   useListHotelProperties,
   useListHotelSeasons,
   useUpdateHotelSeason,
@@ -30,7 +29,6 @@ export function HotelSeasonsAdmin() {
 
   const { data: seasons, isLoading } = useListHotelSeasons();
   const { data: properties } = useListHotelProperties();
-  const { data: packages } = useListHotelPackages();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Season | null>(null);
@@ -59,13 +57,12 @@ export function HotelSeasonsAdmin() {
     () =>
       getSeasonColumns({
         columnLabels: {
-          listing: t('columns.listing'),
+          property: t('columns.property'),
           name: t('columns.name'),
           startDate: t('columns.startDate'),
           endDate: t('columns.endDate'),
         },
         properties: properties ?? [],
-        packages: packages ?? [],
         actionsLabel: tCatalog('actions'),
         openMenuLabel: tCatalog('openMenu'),
         editLabel: tCommon('edit'),
@@ -76,7 +73,7 @@ export function HotelSeasonsAdmin() {
         },
         onDelete: (season) => setDeleting(season),
       }),
-    [t, properties, packages, tCatalog, tCommon],
+    [t, properties, tCatalog, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -110,7 +107,6 @@ export function HotelSeasonsAdmin() {
         <SeasonForm
           season={editing ?? undefined}
           properties={properties ?? []}
-          packages={packages ?? []}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {

@@ -9,12 +9,12 @@ import type { HotelSearchResponseDtoItemsItemBreakdownPerNight } from './hotelSe
 import type { HotelSearchResponseDtoItemsItemBreakdownTotal } from './hotelSearchResponseDtoItemsItemBreakdownTotal';
 
 export type HotelSearchResponseDtoItemsItemBreakdown = {
-  perNight?: HotelSearchResponseDtoItemsItemBreakdownPerNight;
+  perNight: HotelSearchResponseDtoItemsItemBreakdownPerNight;
   /**
    * @minimum 0
    * @maximum 9007199254740991
    * @exclusiveMinimum
    */
-  nights?: number;
+  nights: number;
   total: HotelSearchResponseDtoItemsItemBreakdownTotal;
 };

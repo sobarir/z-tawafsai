@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type {
   CreateRateRuleInput,
   Currency,
-  Package,
   Property,
   RateRule,
   RoomType,
@@ -19,18 +18,14 @@ import { NumberFormField } from '@/components/shared/number-form-field';
 import { Form } from '@/components/ui/form';
 import {
   toCurrencyOptions,
-  toListingOptions,
+  toPropertyOptions,
   toRoomTypeOptions,
   toSeasonOptions,
 } from '@/libs/combobox-options';
 
-/** Sentinel for "no room type" (package rate rules) — Combobox needs a real string value. */
-export const NO_ROOM_TYPE = '__none__';
-
 interface RateRuleFormProps {
   rateRule?: RateRule;
   properties: Property[];
-  packages: Package[];
   seasons: Season[];
   roomTypes: RoomType[];
   currencies: Currency[];
@@ -42,7 +37,6 @@ interface RateRuleFormProps {
 export function RateRuleForm({
   rateRule,
   properties,
-  packages,
   seasons,
   roomTypes,
   currencies,
@@ -57,9 +51,9 @@ export function RateRuleForm({
   const form = useForm<CreateRateRuleInput>({
     resolver: zodResolver(createRateRuleSchema),
     defaultValues: {
-      listingId: rateRule?.listingId ?? '',
+      propertyCode: rateRule?.propertyCode ?? '',
       seasonId: rateRule?.seasonId ?? '',
-      roomTypeId: rateRule?.roomTypeId ?? undefined,
+      roomTypeId: rateRule?.roomTypeId ?? '',
       minOccupancy: rateRule?.minOccupancy ?? 1,
       maxOccupancy: rateRule?.maxOccupancy ?? 1,
       amount: rateRule?.amount ?? 0,
@@ -67,20 +61,19 @@ export function RateRuleForm({
     },
   });
 
-  const selectedListingId = useWatch({
+  const selectedPropertyCode = useWatch({
     control: form.control,
-    name: 'listingId',
+    name: 'propertyCode',
   });
-  const seasonsForListing = seasons.filter(
-    (s) => s.listingId === selectedListingId,
+  const seasonsForProperty = seasons.filter(
+    (s) => s.propertyCode === selectedPropertyCode,
+  );
+  const roomTypesForProperty = roomTypes.filter(
+    (rt) => rt.propertyCode === selectedPropertyCode,
   );
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    await onSubmit({
-      ...values,
-      roomTypeId:
-        values.roomTypeId === NO_ROOM_TYPE ? undefined : values.roomTypeId,
-    });
+    await onSubmit(values);
   });
 
   return (
@@ -88,9 +81,9 @@ export function RateRuleForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <ComboboxFormField
           control={form.control}
-          name="listingId"
-          label={t('listingId')}
-          options={toListingOptions(properties, packages)}
+          name="propertyCode"
+          label={t('propertyCode')}
+          options={toPropertyOptions(properties)}
           disabled={isEdit}
         />
 
@@ -98,18 +91,16 @@ export function RateRuleForm({
           control={form.control}
           name="seasonId"
           label={t('seasonId')}
-          options={toSeasonOptions(seasonsForListing)}
-          disabled={isEdit || !selectedListingId}
+          options={toSeasonOptions(seasonsForProperty)}
+          disabled={isEdit || !selectedPropertyCode}
         />
 
         <ComboboxFormField
           control={form.control}
           name="roomTypeId"
           label={t('roomTypeId')}
-          options={[
-            { value: NO_ROOM_TYPE, label: t('noRoomType') },
-            ...toRoomTypeOptions(roomTypes),
-          ]}
+          options={toRoomTypeOptions(roomTypesForProperty)}
+          disabled={isEdit || !selectedPropertyCode}
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -18,7 +18,7 @@ type RateRuleRow = typeof schema.rateRule.$inferSelect;
 
 const toRateRule = (row: RateRuleRow): RateRule => ({ ...row });
 
-/** Postgres unique-violation — the band_unique / band_unique_no_room_type indexes. */
+/** Postgres unique-violation — the rate_rule_band_unique index. */
 const UNIQUE_VIOLATION = '23505';
 
 /** Drizzle wraps the raw pg error in DrizzleQueryError.cause — the pg error code lives there, not on the top-level error. */
@@ -53,13 +53,13 @@ export class HotelRateRulesService {
     try {
       const [created] = await this.db
         .insert(schema.rateRule)
-        .values({ ...input, roomTypeId: input.roomTypeId ?? null })
+        .values(input)
         .returning();
       return toRateRule(created);
     } catch (error) {
       if (isUniqueViolation(error)) {
         throw new ConflictException(
-          'A rate rule already exists for this listing/season/room type/occupancy band',
+          'A rate rule already exists for this property/season/room type/occupancy band',
         );
       }
       throw error;
@@ -78,7 +78,7 @@ export class HotelRateRulesService {
     } catch (error) {
       if (isUniqueViolation(error)) {
         throw new ConflictException(
-          'A rate rule already exists for this listing/season/room type/occupancy band',
+          'A rate rule already exists for this property/season/room type/occupancy band',
         );
       }
       throw error;

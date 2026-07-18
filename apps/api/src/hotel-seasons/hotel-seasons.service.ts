@@ -60,7 +60,7 @@ export class HotelSeasonsService {
     } catch (error) {
       if (isExclusionViolation(error)) {
         throw new ConflictException(
-          'This date range overlaps an existing season for the same listing',
+          'This date range overlaps an existing season for the same property',
         );
       }
       throw error;
@@ -79,7 +79,7 @@ export class HotelSeasonsService {
     } catch (error) {
       if (isExclusionViolation(error)) {
         throw new ConflictException(
-          'This date range overlaps an existing season for the same listing',
+          'This date range overlaps an existing season for the same property',
         );
       }
       throw error;

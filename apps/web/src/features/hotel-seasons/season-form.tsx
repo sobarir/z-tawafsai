@@ -1,12 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type {
-  CreateSeasonInput,
-  Package,
-  Property,
-  Season,
-} from '@repo/shared';
+import type { CreateSeasonInput, Property, Season } from '@repo/shared';
 import { createSeasonSchema, seasonNameSchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
@@ -28,12 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { toListingOptions } from '@/libs/combobox-options';
+import { toPropertyOptions } from '@/libs/combobox-options';
 
 interface SeasonFormProps {
   season?: Season;
   properties: Property[];
-  packages: Package[];
   onSubmit: (values: CreateSeasonInput) => Promise<void>;
   onCancel: () => void;
   submitting: boolean;
@@ -42,7 +36,6 @@ interface SeasonFormProps {
 export function SeasonForm({
   season,
   properties,
-  packages,
   onSubmit,
   onCancel,
   submitting,
@@ -55,7 +48,7 @@ export function SeasonForm({
   const form = useForm<CreateSeasonInput>({
     resolver: zodResolver(createSeasonSchema),
     defaultValues: {
-      listingId: season?.listingId ?? '',
+      propertyCode: season?.propertyCode ?? '',
       name: season?.name ?? 'standard',
       startDate: season?.startDate ?? '',
       endDate: season?.endDate ?? '',
@@ -71,9 +64,9 @@ export function SeasonForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <ComboboxFormField
           control={form.control}
-          name="listingId"
-          label={t('listingId')}
-          options={toListingOptions(properties, packages)}
+          name="propertyCode"
+          label={t('propertyCode')}
+          options={toPropertyOptions(properties)}
           disabled={isEdit}
         />
 

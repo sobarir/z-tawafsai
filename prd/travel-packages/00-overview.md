@@ -63,13 +63,16 @@ engine" scope and the hotels domain's "search/display only" scope — see
 - i18n: `travelPackages` namespace (public card list) and `travelPackagesAdmin` namespace (admin
   form/table), all 6 locales.
 
-## Naming gotcha (non-obvious — read before touching either table)
+## Former naming gotcha (resolved 2026-07-18 — kept for history)
 
-The Drizzle schema already had an unrelated export named `schema.travelPackage` — this is the
+The Drizzle schema used to have a second, unrelated export named `schema.travelPackage` — the
 **hotels domain's `package` table** (the `kind=package` Listing variant, keyed by `packageCode`),
-predating this feature. The *new* flight+hotel bundle entity added here is a different Postgres
-table (`travel_package`) but its Drizzle export is named `schema.flightHotelPackage` specifically
-to avoid colliding with the pre-existing `schema.travelPackage` export.
+predating this feature. This feature's flight+hotel bundle entity was deliberately named
+`schema.flightHotelPackage` (Postgres table `travel_package`) specifically to avoid colliding
+with that pre-existing `schema.travelPackage` export.
 
-**`schema.travelPackage` ≠ the Travel Packages feature. `schema.flightHotelPackage` is the Travel
-Packages feature.** Reading the wrong one silently type-checks against the wrong table.
+**The collision this section used to warn about no longer exists**: the hotels domain's
+`package` table (and `schema.travelPackage`) was removed on 2026-07-18 — see
+`prd/hotels/CONTEXT.md`. `schema.flightHotelPackage` (Postgres table `travel_package`) is
+untouched and remains this domain's table; there is no other `travelPackage`-named export to
+confuse it with anymore.

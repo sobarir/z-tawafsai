@@ -416,17 +416,13 @@
     "bagThroughChecked": "ব্যাগেজ সরাসরি চেক করা হয়েছে"
   },
   "hotelSearch": {
-    "title": "থাকার জায়গা ও প্যাকেজ খুঁজুন",
-    "description": "গন্তব্য ও তারিখ অনুযায়ী থাকার জায়গা বা প্যাকেজ খুঁজুন, আপনার মুদ্রায় মূল্য সহ।",
+    "title": "থাকার জায়গা খুঁজুন",
+    "description": "গন্তব্য ও তারিখ অনুযায়ী থাকার জায়গা খুঁজুন, আপনার মুদ্রায় মূল্য সহ।",
     "destination": "গন্তব্য",
     "destinationPlaceholder": "জেদ্দা, মদিনা...",
     "checkIn": "চেক-ইন",
     "checkOut": "চেক-আউট",
     "occupancy": "অতিথি",
-    "kind": "দেখান",
-    "kindBoth": "উভয়",
-    "kindProperty": "থাকার জায়গা",
-    "kindPackage": "প্যাকেজ",
     "currency": "মুদ্রা",
     "searchButton": "খুঁজুন",
     "sort": "সাজান",
@@ -436,7 +432,7 @@
     "minPrice": "সর্বনিম্ন মূল্য",
     "maxPrice": "সর্বোচ্চ মূল্য",
     "loading": "খোঁজা হচ্ছে...",
-    "noResults": "এই তারিখে কোনো থাকার জায়গা বা প্যাকেজ মেলেনি। তারিখের পরিসর বাড়িয়ে বা অন্য বিভাগে খুঁজে দেখুন।",
+    "noResults": "এই তারিখে কোনো থাকার জায়গা মেলেনি। তারিখের পরিসর বাড়িয়ে দেখুন।",
     "resultsCount": "{count, plural, one {# টি ফলাফল পাওয়া গেছে} other {# টি ফলাফল পাওয়া গেছে}}",
     "converted": "রূপান্তরিত",
     "durationNights": "{count, plural, one {# রাত} other {# রাত}}",
@@ -451,7 +447,6 @@
     "nav": {
       "section": "ক্যাটালগ অ্যাডমিন",
       "properties": "থাকার জায়গা",
-      "packages": "প্যাকেজ",
       "roomTypes": "রুম টাইপ",
       "seasons": "মৌসুম",
       "rateRules": "মূল্য নিয়ম"
@@ -476,6 +471,7 @@
       "columns": {
         "propertyCode": "কোড",
         "displayName": "নাম",
+        "type": "ধরন",
         "destination": "গন্তব্য",
         "countryCode": "দেশ",
         "starRating": "তারকা",
@@ -486,6 +482,7 @@
         "propertyCodePlaceholder": "যেমন JED-WFH",
         "displayName": "প্রদর্শিত নাম",
         "displayNamePlaceholder": "যেমন জেদ্দা ওয়াটারফ্রন্ট হোটেল",
+        "type": "ধরন",
         "destination": "গন্তব্য",
         "destinationHint": "দেখতে পাচ্ছেন না? প্রথমে রেফারেন্স ডেটা → শহর-এ যোগ করুন।",
         "countryCode": "দেশের কোড",
@@ -496,36 +493,11 @@
         "address": "ঠিকানা",
         "addressPlaceholder": "রাস্তার ঠিকানা",
         "isActive": "সক্রিয় (অনুসন্ধানে দেখানো হবে)"
-      }
-    },
-    "packages": {
-      "title": "প্যাকেজ",
-      "description": "নির্দিষ্ট পরিসরের বান্ডল করা পণ্য, প্রতি যাত্রায় মোট মূল্য নির্ধারিত।",
-      "createTitle": "নতুন প্যাকেজ",
-      "editTitle": "প্যাকেজ সম্পাদনা করুন",
-      "columns": {
-        "packageCode": "কোড",
-        "displayName": "নাম",
-        "destination": "গন্তব্য",
-        "countryCode": "দেশ",
-        "durationNights": "রাত",
-        "isActive": "সক্রিয়"
       },
-      "fields": {
-        "packageCode": "প্যাকেজ কোড",
-        "packageCodePlaceholder": "যেমন UMR-9D-ECO",
-        "displayName": "প্রদর্শিত নাম",
-        "displayNamePlaceholder": "যেমন ৯-দিনের ইকোনমি উমরাহ",
-        "destination": "গন্তব্য",
-        "destinationHint": "দেখতে পাচ্ছেন না? প্রথমে রেফারেন্স ডেটা → শহর-এ যোগ করুন।",
-        "countryCode": "দেশের কোড",
-        "countryCodePlaceholder": "যেমন SA",
-        "heroImageUrl": "প্রধান ছবির URL",
-        "heroImageUrlPlaceholder": "https://...",
-        "durationNights": "সময়কাল (রাত)",
-        "includes": "অন্তর্ভুক্ত",
-        "includesPlaceholder": "প্যাকেজে কী অন্তর্ভুক্ত তার সংক্ষিপ্ত বিবরণ",
-        "isActive": "সক্রিয় (অনুসন্ধানে দেখানো হবে)"
+      "types": {
+        "hotel": "হোটেল",
+        "apartment": "অ্যাপার্টমেন্ট",
+        "house": "বাড়ি"
       }
     },
     "roomTypes": {
@@ -547,17 +519,17 @@
     },
     "seasons": {
       "title": "মৌসুম",
-      "description": "একটি প্রপার্টি বা প্যাকেজের সাথে যুক্ত তারিখের পরিসর যা প্রযোজ্য মূল্য নির্ধারণ করে।",
+      "description": "একটি প্রপার্টির সাথে যুক্ত তারিখের পরিসর যা প্রযোজ্য মূল্য নির্ধারণ করে।",
       "createTitle": "নতুন মৌসুম",
       "editTitle": "মৌসুম সম্পাদনা করুন",
       "columns": {
-        "listing": "প্রপার্টি / প্যাকেজ",
+        "property": "প্রপার্টি",
         "name": "মৌসুম",
         "startDate": "শুরুর তারিখ",
         "endDate": "শেষের তারিখ"
       },
       "fields": {
-        "listingId": "প্রপার্টি / প্যাকেজ",
+        "propertyCode": "প্রপার্টি",
         "name": "মৌসুম",
         "startDate": "শুরুর তারিখ",
         "endDate": "শেষের তারিখ"
@@ -572,21 +544,20 @@
     },
     "rateRules": {
       "title": "মূল্য নিয়ম",
-      "description": "মূল্যের মূল তথ্য: (প্রপার্টি/প্যাকেজ, মৌসুম, ধারণক্ষমতার পরিসর) -> একটি মুদ্রায় মূল্য।",
+      "description": "মূল্যের মূল তথ্য: (প্রপার্টি, মৌসুম, ধারণক্ষমতার পরিসর) -> একটি মুদ্রায় মূল্য।",
       "createTitle": "নতুন মূল্য নিয়ম",
       "editTitle": "মূল্য নিয়ম সম্পাদনা করুন",
       "columns": {
-        "listing": "প্রপার্টি / প্যাকেজ",
+        "property": "প্রপার্টি",
         "season": "মৌসুম",
         "roomType": "রুম টাইপ",
         "band": "ধারণক্ষমতার পরিসর",
         "amount": "পরিমাণ"
       },
       "fields": {
-        "listingId": "প্রপার্টি / প্যাকেজ",
+        "propertyCode": "প্রপার্টি",
         "seasonId": "মৌসুম",
         "roomTypeId": "রুম টাইপ",
-        "noRoomType": "— কোনোটি নয় (প্যাকেজ) —",
         "minOccupancy": "সর্বনিম্ন ধারণক্ষমতা",
         "maxOccupancy": "সর্বোচ্চ ধারণক্ষমতা",
         "amount": "পরিমাণ (ক্ষুদ্রতম একক)",
@@ -615,7 +586,7 @@
     "deleteSuccess": "সফলভাবে মুছে ফেলা হয়েছে।",
     "cities": {
       "title": "শহর",
-      "description": "বিমানবন্দর এবং হোটেল প্রপার্টি/প্যাকেজে ব্যবহৃত রেফারেন্স শহর।",
+      "description": "বিমানবন্দর এবং হোটেল প্রপার্টিতে ব্যবহৃত রেফারেন্স শহর।",
       "createTitle": "নতুন শহর",
       "editTitle": "শহর সম্পাদনা করুন",
       "columns": {
@@ -634,7 +605,7 @@
     },
     "currencies": {
       "title": "মুদ্রা",
-      "description": "থাকার জায়গা ও প্যাকেজের মূল্য নির্ধারণে ব্যবহৃত রেফারেন্স মুদ্রা।",
+      "description": "থাকার জায়গার মূল্য নির্ধারণে ব্যবহৃত রেফারেন্স মুদ্রা।",
       "createTitle": "নতুন মুদ্রা",
       "editTitle": "মুদ্রা সম্পাদনা করুন",
       "columns": {

@@ -1,18 +1,17 @@
 'use client';
 
-import type { Package, Property, Season } from '@repo/shared';
+import type { Property, Season } from '@repo/shared';
 import type { ColumnDef } from '@tanstack/react-table';
 import { actionsColumn } from '@/components/shared/actions-column';
 
 interface SeasonColumnsOptions {
   columnLabels: {
-    listing: string;
+    property: string;
     name: string;
     startDate: string;
     endDate: string;
   };
   properties: Property[];
-  packages: Package[];
   actionsLabel: string;
   openMenuLabel: string;
   editLabel: string;
@@ -24,7 +23,6 @@ interface SeasonColumnsOptions {
 export function getSeasonColumns({
   columnLabels,
   properties,
-  packages,
   actionsLabel,
   openMenuLabel,
   editLabel,
@@ -32,18 +30,16 @@ export function getSeasonColumns({
   onEdit,
   onDelete,
 }: SeasonColumnsOptions): ColumnDef<Season>[] {
-  const listingName = (listingId: string): string => {
-    const property = properties.find((p) => p.listingId === listingId);
-    if (property) return property.displayName;
-    const pkg = packages.find((p) => p.listingId === listingId);
-    return pkg?.displayName ?? listingId;
+  const propertyName = (propertyCode: string): string => {
+    const property = properties.find((p) => p.propertyCode === propertyCode);
+    return property?.displayName ?? propertyCode;
   };
 
   return [
     {
-      id: 'listing',
-      header: columnLabels.listing,
-      cell: ({ row }) => listingName(row.original.listingId),
+      id: 'property',
+      header: columnLabels.property,
+      cell: ({ row }) => propertyName(row.original.propertyCode),
     },
     { accessorKey: 'name', header: columnLabels.name },
     { accessorKey: 'startDate', header: columnLabels.startDate },

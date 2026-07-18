@@ -416,17 +416,13 @@
     "bagThroughChecked": "تسجيل الأمتعة حتى الوجهة النهائية"
   },
   "hotelSearch": {
-    "title": "البحث عن الإقامات والباقات",
-    "description": "اعثر على إقامة أو باقة حسب الوجهة والتواريخ، مع عرض السعر بعملتك.",
+    "title": "البحث عن أماكن الإقامة",
+    "description": "اعثر على مكان إقامة حسب الوجهة والتواريخ، مع عرض السعر بعملتك.",
     "destination": "الوجهة",
     "destinationPlaceholder": "جدة، المدينة المنورة...",
     "checkIn": "تاريخ الوصول",
     "checkOut": "تاريخ المغادرة",
     "occupancy": "عدد الضيوف",
-    "kind": "عرض",
-    "kindBoth": "الكل",
-    "kindProperty": "إقامات",
-    "kindPackage": "باقات",
     "currency": "العملة",
     "searchButton": "بحث",
     "sort": "ترتيب حسب",
@@ -436,7 +432,7 @@
     "minPrice": "أقل سعر",
     "maxPrice": "أعلى سعر",
     "loading": "جارٍ البحث...",
-    "noResults": "لا توجد إقامات أو باقات مطابقة لهذه التواريخ. جرّب توسيع نطاق التواريخ أو تغيير ما تتصفحه.",
+    "noResults": "لا توجد أماكن إقامة مطابقة لهذه التواريخ. جرّب توسيع نطاق التواريخ.",
     "resultsCount": "{count, plural, one {# نتيجة} other {# نتائج}}",
     "converted": "محوّل",
     "durationNights": "{count, plural, one {# ليلة} other {# ليالٍ}}",
@@ -451,7 +447,6 @@
     "nav": {
       "section": "إدارة الكتالوج",
       "properties": "أماكن الإقامة",
-      "packages": "الباقات",
       "roomTypes": "أنواع الغرف",
       "seasons": "المواسم",
       "rateRules": "قواعد التسعير"
@@ -476,6 +471,7 @@
       "columns": {
         "propertyCode": "الرمز",
         "displayName": "الاسم",
+        "type": "النوع",
         "destination": "الوجهة",
         "countryCode": "الدولة",
         "starRating": "النجوم",
@@ -486,6 +482,7 @@
         "propertyCodePlaceholder": "مثال: JED-WFH",
         "displayName": "الاسم المعروض",
         "displayNamePlaceholder": "مثال: فندق جدة الواجهة البحرية",
+        "type": "النوع",
         "destination": "الوجهة",
         "destinationHint": "لا تراه؟ أضفه أولاً ضمن البيانات المرجعية ← المدن.",
         "countryCode": "رمز الدولة",
@@ -496,36 +493,11 @@
         "address": "العنوان",
         "addressPlaceholder": "العنوان البريدي",
         "isActive": "نشط (يظهر في نتائج البحث)"
-      }
-    },
-    "packages": {
-      "title": "الباقات",
-      "description": "منتجات مجمّعة بنطاق ثابت، يُحسب سعرها كإجمالي لكل رحلة مغادرة.",
-      "createTitle": "باقة جديدة",
-      "editTitle": "تعديل الباقة",
-      "columns": {
-        "packageCode": "الرمز",
-        "displayName": "الاسم",
-        "destination": "الوجهة",
-        "countryCode": "الدولة",
-        "durationNights": "الليالي",
-        "isActive": "نشط"
       },
-      "fields": {
-        "packageCode": "رمز الباقة",
-        "packageCodePlaceholder": "مثال: UMR-9D-ECO",
-        "displayName": "الاسم المعروض",
-        "displayNamePlaceholder": "مثال: باقة عمرة اقتصادية 9 أيام",
-        "destination": "الوجهة",
-        "destinationHint": "لا تراه؟ أضفه أولاً ضمن البيانات المرجعية ← المدن.",
-        "countryCode": "رمز الدولة",
-        "countryCodePlaceholder": "مثال: SA",
-        "heroImageUrl": "رابط الصورة الرئيسية",
-        "heroImageUrlPlaceholder": "https://...",
-        "durationNights": "المدة (بالليالي)",
-        "includes": "تشمل",
-        "includesPlaceholder": "ملخص حر لما تتضمنه الباقة",
-        "isActive": "نشط (يظهر في نتائج البحث)"
+      "types": {
+        "hotel": "فندق",
+        "apartment": "شقة",
+        "house": "منزل"
       }
     },
     "roomTypes": {
@@ -547,17 +519,17 @@
     },
     "seasons": {
       "title": "المواسم",
-      "description": "فترات تاريخ مرتبطة بمكان إقامة أو باقة تحدد السعر المطبَّق.",
+      "description": "فترات تاريخ مرتبطة بمكان إقامة تحدد السعر المطبَّق.",
       "createTitle": "موسم جديد",
       "editTitle": "تعديل الموسم",
       "columns": {
-        "listing": "مكان الإقامة / الباقة",
+        "property": "مكان الإقامة",
         "name": "الموسم",
         "startDate": "تاريخ البدء",
         "endDate": "تاريخ الانتهاء"
       },
       "fields": {
-        "listingId": "مكان الإقامة / الباقة",
+        "propertyCode": "مكان الإقامة",
         "name": "الموسم",
         "startDate": "تاريخ البدء",
         "endDate": "تاريخ الانتهاء"
@@ -572,21 +544,20 @@
     },
     "rateRules": {
       "title": "قواعد التسعير",
-      "description": "حقيقة السعر الأساسية: (مكان الإقامة/الباقة، الموسم، نطاق الإشغال) -> السعر بعملة معينة.",
+      "description": "حقيقة السعر الأساسية: (مكان الإقامة، الموسم، نطاق الإشغال) -> السعر بعملة معينة.",
       "createTitle": "قاعدة تسعير جديدة",
       "editTitle": "تعديل قاعدة التسعير",
       "columns": {
-        "listing": "مكان الإقامة / الباقة",
+        "property": "مكان الإقامة",
         "season": "الموسم",
         "roomType": "نوع الغرفة",
         "band": "نطاق الإشغال",
         "amount": "المبلغ"
       },
       "fields": {
-        "listingId": "مكان الإقامة / الباقة",
+        "propertyCode": "مكان الإقامة",
         "seasonId": "الموسم",
         "roomTypeId": "نوع الغرفة",
-        "noRoomType": "— بلا (باقة) —",
         "minOccupancy": "أدنى إشغال",
         "maxOccupancy": "أقصى إشغال",
         "amount": "المبلغ (بالوحدة الصغرى)",
@@ -615,7 +586,7 @@
     "deleteSuccess": "تم الحذف بنجاح.",
     "cities": {
       "title": "المدن",
-      "description": "مدن مرجعية تُستخدم في المطارات وأماكن الإقامة/الباقات الفندقية.",
+      "description": "مدن مرجعية تُستخدم في المطارات وأماكن الإقامة الفندقية.",
       "createTitle": "مدينة جديدة",
       "editTitle": "تعديل المدينة",
       "columns": {
@@ -634,7 +605,7 @@
     },
     "currencies": {
       "title": "العملات",
-      "description": "العملات المرجعية المستخدمة في تسعير أماكن الإقامة والباقات.",
+      "description": "العملات المرجعية المستخدمة في تسعير أماكن الإقامة.",
       "createTitle": "عملة جديدة",
       "editTitle": "تعديل العملة",
       "columns": {

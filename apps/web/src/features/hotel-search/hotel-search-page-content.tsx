@@ -2,10 +2,8 @@ import { getTranslations } from 'next-intl/server';
 import { PageHeader, PageLayout } from '@/components/shared/page-header';
 import type { HotelSearchState } from './hotel-search';
 import { HotelSearch } from './hotel-search';
-import type { HotelSearchKind } from './hotel-search-form';
 import type { HotelSort } from './refine-rail';
 
-const KINDS: HotelSearchKind[] = ['property', 'package', 'both'];
 const SORTS: HotelSort[] = ['price_asc', 'price_desc', 'name'];
 
 function first(value: string | string[] | undefined): string | undefined {
@@ -15,7 +13,6 @@ function first(value: string | string[] | undefined): string | undefined {
 function parseState(
   params: Record<string, string | string[] | undefined>,
 ): HotelSearchState {
-  const kind = first(params.kind);
   const sort = first(params.sort);
   const occupancy = Number(first(params.occupancy));
   const minPrice = first(params.minPrice);
@@ -27,10 +24,6 @@ function parseState(
     checkOut: first(params.checkOut) ?? '',
     occupancy: Number.isFinite(occupancy) && occupancy > 0 ? occupancy : 2,
     currency: first(params.currency) ?? 'USD',
-    kind:
-      kind && KINDS.includes(kind as HotelSearchKind)
-        ? (kind as HotelSearchKind)
-        : 'property',
     sort:
       sort && SORTS.includes(sort as HotelSort)
         ? (sort as HotelSort)

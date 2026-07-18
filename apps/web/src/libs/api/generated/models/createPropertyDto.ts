@@ -5,6 +5,7 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
+import type { CreatePropertyDtoType } from './createPropertyDtoType';
 
 export interface CreatePropertyDto {
   /**
@@ -12,6 +13,7 @@ export interface CreatePropertyDto {
    * @maxLength 50
    */
   propertyCode: string;
+  type: CreatePropertyDtoType;
   /**
    * @minimum 1
    * @maximum 5

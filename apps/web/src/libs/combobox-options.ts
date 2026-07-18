@@ -4,7 +4,6 @@ import type {
   City,
   Currency,
   Flight,
-  Package,
   Property,
   RoomType,
   Season,
@@ -60,23 +59,6 @@ export function toPropertyOptions(properties: Property[]): ComboboxOption[] {
     value: p.propertyCode,
     label: `${p.propertyCode} — ${p.displayName}`,
   }));
-}
-
-/** Properties and packages share the `listing` spine — combine both for any listingId picker. */
-export function toListingOptions(
-  properties: Property[],
-  packages: Package[],
-): ComboboxOption[] {
-  return [
-    ...properties.map((p) => ({
-      value: p.listingId,
-      label: `${p.displayName} (property, ${p.propertyCode})`,
-    })),
-    ...packages.map((p) => ({
-      value: p.listingId,
-      label: `${p.displayName} (package, ${p.packageCode})`,
-    })),
-  ];
 }
 
 export function toSeasonOptions(seasons: Season[]): ComboboxOption[] {
