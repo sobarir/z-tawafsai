@@ -5077,6 +5077,267 @@ async function seed() {
         { kind: 'excluded', label: 'Pengeluaran pribadi' },
       ],
     },
+    {
+      title: '10-Day Premium Umrah — Swissôtel & Hilton',
+      description:
+        'Round-trip flight, 6 nights at Swissôtel Makkah and 4 nights at Al Madinah Hilton, full-board catering. Three seasonal departures across Aug–Oct.',
+      type: 'umrah',
+      operatingAirline: 'GA',
+      flightNumber: '402',
+      departureTime: '2026-08-15T11:50:00+07:00',
+      mealPlan: 'full_board',
+      price: 1450,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-SWISSOTEL', sequence: 1, nights: 6 },
+        { propertyCode: 'MAD-HILTON', sequence: 2, nights: 4 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-08-15',
+          returnDate: '2026-08-25',
+          seatsNote: 'High season — sisa 6 seat',
+        },
+        {
+          departureDate: '2026-09-15',
+          returnDate: '2026-09-25',
+          seatsNote: 'Shoulder season — sisa 12 seat',
+        },
+        {
+          departureDate: '2026-10-15',
+          returnDate: '2026-10-25',
+          seatsNote: 'Value season — sisa 20 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Transportasi darat (bus AC)' },
+        { kind: 'included', label: 'Ziyarah Makkah & Madinah' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+        { kind: 'excluded', label: 'Dam / denda ihram' },
+      ],
+    },
+    {
+      title: '8-Day Economy Umrah — Hemat',
+      description:
+        'Affordable round-trip flight with 5 nights in Makkah and 3 nights in Madinah at comfortable 4-star hotels, half-board catering.',
+      type: 'umrah',
+      operatingAirline: 'SV',
+      flightNumber: '816',
+      departureTime: '2026-09-05T09:10:00+07:00',
+      mealPlan: 'half_board',
+      price: 875,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-COURTYARD', sequence: 1, nights: 5 },
+        { propertyCode: 'MAD-MUNAKAREEM', sequence: 2, nights: 3 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-09-05',
+          returnDate: '2026-09-13',
+          seatsNote: 'Shoulder season',
+        },
+        {
+          departureDate: '2026-10-05',
+          returnDate: '2026-10-13',
+          seatsNote: 'Value season — sisa 25 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Manasik pra-keberangkatan' },
+        { kind: 'excluded', label: 'Perlengkapan umrah' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
+    {
+      title: '11-Night Luxury Umrah — Haram View 5★',
+      description:
+        'Premium round-trip flight, 6 nights at Makkah Clock Royal Tower and 5 nights at The Oberoi Madina, full-board catering and private ziyarah.',
+      type: 'umrah',
+      operatingAirline: 'GA',
+      flightNumber: '402',
+      departureTime: '2026-08-25T11:50:00+07:00',
+      mealPlan: 'full_board',
+      price: 2400,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-CLOCKTWR', sequence: 1, nights: 6 },
+        { propertyCode: 'MAD-OBEROI', sequence: 2, nights: 5 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-08-25',
+          returnDate: '2026-09-05',
+          seatsNote: 'High season — sisa 4 seat',
+        },
+        {
+          departureDate: '2026-09-25',
+          returnDate: '2026-10-06',
+          seatsNote: 'Shoulder season — sisa 8 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Transportasi darat (bus mewah)' },
+        { kind: 'included', label: 'Ziyarah privat Makkah & Madinah' },
+        { kind: 'included', label: 'Perlengkapan umrah premium' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
+    {
+      title: '13-Day Umrah Plus — Jeddah City Tour',
+      description:
+        'Madinah-first itinerary: 4 nights Madinah, 7 nights Makkah, then 2 nights in Jeddah with a city tour before flying home.',
+      type: 'umrah_plus',
+      operatingAirline: 'SV',
+      flightNumber: '818',
+      departureTime: '2026-09-05T17:30:00+07:00',
+      mealPlan: 'full_board',
+      price: 1990,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MAD-SOFITEL', sequence: 1, nights: 4 },
+        { propertyCode: 'MKK-RAFFLES', sequence: 2, nights: 7 },
+        { propertyCode: 'JED-WFH', sequence: 3, nights: 2 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-09-05',
+          returnDate: '2026-09-18',
+          seatsNote: 'Shoulder season',
+        },
+        {
+          departureDate: '2026-10-05',
+          returnDate: '2026-10-18',
+          seatsNote: 'Value season — sisa 15 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'City tour Jeddah (Balad & Corniche)' },
+        { kind: 'included', label: 'Transportasi darat (bus AC)' },
+        { kind: 'excluded', label: 'Tips guide & driver' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
+    {
+      title: '9-Night Umrah — Zamzam Towers',
+      description:
+        'Madinah-first round-trip flight, 4 nights at Anwar Almadinah Mövenpick and 5 nights at Zamzam Pullman Makkah, half-board. IDR-priced.',
+      type: 'umrah',
+      operatingAirline: 'GA',
+      flightNumber: '404',
+      departureTime: '2026-08-05T13:30:00+07:00',
+      mealPlan: 'half_board',
+      price: 28500000,
+      currency: 'IDR',
+      stays: [
+        { propertyCode: 'MAD-ANWAR', sequence: 1, nights: 4 },
+        { propertyCode: 'MKK-ZAMZAMPUL', sequence: 2, nights: 5 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-08-05',
+          returnDate: '2026-08-14',
+          seatsNote: 'High season — sisa 5 seat',
+        },
+        {
+          departureDate: '2026-09-05',
+          returnDate: '2026-09-14',
+          seatsNote: 'Shoulder season',
+        },
+        {
+          departureDate: '2026-10-05',
+          returnDate: '2026-10-14',
+          seatsNote: 'Value season — sisa 18 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Perlengkapan umrah' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
+    {
+      title: '14-Day Grand Umrah Plus — Jeddah Extension',
+      description:
+        'Round-trip flight, 7 nights at Dar Al Tawhid Intercontinental Makkah, 5 nights at Dar Al Iman InterContinental Madinah, plus 2 nights in Jeddah.',
+      type: 'umrah_plus',
+      operatingAirline: 'SV',
+      flightNumber: '816',
+      departureTime: '2026-10-05T09:10:00+07:00',
+      mealPlan: 'full_board',
+      price: 2250,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-TAWHID', sequence: 1, nights: 7 },
+        { propertyCode: 'MAD-DARIMAN', sequence: 2, nights: 5 },
+        { propertyCode: 'JED-WFH', sequence: 3, nights: 2 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-10-05',
+          returnDate: '2026-10-19',
+          seatsNote: 'Value season — sisa 10 seat',
+        },
+        {
+          departureDate: '2026-10-15',
+          returnDate: '2026-10-29',
+          seatsNote: 'Value season',
+        },
+        {
+          departureDate: '2026-10-25',
+          returnDate: '2026-11-08',
+          seatsNote: 'Late season — sisa 22 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'City tour Jeddah' },
+        { kind: 'included', label: 'Transportasi darat (bus mewah)' },
+        { kind: 'included', label: 'Ziyarah Makkah & Madinah' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
+    {
+      title: '25-Day Hajj Package — Full Board 5★',
+      description:
+        'Complete hajj program: 15 nights at Al Marwa Rayhaan Makkah and 10 nights at Saja Almadinah, full-board catering, guided manasik. Limited quota.',
+      type: 'hajj',
+      operatingAirline: 'GA',
+      flightNumber: '402',
+      departureTime: '2026-09-15T11:50:00+07:00',
+      mealPlan: 'full_board',
+      price: 8500,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-MARWA', sequence: 1, nights: 15 },
+        { propertyCode: 'MAD-SAJA', sequence: 2, nights: 10 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-09-15',
+          returnDate: '2026-10-10',
+          seatsNote: 'Kuota terbatas — sisa 3 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Hajj visa & tasrih' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Tenda Arafah & Mina (maktab resmi)' },
+        { kind: 'included', label: 'Manasik haji lengkap' },
+        { kind: 'included', label: 'Dam / hadyu' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
   ];
 
   for (const item of travelPackageSeeds) {
