@@ -11,6 +11,7 @@ import type {
   CreateTravelPackageBookingInput,
   FlightHotelPackage,
   TravelPackageBooking,
+  TravelPackageEarningsRow,
   UpdateFlightHotelPackageInput,
   UpdateTravelPackageBookingInput,
 } from '@repo/shared';
@@ -161,6 +162,28 @@ export class TravelPackagesService {
     );
   }
 
+  // Provider display names for the given packages, batched by id.
+  private async resolveProviderNames(
+    rows: TravelPackageRow[],
+  ): Promise<Map<string, string>> {
+    const providerIds = [
+      ...new Set(
+        rows
+          .map((row) => row.providerId)
+          .filter((id): id is string => id !== null),
+      ),
+    ];
+    if (providerIds.length === 0) return new Map();
+    const providers = await this.db
+      .select({
+        id: schema.travelProvider.id,
+        name: schema.travelProvider.name,
+      })
+      .from(schema.travelProvider)
+      .where(inArray(schema.travelProvider.id, providerIds));
+    return new Map(providers.map((p) => [p.id, p.name]));
+  }
+
   private async enrich(
     rows: TravelPackageRow[],
   ): Promise<FlightHotelPackage[]> {
@@ -175,6 +198,8 @@ export class TravelPackagesService {
       .where(inArray(schema.flights.id, flightIds));
     const flightById = new Map(flights.map((flight) => [flight.id, flight]));
     const flightSummaryById = await this.resolveFlightSummaries(flights);
+
+    const providerNameById = await this.resolveProviderNames(rows);
 
     // Child rows, batched across all packages and grouped by package id.
     const stayRows = await this.db
@@ -254,6 +279,11 @@ export class TravelPackagesService {
         description: row.description,
         heroImageUrl: row.heroImageUrl,
         flyerUrl: row.flyerUrl,
+        providerId: row.providerId,
+        providerName: row.providerId
+          ? (providerNameById.get(row.providerId) ?? null)
+          : null,
+        feePerSeat: row.feePerSeat,
         price: row.price,
         currency: row.currency,
         durationNights: row.durationNights,
@@ -730,5 +760,83 @@ export class TravelPackagesService {
     if (!deleted) {
       throw new NotFoundException(`Booking ${id} not found`);
     }
+  }
+
+  // Agent commission earned from confirmed bookings, grouped by provider +
+  // currency: totalEarned = Σ (booking.pax × package.feePerSeat). Packages with
+  // no provider are excluded (the inner join drops them).
+  async computeEarnings(): Promise<TravelPackageEarningsRow[]> {
+    const rows = await this.db
+      .select({
+        providerId: schema.travelProvider.id,
+        providerName: schema.travelProvider.name,
+        currency: schema.flightHotelPackage.currency,
+        packageId: schema.flightHotelPackage.id,
+        feePerSeat: schema.flightHotelPackage.feePerSeat,
+        pax: schema.travelPackageBooking.pax,
+      })
+      .from(schema.travelPackageBooking)
+      .innerJoin(
+        schema.travelPackageDeparture,
+        eq(
+          schema.travelPackageBooking.departureId,
+          schema.travelPackageDeparture.id,
+        ),
+      )
+      .innerJoin(
+        schema.flightHotelPackage,
+        eq(
+          schema.travelPackageDeparture.packageId,
+          schema.flightHotelPackage.id,
+        ),
+      )
+      .innerJoin(
+        schema.travelProvider,
+        eq(schema.flightHotelPackage.providerId, schema.travelProvider.id),
+      )
+      .where(eq(schema.travelPackageBooking.status, 'confirmed'));
+
+    type Agg = {
+      providerId: string;
+      providerName: string;
+      currency: string;
+      packages: Set<string>;
+      bookingCount: number;
+      paxCount: number;
+      totalEarned: number;
+    };
+    const byProviderCurrency = new Map<string, Agg>();
+    for (const row of rows) {
+      const key = `${row.providerId}|${row.currency}`;
+      let agg = byProviderCurrency.get(key);
+      if (!agg) {
+        agg = {
+          providerId: row.providerId,
+          providerName: row.providerName,
+          currency: row.currency,
+          packages: new Set(),
+          bookingCount: 0,
+          paxCount: 0,
+          totalEarned: 0,
+        };
+        byProviderCurrency.set(key, agg);
+      }
+      agg.packages.add(row.packageId);
+      agg.bookingCount += 1;
+      agg.paxCount += row.pax;
+      agg.totalEarned += row.pax * (row.feePerSeat ?? 0);
+    }
+
+    return [...byProviderCurrency.values()]
+      .map((agg) => ({
+        providerId: agg.providerId,
+        providerName: agg.providerName,
+        currency: agg.currency,
+        packageCount: agg.packages.size,
+        bookingCount: agg.bookingCount,
+        paxCount: agg.paxCount,
+        totalEarned: agg.totalEarned,
+      }))
+      .sort((a, b) => b.totalEarned - a.totalEarned);
   }
 }

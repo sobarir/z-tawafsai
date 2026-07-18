@@ -15,6 +15,7 @@ import {
   useListHotelCurrencies,
   useListHotelProperties,
   useListTravelPackages,
+  useListTravelProviders,
   useUpdateTravelPackage,
 } from '@/libs/api/generated/endpoints';
 import {
@@ -25,6 +26,7 @@ import {
   toCurrencyOptions,
   toFlightOptions,
   toPropertyOptions,
+  toProviderOptions,
 } from '@/libs/combobox-options';
 import { getTravelPackageColumns } from './columns';
 import { TravelPackageForm } from './travel-package-form';
@@ -39,6 +41,7 @@ export function TravelPackagesAdmin() {
   const { data: flights } = useListFlights();
   const { data: properties } = useListHotelProperties();
   const { data: currencies } = useListHotelCurrencies();
+  const { data: providers } = useListTravelProviders();
 
   const flightOptions = useMemo(
     () => toFlightOptions(flights ?? []),
@@ -51,6 +54,10 @@ export function TravelPackagesAdmin() {
   const currencyOptions = useMemo(
     () => toCurrencyOptions(currencies ?? []),
     [currencies],
+  );
+  const providerOptions = useMemo(
+    () => toProviderOptions(providers ?? []),
+    [providers],
   );
 
   const [formOpen, setFormOpen] = useState(false);
@@ -148,6 +155,7 @@ export function TravelPackagesAdmin() {
           flightOptions={flightOptions}
           propertyOptions={propertyOptions}
           currencyOptions={currencyOptions}
+          providerOptions={providerOptions}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {

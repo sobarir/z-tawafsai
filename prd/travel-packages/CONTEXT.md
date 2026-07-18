@@ -5,7 +5,22 @@
 
 ## Current step
 
-**2026-07-19 — seat inventory + booking records + flyer upload (this session).** A deliberate
+**2026-07-19 — provider (agent partner) + per-seat commission + earnings report.** The app owner is
+a **marketing agent** reselling packages from multiple umrah travel companies. Added:
+
+- **`travel_provider`** master entity (name, PPIU `licenseNumber`, contact, `isActive`) — admin CRUD
+  at `/travel-packages/providers` (session-gated). Each package references **one** provider
+  (`travel_package.provider_id`, nullable, `ON DELETE set null` so deleting a provider only unlinks).
+- **`travel_package.fee_per_seat`** — the flat commission the agent earns per pax, set **per package**
+  (a VIP package can carry a higher per-seat fee than an economy one), in the package `currency`.
+- **Earnings report** at `/travel-packages/earnings` (`GET /travel-package-earnings`, admin-only):
+  `totalEarned = Σ (confirmed booking.pax × package.feePerSeat)`, grouped by **provider + currency**
+  (a provider's packages may span currencies). Builds on the confirmed-booking records.
+
+Package response gains `providerId` / `providerName` (joined) / `feePerSeat`; the admin package form
+gets a provider combobox + fee field. Cardinality is **one provider per package** (not many-to-many).
+
+**2026-07-19 — seat inventory + booking records + flyer upload (earlier this session).** A deliberate
 scope expansion past the prior "catalog, not a booking engine" non-goal, confirmed with the product
 owner. Three additions:
 
@@ -90,17 +105,18 @@ Earlier history: the domain + City were originally built and committed in a sing
 
 See `20-steps.md` — all 9 retroactively-logged steps are complete and committed.
 
-## Entity table (2 top-level entities: 7 tables — plus dependencies on Flight/Property from other domains)
+## Entity table (3 top-level entities: 8 tables — plus dependencies on Flight/Property from other domains)
 
 | # | Entity | Table | Key | Admin CRUD | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 1 | City | `city` | city code (natural key) | `reference/cities` | Cross-domain reference data; also consumed by flights (`airports.city_code`) and hotels (destination combobox). |
-| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight + one-or-more Property stays. `flyerUrl` (uploaded). Public list at `/packages`. |
+| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight + one-or-more Property stays + one Provider. `flyerUrl` (uploaded), `feePerSeat` (agent commission). Public list at `/packages`. |
 | 2a | — Stay | `travel_package_stay` | ULID | (via package form) | Ordered city stay → `property`. Nights sum to `durationNights`. |
 | 2b | — Departure | `travel_package_departure` | ULID | (via package form) | Dated group departure; `totalSeats` quota (nullable), `seatsNote` display override. Upserted by id. |
 | 2c | — Inclusion | `travel_package_inclusion` | ULID | (via package form) | Included/excluded line item. |
 | 2d | — Itinerary day | `travel_package_itinerary_day` | ULID | (not yet in UI) | Day-by-day program. |
 | 2e | — Booking | `travel_package_booking` | ULID | `travel-package-bookings` (admin-only) | Back-office reservation vs a departure; confirmed pax consume the quota. |
+| 3 | Travel Provider | `travel_provider` | ULID | `travel-packages/providers` (admin-only) | Umrah travel company the agent partners with. `travel_package.provider_id` → this (nullable, set-null on delete). Earnings report at `/travel-packages/earnings`. |
 
 ## Definition of done
 

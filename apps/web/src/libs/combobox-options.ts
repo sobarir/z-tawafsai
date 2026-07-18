@@ -7,6 +7,7 @@ import type {
   Property,
   RoomType,
   Season,
+  TravelProvider,
 } from '@repo/shared';
 import type { ComboboxOption } from '@/components/ui/combobox';
 
@@ -73,4 +74,10 @@ export function toRoomTypeOptions(roomTypes: RoomType[]): ComboboxOption[] {
     value: r.id,
     label: `${r.propertyCode} — ${r.name}`,
   }));
+}
+
+export function toProviderOptions(
+  providers: TravelProvider[],
+): ComboboxOption[] {
+  return providers.map((p) => ({ value: p.id, label: p.name }));
 }

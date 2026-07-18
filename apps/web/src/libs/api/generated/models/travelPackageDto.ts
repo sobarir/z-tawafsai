@@ -28,6 +28,18 @@ export interface TravelPackageDto {
   heroImageUrl: string | null;
   /** @nullable */
   flyerUrl: string | null;
+  /**
+   * @nullable
+   * @pattern ^[0-9A-HJKMNP-TV-Z]{26}$
+   */
+  providerId: string | null;
+  /** @nullable */
+  providerName: string | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  feePerSeat: number | null;
   /** @minimum 0 */
   price: number;
   /** @pattern ^[A-Z]{3}$ */

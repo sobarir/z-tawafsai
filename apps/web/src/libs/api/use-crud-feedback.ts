@@ -14,7 +14,8 @@ export function useCrudFeedback(
     | 'schedule'
     | 'catalog'
     | 'reference'
-    | 'travelPackagesAdmin' = 'schedule',
+    | 'travelPackagesAdmin'
+    | 'travelProvidersAdmin' = 'schedule',
 ) {
   const queryClient = useQueryClient();
   const tNamespace = useTranslations(namespace);

@@ -565,10 +565,14 @@ function buildReferenceDataNavItems(labels: ReferenceNavLabels): NavItem[] {
 
 const TRAVEL_PACKAGES_NAV_ICONS = {
   travelPackages: Luggage,
+  providers: Handshake,
+  earnings: Coins,
 } as const;
 
 interface TravelPackagesNavLabels {
   travelPackages: string;
+  providers: string;
+  earnings: string;
 }
 
 function buildTravelPackagesAdminNavItems(
@@ -580,6 +584,18 @@ function buildTravelPackagesAdminNavItems(
       label: labels.travelPackages,
       href: '/travel-packages/admin',
       icon: TRAVEL_PACKAGES_NAV_ICONS.travelPackages,
+    },
+    {
+      id: 'travel-packages-providers',
+      label: labels.providers,
+      href: '/travel-packages/providers',
+      icon: TRAVEL_PACKAGES_NAV_ICONS.providers,
+    },
+    {
+      id: 'travel-packages-earnings',
+      label: labels.earnings,
+      href: '/travel-packages/earnings',
+      icon: TRAVEL_PACKAGES_NAV_ICONS.earnings,
     },
   ];
 }
@@ -656,6 +672,8 @@ export function Sidebar() {
       canManageSchedule
         ? buildTravelPackagesAdminNavItems({
             travelPackages: t('travelPackagesAdmin.nav.travelPackages'),
+            providers: t('travelPackagesAdmin.nav.providers'),
+            earnings: t('travelPackagesAdmin.nav.earnings'),
           })
         : [],
     [canManageSchedule, t],

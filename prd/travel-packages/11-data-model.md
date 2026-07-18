@@ -46,6 +46,8 @@ package row no longer carries a single `propertyCode`.
 | `mealPlan` | `travel_package_meal_plan`, nullable | |
 | `heroImageUrl` | `text`, nullable | |
 | `flyerUrl` | `text`, nullable | Uploaded marketing flyer (image/PDF), served from the API uploads dir. Set via `POST /api/uploads/flyer` → stored on local disk → URL saved here. |
+| `providerId` | `text` FK → `travel_provider.id`, nullable | The umrah travel company organizing this package (one per package). `ON DELETE set null` — deleting a provider unlinks its packages, never deletes them. Response adds joined `providerName`. |
+| `feePerSeat` | `numeric(10,2)`, nullable | Flat agent commission earned per pax sold, in the package `currency`. Set per package (VIP > economy). Drives the earnings report. |
 | `price` | `numeric(10,2)` default `0` | Flat price, admin-set — not derived from the flight/hotel pricing. |
 | `currency` | `varchar(3)` default `'USD'` | |
 | `isActive` | `boolean` default `true` | Public list filters to `isActive` client-side. |
@@ -129,6 +131,29 @@ Day-by-day program. Contract-supported; not yet surfaced in the admin form (a fo
 | `dayNumber` | `integer` | Unique per package; `CHECK dayNumber > 0`. |
 | `title` | `text` | |
 | `description` | `text`, nullable | |
+
+## `travel_provider` (new master entity, table `travel_provider`)
+
+An umrah travel company (operator) the agent markets packages for. Admin-only CRUD at
+`/travel-providers`. A package references exactly one provider; the agent earns
+`travel_package.fee_per_seat` per confirmed booking pax.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | `text` PK, ULID | |
+| `name` | `varchar(200)` | |
+| `licenseNumber` | `varchar(100)`, nullable | e.g. Kemenag PPIU licence number. |
+| `contactPhone` / `contactEmail` / `website` | `text`, nullable | |
+| `isActive` | `boolean` default `true` | |
+| `createdAt` / `updatedAt` | `timestamptz` | |
+
+## Agent earnings (computed, admin-only — `GET /travel-package-earnings`)
+
+`TravelPackagesService.computeEarnings()` inner-joins confirmed `travel_package_booking` rows →
+departure → package → provider, then aggregates **by (provider, currency)**:
+`totalEarned = Σ (booking.pax × package.feePerSeat)`, plus package/booking/pax counts. Packages with
+no provider are dropped (inner join); cancelled bookings never count. Grouped by currency because a
+provider's packages may be priced in different currencies (summing across them would be wrong).
 
 ## Response enrichment (computed at read time, not stored)
 

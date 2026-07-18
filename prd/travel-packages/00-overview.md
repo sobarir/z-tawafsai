@@ -17,6 +17,10 @@ booking engine" scope and the hotels domain's "search/display only" scope — se
 ## Goals
 
 - Admin CRUD over travel packages, including their stays / departures / inclusions.
+- **Marketing-agent model (2026-07-19):** the app owner resells packages from multiple umrah travel
+  **providers** (`travel_provider`, admin CRUD). Each package names one provider and a per-seat
+  commission (`feePerSeat`); an admin-only **earnings report** sums the agent's commission from
+  confirmed bookings, by provider + currency.
 - A public, anonymous-readable card listing at `/packages` so a visitor can browse curated
   deals without signing in.
 - Enrich each package with derived display info (airline name, direct/transit, per-stay hotel

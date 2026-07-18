@@ -219,4 +219,55 @@ describe('TravelPackagesService', () => {
       BadRequestException,
     );
   });
+
+  it('reports agent earnings per provider from confirmed bookings', async () => {
+    const [provider] = await db
+      .insert(schema.travelProvider)
+      .values({ name: '__test__ provider' })
+      .returning({ id: schema.travelProvider.id });
+    try {
+      const pkg = await service.create({
+        type: 'umrah',
+        title: TEST_TITLE,
+        flightId: testFlightId,
+        durationNights: 3,
+        price: 999,
+        currency: 'USD',
+        providerId: provider.id,
+        feePerSeat: 50,
+        stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
+        departures: [{ departureDate: '2026-09-01', totalSeats: 20 }],
+      });
+      expect(pkg.providerId).toBe(provider.id);
+      expect(pkg.providerName).toBe('__test__ provider');
+      expect(pkg.feePerSeat).toBe(50);
+
+      await service.createBooking({
+        departureId: pkg.departures[0].id,
+        customerName: 'Umar',
+        pax: 3,
+      });
+      // Cancelled bookings must not count toward earnings.
+      const cancelled = await service.createBooking({
+        departureId: pkg.departures[0].id,
+        customerName: 'Zaid',
+        pax: 2,
+      });
+      await service.updateBooking(cancelled.id, { status: 'cancelled' });
+
+      const earnings = await service.computeEarnings();
+      const row = earnings.find((e) => e.providerId === provider.id);
+      expect(row).toBeDefined();
+      expect(row?.currency).toBe('USD');
+      expect(row?.bookingCount).toBe(1);
+      expect(row?.paxCount).toBe(3);
+      expect(row?.packageCount).toBe(1);
+      expect(row?.totalEarned).toBe(150); // 3 pax × 50
+    } finally {
+      // Package is cleaned up by TEST_TITLE; drop the provider (set-null on FK).
+      await db
+        .delete(schema.travelProvider)
+        .where(eq(schema.travelProvider.id, provider.id));
+    }
+  });
 });

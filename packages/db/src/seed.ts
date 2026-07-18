@@ -5348,7 +5348,52 @@ async function seed() {
     },
   ];
 
-  for (const item of travelPackageSeeds) {
+  // Umrah travel companies (providers) the agent markets for.
+  const travelProviderSeeds = [
+    {
+      name: 'Barokah Umrah Travel',
+      licenseNumber: 'PPIU-2021-001',
+      contactPhone: '+62 21 555 0101',
+      contactEmail: 'sales@barokah.example',
+      website: 'https://barokah.example',
+    },
+    {
+      name: 'Al-Safar Wisata',
+      licenseNumber: 'PPIU-2020-114',
+      contactPhone: '+62 21 555 0202',
+      contactEmail: 'info@alsafar.example',
+      website: null,
+    },
+    {
+      name: 'Madinah Berkah Tour',
+      licenseNumber: 'PPIU-2022-078',
+      contactPhone: '+62 21 555 0303',
+      contactEmail: 'cs@madinahberkah.example',
+      website: null,
+    },
+  ];
+  const providerIds: string[] = [];
+  for (const provider of travelProviderSeeds) {
+    const [existing] = await db
+      .select({ id: schema.travelProvider.id })
+      .from(schema.travelProvider)
+      .where(eq(schema.travelProvider.name, provider.name));
+    if (existing) {
+      await db
+        .update(schema.travelProvider)
+        .set(provider)
+        .where(eq(schema.travelProvider.id, existing.id));
+      providerIds.push(existing.id);
+    } else {
+      const [inserted] = await db
+        .insert(schema.travelProvider)
+        .values(provider)
+        .returning({ id: schema.travelProvider.id });
+      providerIds.push(inserted.id);
+    }
+  }
+
+  for (const [pkgIndex, item] of travelPackageSeeds.entries()) {
     const [anchorFlight] = await db
       .select({ id: schema.flights.id })
       .from(schema.flights)
@@ -5377,6 +5422,10 @@ async function seed() {
       currency: item.currency,
       isActive: true,
       isFeatured: item.isFeatured ?? false,
+      // Round-robin a provider onto each package; VIP-priced packages carry a
+      // higher per-seat commission than economy ones.
+      providerId: providerIds[pkgIndex % providerIds.length] ?? null,
+      feePerSeat: item.price >= 2000 ? 100 : 50,
     };
 
     const [existingTravelPackage] = await db

@@ -514,6 +514,29 @@ export const rateRule = pgTable(
   ],
 );
 
+// An umrah travel company (operator) the agent markets packages for. Each
+// travel_package references one provider; the agent earns a per-seat commission
+// (travel_package.fee_per_seat) on every confirmed booking of that package.
+export const travelProvider = pgTable('travel_provider', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: varchar('name', { length: 200 }).notNull(),
+  // e.g. the Kemenag PPIU licence number.
+  licenseNumber: varchar('license_number', { length: 100 }),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  website: text('website'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
 // Combines a specific flight with one or more ordered city stays (Makkah +
 // Madinah for umrah, plus a third city for umrah_plus) into one admin-curated,
 // flat-priced offering — a display/catalog product, not a booking (no
@@ -534,6 +557,17 @@ export const flightHotelPackage = pgTable('travel_package', {
   heroImageUrl: text('hero_image_url'),
   // Uploaded marketing flyer (image or PDF), served from the API uploads dir.
   flyerUrl: text('flyer_url'),
+  // The umrah travel company organizing this package. Nullable so an unassigned
+  // package is allowed; ON DELETE set null keeps packages when a provider is removed.
+  providerId: text('provider_id').references(() => travelProvider.id, {
+    onDelete: 'set null',
+  }),
+  // Flat commission the agent earns per pax sold, in the package `currency`.
+  feePerSeat: numeric('fee_per_seat', {
+    precision: 10,
+    scale: 2,
+    mode: 'number',
+  }),
   price: numeric('price', { precision: 10, scale: 2, mode: 'number' })
     .notNull()
     .default(0),
@@ -731,5 +765,7 @@ export type NewTravelPackageItineraryDay =
   typeof travelPackageItineraryDay.$inferInsert;
 export type TravelPackageBooking = typeof travelPackageBooking.$inferSelect;
 export type NewTravelPackageBooking = typeof travelPackageBooking.$inferInsert;
+export type TravelProvider = typeof travelProvider.$inferSelect;
+export type NewTravelProvider = typeof travelProvider.$inferInsert;
 export type RateRule = typeof rateRule.$inferSelect;
 export type NewRateRule = typeof rateRule.$inferInsert;

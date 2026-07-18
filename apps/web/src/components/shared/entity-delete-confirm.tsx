@@ -9,7 +9,12 @@ interface EntityDeleteConfirmProps {
   name: string;
   loading: boolean;
   onConfirm: () => void;
-  namespace?: 'schedule' | 'catalog' | 'reference' | 'travelPackagesAdmin';
+  namespace?:
+    | 'schedule'
+    | 'catalog'
+    | 'reference'
+    | 'travelPackagesAdmin'
+    | 'travelProvidersAdmin';
 }
 
 export function EntityDeleteConfirm({

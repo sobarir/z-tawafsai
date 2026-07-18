@@ -3,6 +3,7 @@ import {
   createTravelPackageBookingSchema,
   flightHotelPackageSchema,
   travelPackageBookingSchema,
+  travelPackageEarningsRowSchema,
   updateFlightHotelPackageSchema,
   updateTravelPackageBookingSchema,
 } from '@repo/shared';
@@ -24,4 +25,8 @@ export class CreateTravelPackageBookingDto extends createZodDto(
 ) {}
 export class UpdateTravelPackageBookingDto extends createZodDto(
   updateTravelPackageBookingSchema,
+) {}
+
+export class TravelPackageEarningsRowDto extends createZodDto(
+  travelPackageEarningsRowSchema,
 ) {}

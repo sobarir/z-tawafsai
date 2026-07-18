@@ -761,6 +761,12 @@ export const flightHotelPackageSchema = z.object({
   description: z.string().nullable(),
   heroImageUrl: z.string().nullable(),
   flyerUrl: z.string().nullable(),
+  /** The umrah travel company that organizes this package (one per package). */
+  providerId: ulidSchema.nullable(),
+  /** Provider display name, joined at read time. */
+  providerName: z.string().nullable(),
+  /** Flat commission the agent earns per pax sold, in the package `currency`. */
+  feePerSeat: z.number().nonnegative().nullable(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
   durationNights: z.number().int().positive(),
@@ -816,6 +822,8 @@ export const createFlightHotelPackageSchema = z.object({
   mealPlan: travelPackageMealPlanSchema.optional(),
   heroImageUrl: z.string().max(2000).optional(),
   flyerUrl: z.string().max(2000).optional(),
+  providerId: ulidSchema.optional(),
+  feePerSeat: z.number().nonnegative().optional(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
   isActive: z.boolean().optional(),
@@ -894,3 +902,63 @@ export const uploadResultSchema = z.object({
   url: z.string(),
 });
 export type UploadResult = z.infer<typeof uploadResultSchema>;
+
+/**
+ * An umrah travel company (operator) the agent markets packages for. Each
+ * travel_package references one provider; the agent earns a per-seat commission
+ * (`feePerSeat` on the package) on every confirmed booking of that package.
+ */
+export const travelProviderSchema = z.object({
+  id: ulidSchema,
+  name: z.string().min(1).max(200),
+  /** e.g. the Kemenag PPIU licence number. */
+  licenseNumber: z.string().nullable(),
+  contactPhone: z.string().nullable(),
+  contactEmail: z.string().nullable(),
+  website: z.string().nullable(),
+  isActive: z.boolean(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type TravelProvider = z.infer<typeof travelProviderSchema>;
+
+export const travelProviderListSchema = z.array(travelProviderSchema);
+
+export const createTravelProviderSchema = z.object({
+  name: z.string().min(1).max(200),
+  licenseNumber: z.string().max(100).optional(),
+  contactPhone: z.string().max(50).optional(),
+  contactEmail: z.string().max(200).optional(),
+  website: z.string().max(2000).optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreateTravelProviderInput = z.infer<
+  typeof createTravelProviderSchema
+>;
+
+export const updateTravelProviderSchema = createTravelProviderSchema.partial();
+export type UpdateTravelProviderInput = z.infer<
+  typeof updateTravelProviderSchema
+>;
+
+/**
+ * Agent commission earned, aggregated from CONFIRMED bookings and grouped by
+ * provider + currency: totalEarned = Σ (booking.pax × package.feePerSeat).
+ * Grouped by currency too, since a provider's packages may be priced differently.
+ */
+export const travelPackageEarningsRowSchema = z.object({
+  providerId: ulidSchema,
+  providerName: z.string(),
+  currency: currencyCodeSchema,
+  packageCount: z.number().int().nonnegative(),
+  bookingCount: z.number().int().nonnegative(),
+  paxCount: z.number().int().nonnegative(),
+  totalEarned: z.number().nonnegative(),
+});
+export type TravelPackageEarningsRow = z.infer<
+  typeof travelPackageEarningsRowSchema
+>;
+
+export const travelPackageEarningsSchema = z.array(
+  travelPackageEarningsRowSchema,
+);

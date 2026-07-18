@@ -34,6 +34,10 @@ export interface UpdateTravelPackageDto {
   heroImageUrl?: string;
   /** @maxLength 2000 */
   flyerUrl?: string;
+  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
+  providerId?: string;
+  /** @minimum 0 */
+  feePerSeat?: number;
   /** @minimum 0 */
   price?: number;
   /** @pattern ^[A-Z]{3}$ */

@@ -690,7 +690,9 @@
   "travelPackagesAdmin": {
     "nav": {
       "section": "Admin. des forfaits voyage",
-      "travelPackages": "Forfaits voyage"
+      "travelPackages": "Forfaits voyage",
+      "providers": "Providers",
+      "earnings": "Earnings"
     },
     "actions": "Actions",
     "openMenu": "Ouvrir le menu",
@@ -763,7 +765,9 @@
         "isFeatured": "Featured (shown on landing page)",
         "flyerUrl": "Flyer (image or PDF)",
         "totalSeats": "Total seats",
-        "totalSeatsHint": "Set a seat quota to track availability; leave empty for untracked. Booked seats are entered under \"Manage seats & bookings\"."
+        "totalSeatsHint": "Set a seat quota to track availability; leave empty for untracked. Booked seats are entered under \"Manage seats & bookings\".",
+        "provider": "Provider (umrah travel company)",
+        "feePerSeat": "Your fee per seat"
       },
       "manageSeats": "Manage seats & bookings"
     },
@@ -785,6 +789,21 @@
       "phone": "Phone",
       "phonePlaceholder": "e.g. +62...",
       "addBooking": "Add booking"
+    },
+    "earnings": {
+      "title": "Earnings",
+      "description": "Your commission from confirmed bookings, by provider.",
+      "loading": "Loading...",
+      "empty": "No earnings yet — commission appears once confirmed bookings exist.",
+      "total": "Total ({currency})",
+      "columns": {
+        "provider": "Provider",
+        "currency": "Currency",
+        "packages": "Packages",
+        "bookings": "Bookings",
+        "pax": "Pax",
+        "earned": "Earned"
+      }
     }
   },
   "landing": {
@@ -900,6 +919,43 @@
       "linkLegal": "Legalitas",
       "linkContact": "Kontak",
       "linkPrivacy": "Privasi"
+    }
+  },
+  "travelProvidersAdmin": {
+    "title": "Providers",
+    "description": "Umrah travel companies you market packages for.",
+    "createTitle": "New provider",
+    "editTitle": "Edit provider",
+    "createButton": "New",
+    "actions": "Actions",
+    "openMenu": "Open menu",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "loadingRows": "Loading...",
+    "pageOf": "Page {current} of {total}",
+    "deleteConfirmTitle": "Delete this provider?",
+    "deleteConfirmDescription": "This will permanently delete \"{name}\". Packages linked to it become unassigned (they are not deleted).",
+    "createSuccess": "Created successfully.",
+    "updateSuccess": "Updated successfully.",
+    "deleteSuccess": "Deleted successfully.",
+    "columns": {
+      "name": "Name",
+      "licenseNumber": "License",
+      "contactPhone": "Phone",
+      "isActive": "Active"
+    },
+    "fields": {
+      "name": "Company name",
+      "namePlaceholder": "e.g. Barokah Umrah Travel",
+      "licenseNumber": "License number (PPIU)",
+      "licenseNumberPlaceholder": "e.g. PPIU-2021-001",
+      "contactPhone": "Contact phone",
+      "contactPhonePlaceholder": "e.g. +62 21 555 0101",
+      "contactEmail": "Contact email",
+      "contactEmailPlaceholder": "e.g. sales@company.com",
+      "website": "Website",
+      "websitePlaceholder": "https://...",
+      "isActive": "Active"
     }
   }
 }
