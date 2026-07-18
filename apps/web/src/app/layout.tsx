@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import type { ReactNode } from 'react';
-import { fontSans } from '@/app/fonts';
+import { fontSans, fontSerif } from '@/app/fonts';
 import Providers from '@/app/providers';
 import { getCurrentUser } from '@/features/auth/server/get-current-user';
 import {
@@ -22,8 +22,8 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
   maximumScale: 5,
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
-    { media: '(prefers-color-scheme: light)', color: '#ede9fe' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c2014' },
+    { media: '(prefers-color-scheme: light)', color: '#f6f4ee' },
   ],
 };
 
@@ -116,7 +116,7 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
     <html
       lang={locale}
       dir={dir}
-      className={cn(theme, fontSans.variable)}
+      className={cn(theme, fontSans.variable, fontSerif.variable)}
       suppressHydrationWarning
     >
       <body className={cn(fontSans.className, 'antialiased')}>

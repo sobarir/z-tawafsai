@@ -23,7 +23,11 @@
   sidebar nav entry under a new admin-only section.
 - [x] **Step 5 — Public frontend.** `(public)/travel-packages/page.tsx` — anonymous-readable,
   plain grid of `isActive` packages (`TravelPackageList` → `TravelPackageCard`), no search/filter.
-  Header nav link added (`/travel-packages`) alongside the existing top-nav items.
+  Header nav link added (`/travel-packages`) alongside the existing top-nav items. **Renamed
+  2026-07-17**: route moved to `(public)/(chrome)/packages/page.tsx` (`/packages`) — the
+  `/travel-packages` URL read as misleading once the landing page's own "Paket" (umrah packages)
+  existed; `/packages` is the general cross-domain explore page, feature folder/API/DB names
+  unchanged. See `prd/landing/CONTEXT.md`.
 - [x] **Step 6 — Combobox rebuild.** The shared `Combobox` primitive was rebuilt on real shadcn
   `Command` (new `cmdk` dependency) to fix a pointer-events-inherited-from-Dialog bug — a
   prerequisite for the flight/property/city comboboxes introduced above to work correctly inside

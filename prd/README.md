@@ -14,6 +14,7 @@ ask before picking one.
 | Flight schedule & inventory | `prd/flights/` | v1 + v1.1 (pricing/search) complete | `prd/flights/CONTEXT.md` |
 | Hotel search & pricing | `prd/hotels/` | search + Catalog Admin complete | `prd/hotels/CONTEXT.md` |
 | Travel Packages (flight+hotel bundles) | `prd/travel-packages/` | complete (docs scaffolded retroactively 2026-07-16) | `prd/travel-packages/CONTEXT.md` |
+| Landing (TawafSai marketing page) | `prd/landing/` | implemented 2026-07-17 — placeholder business data not yet replaced | `prd/landing/CONTEXT.md` |
 
 ## Adding a new domain
 

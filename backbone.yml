@@ -38,13 +38,14 @@ prd:
     flights: prd/flights/            # flight schedule & inventory — v1 + v1.1 (pricing/search) complete
     hotels: prd/hotels/              # hotel & package search — search + Catalog Admin complete
     travel-packages: prd/travel-packages/  # flight+hotel bundle admin CRUD + public listing — complete
+    landing: prd/landing/            # TawafSai marketing landing page (apps/web only, static data) — complete
 
 structure:
   apps:
     web: # Next.js 16 frontend — NO database access
       root: apps/web/
-      routes: apps/web/src/app/                    # App Router; (site)/ public, (auth)/ login, dashboard/@admin|@user parallel routes, @admin/schedule/* admin CRUD screens, @admin|@user/search public flight search (same page duplicated per slot — layout picks slot by permission, not by URL match)
-      features: apps/web/src/features/             # auth, i18n, navigation, site, theme, users, airports, airlines, flights, flight-marketing, mct-rules, interline-agreements, connections, flight-search — components/hooks/lib/server per feature
+      routes: apps/web/src/app/                    # App Router; (public)/ root = TawafSai landing page (no generic chrome), (public)/(chrome)/ = about/packages (wrapped in Header+BackgroundGradient), (auth)/ login, dashboard/@admin|@user parallel routes, @admin/schedule/* admin CRUD screens, @admin|@user/search public flight search (same page duplicated per slot — layout picks slot by permission, not by URL match)
+      features: apps/web/src/features/             # auth, i18n, navigation, site, theme, users, airports, airlines, flights, flight-marketing, mct-rules, interline-agreements, connections, flight-search, landing — components/hooks/lib/server per feature
       ui_primitives: apps/web/src/components/ui/   # vendored shadcn/ui
       shared_components: apps/web/src/components/
       libs: apps/web/src/libs/                     # env.ts, api-client.ts, utils, query-client

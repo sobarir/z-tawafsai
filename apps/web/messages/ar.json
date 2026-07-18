@@ -44,7 +44,6 @@
     "searchHotels": "البحث عن الفنادق",
     "logout": "تسجيل الخروج",
     "login": "تسجيل الدخول",
-    "uiComponents": "مكونات الواجهة",
     "travelPackages": "باقات السفر"
   },
   "auth": {
@@ -118,7 +117,37 @@
     }
   },
   "about": {
-    "title": "معلومات عنا"
+    "title": "عن TawafSai",
+    "subtitle": "وكالة سفر عمرة مرخصة رسميًا، تعتني برحلتك من النية وحتى العودة.",
+    "story": {
+      "heading": "قصتنا",
+      "body": "انطلقت TawafSai من فكرة بسيطة: يجب أن تكون رحلة العمرة هادئة وليست مرهقة. نتولى التأشيرات والرحلات الجوية والإقامة بالقرب من الحرم، ليتمكن الحجاج من التركيز الكامل على العبادة."
+    },
+    "license": {
+      "heading": "الترخيص الرسمي",
+      "body": "TawafSai هي جهة منظمة رحلات عمرة (PPIU) مسجلة لدى وزارة الشؤون الدينية الإندونيسية (Kemenag).",
+      "number": "ترخيص Kemenag PPIU رقم XXXX · معتمدة"
+    },
+    "whyChoose": {
+      "heading": "لماذا تختارنا",
+      "licensedTitle": "مرخصة رسميًا",
+      "licensedDescription": "معتمدة وموثوقة من قبل Kemenag.",
+      "ratedTitle": "4.9/5 من أكثر من 2,100 حاج",
+      "ratedDescription": "تقييمات من مسافرين راضين.",
+      "supportTitle": "دعم على مدار الساعة",
+      "supportDescription": "فريقنا متواجد ميدانيًا في مكة والمدينة.",
+      "protectedTitle": "مدفوعات محمية",
+      "protectedDescription": "معاملات آمنة وشفافة."
+    },
+    "contact": {
+      "heading": "تواصل معنا",
+      "body": "لديك أسئلة حول باقة أو حول الاستعداد للعمرة؟ فريقنا هنا لمساعدتك."
+    },
+    "cta": {
+      "heading": "هل أنت مستعد للتخطيط لعمرتك؟",
+      "body": "استكشف باقات العمرة والأدلة الكاملة لدينا.",
+      "button": "عرض باقات العمرة"
+    }
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -136,27 +165,6 @@
     "theme": "المظهر",
     "language": "اللغة",
     "tools": "الأدوات"
-  },
-  "uiComponents": {
-    "title": "مكونات الواجهة",
-    "description": "تصفح أكثر من 40 مكونًا من shadcn/ui والمكونات المخصصة مع المتغيرات والأحجام والحالات التفاعلية.",
-    "onThisPage": "في هذه الصفحة",
-    "sections": {
-      "actions": "الإجراءات",
-      "actionsDesc": "الأزرار والمفاتيح والإجراءات المجمعة.",
-      "forms": "النماذج",
-      "formsDesc": "حقول الإدخال والقوائم ومساعدات النماذج.",
-      "feedback": "التعليقات",
-      "feedbackDesc": "التنبيهات والشارات والتقدم وحالات التحميل.",
-      "dataDisplay": "عرض البيانات",
-      "dataDisplayDesc": "البطاقات والجداول والصور الرمزية والعناصر المرئية.",
-      "navigation": "التنقل",
-      "navigationDesc": "مسارات التنقل والتبويبات والقوائم.",
-      "overlays": "الطبقات",
-      "overlaysDesc": "الحوارات والألواح والنوافذ المنبثقة والقوائم.",
-      "layout": "التخطيط",
-      "layoutDesc": "الأكورديون والعرض الدوار والتقويم والعناصر القابلة للطي."
-    }
   },
   "schedule": {
     "nav": {
@@ -728,6 +736,110 @@
         "currency": "العملة",
         "isActive": "نشط (يظهر للعامة)"
       }
+    }
+  },
+  "landing": {
+    "brand": {
+      "prefix": "Tawaf",
+      "suffix": "Sai"
+    },
+    "sidebar": {
+      "tagKicker": "Perjalanan Umrah & Ziarah",
+      "headline": "Menuju Baitullah, dengan tenang.",
+      "tagline": "Diurus sepenuh hati, dari niat hingga pulang.",
+      "intro": "Panduan, paket, dan kabar terpercaya untuk jamaah umrah Indonesia — semua dalam satu tempat.",
+      "picksAriaLabel": "Artikel pilihan",
+      "picksKicker": "Panduan Pilihan",
+      "picksAll": "Semua →",
+      "footerCaptionLine1": "Dirancang untuk",
+      "footerCaptionLine2": "menenangkan ibadah",
+      "license": "Izin PPIU Kemenag No. XXXX · Terakreditasi"
+    },
+    "topbar": {
+      "navPaket": "Paket",
+      "navDestinasi": "Destinasi",
+      "navJurnal": "Jurnal",
+      "navTentang": "Tentang",
+      "ctaMulaiRencana": "Mulai Rencana",
+      "menuAriaLabel": "Menu",
+      "loginLabel": "Masuk"
+    },
+    "hero": {
+      "kicker": "Keberangkatan 2026 Dibuka",
+      "headlinePre": "Umrah yang ",
+      "headlineEmphasis": "tenang",
+      "headlinePost": ", diurus sampai tuntas.",
+      "subtitle": "Visa, penerbangan, dan hotel dekat Haram — Anda tinggal fokus beribadah.",
+      "bulanLabel": "Bulan",
+      "jamaahLabel": "Jamaah",
+      "ctaCekKetersediaan": "Cek Ketersediaan"
+    },
+    "bookingBar": {
+      "bulanOptions": {
+        "sep": "Sep 2026",
+        "okt": "Okt 2026",
+        "nov": "Nov 2026",
+        "des": "Des 2026"
+      },
+      "jamaahOptions": {
+        "satu": "1 orang",
+        "dua": "2 orang",
+        "keluarga": "Keluarga",
+        "rombongan": "Rombongan"
+      }
+    },
+    "trust": {
+      "kemenagTitle": "Izin Resmi Kemenag",
+      "kemenagSubtitle": "PPIU terakreditasi & terpercaya",
+      "ratingTitle": "4.9/5 dari 2.100+",
+      "ratingSubtitle": "Ulasan jamaah yang puas",
+      "supportTitle": "Pendamping 24/7",
+      "supportSubtitle": "Tim siap bantu di Tanah Suci",
+      "protectedTitle": "Dana Terlindungi",
+      "protectedSubtitle": "Pembayaran aman & transparan"
+    },
+    "packages": {
+      "kicker": "Paket Umrah",
+      "heading": "Pilih yang sesuai kebutuhan",
+      "compareAll": "Jelajahi paket lainnya →",
+      "filterAll": "Semua",
+      "filterHemat": "Hemat",
+      "filterPremium": "Premium",
+      "filterKeluarga": "Keluarga",
+      "priceFrom": "Mulai dari",
+      "durasiLabel": "Durasi",
+      "maskapaiLabel": "Maskapai",
+      "hotelMakkahLabel": "Hotel Makkah",
+      "hotelMadinahLabel": "Hotel Madinah",
+      "directBadge": "Langsung",
+      "detailCta": "Lihat Detail"
+    },
+    "moreDestinations": {
+      "kicker": "Destinasi Ziarah Lainnya",
+      "heading": "Tempat bersejarah lain untuk dikunjungi",
+      "exploreAll": "Jelajahi semua →"
+    },
+    "articles": {
+      "kicker": "Jurnal & Panduan",
+      "heading": "Kabar terbaru untuk jamaah",
+      "allArticles": "Semua artikel →",
+      "loadingMore": "Memuat artikel lainnya…",
+      "allSeen": "Anda sudah melihat semua artikel ✦"
+    },
+    "cta": {
+      "kicker": "Konsultasi Gratis",
+      "heading": "Siap merencanakan umrah Anda?",
+      "body": "Tinggalkan email, kami kirim panduan & penawaran keberangkatan terbaru. Tanpa spam.",
+      "emailPlaceholder": "Alamat email Anda",
+      "emailAriaLabel": "Email",
+      "submit": "Kirim"
+    },
+    "footer": {
+      "copyright": "© 2026 TawafSai · Izin PPIU Kemenag",
+      "linkAbout": "Tentang",
+      "linkLegal": "Legalitas",
+      "linkContact": "Kontak",
+      "linkPrivacy": "Privasi"
     }
   }
 }

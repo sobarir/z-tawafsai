@@ -3013,28 +3013,77 @@ async function seed() {
     0,
   );
 
-  // One sample Travel Package (flight + hotel), pairing a real seeded flight
-  // with a real seeded property — gives the public listing real content.
-  const [anchorFlight] = await db
-    .select({ id: schema.flights.id })
-    .from(schema.flights)
-    .where(
-      and(
-        eq(schema.flights.operatingAirline, 'GA'),
-        eq(schema.flights.flightNumber, '402'),
-        eq(schema.flights.departureTime, new Date('2026-08-05T11:50:00+07:00')),
-      ),
-    );
-
-  if (anchorFlight) {
-    const travelPackageValues = {
+  // Sample Travel Packages (flight + hotel), pairing real seeded flights
+  // with real seeded properties — gives the public listing real content.
+  const travelPackageSeeds: Array<{
+    title: string;
+    description: string;
+    operatingAirline: string;
+    flightNumber: string;
+    departureTime: string;
+    propertyCode: string;
+    durationNights: number;
+    price: number;
+    currency: string;
+  }> = [
+    {
       title: '5-Night Jeddah Getaway',
       description: 'Round-trip flight and a stay at Jeddah Waterfront Hotel.',
-      flightId: anchorFlight.id,
+      operatingAirline: 'GA',
+      flightNumber: '402',
+      departureTime: '2026-08-05T11:50:00+07:00',
       propertyCode: 'JED-WFH',
       durationNights: 5,
       price: 1200,
       currency: 'USD',
+    },
+    {
+      title: '7-Night Madinah Retreat',
+      description: 'Round-trip flight and a stay at Madinah Central Inn.',
+      operatingAirline: 'GA',
+      flightNumber: '404',
+      departureTime: '2026-08-05T13:30:00+07:00',
+      propertyCode: 'MAD-CIN',
+      durationNights: 7,
+      price: 950,
+      currency: 'USD',
+    },
+    {
+      title: '12-Night Grand Jeddah Package',
+      description:
+        'Extended round-trip flight and a stay at Jeddah Waterfront Hotel.',
+      operatingAirline: 'SV',
+      flightNumber: '816',
+      departureTime: '2026-08-05T09:10:00+07:00',
+      propertyCode: 'JED-WFH',
+      durationNights: 12,
+      price: 1850,
+      currency: 'USD',
+    },
+  ];
+
+  for (const item of travelPackageSeeds) {
+    const [anchorFlight] = await db
+      .select({ id: schema.flights.id })
+      .from(schema.flights)
+      .where(
+        and(
+          eq(schema.flights.operatingAirline, item.operatingAirline),
+          eq(schema.flights.flightNumber, item.flightNumber),
+          eq(schema.flights.departureTime, new Date(item.departureTime)),
+        ),
+      );
+
+    if (!anchorFlight) continue;
+
+    const travelPackageValues = {
+      title: item.title,
+      description: item.description,
+      flightId: anchorFlight.id,
+      propertyCode: item.propertyCode,
+      durationNights: item.durationNights,
+      price: item.price,
+      currency: item.currency,
       isActive: true,
     };
 

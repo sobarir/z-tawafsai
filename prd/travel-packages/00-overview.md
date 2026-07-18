@@ -14,7 +14,7 @@ engine" scope and the hotels domain's "search/display only" scope — see
 ## Goals
 
 - Admin CRUD over travel packages.
-- A public, anonymous-readable card listing at `/travel-packages` so a visitor can browse curated
+- A public, anonymous-readable card listing at `/packages` so a visitor can browse curated
   deals without signing in.
 - Enrich each package with derived display info (airline name, direct/transit, duration) computed
   server-side from the flight/leg/airline/airport/city reference tables — the client never
@@ -51,10 +51,12 @@ engine" scope and the hotels domain's "search/display only" scope — see
   `createFlightHotelPackageSchema` / `updateFlightHotelPackageSchema`, `citySchema` /
   `createCitySchema` / `updateCitySchema`.
 - Frontend: `apps/web/src/features/travel-packages/` (admin CRUD + public card list),
-  `apps/web/src/features/cities/` (admin CRUD). Routes: `(public)/travel-packages/page.tsx`
-  (public list, anonymous-readable), `(protected)/@admin/travel-packages/admin/page.tsx` (admin
-  CRUD, admin-only — no `@user` counterpart), `(protected)/@admin/reference/cities/page.tsx`
-  (City admin, under the "Reference Data" sidebar section alongside currencies/fx-rates).
+  `apps/web/src/features/cities/` (admin CRUD). Routes: `(public)/(chrome)/packages/page.tsx`
+  (public list, anonymous-readable — URL is `/packages`; the feature folder and API/DB domain
+  keep the `travel-packages` name, only the public-facing route slug changed),
+  `(protected)/@admin/travel-packages/admin/page.tsx` (admin CRUD, admin-only — no `@user`
+  counterpart), `(protected)/@admin/reference/cities/page.tsx` (City admin, under the "Reference
+  Data" sidebar section alongside currencies/fx-rates).
 - DB: table `travel_package` + table `city`. Migrations `0005_parallel_doorman.sql` (create
   `city`), `0006_outstanding_maginty.sql` (`airports.city_code` FK to `city` + unique index on
   `city.name`), `0007_lonely_bromley.sql` (create `travel_package`).

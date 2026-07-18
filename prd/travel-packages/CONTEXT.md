@@ -33,6 +33,12 @@ Working tree is clean; nothing in this domain is pending commit.
   cross-check `/prd/flights/` and `/prd/hotels/CONTEXT.md` if City's role there changes.
 - **No search/filter on the public page** — deliberately a plain grid, matching the "curated
   catalog" framing rather than a query surface.
+- **Public route renamed 2026-07-17**: `/travel-packages` → `/packages`. The URL read as
+  misleading once the TawafSai landing page's own "Paket" (umrah packages) existed — `/packages`
+  is meant as the general cross-domain explore page (umrah, travel, etc.), the landing page's
+  "Paket" section only surfaces featured/discounted umrah packages. Feature folder
+  (`apps/web/src/features/travel-packages/`), API domain, and DB table name are unchanged — only
+  the public-facing route slug moved. See `prd/landing/CONTEXT.md`.
 
 ## Open questions
 
@@ -54,7 +60,7 @@ See `20-steps.md` — all 9 retroactively-logged steps are complete and committe
 | # | Entity | Table | Key | Admin CRUD | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 1 | City | `city` | city code (natural key) | `reference/cities` | Cross-domain reference data; also consumed by flights (`airports.city_code`) and hotels (destination combobox). |
-| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight (flights domain) + one Property (hotels domain). Public list at `/travel-packages`. |
+| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight (flights domain) + one Property (hotels domain). Public list at `/packages`. |
 
 ## Definition of done: met
 

@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { baseUrl } from '@/features/site/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ['', '/ui-components', '/about', '/login', '/unauthorized'];
+  const routes = ['', '/about', '/packages', '/login', '/unauthorized'];
   return routes.map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),

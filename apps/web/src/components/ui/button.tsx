@@ -43,6 +43,12 @@ const buttonVariants = cva(
         muted: 'bg-muted text-muted-foreground',
         success:
           'bg-success text-success-foreground hover:bg-success/90 focus-visible:ring-success/20 dark:focus-visible:ring-success/40',
+        brand: 'btn-brand-shine font-serif font-semibold border',
+        // Solid CTA for the TawafSai landing page — plain Tailwind utilities so
+        // callers can override the color via className (e.g. the CTA section's
+        // gold "Kirim" button) without fighting the !important gradient classes.
+        brandSolid:
+          'bg-brand-700 text-white shadow-sm hover:bg-brand-900 hover:-translate-y-px hover:shadow-md',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

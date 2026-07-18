@@ -28,7 +28,7 @@ function syncBrowserThemeColor() {
   const root = document.documentElement;
   const pageChrome =
     getComputedStyle(root).getPropertyValue('--page-chrome-meta').trim() ||
-    (root.classList.contains('dark') ? '#09090b' : '#ede9fe');
+    (root.classList.contains('dark') ? '#1c2014' : '#f6f4ee');
 
   const metas = document.querySelectorAll('meta[name="theme-color"]');
 

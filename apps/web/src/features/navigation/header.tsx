@@ -82,17 +82,6 @@ const Header = () => {
               {t('home')}
             </Link>
             <Link
-              href="/ui-components"
-              className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                pathname === '/ui-components'
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
-            >
-              {t('uiComponents')}
-            </Link>
-            <Link
               href="/about"
               className={cn(
                 'rounded-md px-3 py-2 text-sm font-medium transition-colors',
@@ -104,10 +93,10 @@ const Header = () => {
               {t('about')}
             </Link>
             <Link
-              href="/travel-packages"
+              href="/packages"
               className={cn(
                 'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                pathname === '/travel-packages'
+                pathname === '/packages'
                   ? 'text-primary'
                   : 'text-muted-foreground hover:bg-accent hover:text-foreground',
               )}
@@ -193,18 +182,6 @@ const Header = () => {
                 {t('home')}
               </Link>
               <Link
-                href="/ui-components"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  pathname === '/ui-components'
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                )}
-              >
-                {t('uiComponents')}
-              </Link>
-              <Link
                 href="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
@@ -217,11 +194,11 @@ const Header = () => {
                 {t('about')}
               </Link>
               <Link
-                href="/travel-packages"
+                href="/packages"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  pathname === '/travel-packages'
+                  pathname === '/packages'
                     ? 'text-primary'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                 )}

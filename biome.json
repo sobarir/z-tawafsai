@@ -19,7 +19,8 @@
       "!apps/api/openapi.json",
       "!**/pnpm-lock.yaml",
       "!**/*.css",
-      "!**/public"
+      "!**/public",
+      "!prd"
     ]
   },
   "formatter": {
