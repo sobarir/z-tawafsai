@@ -12,6 +12,8 @@ interface PropertyColumnsOptions {
     destination: string;
     countryCode: string;
     starRating: string;
+    distance: string;
+    contact: string;
     isActive: string;
   };
   typeLabels: Record<Property['type'], string>;
@@ -51,6 +53,25 @@ export function getPropertyColumns({
       id: 'starRating',
       header: columnLabels.starRating,
       cell: ({ row }) => row.original.starRating ?? '—',
+    },
+    {
+      id: 'distance',
+      header: columnLabels.distance,
+      cell: ({ row }) => {
+        const { distanceMeters, distanceNote } = row.original;
+        if (distanceMeters == null && !distanceNote) return '—';
+        const parts = [
+          distanceMeters != null ? `${distanceMeters}m` : null,
+          distanceNote,
+        ].filter(Boolean);
+        return parts.join(' · ');
+      },
+    },
+    {
+      id: 'contact',
+      header: columnLabels.contact,
+      cell: ({ row }) =>
+        row.original.contactPhone ?? row.original.contactEmail ?? '—',
     },
     {
       id: 'isActive',

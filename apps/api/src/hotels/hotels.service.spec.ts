@@ -151,11 +151,14 @@ describe('HotelsService.search — golden scenarios', () => {
   });
 
   it('S9 — NO_SEASON: dates outside every season window are silently omitted, still 200', async () => {
+    // 2027-02 is outside every seeded Madinah season: MAD-CIN's single
+    // 'standard' window ends 2026-05-01, and the Nusuk hotels' full-year
+    // 'standard' window (prd/hotel_list.md data) ends 2027-01-01.
     const res = await hotels.search({
       ...baseQuery,
       destination: 'Madinah',
-      checkIn: '2026-06-01',
-      checkOut: '2026-06-03',
+      checkIn: '2027-02-01',
+      checkOut: '2027-02-03',
       occupancy: 2,
       currency: 'SAR',
     });

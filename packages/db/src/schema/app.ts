@@ -381,6 +381,13 @@ export const property = pgTable(
     heroImageUrl: text('hero_image_url'),
     starRating: integer('star_rating'),
     address: text('address'),
+    // Approximate distance to the property's relevant landmark (e.g. Masjid
+    // Al-Haram / Masjid An-Nabawi for Makkah/Madinah hotels), plus a
+    // free-text qualifier (walk time, shuttle requirement, etc).
+    distanceMeters: integer('distance_meters'),
+    distanceNote: text('distance_note'),
+    contactPhone: text('contact_phone'),
+    contactEmail: text('contact_email'),
     isActive: boolean('is_active').notNull().default(true),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()

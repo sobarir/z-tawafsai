@@ -225,6 +225,7 @@ const cities: (typeof schema.city.$inferInsert)[] = [
   { cityCode: 'AMS', name: 'Amsterdam', countryCode: 'NL' },
   { cityCode: 'JED', name: 'Jeddah', countryCode: 'SA' },
   { cityCode: 'MED', name: 'Madinah', countryCode: 'SA' },
+  { cityCode: 'MKK', name: 'Makkah', countryCode: 'SA' },
   { cityCode: 'KUL', name: 'Kuala Lumpur', countryCode: 'MY' },
   { cityCode: 'DXB', name: 'Dubai', countryCode: 'AE' },
   { cityCode: 'AUH', name: 'Abu Dhabi', countryCode: 'AE' },
@@ -3895,6 +3896,10 @@ type PropertySeed = {
   countryCode: string;
   starRating?: number;
   address?: string;
+  distanceMeters?: number;
+  distanceNote?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   roomTypes: RoomTypeSeed[];
   seasons: SeasonSeed[];
   rateRules: RateRuleSeed[];
@@ -3912,9 +3917,13 @@ const properties: PropertySeed[] = [
       { name: 'Double', maxOccupancy: 2 },
       { name: 'Quad', maxOccupancy: 4 },
     ],
+    // Peak runs through 2027-01-01 (not just 2026-07-01) so it covers the
+    // full CGK<->JED/MED demo flight date range (2026-05-31 through
+    // 2026-10-26) — otherwise a flight search in e.g. August finds this
+    // property has NO_SEASON and package creation has no hotel to pair.
     seasons: [
       { name: 'standard', startDate: '2026-01-01', endDate: '2026-05-01' },
-      { name: 'peak', startDate: '2026-05-01', endDate: '2026-07-01' },
+      { name: 'peak', startDate: '2026-05-01', endDate: '2027-01-01' },
     ],
     rateRules: [
       {
@@ -3952,8 +3961,11 @@ const properties: PropertySeed[] = [
     ],
   },
   {
-    // Exists so a NO_SEASON case (S9) is easy: query dates outside this
-    // property's single season window.
+    // Season runs through 2027-01-01 (not just 2026-05-01) so it covers the
+    // full CGK<->JED/MED demo flight date range — see JED-WFH's comment
+    // above. S9's NO_SEASON golden scenario now uses a 2027-02 date
+    // (genuinely outside every seeded Madinah property's window) instead of
+    // relying on this property having a narrow season.
     code: 'MAD-CIN',
     type: 'hotel',
     displayName: 'Madinah Central Inn',
@@ -3961,7 +3973,7 @@ const properties: PropertySeed[] = [
     countryCode: 'SA',
     roomTypes: [{ name: 'Double', maxOccupancy: 2 }],
     seasons: [
-      { name: 'standard', startDate: '2026-01-01', endDate: '2026-05-01' },
+      { name: 'standard', startDate: '2026-01-01', endDate: '2027-01-01' },
     ],
     rateRules: [
       {
@@ -3975,6 +3987,656 @@ const properties: PropertySeed[] = [
     ],
   },
 ];
+
+/**
+ * Nusuk-approved Makkah/Madinah hotels (prd/hotel_list.md, 2026-07-18). The
+ * source only gives one price point per hotel ("Quad Occupancy per night",
+ * a USD range) plus a distance-to-landmark string and a single contact
+ * value (phone or email) — everything below is derived from that:
+ * - amount: the high end of the USD range, converted to IDR at the same
+ *   USD->IDR rate seeded above (16,300), stored as the rate_rule's native
+ *   currency (not USD + live conversion).
+ * - room types: the source only supports Quad pricing, so Double (55%) and
+ *   Triple (80%) are synthesized off the Quad amount, tiling occupancy
+ *   1-4 with no gaps (1-2 / 3-3 / 4-4) — user-confirmed approach, see
+ *   prd/hotels/CONTEXT.md.
+ * - season: a single full-year 'standard' window — the source gives one
+ *   flat rate with no seasonal breakdown.
+ * Two hotels with no usable price ("Varies"/"N/A" throughout) are omitted:
+ * The World Of Luxury Hospitality (Makkah, 4-star) and Park Royal Hotel
+ * Company (Makkah, 3-star).
+ */
+const USD_TO_IDR = 16_300;
+
+type NusukHotelSpec = {
+  code: string;
+  displayName: string;
+  destination: 'Makkah' | 'Madinah';
+  starRating: 3 | 4 | 5;
+  /** High end of the source's USD quad-occupancy nightly range. */
+  quadPriceUsdHigh: number;
+  distanceMeters: number;
+  distanceNote: string | null;
+  contactPhone?: string;
+  contactEmail?: string;
+};
+
+function toNusukProperty(spec: NusukHotelSpec): PropertySeed {
+  const quad = spec.quadPriceUsdHigh * USD_TO_IDR;
+  const triple = spec.quadPriceUsdHigh * 13_040; // quad * 0.80
+  const double = spec.quadPriceUsdHigh * 8_965; // quad * 0.55
+  return {
+    code: spec.code,
+    type: 'hotel',
+    displayName: spec.displayName,
+    destination: spec.destination,
+    countryCode: 'SA',
+    starRating: spec.starRating,
+    distanceMeters: spec.distanceMeters,
+    distanceNote: spec.distanceNote ?? undefined,
+    contactPhone: spec.contactPhone,
+    contactEmail: spec.contactEmail,
+    roomTypes: [
+      { name: 'Double', maxOccupancy: 2 },
+      { name: 'Triple', maxOccupancy: 3 },
+      { name: 'Quad', maxOccupancy: 4 },
+    ],
+    seasons: [
+      { name: 'standard', startDate: '2026-01-01', endDate: '2027-01-01' },
+    ],
+    rateRules: [
+      {
+        seasonName: 'standard',
+        roomTypeName: 'Double',
+        minOccupancy: 1,
+        maxOccupancy: 2,
+        amount: double,
+        currency: 'IDR',
+      },
+      {
+        seasonName: 'standard',
+        roomTypeName: 'Triple',
+        minOccupancy: 3,
+        maxOccupancy: 3,
+        amount: triple,
+        currency: 'IDR',
+      },
+      {
+        seasonName: 'standard',
+        roomTypeName: 'Quad',
+        minOccupancy: 4,
+        maxOccupancy: 4,
+        amount: quad,
+        currency: 'IDR',
+      },
+    ],
+  };
+}
+
+const nusukHotelSpecs: NusukHotelSpec[] = [
+  // --- 5-star, Madinah ---
+  {
+    code: 'MAD-ANWAR',
+    displayName: 'Anwar Almadinah Mövenpick',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 350,
+    distanceMeters: 100,
+    distanceNote: 'Less than',
+    contactPhone: '+966 14 818 1000',
+  },
+  {
+    code: 'MAD-CROWNE',
+    displayName: 'Crowne Plaza Madinah',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 300,
+    distanceMeters: 150,
+    distanceNote: 'Less than',
+    contactPhone: '+966 14 818 5000',
+  },
+  {
+    code: 'MAD-OBEROI',
+    displayName: 'The Oberoi Madina',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 600,
+    distanceMeters: 50,
+    distanceNote: 'Less than',
+    contactEmail: 'reservations.madina@oberoihotels.com',
+  },
+  {
+    code: 'MAD-HILTON',
+    displayName: 'Al Madinah Hilton Hotel',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 400,
+    distanceMeters: 100,
+    distanceNote: 'Less than',
+    contactPhone: '+966 14 820 1000',
+  },
+  {
+    code: 'MAD-SOFITEL',
+    displayName: 'Sofitel Shahd Al Madinah',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 400,
+    distanceMeters: 100,
+    distanceNote: 'Less than',
+    contactPhone: '+966 14 829 9999',
+  },
+  {
+    code: 'MAD-SAJA',
+    displayName: 'Saja Almadinah Hotel',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 200,
+    distanceMeters: 400,
+    distanceNote: 'Approx.',
+    contactEmail: 'info@sajaalmadinah.com',
+  },
+  {
+    code: 'MAD-DARIMAN',
+    displayName: 'Dar Al Iman InterContinental',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 500,
+    distanceMeters: 50,
+    distanceNote: 'Less than',
+    contactPhone: '+966 14 820 6666',
+  },
+  {
+    code: 'MAD-AQEEQ',
+    displayName: 'Aqeeq Madina Hotel',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 280,
+    distanceMeters: 150,
+    distanceNote: 'Less than',
+    contactPhone: '+966 14 820 5500',
+  },
+  {
+    code: 'MAD-TAQWA',
+    displayName: 'Dar Al Taqwa Madinah',
+    destination: 'Madinah',
+    starRating: 5,
+    quadPriceUsdHigh: 500,
+    distanceMeters: 50,
+    distanceNote: 'Less than',
+    contactEmail: 'info@daraltaqwa.com',
+  },
+  // --- 5-star, Makkah ---
+  {
+    code: 'MKK-MARWA',
+    displayName: 'Al Marwa Rayhaan By Rotana',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 350,
+    distanceMeters: 150,
+    distanceNote: '2 min walk',
+    contactEmail: 'res.almarwa@rotana.com',
+  },
+  {
+    code: 'MKK-ANJUM',
+    displayName: 'Anjum Hotel Makkah',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 250,
+    distanceMeters: 450,
+    distanceNote: '5-10 min walk',
+    contactEmail: 'info@anjumhotels.com',
+  },
+  {
+    code: 'MKK-SAFWA',
+    displayName: 'Al Safwa Hotel Towers',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 400,
+    distanceMeters: 50,
+    distanceNote: 'Less than',
+    contactPhone: '+966 12 576 4444',
+  },
+  {
+    code: 'MKK-TAWHID',
+    displayName: 'Dar Al Tawhid Intercontinental',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 700,
+    distanceMeters: 50,
+    distanceNote: 'Front row',
+    contactPhone: '+966 12 529 5000',
+  },
+  {
+    code: 'MKK-CLOCKTWR',
+    displayName: 'Makkah Clock Royal Tower (Fairmont)',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 600,
+    distanceMeters: 50,
+    distanceNote: 'Less than',
+    contactEmail: 'makkah@fairmont.com',
+  },
+  {
+    code: 'MKK-SWISSOTEL',
+    displayName: 'Swissotel Makkah',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 450,
+    distanceMeters: 100,
+    distanceNote: null,
+    contactEmail: 'makkah@swissotel.com',
+  },
+  {
+    code: 'MKK-RAFFLES',
+    displayName: 'Raffles Makkah Palace',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 800,
+    distanceMeters: 50,
+    distanceNote: 'Less than',
+    contactPhone: '+966 12 571 2888',
+  },
+  {
+    code: 'MKK-HILTONJO',
+    displayName: 'Hilton Jabal Omar',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 400,
+    distanceMeters: 250,
+    distanceNote: null,
+    contactPhone: '+966 12 530 3000',
+  },
+  {
+    code: 'MKK-ZAMZAMPUL',
+    displayName: 'Zamzam Pullman Makkah',
+    destination: 'Makkah',
+    starRating: 5,
+    quadPriceUsdHigh: 350,
+    distanceMeters: 100,
+    distanceNote: 'Less than',
+    contactEmail: 'h7604@accor.com',
+  },
+  // --- 4-star, Madinah ---
+  {
+    code: 'MAD-MUNAKAREEM',
+    displayName: 'Al Muna Kareem Hotel',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 250,
+    distanceMeters: 200,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 825 5005',
+  },
+  {
+    code: 'MAD-ZAMZAMPUL',
+    displayName: 'Zamzam Pullman Madina',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 280,
+    distanceMeters: 150,
+    distanceNote: 'Approx.',
+    contactEmail: 'h8139@accor.com',
+  },
+  {
+    code: 'MAD-HIJRA',
+    displayName: 'Dar Al Hijra InterContinental',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 250,
+    distanceMeters: 300,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 820 7777',
+  },
+  {
+    code: 'MAD-EMAARROYAL',
+    displayName: 'Emaar Royal Hotel',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 220,
+    distanceMeters: 100,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 828 7777',
+  },
+  {
+    code: 'MAD-DALLAH',
+    displayName: 'Dallah Taibah Hotel',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 300,
+    distanceMeters: 100,
+    distanceNote: 'Less than',
+    contactEmail: 'info@dallahtaibah.com',
+  },
+  {
+    code: 'MAD-VALY',
+    displayName: 'Valy Hotel',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 150,
+    distanceMeters: 300,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 831 2222',
+  },
+  {
+    code: 'MAD-BOSPHORUS',
+    displayName: 'Bosphorus Hotel',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 160,
+    distanceMeters: 400,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 827 3333',
+  },
+  {
+    code: 'MAD-TWOROYA',
+    displayName: 'Two Roya Al Andalus Company',
+    destination: 'Madinah',
+    starRating: 4,
+    quadPriceUsdHigh: 160,
+    distanceMeters: 200,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 813 1333',
+  },
+  // --- 4-star, Makkah ---
+  {
+    code: 'MKK-ALDANA',
+    displayName: 'Al Dana Diamond Hotel Company',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 140,
+    distanceMeters: 800,
+    distanceNote: 'Approx.',
+    contactEmail: 'info@aldanadiamond.com',
+  },
+  {
+    code: 'MKK-AZKASAFA',
+    displayName: 'Azka Al Safa Hotel Company',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 200,
+    distanceMeters: 150,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 12 566 6999',
+  },
+  {
+    code: 'MKK-MAYSANMASHAER',
+    displayName: 'Maysan Al Mashaer Hotel',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 90,
+    distanceMeters: 5000,
+    distanceNote: 'Shuttle',
+    contactEmail: 'info@maysanhotels.com',
+  },
+  {
+    code: 'MKK-COURTYARD',
+    displayName: 'Courtyard By Marriott Makkah',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 150,
+    distanceMeters: 2000,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 578 3000',
+  },
+  {
+    code: 'MKK-DOUBLETREE',
+    displayName: 'Doubletree By Hilton Jabal Omar',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 250,
+    distanceMeters: 400,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 12 550 4321',
+  },
+  {
+    code: 'MKK-EMAARGRAND',
+    displayName: 'Emaar Grand Hotel',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 130,
+    distanceMeters: 700,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 12 531 3000',
+  },
+  {
+    code: 'MKK-FOURPOINTS',
+    displayName: 'Four Points By Sheraton Hotel',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 100,
+    distanceMeters: 7000,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 528 2828',
+  },
+  {
+    code: 'MKK-LAMAR',
+    displayName: 'Lamar Hotel',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 110,
+    distanceMeters: 1500,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 541 4444',
+  },
+  {
+    code: 'MKK-MAAD',
+    displayName: 'Maad Tourism Company',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 130,
+    distanceMeters: 1500,
+    distanceNote: 'Approx.',
+    contactEmail: 'info@maad.com.sa',
+  },
+  {
+    code: 'MKK-NOVOTEL',
+    displayName: 'Novotel Residences Hotel',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 130,
+    distanceMeters: 3000,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 550 8800',
+  },
+  {
+    code: 'MKK-SHERATONJK',
+    displayName: 'Sheraton Makkah Jabal Al Kaaba',
+    destination: 'Makkah',
+    starRating: 4,
+    quadPriceUsdHigh: 250,
+    distanceMeters: 500,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 12 551 8900',
+  },
+  // --- 3-star, Madinah ---
+  {
+    code: 'MAD-MADENRAWDA',
+    displayName: 'Maden Al Rawda Hotel',
+    destination: 'Madinah',
+    starRating: 3,
+    quadPriceUsdHigh: 130,
+    distanceMeters: 300,
+    distanceNote: 'Approx.',
+    contactEmail: 'info@madenhotel.com',
+  },
+  {
+    code: 'MAD-HOUSEFAITH',
+    displayName: 'The House of Faith',
+    destination: 'Madinah',
+    starRating: 3,
+    quadPriceUsdHigh: 110,
+    distanceMeters: 500,
+    distanceNote: 'Approx.',
+  },
+  {
+    code: 'MAD-CASTLE',
+    displayName: 'Castle Hotel',
+    destination: 'Madinah',
+    starRating: 3,
+    quadPriceUsdHigh: 100,
+    distanceMeters: 600,
+    distanceNote: 'Approx.',
+  },
+  {
+    code: 'MAD-MAIENTAIBA',
+    displayName: 'Maien Taiba',
+    destination: 'Madinah',
+    starRating: 3,
+    quadPriceUsdHigh: 120,
+    distanceMeters: 400,
+    distanceNote: 'Approx.',
+  },
+  {
+    code: 'MAD-RUAHIJRAH',
+    displayName: 'Rua Al Hijrah Hotel',
+    destination: 'Madinah',
+    starRating: 3,
+    quadPriceUsdHigh: 140,
+    distanceMeters: 250,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 14 818 0000',
+  },
+  // --- 3-star, Makkah ---
+  {
+    code: 'MKK-KISWAHTWR',
+    displayName: 'Al Kiswah Towers Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 80,
+    distanceMeters: 1500,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 529 5555',
+  },
+  {
+    code: 'MKK-ALOLAYAN',
+    displayName: 'Alolayan Golden Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 85,
+    distanceMeters: 2000,
+    distanceNote: 'Shuttle',
+  },
+  {
+    code: 'MKK-BATOULAJYAD',
+    displayName: 'Batoul Ajyad Company',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 90,
+    distanceMeters: 1000,
+    distanceNote: 'Approx.',
+  },
+  {
+    code: 'MKK-MAYSANAZIZIYA',
+    displayName: 'Maysan Al Aziziya Hotel Company',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 70,
+    distanceMeters: 5000,
+    distanceNote: 'Shuttle',
+    contactEmail: 'info@maysanhotels.com',
+  },
+  {
+    code: 'MKK-MAYSANMAQAM',
+    displayName: 'Maysan Al Maqam Hotel Company',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 70,
+    distanceMeters: 5000,
+    distanceNote: 'Shuttle',
+    contactEmail: 'info@maysanhotels.com',
+  },
+  {
+    code: 'MKK-MAYSANMULTAZAM',
+    displayName: 'Maysan Al Multazam Hotel Company',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 70,
+    distanceMeters: 5000,
+    distanceNote: 'Shuttle',
+    contactEmail: 'info@maysanhotels.com',
+  },
+  {
+    code: 'MKK-MAYSANSAFA',
+    displayName: 'Maysan Al Safa Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 70,
+    distanceMeters: 5000,
+    distanceNote: 'Shuttle',
+    contactEmail: 'info@maysanhotels.com',
+  },
+  {
+    code: 'MKK-EMAARMANAR',
+    displayName: 'Emaar Al Manar Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 80,
+    distanceMeters: 1200,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 531 3000',
+  },
+  {
+    code: 'MKK-MASARAEZ',
+    displayName: 'Masar Al Aez Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 75,
+    distanceMeters: 2000,
+    distanceNote: 'Shuttle',
+  },
+  {
+    code: 'MKK-NADAAJYAD',
+    displayName: 'Nada Ajyad Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 95,
+    distanceMeters: 800,
+    distanceNote: 'Approx.',
+    contactPhone: '+966 12 577 7771',
+  },
+  {
+    code: 'MKK-PALESTINE',
+    displayName: 'Palestine Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 80,
+    distanceMeters: 1500,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 535 5555',
+  },
+  {
+    code: 'MKK-SARAYADEAFAH',
+    displayName: 'Saraya Al Deafah Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 75,
+    distanceMeters: 1200,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 574 4444',
+  },
+  {
+    code: 'MKK-SNOODAJYAD',
+    displayName: 'Snood Ajyad Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 85,
+    distanceMeters: 1500,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 533 3333',
+  },
+  {
+    code: 'MKK-VIOLET',
+    displayName: 'Violet Hotel',
+    destination: 'Makkah',
+    starRating: 3,
+    quadPriceUsdHigh: 70,
+    distanceMeters: 4000,
+    distanceNote: 'Shuttle',
+    contactPhone: '+966 12 550 5555',
+  },
+];
+
+properties.push(...nusukHotelSpecs.map(toNusukProperty));
 
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
@@ -4183,6 +4845,10 @@ async function seed() {
         countryCode: item.countryCode,
         starRating: item.starRating ?? null,
         address: item.address ?? null,
+        distanceMeters: item.distanceMeters ?? null,
+        distanceNote: item.distanceNote ?? null,
+        contactPhone: item.contactPhone ?? null,
+        contactEmail: item.contactEmail ?? null,
         isActive: true,
       })
       .onConflictDoUpdate({
@@ -4194,6 +4860,10 @@ async function seed() {
           countryCode: item.countryCode,
           starRating: item.starRating ?? null,
           address: item.address ?? null,
+          distanceMeters: item.distanceMeters ?? null,
+          distanceNote: item.distanceNote ?? null,
+          contactPhone: item.contactPhone ?? null,
+          contactEmail: item.contactEmail ?? null,
         },
       });
 

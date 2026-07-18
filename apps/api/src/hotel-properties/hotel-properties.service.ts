@@ -25,6 +25,10 @@ const toProperty = (row: PropertyRow): Property => ({
   destination: row.destination,
   countryCode: row.countryCode,
   heroImageUrl: row.heroImageUrl,
+  distanceMeters: row.distanceMeters,
+  distanceNote: row.distanceNote,
+  contactPhone: row.contactPhone,
+  contactEmail: row.contactEmail,
   isActive: row.isActive,
   createdAt: row.createdAt.toISOString(),
 });
@@ -71,6 +75,10 @@ export class HotelPropertiesService {
         destination: input.destination,
         countryCode: input.countryCode,
         heroImageUrl: input.heroImageUrl ?? null,
+        distanceMeters: input.distanceMeters ?? null,
+        distanceNote: input.distanceNote ?? null,
+        contactPhone: input.contactPhone ?? null,
+        contactEmail: input.contactEmail ?? null,
         isActive: input.isActive ?? true,
       })
       .returning();

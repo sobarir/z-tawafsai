@@ -475,6 +475,8 @@
         "destination": "Destination",
         "countryCode": "Pays",
         "starRating": "Étoiles",
+        "distance": "Distance",
+        "contact": "Contact",
         "isActive": "Actif"
       },
       "fields": {
@@ -492,6 +494,13 @@
         "starRating": "Classement (1-5 étoiles)",
         "address": "Adresse",
         "addressPlaceholder": "Adresse postale",
+        "distanceMeters": "Distance au lieu de référence (m)",
+        "distanceNote": "Note de distance",
+        "distanceNotePlaceholder": "ex. Navette, 2 min à pied, Premier rang",
+        "contactPhone": "Téléphone de contact",
+        "contactPhonePlaceholder": "ex. +966 12 345 6789",
+        "contactEmail": "E-mail de contact",
+        "contactEmailPlaceholder": "ex. info@hotel.com",
         "isActive": "Actif (visible dans la recherche)"
       },
       "types": {

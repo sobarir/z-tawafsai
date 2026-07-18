@@ -475,6 +475,8 @@
         "destination": "الوجهة",
         "countryCode": "الدولة",
         "starRating": "النجوم",
+        "distance": "المسافة",
+        "contact": "التواصل",
         "isActive": "نشط"
       },
       "fields": {
@@ -492,6 +494,13 @@
         "starRating": "تصنيف النجوم (1-5)",
         "address": "العنوان",
         "addressPlaceholder": "العنوان البريدي",
+        "distanceMeters": "المسافة إلى المعلم (متر)",
+        "distanceNote": "ملاحظة المسافة",
+        "distanceNotePlaceholder": "مثال: مكوك، دقيقتان مشيًا، الصف الأول",
+        "contactPhone": "هاتف التواصل",
+        "contactPhonePlaceholder": "مثال: +966 12 345 6789",
+        "contactEmail": "بريد التواصل",
+        "contactEmailPlaceholder": "مثال: info@hotel.com",
         "isActive": "نشط (يظهر في نتائج البحث)"
       },
       "types": {

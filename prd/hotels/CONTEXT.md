@@ -5,6 +5,63 @@
 
 ## Current step
 
+**2026-07-18 (later still) — JED-WFH/MAD-CIN season windows extended to cover
+the full flight date range.** User report: searching hotels/creating a
+package for a flight date like 2026-08-08 found no hotels, because
+JED-WFH's `peak` season ended 2026-07-01 and MAD-CIN's only season ended
+2026-05-01, while the seeded CGK<->JED/MED demo flights (`prd/flights/15-seed-data.md`
+v1.2 + the 6-airline addition) run 2026-05-31 through 2026-10-26 — well past
+both. Fixed by extending both to end 2027-01-01 (matching the Nusuk hotels'
+full-year window already seeded that same day, see below), so every seeded
+property now has season coverage for every seeded flight date. `packages/db/
+src/seed.ts` is the only place this needed to change — no schema change.
+`hotels.service.spec.ts`'s S9 (NO_SEASON) already used a 2027-02 date after
+the Nusuk-hotel pass below, so it still passes unchanged.
+
+**2026-07-18 (later same day) — 56 Nusuk-approved Makkah/Madinah hotels loaded from
+`prd/hotel_list.md`; `property` gained 4 columns.** A user-supplied directory of
+real Nusuk/Hajj-and-Umrah-approved hotels (name, city, star rating 3-5, a
+"Quad Occupancy" USD price range, distance-to-landmark, one contact value)
+was loaded into `property`/`room_type`/`season`/`rate_rule` via
+`packages/db/src/seed.ts`. 2 of 41 source rows had no usable price ("Varies"
+throughout) and were skipped, so 56 of 58 total seeded properties are Nusuk
+data (JED-WFH/MAD-CIN are the original 2). Key decisions (all user-confirmed,
+none inferred):
+- **Price**: the source gives one range per hotel ("Quad Occupancy per
+  night"); the **high end** of that range is used, converted from USD to
+  **IDR** at the same USD->IDR rate already seeded for display conversion
+  (16,300) — stored as the rate_rule's *native* currency, not USD + live FX.
+- **Room types**: the source only supports Quad pricing, so `room_type` now
+  gets 3 rows per Nusuk property — Double/Triple/Quad — with Triple at 80%
+  and Double at 55% of the Quad amount, tiling occupancy 1-4 with no gaps
+  (bands 1-2 / 3-3 / 4-4). Double/Triple prices are **derived, not sourced**.
+- **Season**: one full-year `standard` window (2026-01-01 to 2027-01-01) per
+  Nusuk property — the source gives a single flat rate with no seasonal
+  breakdown, unlike JED-WFH's standard/peak split.
+- **New `property` columns** (nullable, migration `0013`): `distance_meters`
+  (int) + `distance_note` (text) for the source's inconsistent
+  "< 100m" / "~2km (Shuttle)" / "150m (2 min walk)" distance strings, and
+  `contact_phone` + `contact_email` (text, split from the source's single
+  mixed phone-or-email column). Added to `packages/shared`'s
+  `propertySchema`/`createPropertySchema`, `apps/api/src/hotel-properties/`,
+  and the `catalog/properties` admin form + table columns + all 6 locales —
+  full-stack, not backend-only (user's explicit choice over a
+  backend-and-seed-only option).
+- **New `Makkah` city** (`MKK`) added to the seed `cities` array — until now
+  only `JED`/`MED` existed, but roughly half the Nusuk hotels are in Makkah.
+- **A pre-existing golden scenario broke and was fixed**: `hotels.service
+  .spec.ts`'s S9 (NO_SEASON) searched Madinah dates in June 2026 expecting 0
+  results, which held when MAD-CIN was the only Madinah property (its lone
+  season ends 2026-05-01) — with 18 more Madinah properties now carrying a
+  full-year season, that date range is no longer outside every season. Fixed
+  by moving the test to 2027-02, genuinely outside every seeded window.
+- Full quality gates green (`typecheck` 5/5, `lint` 0 new, `test` 106
+  API + 127 web, `db:seed` verified idempotent across 2 runs).
+- `11-data-model.md`'s `property` table doc has been updated with the 4 new
+  columns.
+
+---
+
 **2026-07-18 — hotel-domain `package` concept removed; `listing`+`property` merged.**
 The domain's original `listing` spine (`kind = 'property' | 'package'`) modeled two
 different sellable things: a hotel/lodging unit, and a self-contained,

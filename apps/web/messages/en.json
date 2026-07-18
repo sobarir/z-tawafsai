@@ -247,6 +247,8 @@
         "destination": "Destination",
         "countryCode": "Country",
         "starRating": "Stars",
+        "distance": "Distance",
+        "contact": "Contact",
         "isActive": "Active"
       },
       "fields": {
@@ -264,6 +266,13 @@
         "starRating": "Star rating (1-5)",
         "address": "Address",
         "addressPlaceholder": "Street address",
+        "distanceMeters": "Distance to landmark (m)",
+        "distanceNote": "Distance note",
+        "distanceNotePlaceholder": "e.g. Shuttle, 2 min walk, Front row",
+        "contactPhone": "Contact phone",
+        "contactPhonePlaceholder": "e.g. +966 12 345 6789",
+        "contactEmail": "Contact email",
+        "contactEmailPlaceholder": "e.g. info@hotel.com",
         "isActive": "Active (shown in search)"
       },
       "types": {

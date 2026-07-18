@@ -70,6 +70,8 @@ export function HotelPropertiesAdmin() {
           destination: t('columns.destination'),
           countryCode: t('columns.countryCode'),
           starRating: t('columns.starRating'),
+          distance: t('columns.distance'),
+          contact: t('columns.contact'),
           isActive: t('columns.isActive'),
         },
         typeLabels: Object.fromEntries(
@@ -136,6 +138,10 @@ export function HotelPropertiesAdmin() {
                   isActive: values.isActive,
                   starRating: values.starRating,
                   address: values.address,
+                  distanceMeters: values.distanceMeters,
+                  distanceNote: values.distanceNote,
+                  contactPhone: values.contactPhone,
+                  contactEmail: values.contactEmail,
                 },
               });
             } else {

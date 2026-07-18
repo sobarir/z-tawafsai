@@ -59,6 +59,10 @@ export function PropertyForm({
       isActive: property?.isActive ?? true,
       starRating: property?.starRating ?? undefined,
       address: property?.address ?? undefined,
+      distanceMeters: property?.distanceMeters ?? undefined,
+      distanceNote: property?.distanceNote ?? undefined,
+      contactPhone: property?.contactPhone ?? undefined,
+      contactEmail: property?.contactEmail ?? undefined,
     },
   });
 
@@ -152,6 +156,39 @@ export function PropertyForm({
             name="address"
             label={t('address')}
             placeholder={t('addressPlaceholder')}
+            optional
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <NumberFormField
+            control={form.control}
+            name="distanceMeters"
+            label={t('distanceMeters')}
+            optional
+          />
+          <TextFormField
+            control={form.control}
+            name="distanceNote"
+            label={t('distanceNote')}
+            placeholder={t('distanceNotePlaceholder')}
+            optional
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <TextFormField
+            control={form.control}
+            name="contactPhone"
+            label={t('contactPhone')}
+            placeholder={t('contactPhonePlaceholder')}
+            optional
+          />
+          <TextFormField
+            control={form.control}
+            name="contactEmail"
+            label={t('contactEmail')}
+            placeholder={t('contactEmailPlaceholder')}
             optional
           />
         </div>

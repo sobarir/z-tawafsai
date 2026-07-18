@@ -38,5 +38,19 @@ export interface CreatePropertyDto {
   countryCode: string;
   /** @maxLength 2000 */
   heroImageUrl?: string;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  distanceMeters?: number;
+  /** @maxLength 200 */
+  distanceNote?: string;
+  /** @maxLength 50 */
+  contactPhone?: string;
+  /**
+   * @maxLength 200
+   * @pattern ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+   */
+  contactEmail?: string;
   isActive?: boolean;
 }

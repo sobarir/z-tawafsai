@@ -570,6 +570,12 @@ export const propertySchema = z.object({
   destination: z.string().min(1).max(100),
   countryCode: z.string().length(2),
   heroImageUrl: z.string().nullable(),
+  /** Approx. distance in meters to the property's relevant landmark (e.g. Masjid Al-Haram / An-Nabawi). */
+  distanceMeters: z.number().int().nonnegative().nullable(),
+  /** Free-text qualifier for distanceMeters, e.g. "Shuttle", "2 min walk", "Front row". */
+  distanceNote: z.string().nullable(),
+  contactPhone: z.string().nullable(),
+  contactEmail: z.string().nullable(),
   isActive: z.boolean(),
   createdAt: z.iso.datetime(),
 });
@@ -584,6 +590,10 @@ export const createPropertySchema = z.object({
   destination: z.string().min(1).max(100),
   countryCode: z.string().length(2),
   heroImageUrl: z.string().max(2000).optional(),
+  distanceMeters: z.number().int().nonnegative().optional(),
+  distanceNote: z.string().max(200).optional(),
+  contactPhone: z.string().max(50).optional(),
+  contactEmail: z.email().max(200).optional(),
   isActive: z.boolean().optional(),
 });
 export type CreatePropertyInput = z.infer<typeof createPropertySchema>;

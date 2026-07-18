@@ -63,6 +63,10 @@ Display conversion only. Rate stored as integer with fixed scale to avoid float.
 | hero_image_url | text NULL                   | single string, no media model|
 | star_rating    | integer NULL                | 1–5                          |
 | address        | text NULL                   |                              |
+| distance_meters| integer NULL                | approx. distance to the property's relevant landmark (added 2026-07-18) |
+| distance_note  | text NULL                   | free-text qualifier, e.g. 'Shuttle', '2 min walk' (added 2026-07-18) |
+| contact_phone  | text NULL                   | added 2026-07-18             |
+| contact_email  | text NULL                   | added 2026-07-18             |
 | is_active      | boolean NOT NULL DEFAULT true|                             |
 | created_at     | timestamptz NOT NULL DEFAULT now() |                       |
 

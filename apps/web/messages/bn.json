@@ -475,6 +475,8 @@
         "destination": "গন্তব্য",
         "countryCode": "দেশ",
         "starRating": "তারকা",
+        "distance": "দূরত্ব",
+        "contact": "যোগাযোগ",
         "isActive": "সক্রিয়"
       },
       "fields": {
@@ -492,6 +494,13 @@
         "starRating": "তারকা মান (১-৫)",
         "address": "ঠিকানা",
         "addressPlaceholder": "রাস্তার ঠিকানা",
+        "distanceMeters": "ল্যান্ডমার্কের দূরত্ব (মি)",
+        "distanceNote": "দূরত্বের নোট",
+        "distanceNotePlaceholder": "যেমন শাটল, ২ মিনিট হাঁটা, সামনের সারি",
+        "contactPhone": "যোগাযোগের ফোন",
+        "contactPhonePlaceholder": "যেমন +966 12 345 6789",
+        "contactEmail": "যোগাযোগের ইমেইল",
+        "contactEmailPlaceholder": "যেমন info@hotel.com",
         "isActive": "সক্রিয় (অনুসন্ধানে দেখানো হবে)"
       },
       "types": {
