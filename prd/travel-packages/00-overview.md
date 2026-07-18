@@ -23,15 +23,21 @@ booking engine" scope and the hotels domain's "search/display only" scope — se
   details, departures, inclusions) computed server-side from the flight/leg/airline/airport/city
   and property reference tables — the client never re-derives this.
 
+> **Scope note (2026-07-19):** two non-goals below were deliberately reversed — seat inventory and
+> a (back-office) booking record now exist. See `CONTEXT.md`'s 2026-07-19 entry. What stays out:
+> public self-service booking, occupancy-tiered pricing, fares/PNR/ticketing.
+
 ## Non-goals
 
-- Not a booking flow — "Request this" is a `mailto:` stub, never a POST (mirrors the hotels
-  `hotel-search` detail page CTA).
+- **No public self-service booking flow** — the public "Request this" CTA is a **WhatsApp deep
+  link** (`wa.me`), never a booking POST. Bookings are recorded by staff in the admin after the
+  WhatsApp conversation.
 - No price computation and **no occupancy-tiered pricing** — `price`/`currency` are flat fields an
   admin sets directly per package, not Quad/Triple/Double bands and not derived from the flight's
   fare or the hotel's rate rules.
-- No real inventory or seat/room quota — `departure.seatsNote` is a display string only, not a
-  count; no DP/cancellation, no PNR/ticketing.
+- **Seat inventory IS tracked** (reversed 2026-07-19) — `departure.totalSeats` is a real numeric
+  quota, back-office `travel_package_booking` rows consume it, and the service rejects overbooking.
+  Still out: fares/PNR/ticketing, DP/refund logic, and any public availability POST.
 - No search/filter UI on the public page — it's a plain grid of all `isActive` packages
   (`travel-package-list.tsx`), not a query surface.
 - A package still owns no flight or hotel records of its own — it references one existing Flight

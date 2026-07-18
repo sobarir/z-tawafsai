@@ -113,6 +113,20 @@
       "when": 1784377118840,
       "tag": "0015_big_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1784382214499,
+      "tag": "0016_green_lady_bullseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1784397282575,
+      "tag": "0017_brown_angel",
+      "breakpoints": true
     }
   ]
 }

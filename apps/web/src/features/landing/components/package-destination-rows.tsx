@@ -1,27 +1,9 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { DestinationCard } from '@/features/landing/components/destination-card';
-import { PackageCard } from '@/features/landing/components/package-card';
-import type { PackageRow } from '@/features/landing/components/package-filter-rows';
-import { PackageFilterRows } from '@/features/landing/components/package-filter-rows';
-import { packages } from '@/features/landing/data/packages';
+import { FeaturedPackages } from '@/features/landing/components/featured-packages';
 
 export async function PackageDestinationRows() {
   const t = await getTranslations('landing.packages');
-
-  const rows: PackageRow[] = packages.map((pkg) => ({
-    slug: pkg.slug,
-    category: pkg.category,
-    node: (
-      <>
-        <PackageCard pkg={pkg} t={t} />
-        <DestinationCard
-          destination={pkg.destination}
-          minHeightClassName="min-h-[200px] min-[861px]:min-h-[230px]"
-        />
-      </>
-    ),
-  }));
 
   return (
     <section className="px-4 py-[34px] min-[600px]:px-[30px]" id="paket">
@@ -42,15 +24,7 @@ export async function PackageDestinationRows() {
         </Link>
       </div>
 
-      <PackageFilterRows
-        rows={rows}
-        labels={{
-          all: t('filterAll'),
-          hemat: t('filterHemat'),
-          premium: t('filterPremium'),
-          keluarga: t('filterKeluarga'),
-        }}
-      />
+      <FeaturedPackages />
     </section>
   );
 }

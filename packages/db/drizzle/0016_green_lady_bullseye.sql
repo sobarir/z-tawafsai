@@ -1,0 +1,1 @@
+ALTER TABLE "travel_package" ADD COLUMN "is_featured" boolean DEFAULT false NOT NULL;

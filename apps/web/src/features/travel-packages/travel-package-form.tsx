@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CheckboxFormField } from '@/components/shared/checkbox-form-field';
 import { ComboboxFormField } from '@/components/shared/combobox-form-field';
+import { FileUploadFormField } from '@/components/shared/file-upload-form-field';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
@@ -65,10 +66,12 @@ export function TravelPackageForm({
       flightId: travelPackage?.flight.id ?? '',
       mealPlan: travelPackage?.mealPlan ?? undefined,
       heroImageUrl: travelPackage?.heroImageUrl ?? undefined,
+      flyerUrl: travelPackage?.flyerUrl ?? undefined,
       durationNights: travelPackage?.durationNights ?? 1,
       price: travelPackage?.price ?? 0,
       currency: travelPackage?.currency ?? '',
       isActive: travelPackage?.isActive ?? true,
+      isFeatured: travelPackage?.isFeatured ?? false,
       stays: travelPackage?.stays.map((stay) => ({
         propertyCode: stay.propertyCode,
         sequence: stay.sequence,
@@ -76,9 +79,13 @@ export function TravelPackageForm({
       })) ?? [{ propertyCode: '', sequence: 1, nights: 1 }],
       departures:
         travelPackage?.departures.map((departure) => ({
+          // Preserve the id so the server upserts (keeping this departure's
+          // bookings) instead of deleting + reinserting on save.
+          id: departure.id,
           departureDate: departure.departureDate,
           returnDate: departure.returnDate ?? undefined,
           seatsNote: departure.seatsNote ?? undefined,
+          totalSeats: departure.totalSeats ?? undefined,
         })) ?? [],
       inclusions:
         travelPackage?.inclusions.map((inclusion) => ({
@@ -170,6 +177,12 @@ export function TravelPackageForm({
                 optional
               />
 
+              <FileUploadFormField
+                control={form.control}
+                name="flyerUrl"
+                label={t('flyerUrl')}
+              />
+
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <NumberFormField
                   control={form.control}
@@ -198,7 +211,7 @@ export function TravelPackageForm({
                 {departures.fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end"
+                    className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_7rem_1fr_auto] sm:items-end"
                   >
                     <TextFormField
                       control={form.control}
@@ -211,6 +224,12 @@ export function TravelPackageForm({
                       name={`departures.${index}.returnDate` as const}
                       label={t('returnDate')}
                       placeholder="2026-08-13"
+                      optional
+                    />
+                    <NumberFormField
+                      control={form.control}
+                      name={`departures.${index}.totalSeats` as const}
+                      label={t('totalSeats')}
                       optional
                     />
                     <TextFormField
@@ -231,6 +250,9 @@ export function TravelPackageForm({
                     </Button>
                   </div>
                 ))}
+                <p className="text-xs text-muted-foreground">
+                  {t('totalSeatsHint')}
+                </p>
                 <Button
                   type="button"
                   variant="outline"
@@ -241,6 +263,7 @@ export function TravelPackageForm({
                       departureDate: '',
                       returnDate: undefined,
                       seatsNote: undefined,
+                      totalSeats: undefined,
                     })
                   }
                 >
@@ -253,6 +276,13 @@ export function TravelPackageForm({
                 name="isActive"
                 label={t('isActive')}
                 id="travel-package-is-active"
+              />
+
+              <CheckboxFormField
+                control={form.control}
+                name="isFeatured"
+                label={t('isFeatured')}
+                id="travel-package-is-featured"
               />
             </TabsContent>
 

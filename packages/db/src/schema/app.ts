@@ -349,6 +349,12 @@ export const travelPackageInclusionKind = pgEnum(
   'travel_package_inclusion_kind',
   ['included', 'excluded'],
 );
+// Back-office seat inventory: only `confirmed` bookings count against a
+// departure's quota; `cancelled` rows are retained for history but free the seat.
+export const travelPackageBookingStatus = pgEnum(
+  'travel_package_booking_status',
+  ['confirmed', 'cancelled'],
+);
 
 export const currency = pgTable('currency', {
   code: char('code', { length: 3 }).primaryKey(),
@@ -526,11 +532,17 @@ export const flightHotelPackage = pgTable('travel_package', {
   durationNights: integer('duration_nights').notNull(),
   mealPlan: travelPackageMealPlan('meal_plan'),
   heroImageUrl: text('hero_image_url'),
+  // Uploaded marketing flyer (image or PDF), served from the API uploads dir.
+  flyerUrl: text('flyer_url'),
   price: numeric('price', { precision: 10, scale: 2, mode: 'number' })
     .notNull()
     .default(0),
   currency: varchar('currency', { length: 3 }).notNull().default('USD'),
   isActive: boolean('is_active').notNull().default(true),
+  // Curated flag: featured packages surface on the public landing page's
+  // "Paket" cards. Independent of isActive — a package must be both active and
+  // featured to appear there.
+  isFeatured: boolean('is_featured').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -568,8 +580,9 @@ export const travelPackageStay = pgTable(
   ],
 );
 
-// A dated group departure. `seatsNote` is a free-text display string ("sisa 4
-// seat"), NOT an inventory count — this stays a catalog, not a booking engine.
+// A dated group departure. `totalSeats` is a back-office seat quota (null =
+// untracked); `seatsNote` remains a free-text display override. Confirmed
+// bookings in travel_package_booking count against totalSeats.
 export const travelPackageDeparture = pgTable(
   'travel_package_departure',
   {
@@ -582,6 +595,7 @@ export const travelPackageDeparture = pgTable(
     departureDate: date('departure_date', { mode: 'string' }).notNull(),
     returnDate: date('return_date', { mode: 'string' }),
     seatsNote: text('seats_note'),
+    totalSeats: integer('total_seats'),
   },
   (table) => [
     index('idx_travel_package_departure_package').on(
@@ -592,6 +606,41 @@ export const travelPackageDeparture = pgTable(
       'travel_package_departure_return_after_start',
       sql`${table.returnDate} IS NULL OR ${table.returnDate} >= ${table.departureDate}`,
     ),
+    check(
+      'travel_package_departure_total_seats_nonneg',
+      sql`${table.totalSeats} IS NULL OR ${table.totalSeats} >= 0`,
+    ),
+  ],
+);
+
+// A back-office reservation record against a departure. Confirmed rows consume
+// the departure's seat quota; the service rejects a booking that would overbook.
+// Admin-only — never exposed on the anonymous public package list (customer PII).
+export const travelPackageBooking = pgTable(
+  'travel_package_booking',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    departureId: text('departure_id')
+      .notNull()
+      .references(() => travelPackageDeparture.id, { onDelete: 'cascade' }),
+    customerName: text('customer_name').notNull(),
+    pax: integer('pax').notNull(),
+    phone: text('phone'),
+    notes: text('notes'),
+    status: travelPackageBookingStatus('status').notNull().default('confirmed'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('idx_travel_package_booking_departure').on(table.departureId),
+    check('travel_package_booking_pax_positive', sql`${table.pax} > 0`),
   ],
 );
 
@@ -680,5 +729,7 @@ export type TravelPackageItineraryDay =
   typeof travelPackageItineraryDay.$inferSelect;
 export type NewTravelPackageItineraryDay =
   typeof travelPackageItineraryDay.$inferInsert;
+export type TravelPackageBooking = typeof travelPackageBooking.$inferSelect;
+export type NewTravelPackageBooking = typeof travelPackageBooking.$inferInsert;
 export type RateRule = typeof rateRule.$inferSelect;
 export type NewRateRule = typeof rateRule.$inferInsert;

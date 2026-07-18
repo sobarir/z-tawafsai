@@ -43,6 +43,7 @@ import type {
   CreateRateRuleDto,
   CreateRoomTypeDto,
   CreateSeasonDto,
+  CreateTravelPackageBookingDto,
   CreateTravelPackageDto,
   CurrencyDto,
   FlightDto,
@@ -54,6 +55,7 @@ import type {
   InterlineAgreementDto,
   InterlineResolutionDto,
   ListFlightMarketingParams,
+  ListTravelPackageBookingsParams,
   MctRuleDto,
   MeResponseDto,
   PostDto,
@@ -65,6 +67,7 @@ import type {
   SearchFlightsParams,
   SearchHotelsParams,
   SeasonDto,
+  TravelPackageBookingDto,
   TravelPackageDto,
   UpdateAirlineDto,
   UpdateAirportDto,
@@ -78,7 +81,9 @@ import type {
   UpdateRateRuleDto,
   UpdateRoomTypeDto,
   UpdateSeasonDto,
+  UpdateTravelPackageBookingDto,
   UpdateTravelPackageDto,
+  UploadResultDto,
   ValidateConnectionChainDto,
   ValidateConnectionDto
 } from './models';
@@ -6923,6 +6928,401 @@ export const useDeleteTravelPackage = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteTravelPackageMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List bookings for a departure
+ */
+export const getListTravelPackageBookingsUrl = (params: ListTravelPackageBookingsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/travel-package-bookings?${stringifiedParams}` : `/api/travel-package-bookings`
+}
+
+export const listTravelPackageBookings = async (params: ListTravelPackageBookingsParams, options?: RequestInit): Promise<TravelPackageBookingDto[]> => {
+  
+  return customFetch<TravelPackageBookingDto[]>(getListTravelPackageBookingsUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListTravelPackageBookingsQueryKey = (params?: ListTravelPackageBookingsParams,) => {
+    return [
+    `/api/travel-package-bookings`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getListTravelPackageBookingsQueryOptions = <TData = Awaited<ReturnType<typeof listTravelPackageBookings>>, TError = unknown>(params: ListTravelPackageBookingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackageBookings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTravelPackageBookingsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTravelPackageBookings>>> = ({ signal }) => listTravelPackageBookings(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTravelPackageBookings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListTravelPackageBookingsQueryResult = NonNullable<Awaited<ReturnType<typeof listTravelPackageBookings>>>
+export type ListTravelPackageBookingsQueryError = unknown
+
+
+export function useListTravelPackageBookings<TData = Awaited<ReturnType<typeof listTravelPackageBookings>>, TError = unknown>(
+ params: ListTravelPackageBookingsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackageBookings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTravelPackageBookings>>,
+          TError,
+          Awaited<ReturnType<typeof listTravelPackageBookings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTravelPackageBookings<TData = Awaited<ReturnType<typeof listTravelPackageBookings>>, TError = unknown>(
+ params: ListTravelPackageBookingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackageBookings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTravelPackageBookings>>,
+          TError,
+          Awaited<ReturnType<typeof listTravelPackageBookings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTravelPackageBookings<TData = Awaited<ReturnType<typeof listTravelPackageBookings>>, TError = unknown>(
+ params: ListTravelPackageBookingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackageBookings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List bookings for a departure
+ */
+
+export function useListTravelPackageBookings<TData = Awaited<ReturnType<typeof listTravelPackageBookings>>, TError = unknown>(
+ params: ListTravelPackageBookingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTravelPackageBookings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListTravelPackageBookingsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a booking against a departure
+ */
+export const getCreateTravelPackageBookingUrl = () => {
+
+
+  
+
+  return `/api/travel-package-bookings`
+}
+
+export const createTravelPackageBooking = async (createTravelPackageBookingDto: CreateTravelPackageBookingDto, options?: RequestInit): Promise<TravelPackageBookingDto> => {
+  
+  return customFetch<TravelPackageBookingDto>(getCreateTravelPackageBookingUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createTravelPackageBookingDto,)
+  }
+);}
+
+
+
+
+export const getCreateTravelPackageBookingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTravelPackageBooking>>, TError,{data: CreateTravelPackageBookingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTravelPackageBooking>>, TError,{data: CreateTravelPackageBookingDto}, TContext> => {
+
+const mutationKey = ['createTravelPackageBooking'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTravelPackageBooking>>, {data: CreateTravelPackageBookingDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTravelPackageBooking(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTravelPackageBookingMutationResult = NonNullable<Awaited<ReturnType<typeof createTravelPackageBooking>>>
+    export type CreateTravelPackageBookingMutationBody = CreateTravelPackageBookingDto
+    export type CreateTravelPackageBookingMutationError = unknown
+
+    /**
+ * @summary Create a booking against a departure
+ */
+export const useCreateTravelPackageBooking = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTravelPackageBooking>>, TError,{data: CreateTravelPackageBookingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createTravelPackageBooking>>,
+        TError,
+        {data: CreateTravelPackageBookingDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateTravelPackageBookingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Update a booking
+ */
+export const getUpdateTravelPackageBookingUrl = (id: string,) => {
+
+
+  
+
+  return `/api/travel-package-bookings/${id}`
+}
+
+export const updateTravelPackageBooking = async (id: string,
+    updateTravelPackageBookingDto: UpdateTravelPackageBookingDto, options?: RequestInit): Promise<TravelPackageBookingDto> => {
+  
+  return customFetch<TravelPackageBookingDto>(getUpdateTravelPackageBookingUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTravelPackageBookingDto,)
+  }
+);}
+
+
+
+
+export const getUpdateTravelPackageBookingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTravelPackageBooking>>, TError,{id: string;data: UpdateTravelPackageBookingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTravelPackageBooking>>, TError,{id: string;data: UpdateTravelPackageBookingDto}, TContext> => {
+
+const mutationKey = ['updateTravelPackageBooking'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTravelPackageBooking>>, {id: string;data: UpdateTravelPackageBookingDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateTravelPackageBooking(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTravelPackageBookingMutationResult = NonNullable<Awaited<ReturnType<typeof updateTravelPackageBooking>>>
+    export type UpdateTravelPackageBookingMutationBody = UpdateTravelPackageBookingDto
+    export type UpdateTravelPackageBookingMutationError = unknown
+
+    /**
+ * @summary Update a booking
+ */
+export const useUpdateTravelPackageBooking = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTravelPackageBooking>>, TError,{id: string;data: UpdateTravelPackageBookingDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateTravelPackageBooking>>,
+        TError,
+        {id: string;data: UpdateTravelPackageBookingDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateTravelPackageBookingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a booking
+ */
+export const getDeleteTravelPackageBookingUrl = (id: string,) => {
+
+
+  
+
+  return `/api/travel-package-bookings/${id}`
+}
+
+export const deleteTravelPackageBooking = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteTravelPackageBookingUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteTravelPackageBookingMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTravelPackageBooking>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTravelPackageBooking>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteTravelPackageBooking'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTravelPackageBooking>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteTravelPackageBooking(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTravelPackageBookingMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTravelPackageBooking>>>
+    
+    export type DeleteTravelPackageBookingMutationError = unknown
+
+    /**
+ * @summary Delete a booking
+ */
+export const useDeleteTravelPackageBooking = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTravelPackageBooking>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTravelPackageBooking>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteTravelPackageBookingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Upload a package flyer (image or PDF)
+ */
+export const getUploadFlyerUrl = () => {
+
+
+  
+
+  return `/api/uploads/flyer`
+}
+
+export const uploadFlyer = async ( options?: RequestInit): Promise<UploadResultDto> => {
+  
+  return customFetch<UploadResultDto>(getUploadFlyerUrl(),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+
+export const getUploadFlyerMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadFlyer>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadFlyer>>, TError,void, TContext> => {
+
+const mutationKey = ['uploadFlyer'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadFlyer>>, void> = () => {
+          
+
+          return  uploadFlyer(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadFlyerMutationResult = NonNullable<Awaited<ReturnType<typeof uploadFlyer>>>
+    
+    export type UploadFlyerMutationError = unknown
+
+    /**
+ * @summary Upload a package flyer (image or PDF)
+ */
+export const useUploadFlyer = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadFlyer>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadFlyer>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getUploadFlyerMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

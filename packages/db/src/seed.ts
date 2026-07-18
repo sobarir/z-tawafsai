@@ -4981,11 +4981,13 @@ async function seed() {
     mealPlan: 'full_board' | 'half_board' | 'room_only';
     price: number;
     currency: string;
+    isFeatured?: boolean;
     stays: Array<{ propertyCode: string; sequence: number; nights: number }>;
     departures: Array<{
       departureDate: string;
       returnDate: string | null;
       seatsNote: string | null;
+      totalSeats?: number | null;
     }>;
     inclusions: Array<{ kind: 'included' | 'excluded'; label: string }>;
   }> = [
@@ -5009,6 +5011,7 @@ async function seed() {
           departureDate: '2026-08-05',
           returnDate: '2026-08-13',
           seatsNote: 'Sisa 8 seat',
+          totalSeats: 45,
         },
       ],
       inclusions: [
@@ -5030,6 +5033,7 @@ async function seed() {
       mealPlan: 'full_board',
       price: 1850,
       currency: 'USD',
+      isFeatured: true,
       stays: [
         { propertyCode: 'MKK-NOVOTEL', sequence: 1, nights: 7 },
         { propertyCode: 'MAD-ANWAR', sequence: 2, nights: 5 },
@@ -5088,6 +5092,7 @@ async function seed() {
       mealPlan: 'full_board',
       price: 1450,
       currency: 'USD',
+      isFeatured: true,
       stays: [
         { propertyCode: 'MKK-SWISSOTEL', sequence: 1, nights: 6 },
         { propertyCode: 'MAD-HILTON', sequence: 2, nights: 4 },
@@ -5164,6 +5169,7 @@ async function seed() {
       mealPlan: 'full_board',
       price: 2400,
       currency: 'USD',
+      isFeatured: true,
       stays: [
         { propertyCode: 'MKK-CLOCKTWR', sequence: 1, nights: 6 },
         { propertyCode: 'MAD-OBEROI', sequence: 2, nights: 5 },
@@ -5237,6 +5243,7 @@ async function seed() {
       mealPlan: 'half_board',
       price: 28500000,
       currency: 'IDR',
+      isFeatured: true,
       stays: [
         { propertyCode: 'MAD-ANWAR', sequence: 1, nights: 4 },
         { propertyCode: 'MKK-ZAMZAMPUL', sequence: 2, nights: 5 },
@@ -5368,6 +5375,7 @@ async function seed() {
       price: item.price,
       currency: item.currency,
       isActive: true,
+      isFeatured: item.isFeatured ?? false,
     };
 
     const [existingTravelPackage] = await db

@@ -26,7 +26,10 @@
     "toggleTheme": "Toggle theme",
     "sidebar": "Sidebar",
     "toggleSidebar": "Toggle Sidebar",
-    "remove": "Remove"
+    "remove": "Remove",
+    "uploadFile": "Upload file",
+    "uploading": "Uploading...",
+    "uploadError": "Upload failed. Please try again."
   },
   "theme": {
     "light": "Light",
@@ -669,6 +672,9 @@
     "noResults": "No travel packages available right now.",
     "requestThis": "Request this",
     "requestSubject": "Request",
+    "seatsLeft": "{count, plural, one {# seat left} other {# seats left}}",
+    "viewFlyer": "View flyer",
+    "startingFrom": "Starting from",
     "durationNights": "{count, plural, one {# night} other {# nights}}",
     "direct": "Direct",
     "transitIn": "Transit in {city} ({code})",
@@ -703,6 +709,7 @@
       "description": "Flight and hotel, bundled into one trip.",
       "createTitle": "New travel package",
       "editTitle": "Edit travel package",
+      "manageSeats": "Manage seats & bookings",
       "columns": {
         "title": "Title",
         "flight": "Flight",
@@ -711,7 +718,8 @@
         "price": "Price",
         "isActive": "Active",
         "type": "Type",
-        "stays": "Cities"
+        "stays": "Cities",
+        "isFeatured": "Featured"
       },
       "fields": {
         "title": "Title",
@@ -722,6 +730,7 @@
         "property": "Property",
         "heroImageUrl": "Hero image URL",
         "heroImageUrlPlaceholder": "https://...",
+        "flyerUrl": "Flyer (image or PDF)",
         "durationNights": "Duration (nights)",
         "price": "Price",
         "currency": "Currency",
@@ -738,6 +747,8 @@
         "returnDate": "Return date",
         "seatsNote": "Seats note",
         "seatsNotePlaceholder": "e.g. 4 seats left",
+        "totalSeats": "Total seats",
+        "totalSeatsHint": "Set a seat quota to track availability; leave empty for untracked. Booked seats are entered under \"Manage seats & bookings\".",
         "addDeparture": "Add departure",
         "inclusions": "Included / excluded",
         "inclusionKind": "Type",
@@ -752,8 +763,28 @@
         "mealFullBoard": "Full board",
         "mealHalfBoard": "Half board",
         "mealRoomOnly": "Room only",
-        "tabDetails": "Details"
+        "tabDetails": "Details",
+        "isFeatured": "Featured (shown on landing page)"
       }
+    },
+    "bookings": {
+      "title": "Seats & bookings — {name}",
+      "titleBare": "Seats & bookings",
+      "noDepartures": "This package has no departures yet. Add a departure first.",
+      "untracked": "Quota not tracked",
+      "total": "Total",
+      "booked": "Booked",
+      "remaining": "Remaining",
+      "noBookings": "No bookings yet.",
+      "paxCount": "{count, plural, one {# pax} other {# pax}}",
+      "cancel": "Cancel",
+      "reactivate": "Reactivate",
+      "customerName": "Customer name",
+      "customerNamePlaceholder": "e.g. Ahmad Fauzi",
+      "pax": "Pax",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g. +62...",
+      "addBooking": "Add booking"
     }
   },
   "landing": {
@@ -830,7 +861,18 @@
       "hotelMakkahLabel": "Hotel Makkah",
       "hotelMadinahLabel": "Hotel Madinah",
       "directBadge": "Langsung",
-      "detailCta": "Lihat Detail"
+      "detailCta": "Lihat Detail",
+      "typeUmrah": "Umrah",
+      "typeUmrahPlus": "Umrah Plus",
+      "typeHajj": "Haji",
+      "nightsUnit": "malam",
+      "mealFullBoard": "Full board",
+      "mealHalfBoard": "Half board",
+      "mealRoomOnly": "Room only",
+      "transitVia": "(transit {city})",
+      "emptyHotel": "—",
+      "loading": "Memuat paket unggulan…",
+      "empty": "Belum ada paket unggulan."
     },
     "moreDestinations": {
       "kicker": "Destinasi Ziarah Lainnya",

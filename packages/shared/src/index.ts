@@ -731,9 +731,16 @@ const travelPackageStaySummarySchema = z.object({
 });
 
 const travelPackageDepartureSchema = z.object({
+  id: ulidSchema,
   departureDate: z.iso.date(),
   returnDate: z.iso.date().nullable(),
   seatsNote: z.string().nullable(),
+  /** Seat quota for this departure; null = quota not tracked (unlimited). */
+  totalSeats: z.number().int().nonnegative().nullable(),
+  /** Sum of pax across `confirmed` bookings — computed, never stored directly. */
+  bookedSeats: z.number().int().nonnegative(),
+  /** `totalSeats - bookedSeats` when a quota is set; null when untracked. Aggregate only — individual booking rows (with customer PII) are served by the admin-only bookings endpoint. */
+  remainingSeats: z.number().int().nullable(),
 });
 
 const travelPackageInclusionSchema = z.object({
@@ -753,11 +760,13 @@ export const flightHotelPackageSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().nullable(),
   heroImageUrl: z.string().nullable(),
+  flyerUrl: z.string().nullable(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
   durationNights: z.number().int().positive(),
   mealPlan: travelPackageMealPlanSchema.nullable(),
   isActive: z.boolean(),
+  isFeatured: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   flight: flightHotelPackageFlightSummarySchema,
@@ -779,9 +788,12 @@ const createTravelPackageStaySchema = z.object({
 });
 
 const createTravelPackageDepartureSchema = z.object({
+  /** Present when editing an existing departure — the write path upserts by id so booking rows keyed to it survive. Omit for a new departure. */
+  id: ulidSchema.optional(),
   departureDate: z.iso.date(),
   returnDate: z.iso.date().optional(),
   seatsNote: z.string().max(200).optional(),
+  totalSeats: z.number().int().nonnegative().optional(),
 });
 
 const createTravelPackageInclusionSchema = z.object({
@@ -803,9 +815,11 @@ export const createFlightHotelPackageSchema = z.object({
   durationNights: z.number().int().positive(),
   mealPlan: travelPackageMealPlanSchema.optional(),
   heroImageUrl: z.string().max(2000).optional(),
+  flyerUrl: z.string().max(2000).optional(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
   isActive: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
   stays: z.array(createTravelPackageStaySchema).min(1),
   departures: z.array(createTravelPackageDepartureSchema).optional(),
   inclusions: z.array(createTravelPackageInclusionSchema).optional(),
@@ -820,3 +834,63 @@ export const updateFlightHotelPackageSchema =
 export type UpdateFlightHotelPackageInput = z.infer<
   typeof updateFlightHotelPackageSchema
 >;
+
+/**
+ * Back-office seat inventory: a booking is a reservation record staff enter
+ * against a specific departure. Confirmed pax count against the departure's
+ * `totalSeats` quota; the server rejects a booking that would overbook. This is
+ * an admin-only operational surface — never exposed on the anonymous public
+ * package list (individual rows carry customer PII). See
+ * prd/travel-packages/11-data-model.md.
+ */
+export const travelPackageBookingStatusSchema = z.enum([
+  'confirmed',
+  'cancelled',
+]);
+export type TravelPackageBookingStatus = z.infer<
+  typeof travelPackageBookingStatusSchema
+>;
+
+export const travelPackageBookingSchema = z.object({
+  id: ulidSchema,
+  departureId: ulidSchema,
+  customerName: z.string().min(1).max(200),
+  pax: z.number().int().positive(),
+  phone: z.string().nullable(),
+  notes: z.string().nullable(),
+  status: travelPackageBookingStatusSchema,
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+export type TravelPackageBooking = z.infer<typeof travelPackageBookingSchema>;
+
+export const travelPackageBookingListSchema = z.array(
+  travelPackageBookingSchema,
+);
+
+export const createTravelPackageBookingSchema = z.object({
+  departureId: ulidSchema,
+  customerName: z.string().min(1).max(200),
+  pax: z.number().int().positive(),
+  phone: z.string().max(50).optional(),
+  notes: z.string().max(1000).optional(),
+  status: travelPackageBookingStatusSchema.optional(),
+});
+export type CreateTravelPackageBookingInput = z.infer<
+  typeof createTravelPackageBookingSchema
+>;
+
+// departureId is fixed at creation — a booking cannot be moved between
+// departures (that is a cancel + re-book), so it is omitted from the update shape.
+export const updateTravelPackageBookingSchema = createTravelPackageBookingSchema
+  .omit({ departureId: true })
+  .partial();
+export type UpdateTravelPackageBookingInput = z.infer<
+  typeof updateTravelPackageBookingSchema
+>;
+
+/** Result of a file upload: the absolute URL the stored file is served from. */
+export const uploadResultSchema = z.object({
+  url: z.string(),
+});
+export type UploadResult = z.infer<typeof uploadResultSchema>;

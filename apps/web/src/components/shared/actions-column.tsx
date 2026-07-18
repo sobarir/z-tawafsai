@@ -8,6 +8,9 @@ interface ActionsColumnOptions<TData> {
   deleteLabel: string;
   onEdit: (row: TData) => void;
   onDelete: (row: TData) => void;
+  /** Optional leading action (e.g. a "view"/"manage" drill-in). */
+  viewLabel?: string;
+  onView?: (row: TData) => void;
 }
 
 export function actionsColumn<TData>({
@@ -17,6 +20,8 @@ export function actionsColumn<TData>({
   deleteLabel,
   onEdit,
   onDelete,
+  viewLabel,
+  onView,
 }: ActionsColumnOptions<TData>): ColumnDef<TData> {
   return {
     id: 'actions',
@@ -25,6 +30,9 @@ export function actionsColumn<TData>({
       <RowActionsCell
         openMenuLabel={openMenuLabel}
         actions={[
+          ...(viewLabel && onView
+            ? [{ label: viewLabel, onClick: () => onView(row.original) }]
+            : []),
           { label: editLabel, onClick: () => onEdit(row.original) },
           {
             label: deleteLabel,

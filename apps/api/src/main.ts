@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage } from 'node:http';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -49,6 +51,18 @@ async function bootstrap() {
     origin: [env.WEB_URL],
     credentials: true,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  });
+
+  // Multipart parsing for flyer uploads (POST /api/uploads/flyer), capped per
+  // file; and static serving of stored uploads at /uploads (outside the /api
+  // prefix — the URLs are stored on packages and rendered directly by the web).
+  await app.register(fastifyMultipart, {
+    limits: { fileSize: env.MAX_UPLOAD_BYTES, files: 1 },
+  });
+  await app.register(fastifyStatic, {
+    root: env.UPLOADS_DIR,
+    prefix: '/uploads/',
+    decorateReply: false,
   });
 
   // Swagger UI at /docs, spec at /docs/openapi.json

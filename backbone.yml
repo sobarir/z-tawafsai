@@ -37,7 +37,7 @@ prd:
   domains:
     flights: prd/flights/            # flight schedule & inventory — v1 + v1.1 (pricing/search) complete
     hotels: prd/hotels/              # hotel & package search — search + Catalog Admin complete
-    travel-packages: prd/travel-packages/  # umrah packages: flight + Makkah/Madinah stays, departures, inclusions — admin CRUD + public listing
+    travel-packages: prd/travel-packages/  # umrah packages: flight + Makkah/Madinah stays, departures (seat quota), inclusions, flyer upload — admin CRUD + back-office bookings + public listing
     landing: prd/landing/            # TawafSai marketing landing page (apps/web only, static data) — complete
 
 structure:

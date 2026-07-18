@@ -25,6 +25,7 @@ import { InterlineAgreementsModule } from './interline-agreements/interline-agre
 import { MctRulesModule } from './mct-rules/mct-rules.module';
 import { PostsModule } from './posts/posts.module';
 import { TravelPackagesModule } from './travel-packages/travel-packages.module';
+import { UploadsModule } from './uploads/uploads.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -54,6 +55,7 @@ import { UsersModule } from './users/users.module';
     HotelSeasonsModule,
     HotelRateRulesModule,
     TravelPackagesModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

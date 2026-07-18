@@ -8,10 +8,13 @@ import type { Database } from '@repo/db';
 import { schema } from '@repo/db';
 import type {
   CreateFlightHotelPackageInput,
+  CreateTravelPackageBookingInput,
   FlightHotelPackage,
+  TravelPackageBooking,
   UpdateFlightHotelPackageInput,
+  UpdateTravelPackageBookingInput,
 } from '@repo/shared';
-import { asc, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, ne } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type TravelPackageRow = typeof schema.flightHotelPackage.$inferSelect;
@@ -26,6 +29,20 @@ interface FlightSummaryDetail {
   isDirect: boolean;
   transitAirport: string | null;
   transitCityName: string | null;
+}
+
+// Only the fields present in the PATCH body are written; a nullable field set to
+// undefined in the request is left untouched, an explicit null clears it.
+function buildBookingPatch(
+  input: UpdateTravelPackageBookingInput,
+): Partial<typeof schema.travelPackageBooking.$inferInsert> {
+  const patch: Partial<typeof schema.travelPackageBooking.$inferInsert> = {};
+  if (input.customerName !== undefined) patch.customerName = input.customerName;
+  if (input.pax !== undefined) patch.pax = input.pax;
+  if (input.phone !== undefined) patch.phone = input.phone ?? null;
+  if (input.notes !== undefined) patch.notes = input.notes ?? null;
+  if (input.status !== undefined) patch.status = input.status;
+  return patch;
 }
 
 @Injectable()
@@ -180,6 +197,13 @@ export class TravelPackagesService {
       (departure) => departure.packageId,
     );
 
+    // Booked seats per departure = sum of pax across `confirmed` bookings.
+    // Only aggregate counts surface here — individual booking rows (customer
+    // PII) are served exclusively by the admin-only bookings endpoint.
+    const bookedByDeparture = await this.confirmedPaxByDeparture(
+      departureRows.map((departure) => departure.id),
+    );
+
     const inclusionRows = await this.db
       .select()
       .from(schema.travelPackageInclusion)
@@ -229,11 +253,13 @@ export class TravelPackagesService {
         title: row.title,
         description: row.description,
         heroImageUrl: row.heroImageUrl,
+        flyerUrl: row.flyerUrl,
         price: row.price,
         currency: row.currency,
         durationNights: row.durationNights,
         mealPlan: row.mealPlan,
         isActive: row.isActive,
+        isFeatured: row.isFeatured,
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
         flight: {
@@ -250,13 +276,21 @@ export class TravelPackagesService {
           transitCityName: summary?.transitCityName ?? null,
         },
         stays,
-        departures: (departuresByPackage.get(row.id) ?? []).map(
-          (departure) => ({
+        departures: (departuresByPackage.get(row.id) ?? []).map((departure) => {
+          const bookedSeats = bookedByDeparture.get(departure.id) ?? 0;
+          return {
+            id: departure.id,
             departureDate: departure.departureDate,
             returnDate: departure.returnDate,
             seatsNote: departure.seatsNote,
-          }),
-        ),
+            totalSeats: departure.totalSeats,
+            bookedSeats,
+            remainingSeats:
+              departure.totalSeats === null
+                ? null
+                : departure.totalSeats - bookedSeats,
+          };
+        }),
         inclusions: (inclusionsByPackage.get(row.id) ?? []).map(
           (inclusion) => ({ kind: inclusion.kind, label: inclusion.label }),
         ),
@@ -377,19 +411,7 @@ export class TravelPackagesService {
     }
 
     if (departures !== undefined) {
-      await tx
-        .delete(schema.travelPackageDeparture)
-        .where(eq(schema.travelPackageDeparture.packageId, packageId));
-      if (departures.length > 0) {
-        await tx.insert(schema.travelPackageDeparture).values(
-          departures.map((departure) => ({
-            packageId,
-            departureDate: departure.departureDate,
-            returnDate: departure.returnDate ?? null,
-            seatsNote: departure.seatsNote ?? null,
-          })),
-        );
-      }
+      await this.replaceDepartures(tx, packageId, departures);
     }
 
     if (inclusions !== undefined) {
@@ -451,5 +473,262 @@ export class TravelPackagesService {
     await this.db
       .delete(schema.flightHotelPackage)
       .where(eq(schema.flightHotelPackage.id, id));
+  }
+
+  // Departures carry seat inventory + booking rows, so — unlike the other child
+  // collections — they are upserted by id rather than replaced wholesale: a
+  // departure kept in the payload retains its id (and its bookings). A departure
+  // dropped from the payload is deleted only when it has no bookings; otherwise
+  // the update is rejected so booking history is never silently destroyed.
+  private async replaceDepartures(
+    tx: Tx,
+    packageId: string,
+    departures: NonNullable<CreateFlightHotelPackageInput['departures']>,
+  ): Promise<void> {
+    const existing = await tx
+      .select({ id: schema.travelPackageDeparture.id })
+      .from(schema.travelPackageDeparture)
+      .where(eq(schema.travelPackageDeparture.packageId, packageId));
+    const existingIds = new Set(existing.map((row) => row.id));
+    const keptIds = new Set<string>();
+
+    for (const departure of departures) {
+      const values = {
+        departureDate: departure.departureDate,
+        returnDate: departure.returnDate ?? null,
+        seatsNote: departure.seatsNote ?? null,
+        totalSeats: departure.totalSeats ?? null,
+      };
+      if (departure.id && existingIds.has(departure.id)) {
+        await tx
+          .update(schema.travelPackageDeparture)
+          .set(values)
+          .where(eq(schema.travelPackageDeparture.id, departure.id));
+        keptIds.add(departure.id);
+      } else {
+        await tx
+          .insert(schema.travelPackageDeparture)
+          .values({ packageId, ...values });
+      }
+    }
+
+    const removedIds = [...existingIds].filter((id) => !keptIds.has(id));
+    if (removedIds.length === 0) return;
+
+    const blocked = await tx
+      .select({ departureId: schema.travelPackageBooking.departureId })
+      .from(schema.travelPackageBooking)
+      .where(inArray(schema.travelPackageBooking.departureId, removedIds));
+    if (blocked.length > 0) {
+      throw new BadRequestException(
+        'Cannot remove a departure that has bookings — cancel its bookings first.',
+      );
+    }
+    await tx
+      .delete(schema.travelPackageDeparture)
+      .where(inArray(schema.travelPackageDeparture.id, removedIds));
+  }
+
+  // ── Seat inventory (back-office bookings) ────────────────────────────────
+
+  private async confirmedPaxByDeparture(
+    departureIds: string[],
+  ): Promise<Map<string, number>> {
+    const booked = new Map<string, number>();
+    if (departureIds.length === 0) return booked;
+    const rows = await this.db
+      .select({
+        departureId: schema.travelPackageBooking.departureId,
+        pax: schema.travelPackageBooking.pax,
+      })
+      .from(schema.travelPackageBooking)
+      .where(
+        and(
+          inArray(schema.travelPackageBooking.departureId, departureIds),
+          eq(schema.travelPackageBooking.status, 'confirmed'),
+        ),
+      );
+    for (const row of rows) {
+      booked.set(row.departureId, (booked.get(row.departureId) ?? 0) + row.pax);
+    }
+    return booked;
+  }
+
+  // Sum of confirmed pax on a departure within the transaction, optionally
+  // excluding one booking (so an in-place edit doesn't count itself).
+  private async confirmedPax(
+    tx: Tx,
+    departureId: string,
+    excludeBookingId?: string,
+  ): Promise<number> {
+    const rows = await tx
+      .select({ pax: schema.travelPackageBooking.pax })
+      .from(schema.travelPackageBooking)
+      .where(
+        and(
+          eq(schema.travelPackageBooking.departureId, departureId),
+          eq(schema.travelPackageBooking.status, 'confirmed'),
+          excludeBookingId
+            ? ne(schema.travelPackageBooking.id, excludeBookingId)
+            : undefined,
+        ),
+      );
+    return rows.reduce((sum, row) => sum + row.pax, 0);
+  }
+
+  private toBooking(
+    row: typeof schema.travelPackageBooking.$inferSelect,
+  ): TravelPackageBooking {
+    return {
+      id: row.id,
+      departureId: row.departureId,
+      customerName: row.customerName,
+      pax: row.pax,
+      phone: row.phone,
+      notes: row.notes,
+      status: row.status,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    };
+  }
+
+  async findBookingById(id: string): Promise<TravelPackageBooking> {
+    const [row] = await this.db
+      .select()
+      .from(schema.travelPackageBooking)
+      .where(eq(schema.travelPackageBooking.id, id));
+    if (!row) {
+      throw new NotFoundException(`Booking ${id} not found`);
+    }
+    return this.toBooking(row);
+  }
+
+  async listBookings(departureId: string): Promise<TravelPackageBooking[]> {
+    const [departure] = await this.db
+      .select({ id: schema.travelPackageDeparture.id })
+      .from(schema.travelPackageDeparture)
+      .where(eq(schema.travelPackageDeparture.id, departureId));
+    if (!departure) {
+      throw new NotFoundException(`Departure ${departureId} not found`);
+    }
+    const rows = await this.db
+      .select()
+      .from(schema.travelPackageBooking)
+      .where(eq(schema.travelPackageBooking.departureId, departureId))
+      .orderBy(asc(schema.travelPackageBooking.createdAt));
+    return rows.map((row) => this.toBooking(row));
+  }
+
+  // Locks the departure row and rejects `pax` if it would exceed the quota.
+  // Also 404s a missing departure. A null quota means untracked (no cap).
+  private async assertDepartureCapacity(
+    tx: Tx,
+    departureId: string,
+    pax: number,
+    excludeBookingId?: string,
+  ): Promise<void> {
+    const [departure] = await tx
+      .select({ totalSeats: schema.travelPackageDeparture.totalSeats })
+      .from(schema.travelPackageDeparture)
+      .where(eq(schema.travelPackageDeparture.id, departureId))
+      .for('update');
+    if (!departure) {
+      throw new NotFoundException(`Departure ${departureId} not found`);
+    }
+    if (departure.totalSeats === null) return;
+    const booked = await this.confirmedPax(tx, departureId, excludeBookingId);
+    if (booked + pax > departure.totalSeats) {
+      throw new BadRequestException(
+        `Only ${departure.totalSeats - booked} seat(s) left on this departure`,
+      );
+    }
+  }
+
+  private async assertDepartureExists(
+    tx: Tx,
+    departureId: string,
+  ): Promise<void> {
+    const [departure] = await tx
+      .select({ id: schema.travelPackageDeparture.id })
+      .from(schema.travelPackageDeparture)
+      .where(eq(schema.travelPackageDeparture.id, departureId));
+    if (!departure) {
+      throw new NotFoundException(`Departure ${departureId} not found`);
+    }
+  }
+
+  async createBooking(
+    input: CreateTravelPackageBookingInput,
+  ): Promise<TravelPackageBooking> {
+    const status = input.status ?? 'confirmed';
+    const id = await this.db.transaction(async (tx) => {
+      // Confirmed bookings consume the quota; cancelled ones only need a valid
+      // departure to attach to.
+      if (status === 'confirmed') {
+        await this.assertDepartureCapacity(tx, input.departureId, input.pax);
+      } else {
+        await this.assertDepartureExists(tx, input.departureId);
+      }
+      const [created] = await tx
+        .insert(schema.travelPackageBooking)
+        .values({
+          departureId: input.departureId,
+          customerName: input.customerName,
+          pax: input.pax,
+          phone: input.phone ?? null,
+          notes: input.notes ?? null,
+          status,
+        })
+        .returning({ id: schema.travelPackageBooking.id });
+      return created.id;
+    });
+    return this.findBookingById(id);
+  }
+
+  async updateBooking(
+    id: string,
+    input: UpdateTravelPackageBookingInput,
+  ): Promise<TravelPackageBooking> {
+    await this.db.transaction(async (tx) => {
+      const [existing] = await tx
+        .select()
+        .from(schema.travelPackageBooking)
+        .where(eq(schema.travelPackageBooking.id, id));
+      if (!existing) {
+        throw new NotFoundException(`Booking ${id} not found`);
+      }
+
+      const nextStatus = input.status ?? existing.status;
+      const nextPax = input.pax ?? existing.pax;
+      // Re-check capacity only when the result is a confirmed booking, excluding
+      // this row's own seats from the count.
+      if (nextStatus === 'confirmed') {
+        await this.assertDepartureCapacity(
+          tx,
+          existing.departureId,
+          nextPax,
+          id,
+        );
+      }
+
+      const patch = buildBookingPatch(input);
+      if (Object.keys(patch).length > 0) {
+        await tx
+          .update(schema.travelPackageBooking)
+          .set(patch)
+          .where(eq(schema.travelPackageBooking.id, id));
+      }
+    });
+    return this.findBookingById(id);
+  }
+
+  async removeBooking(id: string): Promise<void> {
+    const [deleted] = await this.db
+      .delete(schema.travelPackageBooking)
+      .where(eq(schema.travelPackageBooking.id, id))
+      .returning({ id: schema.travelPackageBooking.id });
+    if (!deleted) {
+      throw new NotFoundException(`Booking ${id} not found`);
+    }
   }
 }

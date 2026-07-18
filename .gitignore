@@ -9,3 +9,6 @@ coverage/
 .env.*.local
 .DS_Store
 drizzle/meta/_journal.json.bak
+
+# Uploaded files (flyers) — served at runtime, not committed
+apps/api/uploads/

@@ -32,11 +32,14 @@ export interface CreateTravelPackageDto {
   mealPlan?: CreateTravelPackageDtoMealPlan;
   /** @maxLength 2000 */
   heroImageUrl?: string;
+  /** @maxLength 2000 */
+  flyerUrl?: string;
   /** @minimum 0 */
   price: number;
   /** @pattern ^[A-Z]{3}$ */
   currency: string;
   isActive?: boolean;
+  isFeatured?: boolean;
   /** @minItems 1 */
   stays: CreateTravelPackageDtoStaysItem[];
   departures?: CreateTravelPackageDtoDeparturesItem[];

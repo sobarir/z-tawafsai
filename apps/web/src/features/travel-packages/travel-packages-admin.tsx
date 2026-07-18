@@ -28,6 +28,7 @@ import {
 } from '@/libs/combobox-options';
 import { getTravelPackageColumns } from './columns';
 import { TravelPackageForm } from './travel-package-form';
+import { TravelPackageInventoryDialog } from './travel-package-inventory-dialog';
 
 export function TravelPackagesAdmin() {
   const t = useTranslations('travelPackagesAdmin.travelPackages');
@@ -55,6 +56,10 @@ export function TravelPackagesAdmin() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<FlightHotelPackage | null>(null);
   const [deleting, setDeleting] = useState<FlightHotelPackage | null>(null);
+  // Track by id so the inventory dialog re-derives from fresh list data after a
+  // booking mutation invalidates the packages query (updated seat counts).
+  const [viewingId, setViewingId] = useState<string | null>(null);
+  const viewing = travelPackages?.find((pkg) => pkg.id === viewingId) ?? null;
 
   const feedback = useCrudFeedback(
     getListTravelPackagesQueryKey(),
@@ -91,6 +96,7 @@ export function TravelPackagesAdmin() {
           durationNights: t('columns.durationNights'),
           price: t('columns.price'),
           isActive: t('columns.isActive'),
+          isFeatured: t('columns.isFeatured'),
         },
         activeLabel: tCommon('yes'),
         inactiveLabel: tCommon('no'),
@@ -98,11 +104,13 @@ export function TravelPackagesAdmin() {
         openMenuLabel: tAdmin('openMenu'),
         editLabel: tCommon('edit'),
         deleteLabel: tCommon('delete'),
+        manageSeatsLabel: t('manageSeats'),
         onEdit: (travelPackage) => {
           setEditing(travelPackage);
           setFormOpen(true);
         },
         onDelete: (travelPackage) => setDeleting(travelPackage),
+        onManageSeats: (travelPackage) => setViewingId(travelPackage.id),
       }),
     [t, tAdmin, tCommon],
   );
@@ -164,6 +172,12 @@ export function TravelPackagesAdmin() {
         onConfirm={() => {
           if (deleting) deleteMutation.mutate({ id: deleting.id });
         }}
+      />
+
+      <TravelPackageInventoryDialog
+        travelPackage={viewing}
+        open={viewingId !== null}
+        onOpenChange={(open) => !open && setViewingId(null)}
       />
     </div>
   );

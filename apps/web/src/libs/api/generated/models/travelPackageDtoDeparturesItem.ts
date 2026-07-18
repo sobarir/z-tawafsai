@@ -7,6 +7,8 @@
  */
 
 export type TravelPackageDtoDeparturesItem = {
+  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
+  id: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$ */
   departureDate: string;
   /**
@@ -16,4 +18,21 @@ export type TravelPackageDtoDeparturesItem = {
   returnDate: string | null;
   /** @nullable */
   seatsNote: string | null;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   * @nullable
+   */
+  totalSeats: number | null;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  bookedSeats: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   * @nullable
+   */
+  remainingSeats: number | null;
 };

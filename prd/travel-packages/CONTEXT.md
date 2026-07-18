@@ -5,7 +5,32 @@
 
 ## Current step
 
-**2026-07-18 — umrah-model expansion (in progress this session).** The domain was reshaped from a
+**2026-07-19 — seat inventory + booking records + flyer upload (this session).** A deliberate
+scope expansion past the prior "catalog, not a booking engine" non-goal, confirmed with the product
+owner. Three additions:
+
+1. **Seat inventory per departure.** `travel_package_departure` gained a nullable `totalSeats`
+   quota (null = untracked). The enriched departure response now carries computed
+   `bookedSeats`/`remainingSeats` (aggregate only — never individual rows, since the list is
+   anonymous-readable). `seatsNote` is kept as an optional free-text display override.
+2. **Back-office booking records.** New `travel_package_booking` table (FK → departure, cascade;
+   `customerName`, `pax`, `phone`, `notes`, `status` = confirmed|cancelled). Admin-only CRUD
+   (`/travel-package-bookings`, session-gated). Confirmed pax count against the quota; the service
+   rejects an overbooking inside a row-locked transaction. **Booking flow:** the public CTA opens a
+   **WhatsApp** chat (`wa.me/<siteConfig.contact.phoneNumber>`); after the WhatsApp conversation an
+   admin records the booking in the back-office. No public booking POST. Because bookings key off
+   departure ids, the package write path now **upserts departures by id** (was delete+reinsert) and
+   refuses to drop a departure that still has bookings.
+3. **Flyer upload.** New `travel_package.flyerUrl`; real file upload via `POST /api/uploads/flyer`
+   (`@fastify/multipart`, admin-only, image/PDF, 5 MiB cap) stored on **local disk**
+   (`apps/api/uploads/`, gitignored) and served by `@fastify/static` at `/uploads`. New env:
+   `API_PUBLIC_URL`, `UPLOADS_DIR`, `MAX_UPLOAD_BYTES`. A reusable `FileUploadFormField` (web) drives
+   it. Storage is single-server local disk — revisit for multi-instance/serverless deploys (S3/R2).
+
+Admin manages seats/bookings via a per-package drill-in dialog ("Manage seats & bookings" row
+action → `travel-package-inventory-dialog.tsx`).
+
+**2026-07-18 — umrah-model expansion.** The domain was reshaped from a
 generic flight+hotel bundle into an umrah-shaped catalog: a package now has a `type`
 (umrah / umrah_plus / hajj), one-or-more ordered city stays (`travel_package_stay`, Makkah +
 Madinah), dated departures (`travel_package_departure`), an included/excluded list
@@ -20,11 +45,13 @@ Earlier history: the domain + City were originally built and committed in a sing
 
 ## Confirmed decisions
 
-- **Display/marketing product, not a booking engine** — one flat price + currency per package,
-  set directly by an admin. No occupancy-tiered pricing, no fares, no PNR, no seat/room inventory,
-  no availability check. `departure.seatsNote` is a display string, not a count. This line was
-  deliberately held when the umrah-model expansion (2026-07-18) added multi-stay/departures/
-  inclusions. See `00-overview.md` non-goals.
+- **Flat pricing, no fares/PNR** — one flat price + currency per package, set directly by an admin.
+  No occupancy-tiered pricing, no fares, no PNR/ticketing. Still holds.
+- **Seat inventory IS now tracked (2026-07-19, reversed).** The earlier "no seat/room inventory, no
+  availability check" line was deliberately reversed this session: departures carry a numeric
+  `totalSeats` quota and back-office `travel_package_booking` records, with server-side overbooking
+  rejection. It remains **back-office only** — no public self-service booking; the public CTA is a
+  WhatsApp deep link and staff enter the booking. `seatsNote` survives as a display override.
 - **A package has one Flight + one-or-more ordered Property stays** (reversed 2026-07-18 from the
   original "exactly one Property"). Stays live in `travel_package_stay` (Makkah + Madinah, plus a
   third city for umrah_plus); stay nights must sum to `durationNights` (enforced in the service).
@@ -63,16 +90,17 @@ Earlier history: the domain + City were originally built and committed in a sing
 
 See `20-steps.md` — all 9 retroactively-logged steps are complete and committed.
 
-## Entity table (2 top-level entities: 6 tables — plus dependencies on Flight/Property from other domains)
+## Entity table (2 top-level entities: 7 tables — plus dependencies on Flight/Property from other domains)
 
 | # | Entity | Table | Key | Admin CRUD | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 1 | City | `city` | city code (natural key) | `reference/cities` | Cross-domain reference data; also consumed by flights (`airports.city_code`) and hotels (destination combobox). |
-| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight + one-or-more Property stays. Public list at `/packages`. |
+| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight + one-or-more Property stays. `flyerUrl` (uploaded). Public list at `/packages`. |
 | 2a | — Stay | `travel_package_stay` | ULID | (via package form) | Ordered city stay → `property`. Nights sum to `durationNights`. |
-| 2b | — Departure | `travel_package_departure` | ULID | (via package form) | Dated group departure; `seatsNote` display-only. |
+| 2b | — Departure | `travel_package_departure` | ULID | (via package form) | Dated group departure; `totalSeats` quota (nullable), `seatsNote` display override. Upserted by id. |
 | 2c | — Inclusion | `travel_package_inclusion` | ULID | (via package form) | Included/excluded line item. |
 | 2d | — Itinerary day | `travel_package_itinerary_day` | ULID | (not yet in UI) | Day-by-day program. |
+| 2e | — Booking | `travel_package_booking` | ULID | `travel-package-bookings` (admin-only) | Back-office reservation vs a departure; confirmed pax consume the quota. |
 
 ## Definition of done
 

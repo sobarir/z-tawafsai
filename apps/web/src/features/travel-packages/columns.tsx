@@ -13,6 +13,7 @@ interface TravelPackageColumnsOptions {
     durationNights: string;
     price: string;
     isActive: string;
+    isFeatured: string;
   };
   activeLabel: string;
   inactiveLabel: string;
@@ -20,8 +21,10 @@ interface TravelPackageColumnsOptions {
   openMenuLabel: string;
   editLabel: string;
   deleteLabel: string;
+  manageSeatsLabel: string;
   onEdit: (travelPackage: FlightHotelPackage) => void;
   onDelete: (travelPackage: FlightHotelPackage) => void;
+  onManageSeats: (travelPackage: FlightHotelPackage) => void;
 }
 
 export function getTravelPackageColumns({
@@ -32,8 +35,10 @@ export function getTravelPackageColumns({
   openMenuLabel,
   editLabel,
   deleteLabel,
+  manageSeatsLabel,
   onEdit,
   onDelete,
+  onManageSeats,
 }: TravelPackageColumnsOptions): ColumnDef<FlightHotelPackage>[] {
   return [
     { accessorKey: 'title', header: columnLabels.title },
@@ -63,11 +68,19 @@ export function getTravelPackageColumns({
       header: columnLabels.isActive,
       cell: ({ row }) => (row.original.isActive ? activeLabel : inactiveLabel),
     },
+    {
+      id: 'isFeatured',
+      header: columnLabels.isFeatured,
+      cell: ({ row }) =>
+        row.original.isFeatured ? activeLabel : inactiveLabel,
+    },
     actionsColumn({
       actionsLabel,
       openMenuLabel,
       editLabel,
       deleteLabel,
+      viewLabel: manageSeatsLabel,
+      onView: onManageSeats,
       onEdit,
       onDelete,
     }),

@@ -1,7 +1,10 @@
 import {
   createFlightHotelPackageSchema,
+  createTravelPackageBookingSchema,
   flightHotelPackageSchema,
+  travelPackageBookingSchema,
   updateFlightHotelPackageSchema,
+  updateTravelPackageBookingSchema,
 } from '@repo/shared';
 import { createZodDto } from 'nestjs-zod';
 
@@ -11,4 +14,14 @@ export class CreateTravelPackageDto extends createZodDto(
 ) {}
 export class UpdateTravelPackageDto extends createZodDto(
   updateFlightHotelPackageSchema,
+) {}
+
+export class TravelPackageBookingDto extends createZodDto(
+  travelPackageBookingSchema,
+) {}
+export class CreateTravelPackageBookingDto extends createZodDto(
+  createTravelPackageBookingSchema,
+) {}
+export class UpdateTravelPackageBookingDto extends createZodDto(
+  updateTravelPackageBookingSchema,
 ) {}

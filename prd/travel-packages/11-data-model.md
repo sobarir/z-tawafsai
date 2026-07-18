@@ -26,6 +26,7 @@ Consumers:
 - `travel_package_type` — `umrah` | `umrah_plus` | `hajj`.
 - `travel_package_meal_plan` — `full_board` | `half_board` | `room_only`.
 - `travel_package_inclusion_kind` — `included` | `excluded`.
+- `travel_package_booking_status` — `confirmed` | `cancelled` (only `confirmed` consumes quota).
 
 ## `travel_package` (table `travel_package`, Drizzle export `flightHotelPackage` — see the naming
 note in `00-overview.md`)
@@ -44,6 +45,7 @@ package row no longer carries a single `propertyCode`.
 | `durationNights` | `integer` | Admin-set total; the service rejects a package whose stay nights don't sum to it. |
 | `mealPlan` | `travel_package_meal_plan`, nullable | |
 | `heroImageUrl` | `text`, nullable | |
+| `flyerUrl` | `text`, nullable | Uploaded marketing flyer (image/PDF), served from the API uploads dir. Set via `POST /api/uploads/flyer` → stored on local disk → URL saved here. |
 | `price` | `numeric(10,2)` default `0` | Flat price, admin-set — not derived from the flight/hotel pricing. |
 | `currency` | `varchar(3)` default `'USD'` | |
 | `isActive` | `boolean` default `true` | Public list filters to `isActive` client-side. |
@@ -71,8 +73,10 @@ distance-to-Haram/Nabawi), so no lodging detail is duplicated.
 
 ### `travel_package_departure` (child, `ON DELETE cascade`)
 
-A dated group departure. `seatsNote` is a free-text **display** string ("Sisa 4 seat"), NOT an
-inventory count — this keeps the domain a catalog, not a booking engine.
+A dated group departure. As of 2026-07-19 it carries a real seat quota (`totalSeats`); `seatsNote`
+is now an optional free-text **display** override. Unlike the other child collections, departures
+are **upserted by id** on a package update (not delete+reinsert), so their booking rows survive; a
+departure that still has bookings cannot be removed.
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -80,7 +84,26 @@ inventory count — this keeps the domain a catalog, not a booking engine.
 | `packageId` | `text` FK → `travel_package.id` | |
 | `departureDate` | `date` | |
 | `returnDate` | `date`, nullable | `CHECK returnDate IS NULL OR returnDate >= departureDate`. |
-| `seatsNote` | `text`, nullable | |
+| `seatsNote` | `text`, nullable | Display override; superseded by the computed `remainingSeats` when a quota is set. |
+| `totalSeats` | `integer`, nullable | Seat quota; null = untracked. `CHECK total_seats IS NULL OR total_seats >= 0`. Response adds computed `bookedSeats`/`remainingSeats` (aggregate only). |
+
+### `travel_package_booking` (child of departure, `ON DELETE cascade`)
+
+Back-office reservation record. Admin-only CRUD at `/travel-package-bookings` (session-gated — never
+on the anonymous public list, since rows carry customer PII). Confirmed pax count against the
+departure's `totalSeats`; `createBooking`/`updateBooking` re-check the sum inside a row-locked
+(`SELECT … FOR UPDATE`) transaction and throw `BadRequestException` on overbooking.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | `text` PK, ULID | |
+| `departureId` | `text` FK → `travel_package_departure.id` | |
+| `customerName` | `text` | |
+| `pax` | `integer` | `CHECK pax > 0`. Seats this booking consumes. |
+| `phone` | `text`, nullable | |
+| `notes` | `text`, nullable | |
+| `status` | `travel_package_booking_status` default `confirmed` | Only `confirmed` consumes quota; `cancelled` is retained for history. |
+| `createdAt` / `updatedAt` | `timestamptz` | |
 
 ### `travel_package_inclusion` (child, `ON DELETE cascade`)
 

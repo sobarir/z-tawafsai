@@ -26,7 +26,10 @@
     "yes": "Oui",
     "no": "Non",
     "view": "Voir",
-    "remove": "Remove"
+    "remove": "Remove",
+    "uploadFile": "Upload file",
+    "uploading": "Uploading...",
+    "uploadError": "Upload failed. Please try again."
   },
   "theme": {
     "light": "Clair",
@@ -669,6 +672,7 @@
     "noResults": "Aucun forfait voyage disponible pour le moment.",
     "requestThis": "Faire une demande",
     "requestSubject": "Demande",
+    "startingFrom": "À partir de",
     "durationNights": "{count, plural, one {# nuit} other {# nuits}}",
     "direct": "Direct",
     "transitIn": "Escale à {city} ({code})",
@@ -679,7 +683,9 @@
       "umrah": "Umrah",
       "umrah_plus": "Umrah Plus",
       "hajj": "Hajj"
-    }
+    },
+    "seatsLeft": "{count, plural, one {# seat left} other {# seats left}}",
+    "viewFlyer": "View flyer"
   },
   "travelPackagesAdmin": {
     "nav": {
@@ -711,7 +717,8 @@
         "price": "Prix",
         "isActive": "Actif",
         "type": "Type",
-        "stays": "Cities"
+        "stays": "Cities",
+        "isFeatured": "Featured"
       },
       "fields": {
         "title": "Titre",
@@ -752,8 +759,32 @@
         "mealFullBoard": "Full board",
         "mealHalfBoard": "Half board",
         "mealRoomOnly": "Room only",
-        "tabDetails": "Details"
-      }
+        "tabDetails": "Details",
+        "isFeatured": "Featured (shown on landing page)",
+        "flyerUrl": "Flyer (image or PDF)",
+        "totalSeats": "Total seats",
+        "totalSeatsHint": "Set a seat quota to track availability; leave empty for untracked. Booked seats are entered under \"Manage seats & bookings\"."
+      },
+      "manageSeats": "Manage seats & bookings"
+    },
+    "bookings": {
+      "title": "Seats & bookings — {name}",
+      "titleBare": "Seats & bookings",
+      "noDepartures": "This package has no departures yet. Add a departure first.",
+      "untracked": "Quota not tracked",
+      "total": "Total",
+      "booked": "Booked",
+      "remaining": "Remaining",
+      "noBookings": "No bookings yet.",
+      "paxCount": "{count, plural, one {# pax} other {# pax}}",
+      "cancel": "Cancel",
+      "reactivate": "Reactivate",
+      "customerName": "Customer name",
+      "customerNamePlaceholder": "e.g. Ahmad Fauzi",
+      "pax": "Pax",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g. +62...",
+      "addBooking": "Add booking"
     }
   },
   "landing": {
@@ -830,7 +861,18 @@
       "hotelMakkahLabel": "Hotel Makkah",
       "hotelMadinahLabel": "Hotel Madinah",
       "directBadge": "Langsung",
-      "detailCta": "Lihat Detail"
+      "detailCta": "Lihat Detail",
+      "typeUmrah": "Umrah",
+      "typeUmrahPlus": "Umrah Plus",
+      "typeHajj": "Haji",
+      "nightsUnit": "malam",
+      "mealFullBoard": "Full board",
+      "mealHalfBoard": "Half board",
+      "mealRoomOnly": "Room only",
+      "transitVia": "(transit {city})",
+      "emptyHotel": "—",
+      "loading": "Memuat paket unggulan…",
+      "empty": "Belum ada paket unggulan."
     },
     "moreDestinations": {
       "kicker": "Destinasi Ziarah Lainnya",
