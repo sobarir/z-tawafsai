@@ -10,7 +10,7 @@ export async function LandingCta() {
       id="kontak"
     >
       <svg
-        aria-hidden
+        aria-hidden="true"
         className="absolute inset-0 h-full w-full opacity-[.12]"
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid slice"

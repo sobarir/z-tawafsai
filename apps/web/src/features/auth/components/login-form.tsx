@@ -109,7 +109,6 @@ const LoginForm = () => {
                   type="email"
                   autoComplete="email"
                   autoFocus
-                  tabIndex={1}
                   placeholder="email@example.com"
                   aria-invalid={!!emailError}
                   {...form.register('email')}
@@ -122,7 +121,6 @@ const LoginForm = () => {
                 <PasswordInput
                   id="password"
                   autoComplete="current-password"
-                  tabIndex={2}
                   placeholder={t('passwordPlaceholder')}
                   aria-invalid={!!passwordError}
                   {...form.register('password')}
@@ -139,16 +137,11 @@ const LoginForm = () => {
               <TextLink
                 href="/password-reset"
                 className="ml-auto text-xs text-primary sm:text-sm"
-                tabIndex={4}
               >
                 {t('forgotPassword')}
               </TextLink>
 
-              <Button
-                type="submit"
-                tabIndex={3}
-                loading={form.formState.isSubmitting}
-              >
+              <Button type="submit" loading={form.formState.isSubmitting}>
                 {t('submit')}
               </Button>
 

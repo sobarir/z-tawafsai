@@ -80,7 +80,10 @@ const LanguageSwitcher = ({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="group flex w-full flex-1 cursor-pointer items-center justify-between rounded-md border-0 bg-transparent px-2 text-start transition-all hover:bg-accent/60">
+          <button
+            type="button"
+            className="group flex w-full flex-1 cursor-pointer items-center justify-between rounded-md border-0 bg-transparent px-2 text-start transition-all hover:bg-accent/60"
+          >
             <span className="truncate text-[11px] font-medium text-muted-foreground transition-colors group-hover:text-foreground">
               {title}
             </span>
@@ -101,7 +104,10 @@ const LanguageSwitcher = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex cursor-pointer items-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-1.5 text-muted-foreground transition-all hover:text-foreground focus:outline-hidden">
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-1.5 text-muted-foreground transition-all hover:text-foreground focus:outline-hidden"
+        >
           <Globe className="h-4 w-4" />
           <span className="text-xs font-semibold tracking-wide">
             {localeShortCodes[currentLocale]}

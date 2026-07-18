@@ -95,6 +95,7 @@ export function ThemeToggle({
 
   if (variant === 'titled') {
     return (
+      // biome-ignore lint/a11y/useSemanticElements: wraps an interactive Switch — a real <button> would nest buttons; role+tabIndex+onKeyDown make it keyboard-accessible
       <div
         onClick={() => toggleTheme()}
         onPointerDown={handlePointerDown}
@@ -111,6 +112,8 @@ export function ThemeToggle({
         <span className="truncate text-[11px] font-medium text-muted-foreground transition-colors group-hover:text-foreground">
           {title}
         </span>
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: click only stops propagation so interacting with the Switch doesn't also toggle the row */}
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: not a keyboard target — the Switch itself handles keyboard; this only guards propagation */}
         <span
           className="flex h-9 items-center justify-center"
           onClick={(e) => e.stopPropagation()}

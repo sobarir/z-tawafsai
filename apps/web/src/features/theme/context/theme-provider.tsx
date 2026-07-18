@@ -75,6 +75,7 @@ function applyTheme(theme: Theme) {
   root.classList.add(resolvedTheme);
   root.style.colorScheme = resolvedTheme;
 
+  // biome-ignore lint/suspicious/noDocumentCookie: theme must be set synchronously before paint to avoid a flash; the async CookieStore API can't guarantee that
   document.cookie = `theme=${resolvedTheme}; path=/; max-age=31536000; SameSite=Lax`;
   setHeaderChromeActive(root.dataset.headerActive === 'true');
 }

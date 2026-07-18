@@ -46,6 +46,23 @@ const MERMAID_TYPES =
   /^(flowchart|graph|sequenceDiagram|stateDiagram|erDiagram|classDiagram)\b/;
 const PROHIBITION = /^(?:[-*]|\d+\.)\s+.*\b(never|do not|don't)\b/i;
 
+// Non-fence content checks: heading depth and prohibition-rationale rules.
+function checkContentLine(line, n, rel, problems) {
+  const heading = line.match(/^(#{1,6})\s/);
+  if (heading && heading[1].length > 3) {
+    problems.push(
+      `${rel}:${n}: heading depth ${heading[1].length} exceeds 3 — an h4 means this belongs in a separate file`,
+    );
+  }
+
+  if (line.trimStart().startsWith('|')) return; // table rows: routing labels, not rules
+  if (PROHIBITION.test(line.trim()) && !line.includes('—')) {
+    problems.push(
+      `${rel}:${n}: prohibition without an em-dash rationale — the "why" lets the agent generalize the rule`,
+    );
+  }
+}
+
 const problems = [];
 
 for (const [rel, budget] of TARGETS) {
@@ -95,19 +112,7 @@ for (const [rel, budget] of TARGETS) {
       return;
     }
 
-    const heading = line.match(/^(#{1,6})\s/);
-    if (heading && heading[1].length > 3) {
-      problems.push(
-        `${rel}:${n}: heading depth ${heading[1].length} exceeds 3 — an h4 means this belongs in a separate file`,
-      );
-    }
-
-    if (line.trimStart().startsWith('|')) return; // table rows: routing labels, not rules
-    if (PROHIBITION.test(line.trim()) && !line.includes('—')) {
-      problems.push(
-        `${rel}:${n}: prohibition without an em-dash rationale — the "why" lets the agent generalize the rule`,
-      );
-    }
+    checkContentLine(line, n, rel, problems);
   });
 
   if (inFence) {

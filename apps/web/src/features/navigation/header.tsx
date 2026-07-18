@@ -15,6 +15,33 @@ import { setHeaderChromeActive } from '@/features/theme/context/theme-provider';
 import { useScroll } from '@/hooks/use-scroll';
 import { cn } from '@/libs/utils';
 
+function NavLink({
+  href,
+  label,
+  active,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={cn(
+        'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+        active
+          ? 'text-primary'
+          : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+      )}
+    >
+      {label}
+    </Link>
+  );
+}
+
 const Header = () => {
   const t = useTranslations('navigation');
   const locale = useLocale();
@@ -24,6 +51,17 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const scrolled = useScroll(50);
   const headerActive = scrolled || mobileMenuOpen;
+
+  const navItems = [
+    { href: '/', label: t('home') },
+    { href: '/about', label: t('about') },
+    { href: '/packages', label: t('travelPackages') },
+    ...(user ? [{ href: '/dashboard', label: t('dashboard') }] : []),
+  ];
+  const isActive = (href: string) =>
+    href === '/dashboard'
+      ? Boolean(pathname?.startsWith('/dashboard'))
+      : pathname === href;
 
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -70,52 +108,14 @@ const Header = () => {
           </div>
 
           <nav className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 md:flex">
-            <Link
-              href="/"
-              className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                pathname === '/'
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
-            >
-              {t('home')}
-            </Link>
-            <Link
-              href="/about"
-              className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                pathname === '/about'
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
-            >
-              {t('about')}
-            </Link>
-            <Link
-              href="/packages"
-              className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                pathname === '/packages'
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
-            >
-              {t('travelPackages')}
-            </Link>
-            {user && (
-              <Link
-                href="/dashboard"
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  pathname?.startsWith('/dashboard')
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                )}
-              >
-                {t('dashboard')}
-              </Link>
-            )}
+            {navItems.map((item) => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                active={isActive(item.href)}
+              />
+            ))}
           </nav>
 
           <div className="z-10 hidden items-center gap-2 md:flex">
@@ -169,56 +169,15 @@ const Header = () => {
             )}
           >
             <nav className="flex flex-col gap-1">
-              <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  pathname === '/'
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                )}
-              >
-                {t('home')}
-              </Link>
-              <Link
-                href="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  pathname === '/about'
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                )}
-              >
-                {t('about')}
-              </Link>
-              <Link
-                href="/packages"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  pathname === '/packages'
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                )}
-              >
-                {t('travelPackages')}
-              </Link>
-              {user && (
-                <Link
-                  href="/dashboard"
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  active={isActive(item.href)}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    pathname?.startsWith('/dashboard')
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-                  )}
-                >
-                  {t('dashboard')}
-                </Link>
-              )}
+                />
+              ))}
             </nav>
 
             <div className="flex items-center justify-center gap-4 border-t border-border pt-4">

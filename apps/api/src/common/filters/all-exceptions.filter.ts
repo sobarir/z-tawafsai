@@ -59,24 +59,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
 
     if (isHttp && !(exception instanceof ZodSerializationException)) {
-      const response = exception.getResponse();
-      if (typeof response === 'string') {
-        body.message = response;
-      } else if (typeof response === 'object' && response !== null) {
-        const res = response as Record<string, unknown>;
-        body.message = (res.message as string | string[]) ?? exception.message;
-        if (res.error) body.error = res.error as string;
-        if (res.errors) body.issues = res.errors; // nestjs-zod validation issues
-      }
+      applyHttpExceptionDetails(body, exception);
     }
 
-    const logContext = {
+    this.logException(exception, status, body.message, {
       reqId: request.id,
       method: request.method,
       url: request.url,
       statusCode: status,
-    };
+    });
 
+    httpAdapter.reply(reply, body, status);
+  }
+
+  private logException(
+    exception: unknown,
+    status: number,
+    message: string | string[],
+    logContext: Record<string, unknown>,
+  ): void {
     if (status >= 500) {
       const err =
         exception instanceof ZodSerializationException
@@ -87,14 +88,30 @@ export class AllExceptionsFilter implements ExceptionFilter {
         `Unhandled exception: ${err instanceof Error ? err.message : String(err)}`,
         AllExceptionsFilter.name,
       );
-    } else {
-      this.logger.warn(
-        { ...logContext, message: body.message },
-        `Request failed: ${status}`,
-        AllExceptionsFilter.name,
-      );
+      return;
     }
+    this.logger.warn(
+      { ...logContext, message },
+      `Request failed: ${status}`,
+      AllExceptionsFilter.name,
+    );
+  }
+}
 
-    httpAdapter.reply(reply, body, status);
+// Overlays a client-safe HttpException's status/message/issues onto the envelope.
+function applyHttpExceptionDetails(
+  body: ErrorResponseBody,
+  exception: HttpException,
+): void {
+  const response = exception.getResponse();
+  if (typeof response === 'string') {
+    body.message = response;
+    return;
+  }
+  if (typeof response === 'object' && response !== null) {
+    const res = response as Record<string, unknown>;
+    body.message = (res.message as string | string[]) ?? exception.message;
+    if (res.error) body.error = res.error as string;
+    if (res.errors) body.issues = res.errors; // nestjs-zod validation issues
   }
 }

@@ -4638,6 +4638,7 @@ const nusukHotelSpecs: NusukHotelSpec[] = [
 
 properties.push(...nusukHotelSpecs.map(toNusukProperty));
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: sequential seed orchestration — a flat list of simple insert loops, one per entity; splitting it would scatter the deterministic ordering that re-seeding depends on
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {

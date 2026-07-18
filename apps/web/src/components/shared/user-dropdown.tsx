@@ -47,6 +47,7 @@ export const UserDropdown = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
+          type="button"
           className={cn(
             'flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-border/40 bg-background/40 backdrop-blur-xl transition-all hover:border-primary/30 hover:bg-accent/40 focus:outline-hidden',
             onlyAvatar ? 'h-8 w-8 p-0' : 'gap-2 p-1',

@@ -101,6 +101,105 @@ const shouldRenderStructuredData =
   siteConfig.organization.name !== 'Your Organization' &&
   !baseUrl.includes('yourdomain.com');
 
+type JsonLd = Record<string, unknown>;
+
+function organizationJsonLd(): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${baseUrl}/#organization`,
+    name: siteConfig.organization.name,
+    legalName:
+      siteConfig.organization.legalName || siteConfig.organization.name,
+    url: baseUrl,
+    logo: siteConfig.images.logo
+      ? `${baseUrl}${siteConfig.images.logo}`
+      : undefined,
+    description: siteConfig.organization.description,
+    email: siteConfig.organization.email || undefined,
+    telephone: siteConfig.organization.phone || undefined,
+    foundingDate: siteConfig.organization.foundingDate || undefined,
+    sameAs: Object.values(siteConfig.social).filter(Boolean),
+    address: siteConfig.organization.address.city
+      ? {
+          '@type': 'PostalAddress',
+          streetAddress: siteConfig.organization.address.street,
+          addressLocality: siteConfig.organization.address.city,
+          addressRegion: siteConfig.organization.address.region,
+          postalCode: siteConfig.organization.address.postalCode,
+          addressCountry: siteConfig.organization.address.countryCode,
+        }
+      : undefined,
+  };
+}
+
+function webAppJsonLd(): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type':
+      siteConfig.applicationCategory === 'EducationalApplication'
+        ? 'EducationalApplication'
+        : 'SoftwareApplication',
+    '@id': `${baseUrl}/#webapp`,
+    name: siteConfig.appName,
+    description: siteConfig.description,
+    url: baseUrl,
+    applicationCategory: siteConfig.applicationCategory || 'WebApplication',
+    applicationSubCategory: siteConfig.appType || undefined,
+    operatingSystem: 'Web Browser',
+    offers: siteConfig.pricing.model
+      ? {
+          '@type': 'Offer',
+          price: siteConfig.pricing.minPrice || '0',
+          priceCurrency: siteConfig.pricing.currency,
+        }
+      : undefined,
+    author: siteConfig.organization.name
+      ? {
+          '@type': 'Organization',
+          '@id': `${baseUrl}/#organization`,
+          name: siteConfig.organization.name,
+        }
+      : undefined,
+    featureList: siteConfig.features.filter(Boolean),
+    screenshot: siteConfig.images.og
+      ? `${baseUrl}${siteConfig.images.og}`
+      : undefined,
+  };
+}
+
+function websiteJsonLd(): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${baseUrl}/#website`,
+    url: baseUrl,
+    name: siteConfig.appName || siteConfig.title,
+    description: siteConfig.description,
+    publisher: siteConfig.organization.name
+      ? { '@id': `${baseUrl}/#organization` }
+      : undefined,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${baseUrl}/flights?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+    inLanguage: siteConfig.language,
+  };
+}
+
+function JsonLdScript({ id, data }: { id: string; data: JsonLd }) {
+  return (
+    <script
+      id={id}
+      type="application/ld+json"
+      suppressHydrationWarning
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data from trusted site config
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
   const [locale, messages, currentUser] = await Promise.all([
     getLocale(),
@@ -128,115 +227,15 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
         <Analytics />
 
         {shouldRenderStructuredData && (
-          <script
-            id="schema-organization"
-            type="application/ld+json"
-            suppressHydrationWarning
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data from trusted site config
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'Organization',
-                '@id': `${baseUrl}/#organization`,
-                name: siteConfig.organization.name,
-                legalName:
-                  siteConfig.organization.legalName ||
-                  siteConfig.organization.name,
-                url: baseUrl,
-                logo: siteConfig.images.logo
-                  ? `${baseUrl}${siteConfig.images.logo}`
-                  : undefined,
-                description: siteConfig.organization.description,
-                email: siteConfig.organization.email || undefined,
-                telephone: siteConfig.organization.phone || undefined,
-                foundingDate: siteConfig.organization.foundingDate || undefined,
-                sameAs: Object.values(siteConfig.social).filter(Boolean),
-                address: siteConfig.organization.address.city
-                  ? {
-                      '@type': 'PostalAddress',
-                      streetAddress: siteConfig.organization.address.street,
-                      addressLocality: siteConfig.organization.address.city,
-                      addressRegion: siteConfig.organization.address.region,
-                      postalCode: siteConfig.organization.address.postalCode,
-                      addressCountry:
-                        siteConfig.organization.address.countryCode,
-                    }
-                  : undefined,
-              }),
-            }}
-          />
+          <JsonLdScript id="schema-organization" data={organizationJsonLd()} />
         )}
 
         {shouldRenderStructuredData && siteConfig.appName && (
-          <script
-            id="schema-webapp"
-            type="application/ld+json"
-            suppressHydrationWarning
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data from trusted site config
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type':
-                  siteConfig.applicationCategory === 'EducationalApplication'
-                    ? 'EducationalApplication'
-                    : 'SoftwareApplication',
-                '@id': `${baseUrl}/#webapp`,
-                name: siteConfig.appName,
-                description: siteConfig.description,
-                url: baseUrl,
-                applicationCategory:
-                  siteConfig.applicationCategory || 'WebApplication',
-                applicationSubCategory: siteConfig.appType || undefined,
-                operatingSystem: 'Web Browser',
-                offers: siteConfig.pricing.model
-                  ? {
-                      '@type': 'Offer',
-                      price: siteConfig.pricing.minPrice || '0',
-                      priceCurrency: siteConfig.pricing.currency,
-                    }
-                  : undefined,
-                author: siteConfig.organization.name
-                  ? {
-                      '@type': 'Organization',
-                      '@id': `${baseUrl}/#organization`,
-                      name: siteConfig.organization.name,
-                    }
-                  : undefined,
-                featureList: siteConfig.features.filter(Boolean),
-                screenshot: siteConfig.images.og
-                  ? `${baseUrl}${siteConfig.images.og}`
-                  : undefined,
-              }),
-            }}
-          />
+          <JsonLdScript id="schema-webapp" data={webAppJsonLd()} />
         )}
 
         {shouldRenderStructuredData && (
-          <script
-            id="schema-website"
-            type="application/ld+json"
-            suppressHydrationWarning
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data from trusted site config
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'WebSite',
-                '@id': `${baseUrl}/#website`,
-                url: baseUrl,
-                name: siteConfig.appName || siteConfig.title,
-                description: siteConfig.description,
-                publisher: siteConfig.organization.name
-                  ? { '@id': `${baseUrl}/#organization` }
-                  : undefined,
-                potentialAction: {
-                  '@type': 'SearchAction',
-                  target: `${baseUrl}/flights?q={search_term_string}`,
-                  'query-input': 'required name=search_term_string',
-                },
-                inLanguage: siteConfig.language,
-              }),
-            }}
-          />
+          <JsonLdScript id="schema-website" data={websiteJsonLd()} />
         )}
       </body>
     </html>

@@ -46,6 +46,51 @@ function hotelLine(
   return { name: stay.displayName, distance: dist };
 }
 
+function typeBadgeLabel(
+  type: FlightHotelPackage['type'],
+  labels: Labels,
+): string {
+  if (type === 'hajj') return labels.typeHajj;
+  if (type === 'umrah_plus') return labels.typeUmrahPlus;
+  return labels.typeUmrah;
+}
+
+function mealLabel(
+  mealPlan: FlightHotelPackage['mealPlan'],
+  labels: Labels,
+): string {
+  switch (mealPlan) {
+    case 'full_board':
+      return labels.mealFullBoard;
+    case 'half_board':
+      return labels.mealHalfBoard;
+    case 'room_only':
+      return labels.mealRoomOnly;
+    default:
+      return '';
+  }
+}
+
+function earliestDepartureDate(
+  pkg: FlightHotelPackage,
+  locale: string,
+): string {
+  const first = [...pkg.departures].sort(
+    (a, b) =>
+      new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime(),
+  )[0];
+  if (!first) return '';
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(first.departureDate));
+  } catch {
+    return first.departureDate;
+  }
+}
+
 /** Derive the landing card's display fields from an API travel package.
  * Only the fields the card renders are produced — category, badge colour, and
  * the paired destination from the placeholder model are intentionally dropped
@@ -55,22 +100,6 @@ export function toPackageCardData(
   locale: string,
   labels: Labels,
 ): PackageCardData {
-  const typeBadge =
-    pkg.type === 'hajj'
-      ? labels.typeHajj
-      : pkg.type === 'umrah_plus'
-        ? labels.typeUmrahPlus
-        : labels.typeUmrah;
-
-  const meal =
-    pkg.mealPlan === 'full_board'
-      ? labels.mealFullBoard
-      : pkg.mealPlan === 'half_board'
-        ? labels.mealHalfBoard
-        : pkg.mealPlan === 'room_only'
-          ? labels.mealRoomOnly
-          : '';
-
   const stars =
     pkg.stays.reduce((max, stay) => Math.max(max, stay.starRating ?? 0), 0) ||
     5;
@@ -84,26 +113,8 @@ export function toPackageCardData(
         pkg.flight.transitCityName ?? pkg.flight.transitAirport ?? '',
       )}`;
 
-  const firstDeparture = [...pkg.departures].sort(
-    (a, b) =>
-      new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime(),
-  )[0];
-
-  let departureDate = '';
-  if (firstDeparture) {
-    try {
-      departureDate = new Intl.DateTimeFormat(locale, {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }).format(new Date(firstDeparture.departureDate));
-    } catch {
-      departureDate = firstDeparture.departureDate;
-    }
-  }
-
   return {
-    badge: typeBadge,
+    badge: typeBadgeLabel(pkg.type, labels),
     // Umrah Plus / Hajj get the gold accent; plain umrah keeps the brand badge.
     badgeVariant: pkg.type === 'umrah' ? 'default' : 'gold',
     featured: true,
@@ -112,12 +123,12 @@ export function toPackageCardData(
     subtitle: pkg.description ?? '',
     priceMain: formatPrice(pkg.price, pkg.currency, locale),
     priceUnit: '',
-    departureDate,
+    departureDate: earliestDepartureDate(pkg, locale),
     durationValue: `${pkg.durationNights} ${labels.nightsUnit}`,
     airline,
     direct: pkg.flight.isDirect,
     hotelMakkah: hotelLine(makkah, labels.emptyHotel),
     hotelMadinah: hotelLine(madinah, labels.emptyHotel),
-    footNote: meal,
+    footNote: mealLabel(pkg.mealPlan, labels),
   };
 }
