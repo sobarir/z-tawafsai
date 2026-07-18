@@ -318,15 +318,27 @@ describe('ConnectionsService.searchItineraries (Umrah-corridor seed data)', () =
       date: '2026-08-05',
     });
 
+    // All CGK<->JED/MED demo flights are IDR-priced (2026-07-18: the
+    // originally-USD carriers were converted at the same rate as the
+    // USD->IDR fx_rate seed, 16,300; prd/airline_list.md's 6 additions were
+    // always IDR-native).
     expect(results.map((r) => r.flights.map(legLabel))).toEqual([
       ['MS977 CGK->CAI', 'MS653 CAI->JED'],
       ['SV816 CGK->JED'],
       ['GA402 CGK->JED'],
+      ['D7812 CGK->KUL', 'D78118 KUL->JED'],
+      ['QG990 CGK->JED'],
+      ['JT072 CGK->JED'],
+      ['ID782 CGK->JED'],
+      ['TK62 CGK->IST', 'TK754 IST->JED'],
     ]);
-    expect(results.map((r) => r.stopCount)).toEqual([1, 0, 0]);
-    expect(results.map((r) => r.totalPrice)).toEqual([750, 775, 805]);
+    expect(results.map((r) => r.stopCount)).toEqual([1, 0, 0, 1, 0, 0, 0, 1]);
+    expect(results.map((r) => r.totalPrice)).toEqual([
+      12_226_000, 12_633_000, 13_122_000, 13_700_000, 14_400_000, 14_650_000,
+      15_100_000, 18_250_000,
+    ]);
     expect(results[0].connections[0].kind).toBe('connection');
-    expect(results[0].currency).toBe('USD');
+    expect(results[0].currency).toBe('IDR');
   });
 
   it('CGK-JED 2026-08-08: no direct flight exists, but 6 one-stop itineraries do (the gap this feature fixes)', async () => {
@@ -368,10 +380,16 @@ describe('ConnectionsService.searchItineraries (Umrah-corridor seed data)', () =
       date: '2026-08-15',
     });
 
+    // As above, the IDR-priced additions from prd/airline_list.md sort after
+    // the pre-existing USD-priced results (no cross-currency conversion).
     expect(results.map((r) => r.flights.map(legLabel))).toEqual([
       ['SV818 CGK->MED'],
       ['GA404 CGK->MED'],
       ['SV816 CGK->JED', 'SV1422 JED->MED'],
+      ['QG992 CGK->MED'],
+      ['JT074 CGK->MED'],
+      ['ID784 CGK->MED'],
+      ['TK62 CGK->IST', 'TK758 IST->MED'],
     ]);
     expect(results[2].stopCount).toBe(1);
   });
