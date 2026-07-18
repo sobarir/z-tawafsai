@@ -85,8 +85,9 @@ export function TravelPackagesAdmin() {
       getTravelPackageColumns({
         columnLabels: {
           title: t('columns.title'),
+          type: t('columns.type'),
           flight: t('columns.flight'),
-          property: t('columns.property'),
+          stays: t('columns.stays'),
           durationNights: t('columns.durationNights'),
           price: t('columns.price'),
           isActive: t('columns.isActive'),

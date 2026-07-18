@@ -5,8 +5,15 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
+import type { UpdateTravelPackageDtoType } from './updateTravelPackageDtoType';
+import type { UpdateTravelPackageDtoMealPlan } from './updateTravelPackageDtoMealPlan';
+import type { UpdateTravelPackageDtoStaysItem } from './updateTravelPackageDtoStaysItem';
+import type { UpdateTravelPackageDtoDeparturesItem } from './updateTravelPackageDtoDeparturesItem';
+import type { UpdateTravelPackageDtoInclusionsItem } from './updateTravelPackageDtoInclusionsItem';
+import type { UpdateTravelPackageDtoItineraryItem } from './updateTravelPackageDtoItineraryItem';
 
 export interface UpdateTravelPackageDto {
+  type?: UpdateTravelPackageDtoType;
   /**
    * @minLength 1
    * @maxLength 200
@@ -17,16 +24,12 @@ export interface UpdateTravelPackageDto {
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   flightId?: string;
   /**
-   * @minLength 1
-   * @maxLength 50
-   */
-  propertyCode?: string;
-  /**
    * @minimum 0
    * @maximum 9007199254740991
    * @exclusiveMinimum
    */
   durationNights?: number;
+  mealPlan?: UpdateTravelPackageDtoMealPlan;
   /** @maxLength 2000 */
   heroImageUrl?: string;
   /** @minimum 0 */
@@ -34,4 +37,9 @@ export interface UpdateTravelPackageDto {
   /** @pattern ^[A-Z]{3}$ */
   currency?: string;
   isActive?: boolean;
+  /** @minItems 1 */
+  stays?: UpdateTravelPackageDtoStaysItem[];
+  departures?: UpdateTravelPackageDtoDeparturesItem[];
+  inclusions?: UpdateTravelPackageDtoInclusionsItem[];
+  itinerary?: UpdateTravelPackageDtoItineraryItem[];
 }

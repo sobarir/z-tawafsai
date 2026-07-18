@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { createDb, schema } from '@repo/db';
 import { and, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -46,16 +46,22 @@ describe('TravelPackagesService', () => {
 
   it('creates, reads, updates, and deletes a travel package', async () => {
     const created = await service.create({
+      type: 'umrah',
       title: TEST_TITLE,
       flightId: testFlightId,
-      propertyCode: TEST_PROPERTY_CODE,
       durationNights: 3,
       price: 999,
       currency: 'USD',
+      stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
+      departures: [{ departureDate: '2026-09-01', returnDate: '2026-09-04' }],
+      inclusions: [{ kind: 'included', label: 'Umrah visa' }],
     });
     expect(created.title).toBe(TEST_TITLE);
     expect(created.flight.id).toBe(testFlightId);
-    expect(created.property.propertyCode).toBe(TEST_PROPERTY_CODE);
+    expect(created.stays).toHaveLength(1);
+    expect(created.stays[0].propertyCode).toBe(TEST_PROPERTY_CODE);
+    expect(created.departures[0].departureDate).toBe('2026-09-01');
+    expect(created.inclusions[0].label).toBe('Umrah visa');
 
     const fetched = await service.findById(created.id);
     expect(fetched.durationNights).toBe(3);
@@ -67,6 +73,20 @@ describe('TravelPackagesService', () => {
     await expect(service.findById(created.id)).rejects.toThrow(
       NotFoundException,
     );
+  });
+
+  it('rejects a package whose stay nights do not sum to durationNights', async () => {
+    await expect(
+      service.create({
+        type: 'umrah',
+        title: TEST_TITLE,
+        flightId: testFlightId,
+        durationNights: 5,
+        price: 999,
+        currency: 'USD',
+        stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('throws NotFoundException for a missing id', async () => {

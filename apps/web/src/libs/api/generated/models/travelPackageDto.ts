@@ -5,12 +5,18 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
+import type { TravelPackageDtoType } from './travelPackageDtoType';
+import type { TravelPackageDtoMealPlan } from './travelPackageDtoMealPlan';
 import type { TravelPackageDtoFlight } from './travelPackageDtoFlight';
-import type { TravelPackageDtoProperty } from './travelPackageDtoProperty';
+import type { TravelPackageDtoStaysItem } from './travelPackageDtoStaysItem';
+import type { TravelPackageDtoDeparturesItem } from './travelPackageDtoDeparturesItem';
+import type { TravelPackageDtoInclusionsItem } from './travelPackageDtoInclusionsItem';
+import type { TravelPackageDtoItineraryItem } from './travelPackageDtoItineraryItem';
 
 export interface TravelPackageDto {
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   id: string;
+  type: TravelPackageDtoType;
   /**
    * @minLength 1
    * @maxLength 200
@@ -30,11 +36,16 @@ export interface TravelPackageDto {
    * @exclusiveMinimum
    */
   durationNights: number;
+  /** @nullable */
+  mealPlan: TravelPackageDtoMealPlan;
   isActive: boolean;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   createdAt: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   updatedAt: string;
   flight: TravelPackageDtoFlight;
-  property: TravelPackageDtoProperty;
+  stays: TravelPackageDtoStaysItem[];
+  departures: TravelPackageDtoDeparturesItem[];
+  inclusions: TravelPackageDtoInclusionsItem[];
+  itinerary: TravelPackageDtoItineraryItem[];
 }

@@ -4968,52 +4968,114 @@ async function seed() {
     0,
   );
 
-  // Sample Travel Packages (flight + hotel), pairing real seeded flights
-  // with real seeded properties — gives the public listing real content.
+  // Sample umrah packages: each pairs a real seeded flight with an ordered
+  // Makkah + Madinah stay (real seeded properties), a dated departure, and an
+  // included/excluded list — gives the public listing real umrah content.
   const travelPackageSeeds: Array<{
     title: string;
     description: string;
+    type: 'umrah' | 'umrah_plus' | 'hajj';
     operatingAirline: string;
     flightNumber: string;
     departureTime: string;
-    propertyCode: string;
-    durationNights: number;
+    mealPlan: 'full_board' | 'half_board' | 'room_only';
     price: number;
     currency: string;
+    stays: Array<{ propertyCode: string; sequence: number; nights: number }>;
+    departures: Array<{
+      departureDate: string;
+      returnDate: string | null;
+      seatsNote: string | null;
+    }>;
+    inclusions: Array<{ kind: 'included' | 'excluded'; label: string }>;
   }> = [
     {
-      title: '5-Night Jeddah Getaway',
-      description: 'Round-trip flight and a stay at Jeddah Waterfront Hotel.',
+      title: '9-Day Umrah — Makkah & Madinah',
+      description:
+        'Round-trip flight, 5 nights in Makkah and 3 nights in Madinah, full-board catering, and guided ziyarah.',
+      type: 'umrah',
       operatingAirline: 'GA',
       flightNumber: '402',
       departureTime: '2026-08-05T11:50:00+07:00',
-      propertyCode: 'JED-WFH',
-      durationNights: 5,
+      mealPlan: 'full_board',
       price: 1200,
       currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-COURTYARD', sequence: 1, nights: 5 },
+        { propertyCode: 'MAD-CROWNE', sequence: 2, nights: 3 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-08-05',
+          returnDate: '2026-08-13',
+          seatsNote: 'Sisa 8 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Transportasi darat (bus AC)' },
+        { kind: 'included', label: 'Ziyarah Makkah & Madinah' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
     },
     {
-      title: '7-Night Madinah Retreat',
-      description: 'Round-trip flight and a stay at Madinah Central Inn.',
-      operatingAirline: 'GA',
-      flightNumber: '404',
-      departureTime: '2026-08-05T13:30:00+07:00',
-      propertyCode: 'MAD-CIN',
-      durationNights: 7,
-      price: 950,
-      currency: 'USD',
-    },
-    {
-      title: '12-Night Grand Jeddah Package',
+      title: '12-Night Grand Umrah',
       description:
-        'Extended round-trip flight and a stay at Jeddah Waterfront Hotel.',
+        'Extended round-trip flight, 7 nights in Makkah and 5 nights in Madinah at 5-star hotels near the Haramain.',
+      type: 'umrah',
       operatingAirline: 'SV',
       flightNumber: '816',
       departureTime: '2026-08-05T09:10:00+07:00',
-      propertyCode: 'JED-WFH',
-      durationNights: 12,
+      mealPlan: 'full_board',
       price: 1850,
       currency: 'USD',
+      stays: [
+        { propertyCode: 'MKK-NOVOTEL', sequence: 1, nights: 7 },
+        { propertyCode: 'MAD-ANWAR', sequence: 2, nights: 5 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-08-05',
+          returnDate: '2026-08-17',
+          seatsNote: 'Sisa 4 seat',
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Muthawwif / pembimbing ibadah' },
+        { kind: 'included', label: 'Manasik pra-keberangkatan' },
+        { kind: 'included', label: 'Perlengkapan umrah' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
+    },
+    {
+      title: '7-Night Madinah-First Umrah',
+      description:
+        'Round-trip flight starting in Madinah (4 nights) before Makkah (3 nights).',
+      type: 'umrah',
+      operatingAirline: 'GA',
+      flightNumber: '404',
+      departureTime: '2026-08-05T13:30:00+07:00',
+      mealPlan: 'half_board',
+      price: 950,
+      currency: 'USD',
+      stays: [
+        { propertyCode: 'MAD-OBEROI', sequence: 1, nights: 4 },
+        { propertyCode: 'MKK-DOUBLETREE', sequence: 2, nights: 3 },
+      ],
+      departures: [
+        {
+          departureDate: '2026-08-05',
+          returnDate: '2026-08-12',
+          seatsNote: null,
+        },
+      ],
+      inclusions: [
+        { kind: 'included', label: 'Umrah visa' },
+        { kind: 'included', label: 'Transportasi darat (bus AC)' },
+        { kind: 'excluded', label: 'Pengeluaran pribadi' },
+      ],
     },
   ];
 
@@ -5031,12 +5093,17 @@ async function seed() {
 
     if (!anchorFlight) continue;
 
+    const durationNights = item.stays.reduce(
+      (sum, stay) => sum + stay.nights,
+      0,
+    );
     const travelPackageValues = {
+      type: item.type,
       title: item.title,
       description: item.description,
       flightId: anchorFlight.id,
-      propertyCode: item.propertyCode,
-      durationNights: item.durationNights,
+      durationNights,
+      mealPlan: item.mealPlan,
       price: item.price,
       currency: item.currency,
       isActive: true,
@@ -5047,13 +5114,50 @@ async function seed() {
       .from(schema.flightHotelPackage)
       .where(eq(schema.flightHotelPackage.title, travelPackageValues.title));
 
+    let packageId: string;
     if (existingTravelPackage) {
       await db
         .update(schema.flightHotelPackage)
         .set(travelPackageValues)
         .where(eq(schema.flightHotelPackage.id, existingTravelPackage.id));
+      packageId = existingTravelPackage.id;
     } else {
-      await db.insert(schema.flightHotelPackage).values(travelPackageValues);
+      const [inserted] = await db
+        .insert(schema.flightHotelPackage)
+        .values(travelPackageValues)
+        .returning({ id: schema.flightHotelPackage.id });
+      packageId = inserted.id;
+    }
+
+    // Child rows are replaced wholesale so re-seeding stays idempotent.
+    await db
+      .delete(schema.travelPackageStay)
+      .where(eq(schema.travelPackageStay.packageId, packageId));
+    await db
+      .delete(schema.travelPackageDeparture)
+      .where(eq(schema.travelPackageDeparture.packageId, packageId));
+    await db
+      .delete(schema.travelPackageInclusion)
+      .where(eq(schema.travelPackageInclusion.packageId, packageId));
+
+    await db
+      .insert(schema.travelPackageStay)
+      .values(item.stays.map((stay) => ({ packageId, ...stay })));
+    if (item.departures.length > 0) {
+      await db
+        .insert(schema.travelPackageDeparture)
+        .values(
+          item.departures.map((departure) => ({ packageId, ...departure })),
+        );
+    }
+    if (item.inclusions.length > 0) {
+      await db.insert(schema.travelPackageInclusion).values(
+        item.inclusions.map((inclusion, index) => ({
+          packageId,
+          sequence: index + 1,
+          ...inclusion,
+        })),
+      );
     }
   }
 

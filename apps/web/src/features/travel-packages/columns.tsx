@@ -7,8 +7,9 @@ import { actionsColumn } from '@/components/shared/actions-column';
 interface TravelPackageColumnsOptions {
   columnLabels: {
     title: string;
+    type: string;
     flight: string;
-    property: string;
+    stays: string;
     durationNights: string;
     price: string;
     isActive: string;
@@ -36,6 +37,7 @@ export function getTravelPackageColumns({
 }: TravelPackageColumnsOptions): ColumnDef<FlightHotelPackage>[] {
   return [
     { accessorKey: 'title', header: columnLabels.title },
+    { accessorKey: 'type', header: columnLabels.type },
     {
       id: 'flight',
       header: columnLabels.flight,
@@ -45,9 +47,10 @@ export function getTravelPackageColumns({
       },
     },
     {
-      id: 'property',
-      header: columnLabels.property,
-      cell: ({ row }) => row.original.property.displayName,
+      id: 'stays',
+      header: columnLabels.stays,
+      cell: ({ row }) =>
+        row.original.stays.map((stay) => stay.destination).join(' → '),
     },
     { accessorKey: 'durationNights', header: columnLabels.durationNights },
     {

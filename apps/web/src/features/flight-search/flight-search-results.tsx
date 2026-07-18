@@ -13,7 +13,11 @@ interface FlightSearchResultsProps {
   isFetched: boolean;
 }
 
-type Translate = ReturnType<typeof useTranslations>;
+// Scope the translator type to its namespace. The unparameterized
+// `ReturnType<typeof useTranslations>` resolves the union of every message key
+// in the app, which TypeScript can push past its instantiation-depth limit as
+// the message catalog grows (TS2589).
+type Translate = ReturnType<typeof useTranslations<'flightSearch'>>;
 
 /** Every touchdown in the itinerary: technical stops within a flight, plus connecting hubs between flights. */
 function totalStops(itinerary: FlightItinerary): number {

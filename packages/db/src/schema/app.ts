@@ -334,6 +334,22 @@ export const seasonName = pgEnum('season_name', [
   'promo',
 ]);
 
+// Travel-package (umrah) domain enums — see /prd/travel-packages/11-data-model.md.
+export const travelPackageType = pgEnum('travel_package_type', [
+  'umrah',
+  'umrah_plus',
+  'hajj',
+]);
+export const travelPackageMealPlan = pgEnum('travel_package_meal_plan', [
+  'full_board',
+  'half_board',
+  'room_only',
+]);
+export const travelPackageInclusionKind = pgEnum(
+  'travel_package_inclusion_kind',
+  ['included', 'excluded'],
+);
+
 export const currency = pgTable('currency', {
   code: char('code', { length: 3 }).primaryKey(),
   minorUnit: integer('minor_unit').notNull(),
@@ -492,22 +508,23 @@ export const rateRule = pgTable(
   ],
 );
 
-// Combines a specific flight with a specific hotel property into one
-// admin-curated, flat-priced offering — a display/catalog product, not a
-// booking (no fares/PNR/seats). See prd/hotels/CONTEXT.md for the decision.
+// Combines a specific flight with one or more ordered city stays (Makkah +
+// Madinah for umrah, plus a third city for umrah_plus) into one admin-curated,
+// flat-priced offering — a display/catalog product, not a booking (no
+// fares/PNR/seats). Stays/departures/inclusions/itinerary live in the child
+// tables below. See prd/travel-packages/11-data-model.md for the decision.
 export const flightHotelPackage = pgTable('travel_package', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => createId()),
+  type: travelPackageType('type').notNull().default('umrah'),
   title: varchar('title', { length: 200 }).notNull(),
   description: text('description'),
   flightId: varchar('flight_id', { length: 26 })
     .notNull()
     .references(() => flights.id),
-  propertyCode: text('property_code')
-    .notNull()
-    .references(() => property.propertyCode),
   durationNights: integer('duration_nights').notNull(),
+  mealPlan: travelPackageMealPlan('meal_plan'),
   heroImageUrl: text('hero_image_url'),
   price: numeric('price', { precision: 10, scale: 2, mode: 'number' })
     .notNull()
@@ -522,6 +539,107 @@ export const flightHotelPackage = pgTable('travel_package', {
     .$onUpdate(() => new Date())
     .notNull(),
 });
+
+// One ordered city stay within a package — reuses the hotels-domain `property`
+// (which already carries star rating + distance to the Haram/Nabawi), so no
+// lodging detail is duplicated here.
+export const travelPackageStay = pgTable(
+  'travel_package_stay',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    packageId: text('package_id')
+      .notNull()
+      .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
+    propertyCode: text('property_code')
+      .notNull()
+      .references(() => property.propertyCode),
+    sequence: integer('sequence').notNull(),
+    nights: integer('nights').notNull(),
+  },
+  (table) => [
+    uniqueIndex('travel_package_stay_seq_unique').on(
+      table.packageId,
+      table.sequence,
+    ),
+    index('idx_travel_package_stay_package').on(table.packageId),
+    check('travel_package_stay_nights_positive', sql`${table.nights} > 0`),
+  ],
+);
+
+// A dated group departure. `seatsNote` is a free-text display string ("sisa 4
+// seat"), NOT an inventory count — this stays a catalog, not a booking engine.
+export const travelPackageDeparture = pgTable(
+  'travel_package_departure',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    packageId: text('package_id')
+      .notNull()
+      .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
+    departureDate: date('departure_date', { mode: 'string' }).notNull(),
+    returnDate: date('return_date', { mode: 'string' }),
+    seatsNote: text('seats_note'),
+  },
+  (table) => [
+    index('idx_travel_package_departure_package').on(
+      table.packageId,
+      table.departureDate,
+    ),
+    check(
+      'travel_package_departure_return_after_start',
+      sql`${table.returnDate} IS NULL OR ${table.returnDate} >= ${table.departureDate}`,
+    ),
+  ],
+);
+
+// An ordered included/excluded line item (visa, ground transport, ziyarah,
+// muthawwif, manasik, perlengkapan, ...).
+export const travelPackageInclusion = pgTable(
+  'travel_package_inclusion',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    packageId: text('package_id')
+      .notNull()
+      .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
+    kind: travelPackageInclusionKind('kind').notNull(),
+    label: text('label').notNull(),
+    sequence: integer('sequence').notNull(),
+  },
+  (table) => [
+    index('idx_travel_package_inclusion_package').on(table.packageId),
+  ],
+);
+
+// One day of the day-by-day program.
+export const travelPackageItineraryDay = pgTable(
+  'travel_package_itinerary_day',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    packageId: text('package_id')
+      .notNull()
+      .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
+    dayNumber: integer('day_number').notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+  },
+  (table) => [
+    uniqueIndex('travel_package_itinerary_day_unique').on(
+      table.packageId,
+      table.dayNumber,
+    ),
+    check(
+      'travel_package_itinerary_day_number_positive',
+      sql`${table.dayNumber} > 0`,
+    ),
+  ],
+);
 
 export type Airport = typeof airports.$inferSelect;
 export type NewAirport = typeof airports.$inferInsert;
@@ -550,5 +668,17 @@ export type Season = typeof season.$inferSelect;
 export type NewSeason = typeof season.$inferInsert;
 export type FlightHotelPackage = typeof flightHotelPackage.$inferSelect;
 export type NewFlightHotelPackage = typeof flightHotelPackage.$inferInsert;
+export type TravelPackageStay = typeof travelPackageStay.$inferSelect;
+export type NewTravelPackageStay = typeof travelPackageStay.$inferInsert;
+export type TravelPackageDeparture = typeof travelPackageDeparture.$inferSelect;
+export type NewTravelPackageDeparture =
+  typeof travelPackageDeparture.$inferInsert;
+export type TravelPackageInclusion = typeof travelPackageInclusion.$inferSelect;
+export type NewTravelPackageInclusion =
+  typeof travelPackageInclusion.$inferInsert;
+export type TravelPackageItineraryDay =
+  typeof travelPackageItineraryDay.$inferSelect;
+export type NewTravelPackageItineraryDay =
+  typeof travelPackageItineraryDay.$inferInsert;
 export type RateRule = typeof rateRule.$inferSelect;
 export type NewRateRule = typeof rateRule.$inferInsert;

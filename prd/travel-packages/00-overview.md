@@ -1,42 +1,49 @@
 # Travel Packages — overview
 
 > Retroactively documented: this domain was built and committed (`5e0b3a6`, 2026-07-14) before
-> it had a `prd/` folder. This doc describes what exists, not what's planned.
+> it had a `prd/` folder. **Expanded 2026-07-18** from a generic flight+hotel bundle into an
+> umrah-shaped catalog (multi-city stays, package type, dated departures, included/excluded list).
+> This doc describes what exists, not what's planned.
 
 ## What this is
 
-Admin-curated, flat-priced bundles that pair one specific operating flight with one specific
-hotel property into a single sellable catalog item — a display/marketing product, not a booking
-engine (no fares, no PNR, no seat inventory; consistent with the flights domain's "not a booking
-engine" scope and the hotels domain's "search/display only" scope — see
+Admin-curated, flat-priced **umrah/hajj packages**: one specific operating flight paired with one
+or more **ordered city stays** (Makkah + Madinah for umrah; a third city for `umrah_plus`), plus a
+dated departure schedule and an included/excluded list — a display/marketing product, not a
+booking engine (no fares, no PNR, no seat inventory; consistent with the flights domain's "not a
+booking engine" scope and the hotels domain's "search/display only" scope — see
 `/prd/flights/00-overview.md` and `/prd/hotels/CONTEXT.md`).
 
 ## Goals
 
-- Admin CRUD over travel packages.
+- Admin CRUD over travel packages, including their stays / departures / inclusions.
 - A public, anonymous-readable card listing at `/packages` so a visitor can browse curated
   deals without signing in.
-- Enrich each package with derived display info (airline name, direct/transit, duration) computed
-  server-side from the flight/leg/airline/airport/city reference tables — the client never
-  re-derives this.
+- Enrich each package with derived display info (airline name, direct/transit, per-stay hotel
+  details, departures, inclusions) computed server-side from the flight/leg/airline/airport/city
+  and property reference tables — the client never re-derives this.
 
 ## Non-goals
 
 - Not a booking flow — "Request this" is a `mailto:` stub, never a POST (mirrors the hotels
   `hotel-search` detail page CTA).
-- No price computation — `price`/`currency` are flat fields an admin sets directly per package,
-  not derived from the underlying flight's fare or the hotel's own rate rules.
+- No price computation and **no occupancy-tiered pricing** — `price`/`currency` are flat fields an
+  admin sets directly per package, not Quad/Triple/Double bands and not derived from the flight's
+  fare or the hotel's rate rules.
+- No real inventory or seat/room quota — `departure.seatsNote` is a display string only, not a
+  count; no DP/cancellation, no PNR/ticketing.
 - No search/filter UI on the public page — it's a plain grid of all `isActive` packages
   (`travel-package-list.tsx`), not a query surface.
-- No independent inventory — a package references exactly one existing Flight and one existing
-  Property; it does not own flight or hotel records of its own.
+- A package still owns no flight or hotel records of its own — it references one existing Flight
+  and existing Property rows via `travel_package_stay`.
 
 ## Relation to other domains
 
-- Depends on **flights**: `flightId` FK → `flights.id` (the specific operating flight).
-- Depends on **hotels**: `propertyCode` FK → `property.property_code` (must be a `kind=property`
-  listing — hotels' `package` entity is not eligible as the "hotel" side of a bundle, despite the
-  name collision below).
+- Depends on **flights**: `flightId` FK → `flights.id` (the specific operating flight; one per
+  package).
+- Depends on **hotels**: each `travel_package_stay.propertyCode` FK → `property.property_code`
+  (must be a lodging property). Two-plus stays per package (Makkah + Madinah, …); the package row
+  itself no longer holds a single `propertyCode`.
 - Introduces the **City** reference entity (`11-data-model.md`), which is also a dependency of
   `airports.city_code` (flights domain) and the `destination` combobox on hotels' Property/Package
   admin forms. City is genuinely cross-domain reference data, not owned exclusively by this
@@ -57,9 +64,13 @@ engine" scope and the hotels domain's "search/display only" scope — see
   `(protected)/@admin/travel-packages/admin/page.tsx` (admin CRUD, admin-only — no `@user`
   counterpart), `(protected)/@admin/reference/cities/page.tsx` (City admin, under the "Reference
   Data" sidebar section alongside currencies/fx-rates).
-- DB: table `travel_package` + table `city`. Migrations `0005_parallel_doorman.sql` (create
-  `city`), `0006_outstanding_maginty.sql` (`airports.city_code` FK to `city` + unique index on
-  `city.name`), `0007_lonely_bromley.sql` (create `travel_package`).
+- DB: tables `travel_package`, `travel_package_stay`, `travel_package_departure`,
+  `travel_package_inclusion`, `travel_package_itinerary_day`, and `city`. Migrations
+  `0005_parallel_doorman.sql` (create `city`), `0006_outstanding_maginty.sql` (`airports.city_code`
+  FK to `city` + unique index on `city.name`), `0007_lonely_bromley.sql` (create `travel_package`),
+  `0014_special_ken_ellis.sql` (enums + four child tables + `type`/`meal_plan` columns),
+  `0015_big_jubilee.sql` (drop the old single `property_code` column, after backfilling existing
+  packages into `travel_package_stay`).
 - i18n: `travelPackages` namespace (public card list) and `travelPackagesAdmin` namespace (admin
   form/table), all 6 locales.
 

@@ -25,7 +25,8 @@
     "toggleSidebar": "تبديل الشريط الجانبي",
     "yes": "نعم",
     "no": "لا",
-    "view": "عرض"
+    "view": "عرض",
+    "remove": "Remove"
   },
   "theme": {
     "light": "فاتح",
@@ -670,7 +671,15 @@
     "requestSubject": "طلب",
     "durationNights": "{count, plural, one {# ليلة} other {# ليالٍ}}",
     "direct": "مباشرة",
-    "transitIn": "ترانزيت في {city} ({code})"
+    "transitIn": "ترانزيت في {city} ({code})",
+    "departures": "Departures",
+    "stayNights": "{count, plural, one {# night} other {# nights}}",
+    "distance": "{note} {meters} m to the sanctuary",
+    "types": {
+      "umrah": "Umrah",
+      "umrah_plus": "Umrah Plus",
+      "hajj": "Hajj"
+    }
   },
   "travelPackagesAdmin": {
     "nav": {
@@ -700,7 +709,9 @@
         "property": "مكان الإقامة",
         "durationNights": "الليالي",
         "price": "السعر",
-        "isActive": "نشط"
+        "isActive": "نشط",
+        "type": "Type",
+        "stays": "Cities"
       },
       "fields": {
         "title": "العنوان",
@@ -714,7 +725,34 @@
         "durationNights": "المدة (بالليالي)",
         "price": "السعر",
         "currency": "العملة",
-        "isActive": "نشط (يظهر للعامة)"
+        "isActive": "نشط (يظهر للعامة)",
+        "type": "Package type",
+        "mealPlan": "Meal plan",
+        "stays": "City stays",
+        "staysHint": "Nights across all stays must sum to the total duration.",
+        "stayProperty": "Hotel",
+        "stayNights": "Nights",
+        "addStay": "Add stay",
+        "departures": "Departure dates",
+        "departureDate": "Departure date",
+        "returnDate": "Return date",
+        "seatsNote": "Seats note",
+        "seatsNotePlaceholder": "e.g. 4 seats left",
+        "addDeparture": "Add departure",
+        "inclusions": "Included / excluded",
+        "inclusionKind": "Type",
+        "inclusionIncluded": "Included",
+        "inclusionExcluded": "Excluded",
+        "inclusionLabel": "Item",
+        "inclusionLabelPlaceholder": "e.g. Umrah visa",
+        "addInclusion": "Add item",
+        "typeUmrah": "Umrah",
+        "typeUmrahPlus": "Umrah Plus",
+        "typeHajj": "Hajj",
+        "mealFullBoard": "Full board",
+        "mealHalfBoard": "Half board",
+        "mealRoomOnly": "Room only",
+        "tabDetails": "Details"
       }
     }
   },

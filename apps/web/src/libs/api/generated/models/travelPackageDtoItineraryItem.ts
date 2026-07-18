@@ -6,14 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type TravelPackageDtoProperty = {
-  propertyCode: string;
-  displayName: string;
-  destination: string;
+export type TravelPackageDtoItineraryItem = {
   /**
-   * @minimum 1
-   * @maximum 5
-   * @nullable
+   * @minimum 0
+   * @maximum 9007199254740991
+   * @exclusiveMinimum
    */
-  starRating: number | null;
+  dayNumber: number;
+  title: string;
+  /** @nullable */
+  description: string | null;
 };

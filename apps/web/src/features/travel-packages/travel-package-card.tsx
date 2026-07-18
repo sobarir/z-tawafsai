@@ -1,7 +1,7 @@
 'use client';
 
 import type { FlightHotelPackage } from '@repo/shared';
-import { Hotel, Plane } from 'lucide-react';
+import { Calendar, Check, Hotel, Plane, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ function formatDate(iso: string, locale: string): string {
 
 export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
   const t = useTranslations('travelPackages');
-  const { flight, property } = item;
+  const { flight, stays, departures, inclusions } = item;
 
   const requestSubject = encodeURIComponent(
     `${t('requestSubject')}: ${item.title}`,
@@ -36,6 +36,12 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
   return (
     <Card>
       <CardHeader>
+        <div className="flex items-center gap-2">
+          <Badge>{t(`types.${item.type}`)}</Badge>
+          <Badge variant="secondary">
+            {t('durationNights', { count: item.durationNights })}
+          </Badge>
+        </div>
         <CardTitle className="text-lg">{item.title}</CardTitle>
         {item.description ? (
           <p className="text-sm text-muted-foreground">{item.description}</p>
@@ -74,22 +80,72 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
           </div>
         </div>
 
-        <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Hotel className="h-4 w-4" />
-          </span>
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <p className="text-sm font-medium">{property.displayName}</p>
-            <p className="text-sm text-muted-foreground">
-              {property.destination}
-            </p>
-            <div>
-              <Badge variant="secondary">
-                {t('durationNights', { count: item.durationNights })}
-              </Badge>
+        {stays.map((stay) => (
+          <div key={stay.propertyCode} className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Hotel className="h-4 w-4" />
+            </span>
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <p className="text-sm font-medium">
+                {stay.displayName}
+                {stay.starRating ? (
+                  <span className="text-muted-foreground">
+                    {' '}
+                    · {'★'.repeat(stay.starRating)}
+                  </span>
+                ) : null}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {stay.destination} · {t('stayNights', { count: stay.nights })}
+              </p>
+              {stay.distanceMeters != null ? (
+                <p className="text-xs text-muted-foreground">
+                  {t('distance', {
+                    note: stay.distanceNote ?? '',
+                    meters: stay.distanceMeters,
+                  })}
+                </p>
+              ) : null}
             </div>
           </div>
-        </div>
+        ))}
+
+        {departures.length > 0 ? (
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Calendar className="h-4 w-4" />
+            </span>
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="text-sm font-medium">{t('departures')}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {departures.map((departure) => (
+                  <Badge key={departure.departureDate} variant="outline">
+                    {formatDate(departure.departureDate, locale)}
+                    {departure.seatsNote ? ` · ${departure.seatsNote}` : ''}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {inclusions.length > 0 ? (
+          <ul className="flex flex-col gap-1">
+            {inclusions.map((inclusion) => (
+              <li
+                key={`${inclusion.kind}-${inclusion.label}`}
+                className="flex items-center gap-2 text-sm text-muted-foreground"
+              >
+                {inclusion.kind === 'included' ? (
+                  <Check className="h-4 w-4 shrink-0 text-primary" />
+                ) : (
+                  <X className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+                )}
+                <span>{inclusion.label}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
         <p className="text-xl font-bold text-primary">
           {formatCurrency(item.price, item.currency, locale)}

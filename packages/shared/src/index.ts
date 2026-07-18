@@ -685,12 +685,24 @@ export const updateRateRuleSchema = createRateRuleSchema
 export type UpdateRateRuleInput = z.infer<typeof updateRateRuleSchema>;
 
 /**
- * Combines a specific flight with a specific hotel property into one
- * admin-curated, flat-priced offering — a display/catalog product, not a
- * booking (no fares/PNR/seats); see prd/hotels/CONTEXT.md for the decision.
- * The response is enriched with flight/property summaries so the public
- * card list can render without N follow-up requests.
+ * An umrah/hajj catalog product: a specific flight paired with one or more
+ * ordered city stays (Makkah + Madinah, plus a third city for umrah_plus),
+ * a flat price, and a display program — NOT a booking (no fares/PNR/seats;
+ * occupancy pricing and real inventory stay out). See
+ * prd/travel-packages/00-overview.md for the scope decision. The response is
+ * enriched so the public card list renders without N follow-up requests.
  */
+export const travelPackageTypeSchema = z.enum(['umrah', 'umrah_plus', 'hajj']);
+export const travelPackageMealPlanSchema = z.enum([
+  'full_board',
+  'half_board',
+  'room_only',
+]);
+export const travelPackageInclusionKindSchema = z.enum([
+  'included',
+  'excluded',
+]);
+
 const flightHotelPackageFlightSummarySchema = z.object({
   id: ulidSchema,
   operatingAirline: airlineCodeSchema,
@@ -706,41 +718,98 @@ const flightHotelPackageFlightSummarySchema = z.object({
   transitCityName: z.string().nullable(),
 });
 
-const flightHotelPackagePropertySummarySchema = z.object({
+/** One ordered city stay, enriched with the property's display details. */
+const travelPackageStaySummarySchema = z.object({
   propertyCode: z.string(),
   displayName: z.string(),
   destination: z.string(),
   starRating: z.number().int().min(1).max(5).nullable(),
+  distanceMeters: z.number().int().nonnegative().nullable(),
+  distanceNote: z.string().nullable(),
+  sequence: z.number().int().positive(),
+  nights: z.number().int().positive(),
+});
+
+const travelPackageDepartureSchema = z.object({
+  departureDate: z.iso.date(),
+  returnDate: z.iso.date().nullable(),
+  seatsNote: z.string().nullable(),
+});
+
+const travelPackageInclusionSchema = z.object({
+  kind: travelPackageInclusionKindSchema,
+  label: z.string(),
+});
+
+const travelPackageItineraryDaySchema = z.object({
+  dayNumber: z.number().int().positive(),
+  title: z.string(),
+  description: z.string().nullable(),
 });
 
 export const flightHotelPackageSchema = z.object({
   id: ulidSchema,
+  type: travelPackageTypeSchema,
   title: z.string().min(1).max(200),
   description: z.string().nullable(),
   heroImageUrl: z.string().nullable(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
   durationNights: z.number().int().positive(),
+  mealPlan: travelPackageMealPlanSchema.nullable(),
   isActive: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   flight: flightHotelPackageFlightSummarySchema,
-  property: flightHotelPackagePropertySummarySchema,
+  stays: z.array(travelPackageStaySummarySchema),
+  departures: z.array(travelPackageDepartureSchema),
+  inclusions: z.array(travelPackageInclusionSchema),
+  itinerary: z.array(travelPackageItineraryDaySchema),
 });
 export type FlightHotelPackage = z.infer<typeof flightHotelPackageSchema>;
 
 export const flightHotelPackageListSchema = z.array(flightHotelPackageSchema);
 
+// Write shapes: flat FK/scalar values only (no enriched summaries). Nights per
+// stay must sum to durationNights — validated server-side, not here.
+const createTravelPackageStaySchema = z.object({
+  propertyCode: z.string().min(1).max(50),
+  sequence: z.number().int().positive(),
+  nights: z.number().int().positive(),
+});
+
+const createTravelPackageDepartureSchema = z.object({
+  departureDate: z.iso.date(),
+  returnDate: z.iso.date().optional(),
+  seatsNote: z.string().max(200).optional(),
+});
+
+const createTravelPackageInclusionSchema = z.object({
+  kind: travelPackageInclusionKindSchema,
+  label: z.string().min(1).max(200),
+});
+
+const createTravelPackageItineraryDaySchema = z.object({
+  dayNumber: z.number().int().positive(),
+  title: z.string().min(1).max(200),
+  description: z.string().max(2000).optional(),
+});
+
 export const createFlightHotelPackageSchema = z.object({
+  type: travelPackageTypeSchema,
   title: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
   flightId: ulidSchema,
-  propertyCode: z.string().min(1).max(50),
   durationNights: z.number().int().positive(),
+  mealPlan: travelPackageMealPlanSchema.optional(),
   heroImageUrl: z.string().max(2000).optional(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
   isActive: z.boolean().optional(),
+  stays: z.array(createTravelPackageStaySchema).min(1),
+  departures: z.array(createTravelPackageDepartureSchema).optional(),
+  inclusions: z.array(createTravelPackageInclusionSchema).optional(),
+  itinerary: z.array(createTravelPackageItineraryDaySchema).optional(),
 });
 export type CreateFlightHotelPackageInput = z.infer<
   typeof createFlightHotelPackageSchema

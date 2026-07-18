@@ -25,7 +25,8 @@
     "toggleSidebar": "切换侧边栏",
     "yes": "是",
     "no": "否",
-    "view": "查看"
+    "view": "查看",
+    "remove": "Remove"
   },
   "theme": {
     "light": "浅色",
@@ -670,7 +671,15 @@
     "requestSubject": "咨询",
     "durationNights": "{count}晚",
     "direct": "直飞",
-    "transitIn": "经停{city}（{code}）"
+    "transitIn": "经停{city}（{code}）",
+    "departures": "Departures",
+    "stayNights": "{count, plural, one {# night} other {# nights}}",
+    "distance": "{note} {meters} m to the sanctuary",
+    "types": {
+      "umrah": "Umrah",
+      "umrah_plus": "Umrah Plus",
+      "hajj": "Hajj"
+    }
   },
   "travelPackagesAdmin": {
     "nav": {
@@ -700,7 +709,9 @@
         "property": "酒店",
         "durationNights": "晚数",
         "price": "价格",
-        "isActive": "启用"
+        "isActive": "启用",
+        "type": "Type",
+        "stays": "Cities"
       },
       "fields": {
         "title": "标题",
@@ -714,7 +725,34 @@
         "durationNights": "时长（晚）",
         "price": "价格",
         "currency": "货币",
-        "isActive": "启用（公开显示）"
+        "isActive": "启用（公开显示）",
+        "type": "Package type",
+        "mealPlan": "Meal plan",
+        "stays": "City stays",
+        "staysHint": "Nights across all stays must sum to the total duration.",
+        "stayProperty": "Hotel",
+        "stayNights": "Nights",
+        "addStay": "Add stay",
+        "departures": "Departure dates",
+        "departureDate": "Departure date",
+        "returnDate": "Return date",
+        "seatsNote": "Seats note",
+        "seatsNotePlaceholder": "e.g. 4 seats left",
+        "addDeparture": "Add departure",
+        "inclusions": "Included / excluded",
+        "inclusionKind": "Type",
+        "inclusionIncluded": "Included",
+        "inclusionExcluded": "Excluded",
+        "inclusionLabel": "Item",
+        "inclusionLabelPlaceholder": "e.g. Umrah visa",
+        "addInclusion": "Add item",
+        "typeUmrah": "Umrah",
+        "typeUmrahPlus": "Umrah Plus",
+        "typeHajj": "Hajj",
+        "mealFullBoard": "Full board",
+        "mealHalfBoard": "Half board",
+        "mealRoomOnly": "Room only",
+        "tabDetails": "Details"
       }
     }
   },
