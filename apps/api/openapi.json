@@ -2255,6 +2255,153 @@
         ]
       }
     },
+    "/api/hotel-season-windows": {
+      "get": {
+        "operationId": "listHotelSeasonWindows",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SeasonWindowDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List season windows",
+        "tags": [
+          "hotel-season-windows"
+        ]
+      },
+      "post": {
+        "operationId": "createHotelSeasonWindow",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSeasonWindowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonWindowDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a season window",
+        "tags": [
+          "hotel-season-windows"
+        ]
+      }
+    },
+    "/api/hotel-season-windows/{id}": {
+      "get": {
+        "operationId": "getHotelSeasonWindow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonWindowDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a season window",
+        "tags": [
+          "hotel-season-windows"
+        ]
+      },
+      "patch": {
+        "operationId": "updateHotelSeasonWindow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSeasonWindowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonWindowDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a season window",
+        "tags": [
+          "hotel-season-windows"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteHotelSeasonWindow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a season window",
+        "tags": [
+          "hotel-season-windows"
+        ]
+      }
+    },
     "/api/hotel-rate-rules": {
       "get": {
         "operationId": "listHotelRateRules",
@@ -4826,9 +4973,6 @@
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "propertyCode": {
-            "type": "string"
-          },
           "name": {
             "type": "string",
             "minLength": 1,
@@ -4843,7 +4987,6 @@
         },
         "required": [
           "id",
-          "propertyCode",
           "name",
           "maxOccupancy"
         ]
@@ -4851,11 +4994,6 @@
       "CreateRoomTypeDto": {
         "type": "object",
         "properties": {
-          "propertyCode": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 50
-          },
           "name": {
             "type": "string",
             "minLength": 1,
@@ -4869,7 +5007,6 @@
           }
         },
         "required": [
-          "propertyCode",
           "name",
           "maxOccupancy"
         ]
@@ -4897,9 +5034,6 @@
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "propertyCode": {
-            "type": "string"
-          },
           "name": {
             "type": "string",
             "enum": [
@@ -4909,6 +5043,59 @@
               "hajj",
               "promo"
             ]
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "CreateSeasonDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "peak",
+              "ramadan",
+              "hajj",
+              "promo"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateSeasonDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "peak",
+              "ramadan",
+              "hajj",
+              "promo"
+            ]
+          }
+        }
+      },
+      "SeasonWindowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "propertyCode": {
+            "type": "string"
+          },
+          "seasonId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
           "startDate": {
             "type": "string",
@@ -4924,12 +5111,12 @@
         "required": [
           "id",
           "propertyCode",
-          "name",
+          "seasonId",
           "startDate",
           "endDate"
         ]
       },
-      "CreateSeasonDto": {
+      "CreateSeasonWindowDto": {
         "type": "object",
         "properties": {
           "propertyCode": {
@@ -4937,15 +5124,9 @@
             "minLength": 1,
             "maxLength": 50
           },
-          "name": {
+          "seasonId": {
             "type": "string",
-            "enum": [
-              "standard",
-              "peak",
-              "ramadan",
-              "hajj",
-              "promo"
-            ]
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
           "startDate": {
             "type": "string",
@@ -4960,23 +5141,17 @@
         },
         "required": [
           "propertyCode",
-          "name",
+          "seasonId",
           "startDate",
           "endDate"
         ]
       },
-      "UpdateSeasonDto": {
+      "UpdateSeasonWindowDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "seasonId": {
             "type": "string",
-            "enum": [
-              "standard",
-              "peak",
-              "ramadan",
-              "hajj",
-              "promo"
-            ]
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
           "startDate": {
             "type": "string",

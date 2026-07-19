@@ -6,7 +6,6 @@ import { actionsColumn } from '@/components/shared/actions-column';
 
 interface RoomTypeColumnsOptions {
   columnLabels: {
-    propertyCode: string;
     name: string;
     maxOccupancy: string;
   };
@@ -28,7 +27,6 @@ export function getRoomTypeColumns({
   onDelete,
 }: RoomTypeColumnsOptions): ColumnDef<RoomType>[] {
   return [
-    { accessorKey: 'propertyCode', header: columnLabels.propertyCode },
     { accessorKey: 'name', header: columnLabels.name },
     { accessorKey: 'maxOccupancy', header: columnLabels.maxOccupancy },
     actionsColumn({

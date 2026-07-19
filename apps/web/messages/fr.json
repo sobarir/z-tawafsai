@@ -453,6 +453,7 @@
       "properties": "Hébergements",
       "roomTypes": "Types de chambre",
       "seasons": "Saisons",
+      "seasonWindows": "Fenêtres de saison",
       "rateRules": "Règles tarifaires"
     },
     "actions": "Actions",
@@ -515,7 +516,7 @@
     },
     "roomTypes": {
       "title": "Types de chambre",
-      "description": "Catégories de chambres réservables au sein d'un hébergement, avec leur capacité maximale.",
+      "description": "Classes de chambres globales avec une capacité d'occupation, partagées entre hébergements.",
       "createTitle": "Nouveau type de chambre",
       "editTitle": "Modifier le type de chambre",
       "columns": {
@@ -532,7 +533,7 @@
     },
     "seasons": {
       "title": "Saisons",
-      "description": "Périodes de dates rattachées à un hébergement, qui déterminent le tarif applicable.",
+      "description": "Libellés de saison globaux. Chaque hébergement définit ses propres fenêtres de dates.",
       "createTitle": "Nouvelle saison",
       "editTitle": "Modifier la saison",
       "columns": {
@@ -553,6 +554,24 @@
         "ramadan": "Ramadan",
         "hajj": "Hajj",
         "promo": "Promotion"
+      }
+    },
+    "seasonWindows": {
+      "title": "Fenêtres de saison",
+      "description": "Fenêtres de dates par hébergement qui associent un séjour à une saison.",
+      "createTitle": "Nouvelle fenêtre de saison",
+      "editTitle": "Modifier la fenêtre de saison",
+      "columns": {
+        "property": "Hébergement",
+        "season": "Saison",
+        "startDate": "Date de début",
+        "endDate": "Date de fin"
+      },
+      "fields": {
+        "propertyCode": "Hébergement",
+        "seasonId": "Saison",
+        "startDate": "Date de début",
+        "endDate": "Date de fin"
       }
     },
     "rateRules": {

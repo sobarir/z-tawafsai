@@ -65,14 +65,14 @@ export function toPropertyOptions(properties: Property[]): ComboboxOption[] {
 export function toSeasonOptions(seasons: Season[]): ComboboxOption[] {
   return seasons.map((s) => ({
     value: s.id,
-    label: `${s.name} (${s.startDate} → ${s.endDate})`,
+    label: s.name,
   }));
 }
 
 export function toRoomTypeOptions(roomTypes: RoomType[]): ComboboxOption[] {
   return roomTypes.map((r) => ({
     value: r.id,
-    label: `${r.propertyCode} — ${r.name}`,
+    label: r.name,
   }));
 }
 

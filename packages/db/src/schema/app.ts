@@ -427,34 +427,47 @@ export const property = pgTable(
   ],
 );
 
+// Reference/master data — a global catalog of room categories, not tied to any
+// property. `max_occupancy` is the category default; rate rules carry their own
+// occupancy band. See prd/hotels/11-data-model.md.
 export const roomType = pgTable(
   'room_type',
   {
     id: text('id')
       .primaryKey()
       .$defaultFn(() => createId()),
-    propertyCode: text('property_code')
-      .notNull()
-      .references(() => property.propertyCode),
     name: text('name').notNull(),
     maxOccupancy: integer('max_occupancy').notNull(),
   },
   (table) => [
-    uniqueIndex('room_type_property_name_unique').on(
-      table.propertyCode,
-      table.name,
-    ),
-    index('idx_room_type_property').on(table.propertyCode),
+    uniqueIndex('room_type_name_unique').on(table.name),
     check('room_type_max_occupancy_positive', sql`${table.maxOccupancy} > 0`),
   ],
 );
 
+// Reference/master data — a global catalog of season labels (peak, ramadan,
+// hajj, promo). The dated window that actually selects a season lives per
+// property on `season_window`; Standard is the absence of a season (null).
+export const season = pgTable(
+  'season',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    name: seasonName('name').notNull(),
+  },
+  (table) => [uniqueIndex('season_name_unique').on(table.name)],
+);
+
+// Per-property dated window that maps a stay date to a global `season`.
 // Non-overlap within a property is enforced by a Postgres EXCLUDE constraint
 // (daterange + btree_gist) — Drizzle's schema builder has no API for EXCLUDE,
 // so it's added via a hand-written custom migration, not expressed here.
-// See drizzle/<timestamp>_season_no_overlap.sql.
-export const season = pgTable(
-  'season',
+// See drizzle/<timestamp>_season_window_no_overlap.sql. Two windows of the same
+// season type per property are allowed (e.g. two promo periods); only overlap
+// is forbidden.
+export const seasonWindow = pgTable(
+  'season_window',
   {
     id: text('id')
       .primaryKey()
@@ -462,13 +475,21 @@ export const season = pgTable(
     propertyCode: text('property_code')
       .notNull()
       .references(() => property.propertyCode),
-    name: seasonName('name').notNull(),
+    seasonId: text('season_id')
+      .notNull()
+      .references(() => season.id),
     startDate: date('start_date', { mode: 'string' }).notNull(),
     endDate: date('end_date', { mode: 'string' }).notNull(),
   },
   (table) => [
-    index('idx_season_property_start').on(table.propertyCode, table.startDate),
-    check('season_end_after_start', sql`${table.endDate} > ${table.startDate}`),
+    index('idx_season_window_property_start').on(
+      table.propertyCode,
+      table.startDate,
+    ),
+    check(
+      'season_window_end_after_start',
+      sql`${table.endDate} > ${table.startDate}`,
+    ),
   ],
 );
 

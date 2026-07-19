@@ -9,7 +9,6 @@
 export interface RoomTypeDto {
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   id: string;
-  propertyCode: string;
   /**
    * @minLength 1
    * @maxLength 100

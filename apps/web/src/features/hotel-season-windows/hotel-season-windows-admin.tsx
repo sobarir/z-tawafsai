@@ -1,6 +1,6 @@
 'use client';
 
-import type { RoomType } from '@repo/shared';
+import type { SeasonWindow } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { EntityDataTable } from '@/components/shared/entity-data-table';
@@ -8,44 +8,51 @@ import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
 import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
 import { Button } from '@/components/ui/button';
 import {
-  getListHotelRoomTypesQueryKey,
-  useCreateHotelRoomType,
-  useDeleteHotelRoomType,
-  useListHotelRoomTypes,
-  useUpdateHotelRoomType,
+  getListHotelSeasonWindowsQueryKey,
+  useCreateHotelSeasonWindow,
+  useDeleteHotelSeasonWindow,
+  useListHotelProperties,
+  useListHotelSeasons,
+  useListHotelSeasonWindows,
+  useUpdateHotelSeasonWindow,
 } from '@/libs/api/generated/endpoints';
 import {
   crudMutationOptions,
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
-import { getRoomTypeColumns } from './columns';
-import { RoomTypeForm } from './room-type-form';
+import { getSeasonWindowColumns } from './columns';
+import { SeasonWindowForm } from './season-window-form';
 
-export function HotelRoomTypesAdmin() {
-  const t = useTranslations('catalog.roomTypes');
+export function HotelSeasonWindowsAdmin() {
+  const t = useTranslations('catalog.seasonWindows');
   const tCatalog = useTranslations('catalog');
   const tCommon = useTranslations('common');
 
-  const { data: roomTypes, isLoading } = useListHotelRoomTypes();
+  const { data: seasonWindows, isLoading } = useListHotelSeasonWindows();
+  const { data: properties } = useListHotelProperties();
+  const { data: seasons } = useListHotelSeasons();
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<RoomType | null>(null);
-  const [deleting, setDeleting] = useState<RoomType | null>(null);
+  const [editing, setEditing] = useState<SeasonWindow | null>(null);
+  const [deleting, setDeleting] = useState<SeasonWindow | null>(null);
 
-  const feedback = useCrudFeedback(getListHotelRoomTypesQueryKey(), 'catalog');
+  const feedback = useCrudFeedback(
+    getListHotelSeasonWindowsQueryKey(),
+    'catalog',
+  );
 
-  const createMutation = useCreateHotelRoomType({
+  const createMutation = useCreateHotelSeasonWindow({
     mutation: crudMutationOptions(feedback, 'createSuccess', () =>
       setFormOpen(false),
     ),
   });
-  const updateMutation = useUpdateHotelRoomType({
+  const updateMutation = useUpdateHotelSeasonWindow({
     mutation: crudMutationOptions(feedback, 'updateSuccess', () => {
       setFormOpen(false);
       setEditing(null);
     }),
   });
-  const deleteMutation = useDeleteHotelRoomType({
+  const deleteMutation = useDeleteHotelSeasonWindow({
     mutation: crudMutationOptions(feedback, 'deleteSuccess', () =>
       setDeleting(null),
     ),
@@ -53,22 +60,26 @@ export function HotelRoomTypesAdmin() {
 
   const columns = useMemo(
     () =>
-      getRoomTypeColumns({
+      getSeasonWindowColumns({
         columnLabels: {
-          name: t('columns.name'),
-          maxOccupancy: t('columns.maxOccupancy'),
+          property: t('columns.property'),
+          season: t('columns.season'),
+          startDate: t('columns.startDate'),
+          endDate: t('columns.endDate'),
         },
+        properties: properties ?? [],
+        seasons: seasons ?? [],
         actionsLabel: tCatalog('actions'),
         openMenuLabel: tCatalog('openMenu'),
         editLabel: tCommon('edit'),
         deleteLabel: tCommon('delete'),
-        onEdit: (roomType) => {
-          setEditing(roomType);
+        onEdit: (window) => {
+          setEditing(window);
           setFormOpen(true);
         },
-        onDelete: (roomType) => setDeleting(roomType),
+        onDelete: (window) => setDeleting(window),
       }),
-    [t, tCatalog, tCommon],
+    [t, properties, seasons, tCatalog, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -78,7 +89,7 @@ export function HotelRoomTypesAdmin() {
       <EntityDataTable
         namespace="catalog"
         columns={columns}
-        data={roomTypes ?? []}
+        data={seasonWindows ?? []}
         isLoading={isLoading}
         toolbar={
           <Button
@@ -99,8 +110,10 @@ export function HotelRoomTypesAdmin() {
         onOpenChange={setFormOpen}
         title={editing ? t('editTitle') : t('createTitle')}
       >
-        <RoomTypeForm
-          roomType={editing ?? undefined}
+        <SeasonWindowForm
+          seasonWindow={editing ?? undefined}
+          properties={properties ?? []}
+          seasons={seasons ?? []}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {
@@ -108,8 +121,9 @@ export function HotelRoomTypesAdmin() {
               await updateMutation.mutateAsync({
                 id: editing.id,
                 data: {
-                  name: values.name,
-                  maxOccupancy: values.maxOccupancy,
+                  seasonId: values.seasonId,
+                  startDate: values.startDate,
+                  endDate: values.endDate,
                 },
               });
             } else {
@@ -123,7 +137,7 @@ export function HotelRoomTypesAdmin() {
         namespace="catalog"
         open={!!deleting}
         onOpenChange={(open) => !open && setDeleting(null)}
-        name={deleting?.name ?? ''}
+        name={deleting?.startDate ?? ''}
         loading={deleteMutation.isPending}
         onConfirm={() => {
           if (deleting) deleteMutation.mutate({ id: deleting.id });

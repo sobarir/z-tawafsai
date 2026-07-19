@@ -1,7 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { createDb, schema } from '@repo/db';
 import { eq } from 'drizzle-orm';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { HotelRoomTypesService } from './hotel-room-types.service';
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -11,44 +11,21 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new HotelRoomTypesService(db);
 
-// Own isolated property fixture — never touches the seeded JED-WFH property
-// that hotels.service.spec.ts's golden scenarios depend on.
-const FIXTURE_PROPERTY_CODE = 'ZZZ-RT-FIXTURE';
-const TEST_NAME = 'Test Room';
+// Room types are global reference data. Use a name the seed never inserts so
+// this fixture never collides with the seeded catalog (Double/Triple/Quad…).
+const TEST_NAME = 'ZZZ Fixture Room';
 
 async function cleanupRoomTypes() {
-  await db
-    .delete(schema.roomType)
-    .where(eq(schema.roomType.propertyCode, FIXTURE_PROPERTY_CODE));
+  await db.delete(schema.roomType).where(eq(schema.roomType.name, TEST_NAME));
 }
 
 describe('HotelRoomTypesService', () => {
-  beforeAll(async () => {
-    await db.insert(schema.property).values({
-      propertyCode: FIXTURE_PROPERTY_CODE,
-      type: 'hotel',
-      displayName: 'Room Type Fixture Property',
-      destination: 'Test City',
-      countryCode: 'ZZ',
-    });
-  });
-
-  afterAll(async () => {
-    await cleanupRoomTypes();
-    await db
-      .delete(schema.property)
-      .where(eq(schema.property.propertyCode, FIXTURE_PROPERTY_CODE));
-  });
-
+  afterAll(cleanupRoomTypes);
   beforeEach(cleanupRoomTypes);
 
   it('creates, reads, updates, and deletes a room type', async () => {
-    const created = await service.create({
-      propertyCode: FIXTURE_PROPERTY_CODE,
-      name: TEST_NAME,
-      maxOccupancy: 2,
-    });
-    expect(created.propertyCode).toBe(FIXTURE_PROPERTY_CODE);
+    const created = await service.create({ name: TEST_NAME, maxOccupancy: 2 });
+    expect(created.name).toBe(TEST_NAME);
 
     const fetched = await service.findById(created.id);
     expect(fetched.maxOccupancy).toBe(2);
@@ -62,19 +39,11 @@ describe('HotelRoomTypesService', () => {
     );
   });
 
-  it('rejects a duplicate room type name for the same property', async () => {
-    await service.create({
-      propertyCode: FIXTURE_PROPERTY_CODE,
-      name: TEST_NAME,
-      maxOccupancy: 2,
-    });
+  it('rejects a duplicate room type name (global catalog)', async () => {
+    await service.create({ name: TEST_NAME, maxOccupancy: 2 });
 
     await expect(
-      service.create({
-        propertyCode: FIXTURE_PROPERTY_CODE,
-        name: TEST_NAME,
-        maxOccupancy: 4,
-      }),
+      service.create({ name: TEST_NAME, maxOccupancy: 4 }),
     ).rejects.toThrow(ConflictException);
   });
 });

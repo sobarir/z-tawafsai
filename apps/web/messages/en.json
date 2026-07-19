@@ -225,6 +225,7 @@
       "properties": "Properties",
       "roomTypes": "Room Types",
       "seasons": "Seasons",
+      "seasonWindows": "Season Windows",
       "rateRules": "Rate Rules"
     },
     "actions": "Actions",
@@ -287,7 +288,7 @@
     },
     "roomTypes": {
       "title": "Room Types",
-      "description": "Bookable room classes under a property, with an occupancy capacity.",
+      "description": "Global room classes with an occupancy capacity, shared across properties.",
       "createTitle": "New room type",
       "editTitle": "Edit room type",
       "columns": {
@@ -304,7 +305,7 @@
     },
     "seasons": {
       "title": "Seasons",
-      "description": "Named date windows scoped to a property that select which rate applies.",
+      "description": "Global season labels. Each property sets its own dated windows.",
       "createTitle": "New season",
       "editTitle": "Edit season",
       "columns": {
@@ -325,6 +326,24 @@
         "ramadan": "Ramadan",
         "hajj": "Hajj",
         "promo": "Promo"
+      }
+    },
+    "seasonWindows": {
+      "title": "Season Windows",
+      "description": "Per-property date windows that map a stay date to a season.",
+      "createTitle": "New season window",
+      "editTitle": "Edit season window",
+      "columns": {
+        "property": "Property",
+        "season": "Season",
+        "startDate": "Start date",
+        "endDate": "End date"
+      },
+      "fields": {
+        "propertyCode": "Property",
+        "seasonId": "Season",
+        "startDate": "Start date",
+        "endDate": "End date"
       }
     },
     "rateRules": {

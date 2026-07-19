@@ -1,6 +1,6 @@
 # 11 — Data Model (Drizzle spec)
 
-Source of truth. These 6 tables + 2 enums live in `packages/db/src/schema/app.ts` (copy the `post`
+Source of truth. These 7 tables + 2 enums live in `packages/db/src/schema/app.ts` (copy the `post`
 pattern per `packages/db/AGENTS.md`) — alongside the flights domain's `mctScope`/`legRole`/
 `flightStatus` enums and `post`/`airports`/`airlines`/`flights`/`flightLegs`/`flightMarketing`/
 `mctRules`/`interlineAgreements` tables already there (no naming collisions). All money = integer
@@ -24,7 +24,13 @@ property_type     : 'hotel' | 'apartment' | 'house'
 season_name       : 'standard' | 'peak' | 'ramadan' | 'hajj' | 'promo'
 ```
 
-(`season_name` is a label only; the date window on `season` is what selects it.)
+(`season_name` is a label only; the date window on `season_window` is what selects it.)
+
+> **2026-07-19 revision**: `room_type` and `season` are now **global reference data** — a shared
+> catalog, no longer scoped to a property. The per-property date window that selects a season moved
+> to a new `season_window` table (property + season + dates). `room_type` keeps `max_occupancy` as
+> the category default; `rate_rule.room_type_id` / `season_id` now reference the global rows. See
+> `CONTEXT.md` for the decision.
 
 ## 1. `currency` (reference, natural key)
 
@@ -73,43 +79,55 @@ Display conversion only. Rate stored as integer with fixed scale to avoid float.
 - CHECK `star_rating IS NULL OR (star_rating BETWEEN 1 AND 5)`.
 - Index on `destination`, index on `type`, index on `(is_active, type)`.
 
-## 4. `room_type` (ULID) — child of property
+## 4. `room_type` (ULID) — global reference data
 
 | column         | type                        | constraints                  |
 |----------------|-----------------------------|------------------------------|
 | id             | text PK (ULID)              |                              |
-| property_code  | text NOT NULL               | FK → property.property_code  |
-| name           | text NOT NULL               | e.g. 'Double','Quad'         |
-| max_occupancy  | integer NOT NULL            |                              |
+| name           | text NOT NULL               | e.g. 'Double','Quad'; globally unique |
+| max_occupancy  | integer NOT NULL            | category default             |
 
-- UNIQUE `(property_code, name)`.
-- Index on `property_code`.
+- UNIQUE `(name)` — one global catalog, shared across properties.
 - CHECK `max_occupancy > 0`.
 
-## 5. `season` (ULID) — date window scoped to a property
+## 5. `season` (ULID) — global reference data (label catalog)
+
+| column         | type                        | constraints                  |
+|----------------|-----------------------------|------------------------------|
+| id             | text PK (ULID)              |                              |
+| name           | season_name NOT NULL        | label; globally unique       |
+
+- UNIQUE `(name)`. `standard` is season-less (the absence of a season) and is not
+  stored as a row — the seeded catalog is `peak`/`ramadan`/`hajj`/`promo`.
+
+## 6. `season_window` (ULID) — per-property date window
+
+Maps a stay date to a global `season` for one property. Multiple windows of the
+same season type per property are allowed (e.g. two promo periods); only overlap
+is forbidden.
 
 | column         | type                        | constraints                  |
 |----------------|-----------------------------|------------------------------|
 | id             | text PK (ULID)              |                              |
 | property_code  | text NOT NULL               | FK → property.property_code  |
-| name           | season_name NOT NULL        | label                        |
+| season_id      | text NOT NULL               | FK → season.id               |
 | start_date     | date NOT NULL               | inclusive                    |
 | end_date       | date NOT NULL               | exclusive                    |
 
 - CHECK `end_date > start_date`.
-- Non-overlap within a property: enforce with an EXCLUDE constraint using a
-  daterange, `EXCLUDE USING gist (property_code WITH =, daterange(start_date,
-  end_date) WITH &&)`. (Requires btree_gist.) Assert non-overlap in a test too.
+- Non-overlap within a property: EXCLUDE constraint using a daterange,
+  `EXCLUDE USING gist (property_code WITH =, daterange(start_date, end_date) WITH &&)`.
+  (Requires btree_gist.) Assert non-overlap in a test too.
 - Index on `(property_code, start_date)`.
 
-## 6. `rate_rule` (ULID) — the atomic price fact
+## 7. `rate_rule` (ULID) — the atomic price fact
 
 | column          | type                       | constraints                  |
 |-----------------|----------------------------|-------------------------------|
 | id              | text PK (ULID)             |                              |
 | property_code   | text NOT NULL              | FK → property.property_code  |
-| season_id       | text **NULL**              | FK → season.id; NULL = the Standard (base) rate (2026-07-19) |
-| room_type_id    | text NOT NULL              | FK → room_type.id            |
+| season_id       | text **NULL**              | FK → season.id (global); NULL = the Standard (base) rate (2026-07-19) |
+| room_type_id    | text NOT NULL              | FK → room_type.id (global)   |
 | min_occupancy   | integer NOT NULL           | band lower bound (inclusive) |
 | max_occupancy   | integer NOT NULL           | band upper bound (inclusive) |
 | amount          | integer NOT NULL           | minor units, always per-night |
@@ -123,20 +141,24 @@ Display conversion only. Rate stored as integer with fixed scale to avoid float.
 - `season_id` NULL = **Standard** rate, applied whenever no dated season covers the
   stay (or a matched season lacks a band). `season_name = 'standard'` is retired
   as a dated season — Standard is now the absence of a season.
+- Price resolution: a stay date selects the property's `season_window` covering it
+  → its global `season_id` → the `rate_rule` for (property, season_id, room_type,
+  band); no window match falls back to the Standard (null-season) band.
 
 ## Cross-entity invariants (assert in tests, not FK-expressible)
 
-- Every property has ≥1 `room_type`.
+- The global `room_type` catalog is non-empty.
+- Every property has ≥1 `rate_rule` (is priceable).
 - Occupancy bands for a given (property, season, room_type) do not overlap and
   ideally tile the supported range.
 
 ## Schema-generation prompt (paste to kick off Step 3)
 
 > Add to `packages/db/src/schema/app.ts` (copy the existing `post` table pattern used by the
-> flights tables in the same file) the Drizzle schema for the 6 tables and 2 enums specified
+> flights tables in the same file) the Drizzle schema for the 7 tables and 2 enums specified
 > in `prd/hotels/11-data-model.md`, exactly: ULID PKs via `createId()` for supporting entities
 > and natural keys for currency/property, all money as integer minor units plus a
 > `currency` char(3), all timestamps `timestamp({ withTimezone: true })`, every FK indexed,
-> every UNIQUE/CHECK as written, and the season EXCLUDE non-overlap constraint (enable
-> btree_gist). Export `$inferSelect` and `$inferInsert` for all 6 tables. Then run
+> every UNIQUE/CHECK as written, and the `season_window` EXCLUDE non-overlap constraint (enable
+> btree_gist). Export `$inferSelect` and `$inferInsert` for all 7 tables. Then run
 > `pnpm db:generate`. No UUIDs. No float money columns.

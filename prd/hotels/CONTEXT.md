@@ -290,24 +290,27 @@ exists between `hotel-detail.tsx` and `hotel-search-results.tsx`'s card
 header block, left alone per the rule-of-three: two copies don't warrant
 extraction yet), `pnpm check:backbone` (90 paths verified).
 
-## Entity table (current, as of 2026-07-18: 6 entities, 6 tables, 0 derived)
+## Entity table (current, as of 2026-07-19: 7 entities, 7 tables, 0 derived)
 
 `listing` and `package` no longer exist — see "Current step" above. This supersedes the
 historical "8 entities" table this section used to carry (kept in the domain's build history
 via git, not restated here).
 
+**2026-07-19**: Room Type and Season became **global reference data** (no `property_code`); the
+per-property date window that selects a season moved to the new `season_window` table.
+
 | # | Entity              | Table                 | Key            | Admin CRUD                            | Notes |
 |---|---------------------|-----------------------|----------------|----------------------------------------|-------|
 | 1 | Property            | `property`            | property code  | `catalog/properties` | Spine + property fields merged into one table. `type` ∈ {hotel, apartment, house}. `destination` is a city-name combobox backed by the City entity. |
-| 2 | Room Type           | `room_type`           | ULID           | `catalog/room-types` | Child of property. Occupancy capacity lives here. |
-| 3 | Season              | `season`              | ULID           | `catalog/seasons` | Named date window scoped to a property. |
-| 4 | Rate Rule           | `rate_rule`           | ULID           | `catalog/rate-rules` | (property, season, occupancy band) → price in a currency. `room_type_id` is always set. |
-| 5 | Currency            | `currency`            | ISO-4217 code  | `reference/currencies` | Reference table, shared with flights. |
-| 6 | FX Rate             | `fx_rate`             | ULID           | `reference/fx-rates` | (base, quote) → rate. For display conversion only. |
+| 2 | Room Type           | `room_type`           | ULID           | `catalog/room-types` | **Global reference catalog**, unique by name. `max_occupancy` is the category default. |
+| 3 | Season              | `season`              | ULID           | `catalog/seasons` | **Global reference catalog** of season labels, unique by name. Standard = null (no row). |
+| 4 | Season Window       | `season_window`       | ULID           | `catalog/season-windows` | Per-property dated window → global season. Non-overlap per property. |
+| 5 | Rate Rule           | `rate_rule`           | ULID           | `catalog/rate-rules` | (property, global season, global room type, occupancy band) → price in a currency. `room_type_id` is always set. |
+| 6 | Currency            | `currency`            | ISO-4217 code  | `reference/currencies` | Reference table, shared with flights. |
+| 7 | FX Rate             | `fx_rate`             | ULID           | `reference/fx-rates` | (base, quote) → rate. For display conversion only. |
 
-All 5 manageable entities (Property included — the merge gave it a standalone screen where
-Listing never had one) have full create/edit/delete admin screens under
-`(protected)/@admin/catalog/*` (the 4 property-scoped entities) and
+All 5 catalog entities have full create/edit/delete admin screens under
+`(protected)/@admin/catalog/*`, and the two shared reference entities under
 `(protected)/@admin/reference/*` (currency, fx-rate — reference data shared with other domains).
 The City entity (dependency of the Property form) lives at `reference/cities`; see
 `apps/api/src/cities/`.

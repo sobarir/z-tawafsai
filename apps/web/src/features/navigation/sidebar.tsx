@@ -6,6 +6,7 @@ import {
   BedDouble,
   Building2,
   CalendarRange,
+  ChevronDown,
   Clock,
   Coins,
   Handshake,
@@ -38,6 +39,11 @@ import { AppBrand } from '@/components/shared/app-brand';
 import { UserDropdown } from '@/components/shared/user-dropdown';
 import { Button } from '@/components/ui/button';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
   Sheet,
   SheetContent,
   SheetTitle,
@@ -64,6 +70,7 @@ interface NavItem {
 interface NavGroup {
   items: NavItem[];
   sectionLabel?: string;
+  icon?: LucideIcon;
 }
 
 interface SidebarContentProps {
@@ -118,12 +125,14 @@ function NavLinkItem({
   isCollapsed,
   isRtl,
   onItemClick,
+  hideIcon,
 }: {
   item: NavItem;
   pathname: string;
   isCollapsed: boolean;
   isRtl: boolean;
   onItemClick?: () => void;
+  hideIcon?: boolean;
 }) {
   const Icon = item.icon;
   const isActive = isNavActive(pathname, item.href);
@@ -138,10 +147,14 @@ function NavLinkItem({
         isCollapsed && 'sidebar-nav-admin-collapsed',
       )}
     >
-      <span className="sidebar-nav-admin-icon">
-        <Icon className="h-[18px] w-[18px]" />
-      </span>
-      {!isCollapsed && <span className="truncate">{item.label}</span>}
+      {Icon && !hideIcon && (
+        <span className="sidebar-nav-admin-icon">
+          <Icon className="h-[18px] w-[18px]" />
+        </span>
+      )}
+      {!isCollapsed && (
+        <span className={cn('truncate', hideIcon && 'ml-6')}>{item.label}</span>
+      )}
     </Link>
   );
 
@@ -167,30 +180,42 @@ function NavGroupSection({
   isRtl: boolean;
   onItemClick?: () => void;
 }) {
+  const [isOpen, setIsOpen] = useState(true);
+
   if (group.items.length === 0) return null;
 
   return (
-    <>
-      <div className="my-2 border-t border-sidebar-glass-edge" />
+    <Collapsible
+      open={isCollapsed || isOpen}
+      onOpenChange={setIsOpen}
+      className="group/collapsible"
+    >
       {!isCollapsed && group.sectionLabel ? (
-        <p className="px-2 pb-1.5 text-xs font-medium text-muted-foreground">
-          {group.sectionLabel}
-        </p>
+        <CollapsibleTrigger className="flex w-full items-center justify-between px-2 pb-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground [&[data-state=open]>svg.chevron]:rotate-180">
+          <div className="flex items-center gap-2">
+            {group.icon && <group.icon className="h-4 w-4" />}
+            {group.sectionLabel}
+          </div>
+          <ChevronDown className="chevron h-4 w-4 shrink-0 transition-transform duration-200" />
+        </CollapsibleTrigger>
       ) : null}
-      <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
-        {group.items.map((item) => (
-          <li key={item.id}>
-            <NavLinkItem
-              item={item}
-              pathname={pathname}
-              isCollapsed={isCollapsed}
-              isRtl={isRtl}
-              onItemClick={onItemClick}
-            />
-          </li>
-        ))}
-      </ul>
-    </>
+      <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden">
+        <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
+          {group.items.map((item) => (
+            <li key={item.id}>
+              <NavLinkItem
+                item={item}
+                pathname={pathname}
+                isCollapsed={isCollapsed}
+                isRtl={isRtl}
+                onItemClick={onItemClick}
+                hideIcon={!isCollapsed}
+              />
+            </li>
+          ))}
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -235,7 +260,10 @@ function SidebarContent({
 
       <TooltipProvider delayDuration={0}>
         <nav className="no-scrollbar min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-2 py-2">
-          <ul className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5">
+          <ul
+            className="sidebar-nav-group flex w-full min-w-0 flex-col gap-1.5"
+            style={{ borderBottom: 'none', borderImage: 'none' }}
+          >
             {items.map((item) => (
               <li key={item.id}>
                 <NavLinkItem
@@ -489,6 +517,7 @@ const CATALOG_NAV_ICONS = {
   properties: Hotel,
   roomTypes: BedDouble,
   seasons: CalendarRange,
+  seasonWindows: CalendarRange,
   rateRules: Tags,
 } as const;
 
@@ -496,6 +525,7 @@ interface CatalogNavLabels {
   properties: string;
   roomTypes: string;
   seasons: string;
+  seasonWindows: string;
   rateRules: string;
 }
 
@@ -518,6 +548,12 @@ function buildCatalogAdminNavItems(labels: CatalogNavLabels): NavItem[] {
       label: labels.seasons,
       href: '/catalog/seasons',
       icon: CATALOG_NAV_ICONS.seasons,
+    },
+    {
+      id: 'catalog-season-windows',
+      label: labels.seasonWindows,
+      href: '/catalog/season-windows',
+      icon: CATALOG_NAV_ICONS.seasonWindows,
     },
     {
       id: 'catalog-rate-rules',
@@ -647,6 +683,7 @@ export function Sidebar() {
             properties: t('catalog.nav.properties'),
             roomTypes: t('catalog.nav.roomTypes'),
             seasons: t('catalog.nav.seasons'),
+            seasonWindows: t('catalog.nav.seasonWindows'),
             rateRules: t('catalog.nav.rateRules'),
           })
         : [],
@@ -682,12 +719,25 @@ export function Sidebar() {
 
   const secondaryGroups = useMemo(
     () => [
-      { items: adminItems, sectionLabel: adminSectionLabel },
-      { items: catalogItems, sectionLabel: catalogSectionLabel },
-      { items: referenceItems, sectionLabel: referenceSectionLabel },
+      {
+        items: adminItems,
+        sectionLabel: adminSectionLabel,
+        icon: CalendarRange,
+      },
+      {
+        items: catalogItems,
+        sectionLabel: catalogSectionLabel,
+        icon: Building2,
+      },
+      {
+        items: referenceItems,
+        sectionLabel: referenceSectionLabel,
+        icon: Tags,
+      },
       {
         items: travelPackagesAdminItems,
         sectionLabel: travelPackagesAdminSectionLabel,
+        icon: Luggage,
       },
     ],
     [

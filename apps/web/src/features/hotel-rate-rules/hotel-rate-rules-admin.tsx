@@ -2,8 +2,9 @@
 
 import type { RateRule } from '@repo/shared';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
-import { EntityDataTable } from '@/components/shared/entity-data-table';
+import { useCallback, useMemo, useState } from 'react';
+import { DataGrid } from 'react-data-grid';
+import 'react-data-grid/lib/styles.css';
 import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
 import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,12 @@ import {
   crudMutationOptions,
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
-import { getRateRuleColumns } from './columns';
+import {
+  type DetailFilters,
+  type GridRow,
+  getDetailColumns,
+  getMasterColumns,
+} from './columns';
 import { RateRuleForm } from './rate-rule-form';
 
 export function HotelRateRulesAdmin() {
@@ -39,6 +45,9 @@ export function HotelRateRulesAdmin() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<RateRule | null>(null);
   const [deleting, setDeleting] = useState<RateRule | null>(null);
+  const [initialPropertyCode, setInitialPropertyCode] = useState<
+    string | undefined
+  >();
 
   const feedback = useCrudFeedback(getListHotelRateRulesQueryKey(), 'catalog');
 
@@ -59,18 +68,103 @@ export function HotelRateRulesAdmin() {
     ),
   });
 
-  const columns = useMemo(
-    () =>
-      getRateRuleColumns({
+  const [filters, setFilters] = useState<DetailFilters>({
+    season: '',
+    roomType: '',
+    band: '',
+    amount: '',
+  });
+
+  const [propertyFilter, setPropertyFilter] = useState('');
+  const [expandedMasterIds, setExpandedMasterIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const filteredRateRules = useMemo(() => {
+    if (!rateRules) return [];
+    return rateRules.filter((r) => {
+      const seasonName = r.seasonId
+        ? (seasons?.find((s) => s.id === r.seasonId)?.name?.toLowerCase() ??
+          r.seasonId.toLowerCase())
+        : t('standardSeason').toLowerCase();
+      const roomTypeName =
+        roomTypes?.find((rt) => rt.id === r.roomTypeId)?.name?.toLowerCase() ??
+        r.roomTypeId.toLowerCase();
+      const band = `${r.minOccupancy}–${r.maxOccupancy}`.toLowerCase();
+      const amount = `${r.amount} ${r.currency}`.toLowerCase();
+
+      return (
+        seasonName.includes(filters.season.toLowerCase()) &&
+        roomTypeName.includes(filters.roomType.toLowerCase()) &&
+        band.includes(filters.band.toLowerCase()) &&
+        amount.includes(filters.amount.toLowerCase())
+      );
+    });
+  }, [rateRules, filters, seasons, roomTypes, t]);
+
+  const gridRows = useMemo(() => {
+    const rows: GridRow[] = [];
+    const propertyCodes = Array.from(
+      new Set(rateRules?.map((r) => r.propertyCode) ?? []),
+    );
+
+    for (const code of propertyCodes) {
+      const propertyName =
+        properties?.find((p) => p.propertyCode === code)?.displayName ?? code;
+
+      if (
+        propertyFilter &&
+        !propertyName.toLowerCase().includes(propertyFilter.toLowerCase()) &&
+        !code.toLowerCase().includes(propertyFilter.toLowerCase())
+      ) {
+        continue;
+      }
+
+      const isExpanded = expandedMasterIds.has(code);
+      rows.push({
+        type: 'MASTER',
+        id: code,
+        propertyName,
+        expanded: isExpanded,
+      });
+
+      if (isExpanded) {
+        rows.push({
+          type: 'DETAIL',
+          id: `${code}-detail`,
+          parentId: code,
+        });
+      }
+    }
+    return rows;
+  }, [rateRules, properties, expandedMasterIds, propertyFilter]);
+
+  const toggleExpand = useCallback((propertyCode: string) => {
+    setExpandedMasterIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(propertyCode)) {
+        next.delete(propertyCode);
+      } else {
+        next.add(propertyCode);
+      }
+      return next;
+    });
+  }, []);
+
+  const renderDetail = useCallback(
+    (propertyCode: string) => {
+      const propertyRules = filteredRateRules.filter(
+        (r) => r.propertyCode === propertyCode,
+      );
+
+      const detailCols = getDetailColumns({
         columnLabels: {
-          property: t('columns.property'),
           season: t('columns.season'),
           roomType: t('columns.roomType'),
           band: t('columns.band'),
           amount: t('columns.amount'),
         },
         standardSeasonLabel: t('standardSeason'),
-        properties: properties ?? [],
         seasons: seasons ?? [],
         roomTypes: roomTypes ?? [],
         actionsLabel: tCatalog('actions'),
@@ -82,32 +176,77 @@ export function HotelRateRulesAdmin() {
           setFormOpen(true);
         },
         onDelete: (rateRule) => setDeleting(rateRule),
-      }),
-    [t, properties, seasons, roomTypes, tCatalog, tCommon],
+        onCreate: () => {
+          setEditing(null);
+          setInitialPropertyCode(propertyCode);
+          setFormOpen(true);
+        },
+        filters,
+        onFilterChange: setFilters,
+      });
+
+      return (
+        <div className="border bg-background shadow-sm rounded-md overflow-hidden h-full flex flex-col">
+          <DataGrid
+            columns={detailCols}
+            rows={propertyRules}
+            className="rdg-light h-full"
+            headerRowHeight={64}
+          />
+        </div>
+      );
+    },
+    [filteredRateRules, t, seasons, roomTypes, tCatalog, tCommon, filters],
   );
+
+  const masterColumns = useMemo(() => {
+    return getMasterColumns({
+      propertyLabel: t('columns.property'),
+      filterValue: propertyFilter,
+      onFilterChange: setPropertyFilter,
+      toggleExpand,
+      renderDetail,
+    });
+  }, [t, propertyFilter, toggleExpand, renderDetail]);
 
   const submitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-4">
-      <EntityDataTable
-        namespace="catalog"
-        columns={columns}
-        data={rateRules ?? []}
-        isLoading={isLoading}
-        toolbar={
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-          >
-            {tCatalog('createButton')}
-          </Button>
-        }
-      />
+      <div className="flex items-center justify-end">
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => {
+            setEditing(null);
+            setInitialPropertyCode(undefined);
+            setFormOpen(true);
+          }}
+        >
+          {tCatalog('createButton')}
+        </Button>
+      </div>
+
+      <div
+        className={`flex flex-col flex-1 min-h-[500px] ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+      >
+        <DataGrid
+          columns={masterColumns}
+          rows={gridRows}
+          className="rdg-light flex-1 min-h-[500px]"
+          headerRowHeight={64}
+          rowHeight={(row) => {
+            if (row.type === 'DETAIL') {
+              const count = filteredRateRules.filter(
+                (r) => r.propertyCode === row.parentId,
+              ).length;
+              // 32px padding (p-4), 64px header, 35px per row, 2px border, +16px buffer for scrollbar
+              return 32 + 64 + count * 35 + 18;
+            }
+            return 35;
+          }}
+        />
+      </div>
 
       <EntityFormDialog
         open={formOpen}
@@ -116,6 +255,7 @@ export function HotelRateRulesAdmin() {
       >
         <RateRuleForm
           rateRule={editing ?? undefined}
+          initialPropertyCode={initialPropertyCode}
           properties={properties ?? []}
           seasons={seasons ?? []}
           roomTypes={roomTypes ?? []}

@@ -14,14 +14,19 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 
 describe('hotel data-model invariants', () => {
-  it('every property has at least one room type', async () => {
+  it('the global room type catalog is non-empty', async () => {
+    const roomTypes = await db.select().from(schema.roomType);
+    expect(roomTypes.length).toBeGreaterThan(0);
+  });
+
+  it('every property has at least one rate rule (is priceable)', async () => {
     const properties = await db.select().from(schema.property);
     for (const property of properties) {
-      const roomTypes = await db
+      const rateRules = await db
         .select()
-        .from(schema.roomType)
-        .where(eq(schema.roomType.propertyCode, property.propertyCode));
-      expect(roomTypes.length).toBeGreaterThan(0);
+        .from(schema.rateRule)
+        .where(eq(schema.rateRule.propertyCode, property.propertyCode));
+      expect(rateRules.length).toBeGreaterThan(0);
     }
   });
 

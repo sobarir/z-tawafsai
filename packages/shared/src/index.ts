@@ -603,27 +603,25 @@ export const updatePropertySchema = createPropertySchema
   .partial();
 export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
 
+// Room types are global reference data — a shared catalog of room categories,
+// not scoped to any property. `maxOccupancy` is the category default.
 export const roomTypeSchema = z.object({
   id: ulidSchema,
-  propertyCode: z.string(),
   name: z.string().min(1).max(100),
   maxOccupancy: z.number().int().positive(),
 });
 export type RoomType = z.infer<typeof roomTypeSchema>;
 
 export const createRoomTypeSchema = z.object({
-  propertyCode: z.string().min(1).max(50),
   name: z.string().min(1).max(100),
   maxOccupancy: z.number().int().positive(),
 });
 export type CreateRoomTypeInput = z.infer<typeof createRoomTypeSchema>;
 
-export const updateRoomTypeSchema = createRoomTypeSchema
-  .omit({ propertyCode: true })
-  .partial();
+export const updateRoomTypeSchema = createRoomTypeSchema.partial();
 export type UpdateRoomTypeInput = z.infer<typeof updateRoomTypeSchema>;
 
-/** Label only — the date window on `season` is what actually selects it. */
+/** Global season label. The dated window that selects it lives on `season_window`. */
 export const seasonNameSchema = z.enum([
   'standard',
   'peak',
@@ -633,27 +631,44 @@ export const seasonNameSchema = z.enum([
 ]);
 export type SeasonName = z.infer<typeof seasonNameSchema>;
 
+// Seasons are global reference data — a shared catalog of season labels. The
+// per-property dated window that maps a stay to a season is `seasonWindow`.
 export const seasonSchema = z.object({
   id: ulidSchema,
-  propertyCode: z.string(),
   name: seasonNameSchema,
-  startDate: z.iso.date(),
-  endDate: z.iso.date(),
 });
 export type Season = z.infer<typeof seasonSchema>;
 
 export const createSeasonSchema = z.object({
-  propertyCode: z.string().min(1).max(50),
   name: seasonNameSchema,
-  startDate: z.iso.date(),
-  endDate: z.iso.date(),
 });
 export type CreateSeasonInput = z.infer<typeof createSeasonSchema>;
 
-export const updateSeasonSchema = createSeasonSchema
+export const updateSeasonSchema = createSeasonSchema.partial();
+export type UpdateSeasonInput = z.infer<typeof updateSeasonSchema>;
+
+// A per-property dated window that maps a stay date to a global season.
+export const seasonWindowSchema = z.object({
+  id: ulidSchema,
+  propertyCode: z.string(),
+  seasonId: ulidSchema,
+  startDate: z.iso.date(),
+  endDate: z.iso.date(),
+});
+export type SeasonWindow = z.infer<typeof seasonWindowSchema>;
+
+export const createSeasonWindowSchema = z.object({
+  propertyCode: z.string().min(1).max(50),
+  seasonId: ulidSchema,
+  startDate: z.iso.date(),
+  endDate: z.iso.date(),
+});
+export type CreateSeasonWindowInput = z.infer<typeof createSeasonWindowSchema>;
+
+export const updateSeasonWindowSchema = createSeasonWindowSchema
   .omit({ propertyCode: true })
   .partial();
-export type UpdateSeasonInput = z.infer<typeof updateSeasonSchema>;
+export type UpdateSeasonWindowInput = z.infer<typeof updateSeasonWindowSchema>;
 
 export const rateRuleSchema = z.object({
   id: ulidSchema,

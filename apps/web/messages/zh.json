@@ -453,6 +453,7 @@
       "properties": "酒店",
       "roomTypes": "房型",
       "seasons": "季节",
+      "seasonWindows": "季节窗口",
       "rateRules": "价格规则"
     },
     "actions": "操作",
@@ -515,7 +516,7 @@
     },
     "roomTypes": {
       "title": "房型",
-      "description": "酒店下可预订的房间类型，包含最大入住人数。",
+      "description": "具有入住容量的全局房型，跨物业共享。",
       "createTitle": "新建房型",
       "editTitle": "编辑房型",
       "columns": {
@@ -532,7 +533,7 @@
     },
     "seasons": {
       "title": "季节",
-      "description": "关联到某个酒店的日期区间，用于决定适用价格。",
+      "description": "全局季节标签。每个物业设置自己的日期窗口。",
       "createTitle": "新建季节",
       "editTitle": "编辑季节",
       "columns": {
@@ -553,6 +554,24 @@
         "ramadan": "斋月",
         "hajj": "朝觐",
         "promo": "促销"
+      }
+    },
+    "seasonWindows": {
+      "title": "季节窗口",
+      "description": "按物业设置的日期窗口，将入住日期映射到季节。",
+      "createTitle": "新建季节窗口",
+      "editTitle": "编辑季节窗口",
+      "columns": {
+        "property": "酒店",
+        "season": "季节",
+        "startDate": "开始日期",
+        "endDate": "结束日期"
+      },
+      "fields": {
+        "propertyCode": "酒店",
+        "seasonId": "季节",
+        "startDate": "开始日期",
+        "endDate": "结束日期"
       }
     },
     "rateRules": {

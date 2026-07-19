@@ -11,7 +11,6 @@ import {
   getListHotelSeasonsQueryKey,
   useCreateHotelSeason,
   useDeleteHotelSeason,
-  useListHotelProperties,
   useListHotelSeasons,
   useUpdateHotelSeason,
 } from '@/libs/api/generated/endpoints';
@@ -28,7 +27,6 @@ export function HotelSeasonsAdmin() {
   const tCommon = useTranslations('common');
 
   const { data: seasons, isLoading } = useListHotelSeasons();
-  const { data: properties } = useListHotelProperties();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Season | null>(null);
@@ -57,12 +55,8 @@ export function HotelSeasonsAdmin() {
     () =>
       getSeasonColumns({
         columnLabels: {
-          property: t('columns.property'),
           name: t('columns.name'),
-          startDate: t('columns.startDate'),
-          endDate: t('columns.endDate'),
         },
-        properties: properties ?? [],
         actionsLabel: tCatalog('actions'),
         openMenuLabel: tCatalog('openMenu'),
         editLabel: tCommon('edit'),
@@ -73,7 +67,7 @@ export function HotelSeasonsAdmin() {
         },
         onDelete: (season) => setDeleting(season),
       }),
-    [t, properties, tCatalog, tCommon],
+    [t, tCatalog, tCommon],
   );
 
   const submitting = createMutation.isPending || updateMutation.isPending;
@@ -106,18 +100,13 @@ export function HotelSeasonsAdmin() {
       >
         <SeasonForm
           season={editing ?? undefined}
-          properties={properties ?? []}
           submitting={submitting}
           onCancel={() => setFormOpen(false)}
           onSubmit={async (values) => {
             if (editing) {
               await updateMutation.mutateAsync({
                 id: editing.id,
-                data: {
-                  name: values.name,
-                  startDate: values.startDate,
-                  endDate: values.endDate,
-                },
+                data: { name: values.name },
               });
             } else {
               await createMutation.mutateAsync({ data: values });

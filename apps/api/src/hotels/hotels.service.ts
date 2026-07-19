@@ -34,6 +34,11 @@ export class HotelsService {
       })
       .from(schema.fxRate);
 
+    // Room types are global reference data — load the whole catalog once and
+    // reuse it for every property. A property "offers" a room type only where a
+    // rate rule exists for it; the resolver skips the rest (NO_BAND).
+    const roomTypes = await this.db.select().from(schema.roomType);
+
     const properties = await this.db
       .select()
       .from(schema.property)
@@ -49,6 +54,7 @@ export class HotelsService {
       const result = await this.resolveProperty(
         property,
         query,
+        roomTypes,
         currencies,
         fxRates,
       );
@@ -79,23 +85,22 @@ export class HotelsService {
   private async resolveProperty(
     property: PropertyRow,
     query: HotelSearchQuery,
+    roomTypes: RoomTypeRow[],
     currencies: CurrencyInfo[],
     fxRates: FxRateRow[],
   ): Promise<HotelSearchResult | undefined> {
-    const roomTypes = await this.db
-      .select()
-      .from(schema.roomType)
-      .where(eq(schema.roomType.propertyCode, property.propertyCode));
     if (roomTypes.length === 0) return undefined;
 
+    // The season is selected by the property's own dated windows; the resolver
+    // matches rate rules on the global season id, so project each window to it.
     const seasons = await this.db
       .select({
-        id: schema.season.id,
-        startDate: schema.season.startDate,
-        endDate: schema.season.endDate,
+        id: schema.seasonWindow.seasonId,
+        startDate: schema.seasonWindow.startDate,
+        endDate: schema.seasonWindow.endDate,
       })
-      .from(schema.season)
-      .where(eq(schema.season.propertyCode, property.propertyCode));
+      .from(schema.seasonWindow)
+      .where(eq(schema.seasonWindow.propertyCode, property.propertyCode));
 
     const rateRules = await this.db
       .select({

@@ -11,7 +11,7 @@ import type {
   RoomType,
   UpdateRoomTypeInput,
 } from '@repo/shared';
-import { and, asc, eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type RoomTypeRow = typeof schema.roomType.$inferSelect;
@@ -26,7 +26,7 @@ export class HotelRoomTypesService {
     const rows = await this.db
       .select()
       .from(schema.roomType)
-      .orderBy(asc(schema.roomType.propertyCode), asc(schema.roomType.name));
+      .orderBy(asc(schema.roomType.name));
     return rows.map(toRoomType);
   }
 
@@ -45,16 +45,9 @@ export class HotelRoomTypesService {
     const [existing] = await this.db
       .select({ id: schema.roomType.id })
       .from(schema.roomType)
-      .where(
-        and(
-          eq(schema.roomType.propertyCode, input.propertyCode),
-          eq(schema.roomType.name, input.name),
-        ),
-      );
+      .where(eq(schema.roomType.name, input.name));
     if (existing) {
-      throw new ConflictException(
-        `Room type "${input.name}" already exists for property ${input.propertyCode}`,
-      );
+      throw new ConflictException(`Room type "${input.name}" already exists`);
     }
     const [created] = await this.db
       .insert(schema.roomType)

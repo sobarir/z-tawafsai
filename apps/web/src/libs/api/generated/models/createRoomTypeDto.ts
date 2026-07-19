@@ -9,11 +9,6 @@
 export interface CreateRoomTypeDto {
   /**
    * @minLength 1
-   * @maxLength 50
-   */
-  propertyCode: string;
-  /**
-   * @minLength 1
    * @maxLength 100
    */
   name: string;

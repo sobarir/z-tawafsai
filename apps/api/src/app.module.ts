@@ -19,6 +19,7 @@ import { HotelFxRatesModule } from './hotel-fx-rates/hotel-fx-rates.module';
 import { HotelPropertiesModule } from './hotel-properties/hotel-properties.module';
 import { HotelRateRulesModule } from './hotel-rate-rules/hotel-rate-rules.module';
 import { HotelRoomTypesModule } from './hotel-room-types/hotel-room-types.module';
+import { HotelSeasonWindowsModule } from './hotel-season-windows/hotel-season-windows.module';
 import { HotelSeasonsModule } from './hotel-seasons/hotel-seasons.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { InterlineAgreementsModule } from './interline-agreements/interline-agreements.module';
@@ -54,6 +55,7 @@ import { UsersModule } from './users/users.module';
     HotelPropertiesModule,
     HotelRoomTypesModule,
     HotelSeasonsModule,
+    HotelSeasonWindowsModule,
     HotelRateRulesModule,
     TravelPackagesModule,
     TravelProvidersModule,

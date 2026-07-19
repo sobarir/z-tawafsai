@@ -43,6 +43,7 @@ import type {
   CreateRateRuleDto,
   CreateRoomTypeDto,
   CreateSeasonDto,
+  CreateSeasonWindowDto,
   CreateTravelPackageBookingDto,
   CreateTravelPackageDto,
   CreateTravelProviderDto,
@@ -68,6 +69,7 @@ import type {
   SearchFlightsParams,
   SearchHotelsParams,
   SeasonDto,
+  SeasonWindowDto,
   TravelPackageBookingDto,
   TravelPackageDto,
   TravelPackageEarningsRowDto,
@@ -84,6 +86,7 @@ import type {
   UpdateRateRuleDto,
   UpdateRoomTypeDto,
   UpdateSeasonDto,
+  UpdateSeasonWindowDto,
   UpdateTravelPackageBookingDto,
   UpdateTravelPackageDto,
   UpdateTravelProviderDto,
@@ -6096,6 +6099,424 @@ export const useDeleteHotelSeason = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteHotelSeasonMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List season windows
+ */
+export const getListHotelSeasonWindowsUrl = () => {
+
+
+  
+
+  return `/api/hotel-season-windows`
+}
+
+export const listHotelSeasonWindows = async ( options?: RequestInit): Promise<SeasonWindowDto[]> => {
+  
+  return customFetch<SeasonWindowDto[]>(getListHotelSeasonWindowsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListHotelSeasonWindowsQueryKey = () => {
+    return [
+    `/api/hotel-season-windows`
+    ] as const;
+    }
+
+    
+export const getListHotelSeasonWindowsQueryOptions = <TData = Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListHotelSeasonWindowsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listHotelSeasonWindows>>> = ({ signal }) => listHotelSeasonWindows({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListHotelSeasonWindowsQueryResult = NonNullable<Awaited<ReturnType<typeof listHotelSeasonWindows>>>
+export type ListHotelSeasonWindowsQueryError = unknown
+
+
+export function useListHotelSeasonWindows<TData = Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelSeasonWindows>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelSeasonWindows>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelSeasonWindows<TData = Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listHotelSeasonWindows>>,
+          TError,
+          Awaited<ReturnType<typeof listHotelSeasonWindows>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListHotelSeasonWindows<TData = Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List season windows
+ */
+
+export function useListHotelSeasonWindows<TData = Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listHotelSeasonWindows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListHotelSeasonWindowsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create a season window
+ */
+export const getCreateHotelSeasonWindowUrl = () => {
+
+
+  
+
+  return `/api/hotel-season-windows`
+}
+
+export const createHotelSeasonWindow = async (createSeasonWindowDto: CreateSeasonWindowDto, options?: RequestInit): Promise<SeasonWindowDto> => {
+  
+  return customFetch<SeasonWindowDto>(getCreateHotelSeasonWindowUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSeasonWindowDto,)
+  }
+);}
+
+
+
+
+export const getCreateHotelSeasonWindowMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelSeasonWindow>>, TError,{data: CreateSeasonWindowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelSeasonWindow>>, TError,{data: CreateSeasonWindowDto}, TContext> => {
+
+const mutationKey = ['createHotelSeasonWindow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelSeasonWindow>>, {data: CreateSeasonWindowDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelSeasonWindow(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelSeasonWindowMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelSeasonWindow>>>
+    export type CreateHotelSeasonWindowMutationBody = CreateSeasonWindowDto
+    export type CreateHotelSeasonWindowMutationError = unknown
+
+    /**
+ * @summary Create a season window
+ */
+export const useCreateHotelSeasonWindow = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelSeasonWindow>>, TError,{data: CreateSeasonWindowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelSeasonWindow>>,
+        TError,
+        {data: CreateSeasonWindowDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateHotelSeasonWindowMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Get a season window
+ */
+export const getGetHotelSeasonWindowUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-season-windows/${id}`
+}
+
+export const getHotelSeasonWindow = async (id: string, options?: RequestInit): Promise<SeasonWindowDto> => {
+  
+  return customFetch<SeasonWindowDto>(getGetHotelSeasonWindowUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetHotelSeasonWindowQueryKey = (id?: string,) => {
+    return [
+    `/api/hotel-season-windows/${id}`
+    ] as const;
+    }
+
+    
+export const getGetHotelSeasonWindowQueryOptions = <TData = Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelSeasonWindowQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelSeasonWindow>>> = ({ signal }) => getHotelSeasonWindow(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetHotelSeasonWindowQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelSeasonWindow>>>
+export type GetHotelSeasonWindowQueryError = unknown
+
+
+export function useGetHotelSeasonWindow<TData = Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelSeasonWindow>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelSeasonWindow>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelSeasonWindow<TData = Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getHotelSeasonWindow>>,
+          TError,
+          Awaited<ReturnType<typeof getHotelSeasonWindow>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetHotelSeasonWindow<TData = Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a season window
+ */
+
+export function useGetHotelSeasonWindow<TData = Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHotelSeasonWindow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetHotelSeasonWindowQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Update a season window
+ */
+export const getUpdateHotelSeasonWindowUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-season-windows/${id}`
+}
+
+export const updateHotelSeasonWindow = async (id: string,
+    updateSeasonWindowDto: UpdateSeasonWindowDto, options?: RequestInit): Promise<SeasonWindowDto> => {
+  
+  return customFetch<SeasonWindowDto>(getUpdateHotelSeasonWindowUrl(id),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateSeasonWindowDto,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelSeasonWindowMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelSeasonWindow>>, TError,{id: string;data: UpdateSeasonWindowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelSeasonWindow>>, TError,{id: string;data: UpdateSeasonWindowDto}, TContext> => {
+
+const mutationKey = ['updateHotelSeasonWindow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelSeasonWindow>>, {id: string;data: UpdateSeasonWindowDto}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateHotelSeasonWindow(id,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelSeasonWindowMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelSeasonWindow>>>
+    export type UpdateHotelSeasonWindowMutationBody = UpdateSeasonWindowDto
+    export type UpdateHotelSeasonWindowMutationError = unknown
+
+    /**
+ * @summary Update a season window
+ */
+export const useUpdateHotelSeasonWindow = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelSeasonWindow>>, TError,{id: string;data: UpdateSeasonWindowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelSeasonWindow>>,
+        TError,
+        {id: string;data: UpdateSeasonWindowDto},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdateHotelSeasonWindowMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Delete a season window
+ */
+export const getDeleteHotelSeasonWindowUrl = (id: string,) => {
+
+
+  
+
+  return `/api/hotel-season-windows/${id}`
+}
+
+export const deleteHotelSeasonWindow = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteHotelSeasonWindowUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteHotelSeasonWindowMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelSeasonWindow>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelSeasonWindow>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteHotelSeasonWindow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelSeasonWindow>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteHotelSeasonWindow(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelSeasonWindowMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelSeasonWindow>>>
+    
+    export type DeleteHotelSeasonWindowMutationError = unknown
+
+    /**
+ * @summary Delete a season window
+ */
+export const useDeleteHotelSeasonWindow = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelSeasonWindow>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelSeasonWindow>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteHotelSeasonWindowMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

@@ -11,12 +11,14 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new HotelRateRulesService(db);
 
-// Own isolated property + season + room type fixtures — never touches the
-// seeded JED-WFH/MAD-CIN data hotels.service.spec.ts's golden scenarios
-// depend on. USD is seeded reference data (prd/hotels/15-seed-data.md),
-// safe to reuse as an FK.
+// Own isolated property fixture — never touches the seeded JED-WFH/MAD-CIN data
+// hotels.service.spec.ts's golden scenarios depend on. Seasons and room types
+// are global reference data now: reference a seeded season read-only and create
+// a uniquely-named global room type. USD is seeded reference data
+// (prd/hotels/15-seed-data.md), safe to reuse as an FK.
 const CURRENCY = 'USD';
 const FIXTURE_CODE = 'ZZZ-RATERULE';
+const FIXTURE_ROOM_TYPE = 'ZZZ RateRule Room';
 
 let fixtureSeasonId: string;
 let fixtureRoomTypeId: string;
@@ -37,31 +39,21 @@ describe('HotelRateRulesService', () => {
       countryCode: 'ZZ',
     });
 
-    const [season] = await db
-      .insert(schema.season)
-      .values({
-        propertyCode: FIXTURE_CODE,
-        name: 'standard',
-        startDate: '2027-01-01',
-        endDate: '2027-06-01',
-      })
-      .returning();
+    const [season] = await db.select().from(schema.season).limit(1);
+    if (!season) {
+      throw new Error('No seeded season to reference — run the seed first');
+    }
     fixtureSeasonId = season.id;
 
     const [roomType] = await db
       .insert(schema.roomType)
-      .values({
-        propertyCode: FIXTURE_CODE,
-        name: 'Double',
-        maxOccupancy: 2,
-      })
+      .values({ name: FIXTURE_ROOM_TYPE, maxOccupancy: 2 })
       .returning();
     fixtureRoomTypeId = roomType.id;
   });
 
   afterAll(async () => {
     await cleanupRateRules();
-    await db.delete(schema.season).where(eq(schema.season.id, fixtureSeasonId));
     await db
       .delete(schema.roomType)
       .where(eq(schema.roomType.id, fixtureRoomTypeId));

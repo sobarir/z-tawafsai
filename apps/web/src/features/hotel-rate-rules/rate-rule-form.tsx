@@ -11,7 +11,7 @@ import type {
 } from '@repo/shared';
 import { createRateRuleSchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
@@ -29,6 +29,7 @@ interface RateRuleFormProps {
   seasons: Season[];
   roomTypes: RoomType[];
   currencies: Currency[];
+  initialPropertyCode?: string;
   onSubmit: (values: CreateRateRuleInput) => Promise<void>;
   onCancel: () => void;
   submitting: boolean;
@@ -40,6 +41,7 @@ export function RateRuleForm({
   seasons,
   roomTypes,
   currencies,
+  initialPropertyCode,
   onSubmit,
   onCancel,
   submitting,
@@ -51,7 +53,7 @@ export function RateRuleForm({
   const form = useForm<CreateRateRuleInput>({
     resolver: zodResolver(createRateRuleSchema),
     defaultValues: {
-      propertyCode: rateRule?.propertyCode ?? '',
+      propertyCode: rateRule?.propertyCode ?? initialPropertyCode ?? '',
       // Undefined (empty) = the Standard, season-less base rate.
       seasonId: rateRule?.seasonId ?? undefined,
       roomTypeId: rateRule?.roomTypeId ?? '',
@@ -61,17 +63,6 @@ export function RateRuleForm({
       currency: rateRule?.currency ?? '',
     },
   });
-
-  const selectedPropertyCode = useWatch({
-    control: form.control,
-    name: 'propertyCode',
-  });
-  const seasonsForProperty = seasons.filter(
-    (s) => s.propertyCode === selectedPropertyCode,
-  );
-  const roomTypesForProperty = roomTypes.filter(
-    (rt) => rt.propertyCode === selectedPropertyCode,
-  );
 
   const handleSubmit = form.handleSubmit(async (values) => {
     // Empty season → Standard (season-less) base rate.
@@ -94,8 +85,8 @@ export function RateRuleForm({
             control={form.control}
             name="seasonId"
             label={t('seasonId')}
-            options={toSeasonOptions(seasonsForProperty)}
-            disabled={isEdit || !selectedPropertyCode}
+            options={toSeasonOptions(seasons)}
+            disabled={isEdit}
           />
           <p className="text-xs text-muted-foreground">
             {t('seasonStandardHint')}
@@ -106,8 +97,8 @@ export function RateRuleForm({
           control={form.control}
           name="roomTypeId"
           label={t('roomTypeId')}
-          options={toRoomTypeOptions(roomTypesForProperty)}
-          disabled={isEdit || !selectedPropertyCode}
+          options={toRoomTypeOptions(roomTypes)}
+          disabled={isEdit}
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

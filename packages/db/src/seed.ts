@@ -4852,6 +4852,49 @@ async function seed() {
     await db.delete(schema.season).where(eq(schema.season.name, 'standard'));
   }
 
+  // Room types are global reference data — seed the union of every property's
+  // room types once, keyed by name (max occupancy is the category default).
+  const roomTypeMaxByName = new Map<string, number>();
+  for (const item of properties) {
+    for (const rt of item.roomTypes) {
+      roomTypeMaxByName.set(
+        rt.name,
+        Math.max(roomTypeMaxByName.get(rt.name) ?? 0, rt.maxOccupancy),
+      );
+    }
+  }
+  const roomTypeIdByName = new Map<string, string>();
+  for (const [name, maxOccupancy] of roomTypeMaxByName) {
+    const [row] = await db
+      .insert(schema.roomType)
+      .values({ name, maxOccupancy })
+      .onConflictDoUpdate({
+        target: schema.roomType.name,
+        set: { maxOccupancy },
+      })
+      .returning();
+    roomTypeIdByName.set(name, row.id);
+  }
+
+  // Seasons are global reference labels — 'standard' is season-less (null), so
+  // only the dated season names become rows. The per-property date window is
+  // seeded as season_window inside the property loop below.
+  const seasonNames = new Set<SeasonSeed['name']>();
+  for (const item of properties) {
+    for (const s of item.seasons) {
+      if (s.name !== 'standard') seasonNames.add(s.name);
+    }
+  }
+  const seasonIdByName = new Map<string, string>();
+  for (const name of seasonNames) {
+    const [row] = await db
+      .insert(schema.season)
+      .values({ name })
+      .onConflictDoUpdate({ target: schema.season.name, set: { name } })
+      .returning();
+    seasonIdByName.set(name, row.id);
+  }
+
   for (const item of properties) {
     await db
       .insert(schema.property)
@@ -4885,54 +4928,35 @@ async function seed() {
         },
       });
 
-    const roomTypeIdByName = new Map<string, string>();
-    for (const roomType of item.roomTypes) {
-      const [row] = await db
-        .insert(schema.roomType)
-        .values({
-          propertyCode: item.code,
-          name: roomType.name,
-          maxOccupancy: roomType.maxOccupancy,
-        })
-        .onConflictDoUpdate({
-          target: [schema.roomType.propertyCode, schema.roomType.name],
-          set: { maxOccupancy: roomType.maxOccupancy },
-        })
-        .returning();
-      roomTypeIdByName.set(roomType.name, row.id);
-    }
-
-    const seasonIdByName = new Map<string, string>();
+    // Per-property dated windows map a stay date to a global season. 'standard'
+    // is season-less (null) — no window row. Idempotent: skip if an identical
+    // window already exists (the EXCLUDE constraint would reject a re-insert).
     for (const season of item.seasons) {
-      // 'standard' is no longer a dated season — its rate rules become
-      // season-less below. Skip creating a season row for it.
       if (season.name === 'standard') continue;
+      const seasonId = seasonIdByName.get(season.name);
+      if (!seasonId) {
+        throw new Error(
+          `Seed error: ${item.code} references unknown season "${season.name}"`,
+        );
+      }
       const [existing] = await db
-        .select()
-        .from(schema.season)
+        .select({ id: schema.seasonWindow.id })
+        .from(schema.seasonWindow)
         .where(
           and(
-            eq(schema.season.propertyCode, item.code),
-            eq(schema.season.name, season.name),
+            eq(schema.seasonWindow.propertyCode, item.code),
+            eq(schema.seasonWindow.seasonId, seasonId),
+            eq(schema.seasonWindow.startDate, season.startDate),
+            eq(schema.seasonWindow.endDate, season.endDate),
           ),
         );
-      if (existing) {
-        await db
-          .update(schema.season)
-          .set({ startDate: season.startDate, endDate: season.endDate })
-          .where(eq(schema.season.id, existing.id));
-        seasonIdByName.set(season.name, existing.id);
-      } else {
-        const [row] = await db
-          .insert(schema.season)
-          .values({
-            propertyCode: item.code,
-            name: season.name,
-            startDate: season.startDate,
-            endDate: season.endDate,
-          })
-          .returning();
-        seasonIdByName.set(season.name, row.id);
+      if (!existing) {
+        await db.insert(schema.seasonWindow).values({
+          propertyCode: item.code,
+          seasonId,
+          startDate: season.startDate,
+          endDate: season.endDate,
+        });
       }
     }
 
