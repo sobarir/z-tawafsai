@@ -15,7 +15,7 @@ import type {
   UpdateFlightHotelPackageInput,
   UpdateTravelPackageBookingInput,
 } from '@repo/shared';
-import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type TravelPackageRow = typeof schema.flightHotelPackage.$inferSelect;
@@ -592,28 +592,6 @@ export class TravelPackagesService {
       booked.set(row.departureId, (booked.get(row.departureId) ?? 0) + row.pax);
     }
     return booked;
-  }
-
-  // Sum of confirmed pax on a departure within the transaction, optionally
-  // excluding one booking (so an in-place edit doesn't count itself).
-  private async confirmedPax(
-    tx: Tx,
-    departureId: string,
-    excludeBookingId?: string,
-  ): Promise<number> {
-    const rows = await tx
-      .select({ pax: schema.travelPackageBooking.pax })
-      .from(schema.travelPackageBooking)
-      .where(
-        and(
-          eq(schema.travelPackageBooking.departureId, departureId),
-          eq(schema.travelPackageBooking.status, 'confirmed'),
-          excludeBookingId
-            ? ne(schema.travelPackageBooking.id, excludeBookingId)
-            : undefined,
-        ),
-      );
-    return rows.reduce((sum, row) => sum + row.pax, 0);
   }
 
   private toBooking(

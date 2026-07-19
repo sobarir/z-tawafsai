@@ -804,15 +804,6 @@ const createTravelPackageStaySchema = z.object({
   nights: z.number().int().positive(),
 });
 
-const travelPackageDepartureWriteSchema = z.object({
-  id: ulidSchema,
-  flightId: ulidSchema,
-  returnDate: z.iso.date().nullable(),
-  seatsNote: z.string().nullable(),
-  totalSeats: z.number().int().nonnegative().nullable(),
-  availableSeats: z.number().int().nonnegative().nullable(),
-});
-
 const createTravelPackageDepartureSchema = z.object({
   /** Present when editing an existing departure — the write path upserts by id so booking rows keyed to it survive. Omit for a new departure. */
   id: ulidSchema.optional(),
