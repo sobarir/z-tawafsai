@@ -5,6 +5,19 @@
 
 ## Current step
 
+**2026-07-19 — Standard is now the default (season is optional).** Previously every price
+needed a dated season, even the base rate (a `season` named `standard`). Reversed per the product
+owner: `rate_rule.season_id` is now **nullable** — a season-less rate rule **is** the Standard
+(base) rate. The resolver prefers a matched dated season's band and **falls back to the Standard
+band** (`season_id = NULL`) when no season covers the stay or the season lacks a band; the
+**`NO_SEASON` outcome is removed**. Unique index is now `NULLS NOT DISTINCT` so duplicate Standard
+bands still collide. Migration `0019`; seed converts legacy `standard` seasons → season-less rate
+rules and drops those season rows (171 season-less / 2 seasoned after re-seed). The rate-rule admin
+form makes Season optional ("leave empty = Standard"); the list shows "Standard" for null. Golden
+scenario S9 flipped from NO_SEASON-omitted to Standard-fallback-priced. Full stack: `packages/db`
+(schema + migration + seed), `packages/shared` (rateRule `seasonId` nullable), `apps/api`
+(resolver + specs), regenerated hooks, `apps/web` (form + columns + i18n), and these hotels PRD docs.
+
 **2026-07-18 (later still) — JED-WFH/MAD-CIN season windows extended to cover
 the full flight date range.** User report: searching hotels/creating a
 package for a flight date like 2026-08-08 found no hotels, because

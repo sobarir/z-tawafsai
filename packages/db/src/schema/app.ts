@@ -12,6 +12,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -480,9 +481,10 @@ export const rateRule = pgTable(
     propertyCode: text('property_code')
       .notNull()
       .references(() => property.propertyCode),
-    seasonId: text('season_id')
-      .notNull()
-      .references(() => season.id),
+    // Nullable: a season-less rate rule is the Standard (base) rate, used
+    // whenever no dated season covers the stay (or a season has no matching
+    // band). See prd/hotels/13-resolver-and-search.md.
+    seasonId: text('season_id').references(() => season.id),
     roomTypeId: text('room_type_id')
       .notNull()
       .references(() => roomType.id),
@@ -504,13 +506,18 @@ export const rateRule = pgTable(
       sql`${table.maxOccupancy} >= ${table.minOccupancy}`,
     ),
     check('rate_rule_amount_non_negative', sql`${table.amount} >= 0`),
-    uniqueIndex('rate_rule_band_unique').on(
-      table.propertyCode,
-      table.seasonId,
-      table.roomTypeId,
-      table.minOccupancy,
-      table.maxOccupancy,
-    ),
+    // nullsNotDistinct so two season-less (Standard) bands for the same
+    // property/room/occupancy still collide (Postgres treats NULLs as distinct
+    // by default, which would let duplicate standard bands through).
+    unique('rate_rule_band_unique')
+      .on(
+        table.propertyCode,
+        table.seasonId,
+        table.roomTypeId,
+        table.minOccupancy,
+        table.maxOccupancy,
+      )
+      .nullsNotDistinct(),
   ],
 );
 

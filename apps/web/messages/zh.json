@@ -574,8 +574,10 @@
         "minOccupancy": "最小入住人数",
         "maxOccupancy": "最大入住人数",
         "amount": "金额（最小货币单位）",
-        "currency": "货币"
-      }
+        "currency": "货币",
+        "seasonStandardHint": "Leave empty for the Standard (base) rate — it applies whenever no season covers the stay."
+      },
+      "standardSeason": "Standard"
     }
   },
   "reference": {

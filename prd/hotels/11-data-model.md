@@ -108,7 +108,7 @@ Display conversion only. Rate stored as integer with fixed scale to avoid float.
 |-----------------|----------------------------|-------------------------------|
 | id              | text PK (ULID)             |                              |
 | property_code   | text NOT NULL              | FK → property.property_code  |
-| season_id       | text NOT NULL              | FK → season.id               |
+| season_id       | text **NULL**              | FK → season.id; NULL = the Standard (base) rate (2026-07-19) |
 | room_type_id    | text NOT NULL              | FK → room_type.id            |
 | min_occupancy   | integer NOT NULL           | band lower bound (inclusive) |
 | max_occupancy   | integer NOT NULL           | band upper bound (inclusive) |
@@ -117,9 +117,12 @@ Display conversion only. Rate stored as integer with fixed scale to avoid float.
 
 - CHECK `max_occupancy >= min_occupancy`.
 - CHECK `amount >= 0`.
-- UNIQUE `(property_code, season_id, room_type_id, min_occupancy, max_occupancy)`
-  — one rule per band per room per season.
-- Index on `(property_code, season_id)`.
+- UNIQUE **NULLS NOT DISTINCT** `(property_code, season_id, room_type_id, min_occupancy, max_occupancy)`
+  — one rule per band per room per season; `NULLS NOT DISTINCT` so two Standard
+  (season-less) bands for the same property/room/occupancy still collide.
+- `season_id` NULL = **Standard** rate, applied whenever no dated season covers the
+  stay (or a matched season lacks a band). `season_name = 'standard'` is retired
+  as a dated season — Standard is now the absence of a season.
 
 ## Cross-entity invariants (assert in tests, not FK-expressible)
 

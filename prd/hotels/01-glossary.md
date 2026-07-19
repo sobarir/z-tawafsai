@@ -28,16 +28,19 @@ Input: `listingId`, `checkIn`, `checkOut` (checkOut exclusive), `occupancy`,
 
 ```
 1. Load listing. If inactive → EXCLUDED.
-2. Resolve season:
+2. Resolve season (optional — 2026-07-19):
      find the season on this listing whose window contains the stay.
      - property: the stay must fall within a single season window
                  (checkIn ≥ season.start AND checkOut ≤ season.end).
      - package:  the checkIn (departure) must fall within a season window.
-     If none → NO_SEASON (listing excluded from results, not an error).
-3. Resolve occupancy band:
-     find the rate_rule for (listing, season[, roomType]) whose
-     [min,max] occupancy contains `occupancy`.
-     If none → NO_BAND (excluded).
+     If none, that's fine — the Standard (season-less) rate applies. There is
+     no NO_SEASON outcome: "no season" simply means Standard.
+3. Resolve occupancy band (season → Standard fallback):
+     find the rate_rule for (listing, matched-season[, roomType]) whose
+     [min,max] occupancy contains `occupancy`. If the matched season has no such
+     band (or no season matched), fall back to the Standard band — the rate_rule
+     with season_id = NULL for that [roomType,] occupancy.
+     If neither a seasonal nor a Standard band matches → NO_BAND (excluded).
 4. Compute native amount:
      - property: nights = checkOut - checkIn (in days);
                  native = rate_rule.amount_per_night * nights.
@@ -64,8 +67,9 @@ scoping.
 
 ## Resolution outcomes (not exceptions — filters)
 
-`OK`, `NO_SEASON`, `NO_BAND`, `FX_MISSING`, `INACTIVE`. Anything not `OK` means
-the listing is silently dropped from that search's results, never a 500.
+`OK`, `NO_BAND`, `FX_MISSING`, `INACTIVE`. Anything not `OK` means the listing is
+silently dropped from that search's results, never a 500. (`NO_SEASON` was
+removed 2026-07-19 — a missing season now falls back to the Standard rate.)
 
 ## The 5 golden rules
 

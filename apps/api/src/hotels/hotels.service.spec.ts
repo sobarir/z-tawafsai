@@ -150,10 +150,10 @@ describe('HotelsService.search — golden scenarios', () => {
     expect(item?.price).toEqual({ amount: 10_667, currency: 'USD' });
   });
 
-  it('S9 — NO_SEASON: dates outside every season window are silently omitted, still 200', async () => {
-    // 2027-02 is outside every seeded Madinah season: MAD-CIN's single
-    // 'standard' window ends 2026-05-01, and the Nusuk hotels' full-year
-    // 'standard' window (prd/hotel_list.md data) ends 2027-01-01.
+  it('S9 — Standard fallback: dates outside every dated season still price at the season-less Standard rate', async () => {
+    // 2027-02 is outside every seeded Madinah dated season. Under the
+    // "Standard = no season" model, the season-less base rate applies, so the
+    // Madinah properties are priced (previously this was NO_SEASON → omitted).
     const res = await hotels.search({
       ...baseQuery,
       destination: 'Madinah',
@@ -162,7 +162,10 @@ describe('HotelsService.search — golden scenarios', () => {
       occupancy: 2,
       currency: 'SAR',
     });
-    expect(res.items).toHaveLength(0);
+    expect(res.items.length).toBeGreaterThan(0);
+    for (const item of res.items) {
+      expect(item.price.amount).toBeGreaterThan(0);
+    }
   });
 
   it('S10 — NO_BAND: occupancy above every band is silently omitted', async () => {

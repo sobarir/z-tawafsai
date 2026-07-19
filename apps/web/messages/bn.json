@@ -574,8 +574,10 @@
         "minOccupancy": "সর্বনিম্ন ধারণক্ষমতা",
         "maxOccupancy": "সর্বোচ্চ ধারণক্ষমতা",
         "amount": "পরিমাণ (ক্ষুদ্রতম একক)",
-        "currency": "মুদ্রা"
-      }
+        "currency": "মুদ্রা",
+        "seasonStandardHint": "Leave empty for the Standard (base) rate — it applies whenever no season covers the stay."
+      },
+      "standardSeason": "Standard"
     }
   },
   "reference": {

@@ -12,12 +12,7 @@ import {
   nights,
 } from './money';
 
-export type ResolveOutcome =
-  | 'OK'
-  | 'NO_SEASON'
-  | 'NO_BAND'
-  | 'FX_MISSING'
-  | 'INACTIVE';
+export type ResolveOutcome = 'OK' | 'NO_BAND' | 'FX_MISSING' | 'INACTIVE';
 
 export type SeasonRow = {
   id: string;
@@ -28,7 +23,8 @@ export type SeasonRow = {
 };
 
 export type RateRuleRow = {
-  seasonId: string;
+  /** Null = the Standard (season-less) base rate. */
+  seasonId: string | null;
   roomTypeId: string;
   minOccupancy: number;
   maxOccupancy: number;
@@ -73,7 +69,7 @@ function matchSeason(input: ResolveInput): SeasonRow | undefined {
 
 function matchBand(
   input: ResolveInput,
-  seasonId: string,
+  seasonId: string | null,
 ): RateRuleRow | undefined {
   return input.rateRules.find(
     (r) =>
@@ -89,12 +85,14 @@ export function resolvePrice(input: ResolveInput): ResolveResult {
     return { outcome: 'INACTIVE' };
   }
 
+  // A dated season covering the stay takes priority; otherwise (and whenever the
+  // matched season has no band for this room/occupancy) fall back to the
+  // Standard, season-less band. There is no NO_SEASON outcome any more —
+  // "no season" simply means Standard.
   const season = matchSeason(input);
-  if (!season) {
-    return { outcome: 'NO_SEASON' };
-  }
-
-  const band = matchBand(input, season.id);
+  const band =
+    (season ? matchBand(input, season.id) : undefined) ??
+    matchBand(input, null);
   if (!band) {
     return { outcome: 'NO_BAND' };
   }

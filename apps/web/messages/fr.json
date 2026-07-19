@@ -574,8 +574,10 @@
         "minOccupancy": "Occupation minimale",
         "maxOccupancy": "Occupation maximale",
         "amount": "Montant (unité mineure)",
-        "currency": "Devise"
-      }
+        "currency": "Devise",
+        "seasonStandardHint": "Leave empty for the Standard (base) rate — it applies whenever no season covers the stay."
+      },
+      "standardSeason": "Standard"
     }
   },
   "reference": {

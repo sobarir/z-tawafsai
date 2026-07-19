@@ -52,7 +52,8 @@ export function RateRuleForm({
     resolver: zodResolver(createRateRuleSchema),
     defaultValues: {
       propertyCode: rateRule?.propertyCode ?? '',
-      seasonId: rateRule?.seasonId ?? '',
+      // Undefined (empty) = the Standard, season-less base rate.
+      seasonId: rateRule?.seasonId ?? undefined,
       roomTypeId: rateRule?.roomTypeId ?? '',
       minOccupancy: rateRule?.minOccupancy ?? 1,
       maxOccupancy: rateRule?.maxOccupancy ?? 1,
@@ -73,7 +74,8 @@ export function RateRuleForm({
   );
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    await onSubmit(values);
+    // Empty season → Standard (season-less) base rate.
+    await onSubmit({ ...values, seasonId: values.seasonId || undefined });
   });
 
   return (
@@ -87,13 +89,18 @@ export function RateRuleForm({
           disabled={isEdit}
         />
 
-        <ComboboxFormField
-          control={form.control}
-          name="seasonId"
-          label={t('seasonId')}
-          options={toSeasonOptions(seasonsForProperty)}
-          disabled={isEdit || !selectedPropertyCode}
-        />
+        <div className="flex flex-col gap-1">
+          <ComboboxFormField
+            control={form.control}
+            name="seasonId"
+            label={t('seasonId')}
+            options={toSeasonOptions(seasonsForProperty)}
+            disabled={isEdit || !selectedPropertyCode}
+          />
+          <p className="text-xs text-muted-foreground">
+            {t('seasonStandardHint')}
+          </p>
+        </div>
 
         <ComboboxFormField
           control={form.control}

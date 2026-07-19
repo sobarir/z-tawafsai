@@ -574,8 +574,10 @@
         "minOccupancy": "Ocupación mínima",
         "maxOccupancy": "Ocupación máxima",
         "amount": "Importe (unidad menor)",
-        "currency": "Moneda"
-      }
+        "currency": "Moneda",
+        "seasonStandardHint": "Leave empty for the Standard (base) rate — it applies whenever no season covers the stay."
+      },
+      "standardSeason": "Standard"
     }
   },
   "reference": {

@@ -12,6 +12,8 @@ interface RateRuleColumnsOptions {
     band: string;
     amount: string;
   };
+  /** Shown for a season-less (Standard) rate rule. */
+  standardSeasonLabel: string;
   properties: Property[];
   seasons: Season[];
   roomTypes: RoomType[];
@@ -25,6 +27,7 @@ interface RateRuleColumnsOptions {
 
 export function getRateRuleColumns({
   columnLabels,
+  standardSeasonLabel,
   properties,
   seasons,
   roomTypes,
@@ -38,8 +41,10 @@ export function getRateRuleColumns({
   const propertyName = (propertyCode: string): string =>
     properties.find((p) => p.propertyCode === propertyCode)?.displayName ??
     propertyCode;
-  const seasonName = (seasonId: string): string =>
-    seasons.find((s) => s.id === seasonId)?.name ?? seasonId;
+  const seasonName = (seasonId: string | null): string =>
+    seasonId
+      ? (seasons.find((s) => s.id === seasonId)?.name ?? seasonId)
+      : standardSeasonLabel;
   const roomTypeName = (roomTypeId: string): string =>
     roomTypes.find((r) => r.id === roomTypeId)?.name ?? roomTypeId;
 

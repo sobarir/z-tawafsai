@@ -658,7 +658,8 @@ export type UpdateSeasonInput = z.infer<typeof updateSeasonSchema>;
 export const rateRuleSchema = z.object({
   id: ulidSchema,
   propertyCode: z.string(),
-  seasonId: ulidSchema,
+  /** Null = the Standard (base) rate — applies when no dated season covers the stay. */
+  seasonId: ulidSchema.nullable(),
   roomTypeId: ulidSchema,
   minOccupancy: z.number().int().positive(),
   maxOccupancy: z.number().int().positive(),
@@ -670,7 +671,8 @@ export type RateRule = z.infer<typeof rateRuleSchema>;
 
 export const createRateRuleSchema = z.object({
   propertyCode: z.string().min(1).max(50),
-  seasonId: ulidSchema,
+  /** Omit for the Standard (season-less) base rate. */
+  seasonId: ulidSchema.optional(),
   roomTypeId: ulidSchema,
   minOccupancy: z.number().int().positive(),
   maxOccupancy: z.number().int().positive(),

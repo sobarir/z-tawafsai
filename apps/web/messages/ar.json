@@ -574,8 +574,10 @@
         "minOccupancy": "أدنى إشغال",
         "maxOccupancy": "أقصى إشغال",
         "amount": "المبلغ (بالوحدة الصغرى)",
-        "currency": "العملة"
-      }
+        "currency": "العملة",
+        "seasonStandardHint": "Leave empty for the Standard (base) rate — it applies whenever no season covers the stay."
+      },
+      "standardSeason": "Standard"
     }
   },
   "reference": {

@@ -329,9 +329,10 @@
     },
     "rateRules": {
       "title": "Rate Rules",
-      "description": "The atomic price fact: (property, season, occupancy band) -> price in a currency.",
+      "description": "The atomic price fact: (property, season or Standard, occupancy band) -> price in a currency.",
       "createTitle": "New rate rule",
       "editTitle": "Edit rate rule",
+      "standardSeason": "Standard",
       "columns": {
         "property": "Property",
         "season": "Season",
@@ -342,6 +343,7 @@
       "fields": {
         "propertyCode": "Property",
         "seasonId": "Season",
+        "seasonStandardHint": "Leave empty for the Standard (base) rate — it applies whenever no season covers the stay.",
         "roomTypeId": "Room type",
         "minOccupancy": "Min occupancy",
         "maxOccupancy": "Max occupancy",

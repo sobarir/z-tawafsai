@@ -13,7 +13,7 @@ export interface CreateRateRuleDto {
    */
   propertyCode: string;
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  seasonId: string;
+  seasonId?: string;
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   roomTypeId: string;
   /**

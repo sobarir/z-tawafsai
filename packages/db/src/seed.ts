@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { createDb } from './client';
 import * as schema from './schema';
 
@@ -4835,6 +4835,23 @@ async function seed() {
       });
   }
 
+  // "Standard" is now the absence of a season — a season-less rate rule is the
+  // base rate. Idempotent one-time cleanup: drop any legacy 'standard' seasons
+  // and their rate rules so the standard bands below re-create season-less.
+  const legacyStandardSeasons = await db
+    .select({ id: schema.season.id })
+    .from(schema.season)
+    .where(eq(schema.season.name, 'standard'));
+  if (legacyStandardSeasons.length > 0) {
+    await db.delete(schema.rateRule).where(
+      inArray(
+        schema.rateRule.seasonId,
+        legacyStandardSeasons.map((s) => s.id),
+      ),
+    );
+    await db.delete(schema.season).where(eq(schema.season.name, 'standard'));
+  }
+
   for (const item of properties) {
     await db
       .insert(schema.property)
@@ -4887,6 +4904,9 @@ async function seed() {
 
     const seasonIdByName = new Map<string, string>();
     for (const season of item.seasons) {
+      // 'standard' is no longer a dated season — its rate rules become
+      // season-less below. Skip creating a season row for it.
+      if (season.name === 'standard') continue;
       const [existing] = await db
         .select()
         .from(schema.season)
@@ -4917,8 +4937,13 @@ async function seed() {
     }
 
     for (const rule of item.rateRules) {
-      const seasonId = seasonIdByName.get(rule.seasonName);
-      if (!seasonId) {
+      // A 'standard' rate rule is season-less (the base rate); everything else
+      // resolves to its dated season.
+      const seasonId =
+        rule.seasonName === 'standard'
+          ? null
+          : (seasonIdByName.get(rule.seasonName) ?? null);
+      if (rule.seasonName !== 'standard' && seasonId === null) {
         throw new Error(
           `Seed error: rate rule for ${item.code} references unknown season "${rule.seasonName}"`,
         );
@@ -4936,7 +4961,9 @@ async function seed() {
         .where(
           and(
             eq(schema.rateRule.propertyCode, item.code),
-            eq(schema.rateRule.seasonId, seasonId),
+            seasonId === null
+              ? isNull(schema.rateRule.seasonId)
+              : eq(schema.rateRule.seasonId, seasonId),
             eq(schema.rateRule.roomTypeId, roomTypeId),
             eq(schema.rateRule.minOccupancy, rule.minOccupancy),
             eq(schema.rateRule.maxOccupancy, rule.maxOccupancy),

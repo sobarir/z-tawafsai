@@ -39,13 +39,15 @@ Rounding happens **once**, at the final display conversion. Never round mid-calc
 
 ```
 resolvePrice(listing, { checkIn, checkOut, occupancy, displayCurrency, roomTypeId? })
-  → { outcome: 'OK'|'NO_SEASON'|'NO_BAND'|'FX_MISSING'|'INACTIVE',
+  → { outcome: 'OK'|'NO_BAND'|'FX_MISSING'|'INACTIVE',
       native?: Money, converted?: Money, breakdown?: {...} }
 
 steps (see 01-glossary.md for the canonical algorithm):
   - inactive listing → INACTIVE
-  - season := matchSeason(listing, checkIn, checkOut)   // kind-dependent
-  - band   := matchBand(listing, season, occupancy, roomTypeId)
+  - season := matchSeason(listing, checkIn, checkOut)   // kind-dependent; may be none
+  - band   := matchBand(listing, season, ...) ?? matchBand(listing, null, ...)
+              // a matched season's band wins; otherwise the Standard
+              // (season_id = NULL) band applies. No NO_SEASON outcome.
   - native := listing.kind === 'property'
                 ? band.amount * nights(checkIn, checkOut)
                 : band.amount

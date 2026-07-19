@@ -69,6 +69,7 @@ export function HotelRateRulesAdmin() {
           band: t('columns.band'),
           amount: t('columns.amount'),
         },
+        standardSeasonLabel: t('standardSeason'),
         properties: properties ?? [],
         seasons: seasons ?? [],
         roomTypes: roomTypes ?? [],

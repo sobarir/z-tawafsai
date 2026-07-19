@@ -55,13 +55,45 @@ describe('resolvePrice', () => {
     expect(result.outcome).toBe('INACTIVE');
   });
 
-  it('returns NO_SEASON when the stay falls outside every season window', () => {
+  const standardBand = {
+    seasonId: null,
+    roomTypeId: 'rt-double',
+    minOccupancy: 1,
+    maxOccupancy: 2,
+    amount: 30_000,
+    currency: 'SAR',
+  };
+
+  it('falls back to the Standard (season-less) band when no dated season covers the stay', () => {
+    const result = resolvePrice({
+      ...propertyBase,
+      rateRules: [...propertyBase.rateRules, standardBand],
+      checkIn: '2026-06-01',
+      checkOut: '2026-06-04',
+    });
+    expect(result.outcome).toBe('OK');
+    if (result.outcome !== 'OK') throw new Error('unreachable');
+    expect(result.native).toEqual({ amount: 90_000, currency: 'SAR' }); // 3 × 30000
+  });
+
+  it('prefers a matching season band over the Standard band', () => {
+    const result = resolvePrice({
+      ...propertyBase,
+      rateRules: [...propertyBase.rateRules, standardBand],
+      // checkIn 2026-02 is inside the dated season window, so its 40000 band wins.
+    });
+    expect(result.outcome).toBe('OK');
+    if (result.outcome !== 'OK') throw new Error('unreachable');
+    expect(result.breakdown.perNight.amount).toBe(40_000);
+  });
+
+  it('returns NO_BAND when neither a season nor a Standard band covers the inputs', () => {
     const result = resolvePrice({
       ...propertyBase,
       checkIn: '2026-06-01',
       checkOut: '2026-06-04',
     });
-    expect(result.outcome).toBe('NO_SEASON');
+    expect(result.outcome).toBe('NO_BAND');
   });
 
   it('returns NO_BAND when occupancy exceeds every band', () => {
