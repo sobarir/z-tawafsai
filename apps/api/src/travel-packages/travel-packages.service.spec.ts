@@ -48,19 +48,17 @@ describe('TravelPackagesService', () => {
     const created = await service.create({
       type: 'umrah',
       title: TEST_TITLE,
-      flightId: testFlightId,
       durationNights: 3,
       price: 999,
       currency: 'USD',
       stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
-      departures: [{ departureDate: '2026-09-01', returnDate: '2026-09-04' }],
+      departures: [{ flightId: testFlightId, returnDate: '2026-09-04' }],
       inclusions: [{ kind: 'included', label: 'Umrah visa' }],
     });
     expect(created.title).toBe(TEST_TITLE);
-    expect(created.flight.id).toBe(testFlightId);
+    expect(created.departures[0].flight.id).toBe(testFlightId);
     expect(created.stays).toHaveLength(1);
     expect(created.stays[0].propertyCode).toBe(TEST_PROPERTY_CODE);
-    expect(created.departures[0].departureDate).toBe('2026-09-01');
     expect(created.inclusions[0].label).toBe('Umrah visa');
     expect(created.isFeatured).toBe(false);
 
@@ -85,11 +83,11 @@ describe('TravelPackagesService', () => {
       service.create({
         type: 'umrah',
         title: TEST_TITLE,
-        flightId: testFlightId,
         durationNights: 5,
         price: 999,
         currency: 'USD',
         stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
+        departures: [{ flightId: testFlightId }],
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -104,23 +102,23 @@ describe('TravelPackagesService', () => {
     const pkg = await service.create({
       type: 'umrah',
       title: TEST_TITLE,
-      flightId: testFlightId,
       durationNights: 3,
       price: 999,
       currency: 'USD',
       stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
       departures: [
         {
-          departureDate: '2026-09-01',
+          flightId: testFlightId,
           returnDate: '2026-09-04',
           totalSeats: 5,
+          availableSeats: 5,
         },
       ],
     });
     const departureId = pkg.departures[0].id;
     expect(pkg.departures[0].totalSeats).toBe(5);
     expect(pkg.departures[0].bookedSeats).toBe(0);
-    expect(pkg.departures[0].remainingSeats).toBe(5);
+    expect(pkg.departures[0].availableSeats).toBe(5);
 
     const booking = await service.createBooking({
       departureId,
@@ -131,7 +129,7 @@ describe('TravelPackagesService', () => {
 
     const afterBooking = await service.findById(pkg.id);
     expect(afterBooking.departures[0].bookedSeats).toBe(3);
-    expect(afterBooking.departures[0].remainingSeats).toBe(2);
+    expect(afterBooking.departures[0].availableSeats).toBe(2);
 
     // Only 2 seats left — a 3-pax booking overbooks and is rejected.
     await expect(
@@ -145,7 +143,7 @@ describe('TravelPackagesService', () => {
     expect(cancelled.status).toBe('cancelled');
     const afterCancel = await service.findById(pkg.id);
     expect(afterCancel.departures[0].bookedSeats).toBe(0);
-    expect(afterCancel.departures[0].remainingSeats).toBe(5);
+    expect(afterCancel.departures[0].availableSeats).toBe(5);
 
     await service.removeBooking(booking.id);
     await expect(service.findBookingById(booking.id)).rejects.toThrow(
@@ -157,16 +155,15 @@ describe('TravelPackagesService', () => {
     const pkg = await service.create({
       type: 'umrah',
       title: TEST_TITLE,
-      flightId: testFlightId,
       durationNights: 3,
       price: 999,
       currency: 'USD',
       stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
-      departures: [{ departureDate: '2026-09-01' }],
+      departures: [{ flightId: testFlightId }],
     });
     const departureId = pkg.departures[0].id;
     expect(pkg.departures[0].totalSeats).toBeNull();
-    expect(pkg.departures[0].remainingSeats).toBeNull();
+    expect(pkg.departures[0].availableSeats).toBeNull();
 
     // No quota → any pax is accepted; bookedSeats still accumulates.
     await service.createBooking({
@@ -176,19 +173,20 @@ describe('TravelPackagesService', () => {
     });
     const after = await service.findById(pkg.id);
     expect(after.departures[0].bookedSeats).toBe(999);
-    expect(after.departures[0].remainingSeats).toBeNull();
+    expect(after.departures[0].availableSeats).toBeNull();
   });
 
   it('upserts departures by id so bookings survive a package update, and blocks removing a booked departure', async () => {
     const pkg = await service.create({
       type: 'umrah',
       title: TEST_TITLE,
-      flightId: testFlightId,
       durationNights: 3,
       price: 999,
       currency: 'USD',
       stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
-      departures: [{ departureDate: '2026-09-01', totalSeats: 10 }],
+      departures: [
+        { flightId: testFlightId, totalSeats: 10, availableSeats: 10 },
+      ],
     });
     const departureId = pkg.departures[0].id;
     const booking = await service.createBooking({
@@ -201,12 +199,17 @@ describe('TravelPackagesService', () => {
     const updated = await service.update(pkg.id, {
       price: 1200,
       departures: [
-        { id: departureId, departureDate: '2026-09-02', totalSeats: 10 },
+        {
+          id: departureId,
+          flightId: testFlightId,
+          totalSeats: 10,
+          availableSeats: 8,
+        },
       ],
     });
     expect(updated.departures).toHaveLength(1);
     expect(updated.departures[0].id).toBe(departureId);
-    expect(updated.departures[0].departureDate).toBe('2026-09-02');
+    expect(updated.departures[0].flight.id).toBe(testFlightId);
     expect(updated.departures[0].bookedSeats).toBe(2);
     expect((await service.findBookingById(booking.id)).id).toBe(booking.id);
 
@@ -229,14 +232,13 @@ describe('TravelPackagesService', () => {
       const pkg = await service.create({
         type: 'umrah',
         title: TEST_TITLE,
-        flightId: testFlightId,
         durationNights: 3,
         price: 999,
         currency: 'USD',
         providerId: provider.id,
         feePerSeat: 50,
         stays: [{ propertyCode: TEST_PROPERTY_CODE, sequence: 1, nights: 3 }],
-        departures: [{ departureDate: '2026-09-01', totalSeats: 20 }],
+        departures: [{ flightId: testFlightId, totalSeats: 20 }],
       });
       expect(pkg.providerId).toBe(provider.id);
       expect(pkg.providerName).toBe('__test__ provider');

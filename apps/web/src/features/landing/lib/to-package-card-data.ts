@@ -77,7 +77,8 @@ function earliestDepartureDate(
 ): string {
   const first = [...pkg.departures].sort(
     (a, b) =>
-      new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime(),
+      new Date(a.flight.departureTime).getTime() -
+      new Date(b.flight.departureTime).getTime(),
   )[0];
   if (!first) return '';
   try {
@@ -85,9 +86,9 @@ function earliestDepartureDate(
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-    }).format(new Date(first.departureDate));
+    }).format(new Date(first.flight.departureTime));
   } catch {
-    return first.departureDate;
+    return first.flight.departureTime;
   }
 }
 
@@ -107,11 +108,19 @@ export function toPackageCardData(
   const makkah = pkg.stays.find((stay) => /mak/i.test(stay.destination));
   const madinah = pkg.stays.find((stay) => /mad/i.test(stay.destination));
 
-  const airline = pkg.flight.isDirect
-    ? pkg.flight.airlineName
-    : `${pkg.flight.airlineName} ${labels.transitVia(
-        pkg.flight.transitCityName ?? pkg.flight.transitAirport ?? '',
-      )}`;
+  const firstDeparture = [...pkg.departures].sort(
+    (a, b) =>
+      new Date(a.flight.departureTime).getTime() -
+      new Date(b.flight.departureTime).getTime(),
+  )[0];
+
+  const airline = firstDeparture?.flight.isDirect
+    ? firstDeparture.flight.airlineName
+    : `${firstDeparture?.flight.airlineName ?? ''} ${labels.transitVia(
+        firstDeparture?.flight.transitCityName ??
+          firstDeparture?.flight.transitAirport ??
+          '',
+      )}`.trim();
 
   return {
     badge: typeBadgeLabel(pkg.type, labels),
@@ -126,7 +135,7 @@ export function toPackageCardData(
     departureDate: earliestDepartureDate(pkg, locale),
     durationValue: `${pkg.durationNights} ${labels.nightsUnit}`,
     airline,
-    direct: pkg.flight.isDirect,
+    direct: firstDeparture?.flight.isDirect ?? true,
     hotelMakkah: hotelLine(makkah, labels.emptyHotel),
     hotelMadinah: hotelLine(madinah, labels.emptyHotel),
     footNote: mealLabel(pkg.mealPlan, labels),

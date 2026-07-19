@@ -327,13 +327,6 @@ export const propertyType = pgEnum('property_type', [
   'apartment',
   'house',
 ]);
-export const seasonName = pgEnum('season_name', [
-  'standard',
-  'peak',
-  'ramadan',
-  'hajj',
-  'promo',
-]);
 
 // Travel-package (umrah) domain enums — see /prd/travel-packages/11-data-model.md.
 export const travelPackageType = pgEnum('travel_package_type', [
@@ -454,7 +447,7 @@ export const season = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => createId()),
-    name: seasonName('name').notNull(),
+    name: varchar('name', { length: 50 }).notNull(),
   },
   (table) => [uniqueIndex('season_name_unique').on(table.name)],
 );
@@ -577,9 +570,6 @@ export const flightHotelPackage = pgTable('travel_package', {
   type: travelPackageType('type').notNull().default('umrah'),
   title: varchar('title', { length: 200 }).notNull(),
   description: text('description'),
-  flightId: varchar('flight_id', { length: 26 })
-    .notNull()
-    .references(() => flights.id),
   durationNights: integer('duration_nights').notNull(),
   mealPlan: travelPackageMealPlan('meal_plan'),
   heroImageUrl: text('hero_image_url'),
@@ -654,19 +644,19 @@ export const travelPackageDeparture = pgTable(
     packageId: text('package_id')
       .notNull()
       .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
-    departureDate: date('departure_date', { mode: 'string' }).notNull(),
+    flightId: varchar('flight_id', { length: 26 })
+      .notNull()
+      .references(() => flights.id),
     returnDate: date('return_date', { mode: 'string' }),
     seatsNote: text('seats_note'),
     totalSeats: integer('total_seats'),
+    availableSeats: integer('available_seats'),
   },
   (table) => [
-    index('idx_travel_package_departure_package').on(
-      table.packageId,
-      table.departureDate,
-    ),
+    index('idx_travel_package_departure_package').on(table.packageId),
     check(
-      'travel_package_departure_return_after_start',
-      sql`${table.returnDate} IS NULL OR ${table.returnDate} >= ${table.departureDate}`,
+      'travel_package_departure_available_seats_nonneg',
+      sql`${table.availableSeats} IS NULL OR ${table.availableSeats} >= 0`,
     ),
     check(
       'travel_package_departure_total_seats_nonneg',

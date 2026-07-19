@@ -42,10 +42,21 @@ export function toAirlineOptions(airlines: Airline[]): ComboboxOption[] {
 }
 
 export function toFlightOptions(flights: Flight[]): ComboboxOption[] {
-  return flights.map((f) => ({
-    value: f.id,
-    label: `${f.operatingAirline}${f.flightNumber} (${f.originAirport}→${f.destAirport})`,
-  }));
+  return flights.map((f) => {
+    const timeStr = f.departureTime
+      ? new Date(f.departureTime).toLocaleString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : 'Unknown Time';
+    return {
+      value: f.id,
+      label: `${f.operatingAirline}${f.flightNumber} (${f.originAirport}→${f.destAirport}) · ${timeStr}`,
+    };
+  });
 }
 
 export function toCurrencyOptions(currencies: Currency[]): ComboboxOption[] {

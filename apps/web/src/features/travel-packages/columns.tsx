@@ -47,7 +47,9 @@ export function getTravelPackageColumns({
       id: 'flight',
       header: columnLabels.flight,
       cell: ({ row }) => {
-        const { flight } = row.original;
+        const firstDeparture = row.original.departures[0];
+        if (!firstDeparture) return '-';
+        const { flight } = firstDeparture;
         return `${flight.operatingAirline}${flight.flightNumber} (${flight.originAirport}→${flight.destAirport})`;
       },
     },

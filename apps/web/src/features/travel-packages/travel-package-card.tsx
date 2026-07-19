@@ -26,9 +26,13 @@ function formatDate(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale, { dateStyle: 'medium' });
 }
 
+function formatTime(iso: string, locale: string): string {
+  return new Date(iso).toLocaleTimeString(locale, { timeStyle: 'short' });
+}
+
 export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
   const t = useTranslations('travelPackages');
-  const { flight, stays, departures, inclusions } = item;
+  const { stays, departures, inclusions } = item;
 
   // Booking is handled over WhatsApp: the CTA opens a chat prefilled with the
   // package title; staff then record the booking in the back-office admin.
@@ -43,7 +47,8 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
 
   const firstDeparture = [...departures].sort(
     (a, b) =>
-      new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime(),
+      new Date(a.flight.departureTime).getTime() -
+      new Date(b.flight.departureTime).getTime(),
   )[0];
 
   let departureDateStr = '';
@@ -53,9 +58,9 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
-      }).format(new Date(firstDeparture.departureDate));
+      }).format(new Date(firstDeparture.flight.departureTime));
     } catch {
-      departureDateStr = firstDeparture.departureDate;
+      departureDateStr = firstDeparture.flight.departureTime;
     }
   }
 
@@ -145,30 +150,35 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         </div>
 
         {/* 2. Airline */}
-        <div className="flex items-start gap-2.5">
-          <Plane className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
-          <div>
-            <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
-              {flight.airlineName}
+        {firstDeparture && (
+          <div className="flex items-start gap-2.5">
+            <Plane className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
+            <div>
+              <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
+                {firstDeparture.flight.airlineName}
+              </div>
+              {firstDeparture.flight.isDirect ? (
+                <div className="mt-0.5">
+                  <Badge className="rounded-full border-transparent bg-brand-600 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-white uppercase">
+                    {t('direct')}
+                  </Badge>
+                </div>
+              ) : (
+                <div className="mt-0.5">
+                  <Badge className="rounded-full border-transparent bg-gray-200 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-landing-ink uppercase">
+                    {t('transitIn', {
+                      city:
+                        firstDeparture.flight.transitCityName ??
+                        firstDeparture.flight.transitAirport ??
+                        '',
+                      code: firstDeparture.flight.transitAirport ?? '',
+                    })}
+                  </Badge>
+                </div>
+              )}
             </div>
-            {flight.isDirect ? (
-              <div className="mt-0.5">
-                <Badge className="rounded-full border-transparent bg-brand-600 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-white uppercase">
-                  {t('direct')}
-                </Badge>
-              </div>
-            ) : (
-              <div className="mt-0.5">
-                <Badge className="rounded-full border-transparent bg-gray-200 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-landing-ink uppercase">
-                  {t('transitIn', {
-                    city: flight.transitCityName ?? flight.transitAirport ?? '',
-                    code: flight.transitAirport ?? '',
-                  })}
-                </Badge>
-              </div>
-            )}
           </div>
-        </div>
+        )}
 
         {/* 3+. Hotels */}
         {stays.map((stay) => (
@@ -199,23 +209,30 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         {/* Extra Info Section */}
         <div className="col-span-1 flex flex-col gap-4 min-[761px]:col-span-2">
           {/* Detailed Flight info */}
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Plane className="h-4 w-4" />
-            </span>
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <p className="text-sm font-medium">
-                {flight.operatingAirline} {flight.flightNumber}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {flight.originAirport} → {flight.destAirport} ·{' '}
-                {formatDate(flight.departureTime, locale)}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {formatDuration(flight.departureTime, flight.arrivalTime)}
-              </p>
+          {firstDeparture && (
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Plane className="h-4 w-4" />
+              </span>
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <p className="text-sm font-medium">
+                  {firstDeparture.flight.operatingAirline}{' '}
+                  {firstDeparture.flight.flightNumber}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {firstDeparture.flight.originAirport} →{' '}
+                  {firstDeparture.flight.destAirport} ·{' '}
+                  {formatTime(firstDeparture.flight.departureTime, locale)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {formatDuration(
+                    firstDeparture.flight.departureTime,
+                    firstDeparture.flight.arrivalTime,
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* All Departures */}
           {departures.length > 0 && (
@@ -226,16 +243,22 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
               <div className="flex min-w-0 flex-col gap-1">
                 <p className="text-sm font-medium">{t('departures')}</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {departures.map((departure) => (
-                    <Badge key={departure.id} variant="outline">
-                      {formatDate(departure.departureDate, locale)}
-                      {departure.remainingSeats !== null
-                        ? ` · ${t('seatsLeft', { count: departure.remainingSeats })}`
-                        : departure.seatsNote
-                          ? ` · ${departure.seatsNote}`
-                          : ''}
-                    </Badge>
-                  ))}
+                  {departures.map((departure) => {
+                    const remainingSeats =
+                      departure.availableSeats !== null
+                        ? departure.availableSeats - departure.bookedSeats
+                        : null;
+                    return (
+                      <Badge key={departure.id} variant="outline">
+                        {formatDate(departure.flight.departureTime, locale)}
+                        {remainingSeats !== null
+                          ? ` · ${t('seatsLeft', { count: remainingSeats })}`
+                          : departure.seatsNote
+                            ? ` · ${departure.seatsNote}`
+                            : ''}
+                      </Badge>
+                    );
+                  })}
                 </div>
               </div>
             </div>

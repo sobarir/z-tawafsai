@@ -788,7 +788,7 @@
         "seatsNote": "Seats note",
         "seatsNotePlaceholder": "e.g. 4 seats left",
         "totalSeats": "Total seats",
-        "totalSeatsHint": "Set a seat quota to track availability; leave empty for untracked. Booked seats are entered under \"Manage seats & bookings\".",
+        "totalSeatsHint": "Set total seats to record your provider quota, and track what you have left to sell using available seats.",
         "addDeparture": "Add departure",
         "inclusions": "Included / excluded",
         "inclusionKind": "Type",
@@ -804,7 +804,8 @@
         "mealHalfBoard": "Half board",
         "mealRoomOnly": "Room only",
         "tabDetails": "Details",
-        "isFeatured": "Featured (shown on landing page)"
+        "isFeatured": "Featured (shown on landing page)",
+        "availableSeats": "Available seats"
       }
     },
     "bookings": {

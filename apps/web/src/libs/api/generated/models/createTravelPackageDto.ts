@@ -21,8 +21,6 @@ export interface CreateTravelPackageDto {
   title: string;
   /** @maxLength 2000 */
   description?: string;
-  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  flightId: string;
   /**
    * @minimum 0
    * @maximum 9007199254740991

@@ -5036,13 +5036,8 @@
           },
           "name": {
             "type": "string",
-            "enum": [
-              "standard",
-              "peak",
-              "ramadan",
-              "hajj",
-              "promo"
-            ]
+            "minLength": 1,
+            "maxLength": 50
           }
         },
         "required": [
@@ -5055,13 +5050,8 @@
         "properties": {
           "name": {
             "type": "string",
-            "enum": [
-              "standard",
-              "peak",
-              "ramadan",
-              "hajj",
-              "promo"
-            ]
+            "minLength": 1,
+            "maxLength": 50
           }
         },
         "required": [
@@ -5073,13 +5063,8 @@
         "properties": {
           "name": {
             "type": "string",
-            "enum": [
-              "standard",
-              "peak",
-              "ramadan",
-              "hajj",
-              "promo"
-            ]
+            "minLength": 1,
+            "maxLength": 50
           }
         }
       },
@@ -5384,69 +5369,6 @@
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           },
-          "flight": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-              },
-              "operatingAirline": {
-                "type": "string",
-                "pattern": "^[A-Z0-9]{2}$"
-              },
-              "airlineName": {
-                "type": "string"
-              },
-              "flightNumber": {
-                "type": "string",
-                "pattern": "^[0-9]{1,4}[A-Z]?$"
-              },
-              "originAirport": {
-                "type": "string",
-                "pattern": "^[A-Z]{3}$"
-              },
-              "destAirport": {
-                "type": "string",
-                "pattern": "^[A-Z]{3}$"
-              },
-              "departureTime": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
-              },
-              "arrivalTime": {
-                "type": "string",
-                "format": "date-time",
-                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
-              },
-              "isDirect": {
-                "type": "boolean"
-              },
-              "transitAirport": {
-                "type": "string",
-                "pattern": "^[A-Z]{3}$",
-                "nullable": true
-              },
-              "transitCityName": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "id",
-              "operatingAirline",
-              "airlineName",
-              "flightNumber",
-              "originAirport",
-              "destAirport",
-              "departureTime",
-              "arrivalTime",
-              "isDirect",
-              "transitAirport",
-              "transitCityName"
-            ]
-          },
           "stays": {
             "type": "array",
             "items": {
@@ -5511,10 +5433,72 @@
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
-                "departureDate": {
+                "flightId": {
                   "type": "string",
-                  "format": "date",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "flight": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "operatingAirline": {
+                      "type": "string",
+                      "pattern": "^[A-Z0-9]{2}$"
+                    },
+                    "airlineName": {
+                      "type": "string"
+                    },
+                    "flightNumber": {
+                      "type": "string",
+                      "pattern": "^[0-9]{1,4}[A-Z]?$"
+                    },
+                    "originAirport": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "destAirport": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    },
+                    "departureTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                    },
+                    "arrivalTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                    },
+                    "isDirect": {
+                      "type": "boolean"
+                    },
+                    "transitAirport": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$",
+                      "nullable": true
+                    },
+                    "transitCityName": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "operatingAirline",
+                    "airlineName",
+                    "flightNumber",
+                    "originAirport",
+                    "destAirport",
+                    "departureTime",
+                    "arrivalTime",
+                    "isDirect",
+                    "transitAirport",
+                    "transitCityName"
+                  ]
                 },
                 "returnDate": {
                   "type": "string",
@@ -5532,26 +5516,27 @@
                   "maximum": 9007199254740991,
                   "nullable": true
                 },
+                "availableSeats": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "nullable": true
+                },
                 "bookedSeats": {
                   "type": "integer",
                   "minimum": 0,
                   "maximum": 9007199254740991
-                },
-                "remainingSeats": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991,
-                  "nullable": true
                 }
               },
               "required": [
                 "id",
-                "departureDate",
+                "flightId",
+                "flight",
                 "returnDate",
                 "seatsNote",
                 "totalSeats",
-                "bookedSeats",
-                "remainingSeats"
+                "availableSeats",
+                "bookedSeats"
               ]
             }
           },
@@ -5622,7 +5607,6 @@
           "isFeatured",
           "createdAt",
           "updatedAt",
-          "flight",
           "stays",
           "departures",
           "inclusions",
@@ -5648,10 +5632,6 @@
           "description": {
             "type": "string",
             "maxLength": 2000
-          },
-          "flightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
           "durationNights": {
             "type": "integer",
@@ -5737,10 +5717,9 @@
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
-                "departureDate": {
+                "flightId": {
                   "type": "string",
-                  "format": "date",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
                 "returnDate": {
                   "type": "string",
@@ -5755,10 +5734,15 @@
                   "type": "integer",
                   "minimum": 0,
                   "maximum": 9007199254740991
+                },
+                "availableSeats": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
                 }
               },
               "required": [
-                "departureDate"
+                "flightId"
               ]
             }
           },
@@ -5817,7 +5801,6 @@
         "required": [
           "type",
           "title",
-          "flightId",
           "durationNights",
           "price",
           "currency",
@@ -5843,10 +5826,6 @@
           "description": {
             "type": "string",
             "maxLength": 2000
-          },
-          "flightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
           "durationNights": {
             "type": "integer",
@@ -5932,10 +5911,9 @@
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
-                "departureDate": {
+                "flightId": {
                   "type": "string",
-                  "format": "date",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
                 "returnDate": {
                   "type": "string",
@@ -5950,10 +5928,15 @@
                   "type": "integer",
                   "minimum": 0,
                   "maximum": 9007199254740991
+                },
+                "availableSeats": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
                 }
               },
               "required": [
-                "departureDate"
+                "flightId"
               ]
             }
           },

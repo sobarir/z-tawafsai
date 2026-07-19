@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CreateSeasonInput, Season } from '@repo/shared';
-import { createSeasonSchema, seasonNameSchema } from '@repo/shared';
+import { createSeasonSchema } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
@@ -14,13 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 
 interface SeasonFormProps {
   season?: Season;
@@ -36,13 +30,12 @@ export function SeasonForm({
   submitting,
 }: SeasonFormProps) {
   const t = useTranslations('catalog.seasons.fields');
-  const tSeasonName = useTranslations('catalog.seasons.names');
   const tCommon = useTranslations('common');
 
   const form = useForm<CreateSeasonInput>({
     resolver: zodResolver(createSeasonSchema),
     defaultValues: {
-      name: season?.name ?? 'standard',
+      name: season?.name ?? '',
     },
   });
 
@@ -60,18 +53,7 @@ export function SeasonForm({
             <FormItem>
               <FormLabel>{t('name')}</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {seasonNameSchema.options.map((name) => (
-                      <SelectItem key={name} value={name}>
-                        {tSeasonName(name)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input {...field} placeholder="e.g. Summer Holiday 2026" />
               </FormControl>
               <FormMessage />
             </FormItem>

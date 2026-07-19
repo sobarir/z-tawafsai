@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type TravelPackageDtoFlight = {
+export type TravelPackageDtoDeparturesItemFlight = {
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   id: string;
   /** @pattern ^[A-Z0-9]{2}$ */

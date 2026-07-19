@@ -15,7 +15,7 @@ import type {
   UpdateFlightHotelPackageInput,
   UpdateTravelPackageBookingInput,
 } from '@repo/shared';
-import { and, asc, desc, eq, inArray, ne } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type TravelPackageRow = typeof schema.flightHotelPackage.$inferSelect;
@@ -190,12 +190,24 @@ export class TravelPackagesService {
     if (rows.length === 0) return [];
 
     const packageIds = rows.map((row) => row.id);
-    const flightIds = [...new Set(rows.map((row) => row.flightId))];
 
-    const flights = await this.db
+    const departureRows = await this.db
       .select()
-      .from(schema.flights)
-      .where(inArray(schema.flights.id, flightIds));
+      .from(schema.travelPackageDeparture)
+      .where(inArray(schema.travelPackageDeparture.packageId, packageIds));
+    const departuresByPackage = this.groupBy(
+      departureRows,
+      (departure) => departure.packageId,
+    );
+
+    const flightIds = [...new Set(departureRows.map((row) => row.flightId))];
+    let flights: (typeof schema.flights.$inferSelect)[] = [];
+    if (flightIds.length > 0) {
+      flights = await this.db
+        .select()
+        .from(schema.flights)
+        .where(inArray(schema.flights.id, flightIds));
+    }
     const flightById = new Map(flights.map((flight) => [flight.id, flight]));
     const flightSummaryById = await this.resolveFlightSummaries(flights);
 
@@ -212,16 +224,7 @@ export class TravelPackagesService {
     ]);
     const staysByPackage = this.groupBy(stayRows, (stay) => stay.packageId);
 
-    const departureRows = await this.db
-      .select()
-      .from(schema.travelPackageDeparture)
-      .where(inArray(schema.travelPackageDeparture.packageId, packageIds))
-      .orderBy(asc(schema.travelPackageDeparture.departureDate));
-    const departuresByPackage = this.groupBy(
-      departureRows,
-      (departure) => departure.packageId,
-    );
-
+    // Departures already fetched above to resolve flights.
     // Booked seats per departure = sum of pax across `confirmed` bookings.
     // Only aggregate counts surface here — individual booking rows (customer
     // PII) are served exclusively by the admin-only bookings endpoint.
@@ -251,10 +254,6 @@ export class TravelPackagesService {
 
     const result: FlightHotelPackage[] = [];
     for (const row of rows) {
-      const flight = flightById.get(row.flightId);
-      if (!flight) continue;
-      const summary = flightSummaryById.get(flight.id);
-
       const stays = (staysByPackage.get(row.id) ?? [])
         .map((stay) => {
           const property = propertyByCode.get(stay.propertyCode);
@@ -292,35 +291,45 @@ export class TravelPackagesService {
         isFeatured: row.isFeatured,
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
-        flight: {
-          id: flight.id,
-          operatingAirline: flight.operatingAirline,
-          airlineName: summary?.airlineName ?? flight.operatingAirline,
-          flightNumber: flight.flightNumber,
-          originAirport: flight.originAirport,
-          destAirport: flight.destAirport,
-          departureTime: flight.departureTime.toISOString(),
-          arrivalTime: flight.arrivalTime.toISOString(),
-          isDirect: summary?.isDirect ?? true,
-          transitAirport: summary?.transitAirport ?? null,
-          transitCityName: summary?.transitCityName ?? null,
-        },
         stays,
-        departures: (departuresByPackage.get(row.id) ?? []).map((departure) => {
-          const bookedSeats = bookedByDeparture.get(departure.id) ?? 0;
-          return {
-            id: departure.id,
-            departureDate: departure.departureDate,
-            returnDate: departure.returnDate,
-            seatsNote: departure.seatsNote,
-            totalSeats: departure.totalSeats,
-            bookedSeats,
-            remainingSeats:
-              departure.totalSeats === null
-                ? null
-                : departure.totalSeats - bookedSeats,
-          };
-        }),
+        departures: (departuresByPackage.get(row.id) ?? [])
+          .sort((a, b) => {
+            const flightA = flightById.get(a.flightId);
+            const flightB = flightById.get(b.flightId);
+            if (!flightA || !flightB) return 0;
+            return (
+              flightA.departureTime.getTime() - flightB.departureTime.getTime()
+            );
+          })
+          .map((departure) => {
+            const bookedSeats = bookedByDeparture.get(departure.id) ?? 0;
+            const flight = flightById.get(departure.flightId);
+            const summary = flightSummaryById.get(departure.flightId);
+            if (!flight) throw new Error('Flight not found for departure');
+
+            return {
+              id: departure.id,
+              flightId: departure.flightId,
+              flight: {
+                id: flight.id,
+                operatingAirline: flight.operatingAirline,
+                airlineName: summary?.airlineName ?? flight.operatingAirline,
+                flightNumber: flight.flightNumber,
+                originAirport: flight.originAirport,
+                destAirport: flight.destAirport,
+                departureTime: flight.departureTime.toISOString(),
+                arrivalTime: flight.arrivalTime.toISOString(),
+                isDirect: summary?.isDirect ?? true,
+                transitAirport: summary?.transitAirport ?? null,
+                transitCityName: summary?.transitCityName ?? null,
+              },
+              returnDate: departure.returnDate,
+              seatsNote: departure.seatsNote,
+              totalSeats: departure.totalSeats,
+              availableSeats: departure.availableSeats,
+              bookedSeats,
+            };
+          }),
         inclusions: (inclusionsByPackage.get(row.id) ?? []).map(
           (inclusion) => ({ kind: inclusion.kind, label: inclusion.label }),
         ),
@@ -524,10 +533,11 @@ export class TravelPackagesService {
 
     for (const departure of departures) {
       const values = {
-        departureDate: departure.departureDate,
+        flightId: departure.flightId,
         returnDate: departure.returnDate ?? null,
         seatsNote: departure.seatsNote ?? null,
         totalSeats: departure.totalSeats ?? null,
+        availableSeats: departure.availableSeats ?? null,
       };
       if (departure.id && existingIds.has(departure.id)) {
         await tx
@@ -655,21 +665,20 @@ export class TravelPackagesService {
     tx: Tx,
     departureId: string,
     pax: number,
-    excludeBookingId?: string,
   ): Promise<void> {
     const [departure] = await tx
-      .select({ totalSeats: schema.travelPackageDeparture.totalSeats })
+      .select({ availableSeats: schema.travelPackageDeparture.availableSeats })
       .from(schema.travelPackageDeparture)
       .where(eq(schema.travelPackageDeparture.id, departureId))
       .for('update');
     if (!departure) {
       throw new NotFoundException(`Departure ${departureId} not found`);
     }
-    if (departure.totalSeats === null) return;
-    const booked = await this.confirmedPax(tx, departureId, excludeBookingId);
-    if (booked + pax > departure.totalSeats) {
+    if (departure.availableSeats === null) return;
+
+    if (departure.availableSeats < pax) {
       throw new BadRequestException(
-        `Only ${departure.totalSeats - booked} seat(s) left on this departure`,
+        `Only ${departure.availableSeats} seat(s) left on this departure`,
       );
     }
   }
@@ -696,6 +705,17 @@ export class TravelPackagesService {
       // departure to attach to.
       if (status === 'confirmed') {
         await this.assertDepartureCapacity(tx, input.departureId, input.pax);
+        await tx
+          .update(schema.travelPackageDeparture)
+          .set({
+            availableSeats: sql`${schema.travelPackageDeparture.availableSeats} - ${input.pax}`,
+          })
+          .where(
+            and(
+              eq(schema.travelPackageDeparture.id, input.departureId),
+              isNotNull(schema.travelPackageDeparture.availableSeats),
+            ),
+          );
       } else {
         await this.assertDepartureExists(tx, input.departureId);
       }
@@ -733,12 +753,40 @@ export class TravelPackagesService {
       // Re-check capacity only when the result is a confirmed booking, excluding
       // this row's own seats from the count.
       if (nextStatus === 'confirmed') {
-        await this.assertDepartureCapacity(
-          tx,
-          existing.departureId,
-          nextPax,
-          id,
-        );
+        let diff = nextPax;
+        if (existing.status === 'confirmed') {
+          diff = nextPax - existing.pax;
+        }
+        if (diff > 0) {
+          await this.assertDepartureCapacity(tx, existing.departureId, diff);
+        }
+
+        if (diff !== 0) {
+          await tx
+            .update(schema.travelPackageDeparture)
+            .set({
+              availableSeats: sql`${schema.travelPackageDeparture.availableSeats} - ${diff}`,
+            })
+            .where(
+              and(
+                eq(schema.travelPackageDeparture.id, existing.departureId),
+                isNotNull(schema.travelPackageDeparture.availableSeats),
+              ),
+            );
+        }
+      } else if (existing.status === 'confirmed') {
+        // Status changed from confirmed to something else (e.g., cancelled)
+        await tx
+          .update(schema.travelPackageDeparture)
+          .set({
+            availableSeats: sql`${schema.travelPackageDeparture.availableSeats} + ${existing.pax}`,
+          })
+          .where(
+            and(
+              eq(schema.travelPackageDeparture.id, existing.departureId),
+              isNotNull(schema.travelPackageDeparture.availableSeats),
+            ),
+          );
       }
 
       const patch = buildBookingPatch(input);
@@ -753,13 +801,29 @@ export class TravelPackagesService {
   }
 
   async removeBooking(id: string): Promise<void> {
-    const [deleted] = await this.db
-      .delete(schema.travelPackageBooking)
-      .where(eq(schema.travelPackageBooking.id, id))
-      .returning({ id: schema.travelPackageBooking.id });
-    if (!deleted) {
-      throw new NotFoundException(`Booking ${id} not found`);
-    }
+    await this.db.transaction(async (tx) => {
+      const [deleted] = await tx
+        .delete(schema.travelPackageBooking)
+        .where(eq(schema.travelPackageBooking.id, id))
+        .returning();
+      if (!deleted) {
+        throw new NotFoundException(`Booking ${id} not found`);
+      }
+
+      if (deleted.status === 'confirmed') {
+        await tx
+          .update(schema.travelPackageDeparture)
+          .set({
+            availableSeats: sql`${schema.travelPackageDeparture.availableSeats} + ${deleted.pax}`,
+          })
+          .where(
+            and(
+              eq(schema.travelPackageDeparture.id, deleted.departureId),
+              isNotNull(schema.travelPackageDeparture.availableSeats),
+            ),
+          );
+      }
+    });
   }
 
   // Agent commission earned from confirmed bookings, grouped by provider +

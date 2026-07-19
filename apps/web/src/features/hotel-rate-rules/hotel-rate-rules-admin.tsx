@@ -3,7 +3,7 @@
 import type { RateRule } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
-import { DataGrid } from 'react-data-grid';
+import { DataGrid, TreeDataGrid } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
 import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
@@ -151,12 +151,61 @@ export function HotelRateRulesAdmin() {
     });
   }, []);
 
+  function DetailGrid({
+    propertyCode,
+    filteredRateRules,
+    detailCols,
+    seasons,
+    standardSeasonLabel,
+  }: {
+    propertyCode: string;
+    filteredRateRules: RateRule[];
+    detailCols: any[];
+    seasons: any[];
+    standardSeasonLabel: string;
+  }) {
+    const propertyRules = useMemo(() => {
+      return filteredRateRules
+        .filter((r) => r.propertyCode === propertyCode)
+        .map((r) => ({
+          ...r,
+          season: r.seasonId
+            ? (seasons?.find((s) => s.id === r.seasonId)?.name ?? r.seasonId)
+            : standardSeasonLabel,
+        }));
+    }, [filteredRateRules, propertyCode, seasons, standardSeasonLabel]);
+
+    const [expandedGroupIds, setExpandedGroupIds] = useState<
+      ReadonlySet<unknown>
+    >(() => new Set(propertyRules.map((r) => r.season)));
+
+    return (
+      <div className="border bg-background shadow-sm rounded-md overflow-hidden h-full flex flex-col">
+        <TreeDataGrid
+          columns={detailCols}
+          rows={propertyRules}
+          rowKeyGetter={(row) => row.id}
+          groupBy={['season']}
+          rowGrouper={(rows, columnKey) => {
+            const groups: Record<string, any[]> = {};
+            for (const row of rows) {
+              const key = String((row as any)[columnKey]);
+              groups[key] ??= [];
+              groups[key].push(row);
+            }
+            return groups;
+          }}
+          expandedGroupIds={expandedGroupIds}
+          onExpandedGroupIdsChange={setExpandedGroupIds}
+          className="rdg-light h-full"
+          headerRowHeight={64}
+        />
+      </div>
+    );
+  }
+
   const renderDetail = useCallback(
     (propertyCode: string) => {
-      const propertyRules = filteredRateRules.filter(
-        (r) => r.propertyCode === propertyCode,
-      );
-
       const detailCols = getDetailColumns({
         columnLabels: {
           season: t('columns.season'),
@@ -186,14 +235,13 @@ export function HotelRateRulesAdmin() {
       });
 
       return (
-        <div className="border bg-background shadow-sm rounded-md overflow-hidden h-full flex flex-col">
-          <DataGrid
-            columns={detailCols}
-            rows={propertyRules}
-            className="rdg-light h-full"
-            headerRowHeight={64}
-          />
-        </div>
+        <DetailGrid
+          propertyCode={propertyCode}
+          filteredRateRules={filteredRateRules}
+          detailCols={detailCols}
+          seasons={seasons ?? []}
+          standardSeasonLabel={t('standardSeason')}
+        />
       );
     },
     [filteredRateRules, t, seasons, roomTypes, tCatalog, tCommon, filters],
@@ -237,11 +285,14 @@ export function HotelRateRulesAdmin() {
           headerRowHeight={64}
           rowHeight={(row) => {
             if (row.type === 'DETAIL') {
-              const count = filteredRateRules.filter(
+              const rules = filteredRateRules.filter(
                 (r) => r.propertyCode === row.parentId,
-              ).length;
-              // 32px padding (p-4), 64px header, 35px per row, 2px border, +16px buffer for scrollbar
-              return 32 + 64 + count * 35 + 18;
+              );
+              const count = rules.length;
+              const uniqueSeasonsCount = new Set(rules.map((r) => r.seasonId))
+                .size;
+              // 32px padding (p-4), 64px header, 35px per row, 35px per group header, +16px buffer
+              return 32 + 64 + (count + uniqueSeasonsCount) * 35 + 18;
             }
             return 35;
           }}

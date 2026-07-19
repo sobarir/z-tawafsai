@@ -71,11 +71,21 @@ export function Combobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
+        className="min-w-[var(--radix-popover-trigger-width)] w-max max-w-[90vw] p-0"
         align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        usePortal={false}
       >
-        <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+        <Command
+          filter={(value, search, keywords) => {
+            const extendValue = value + ' ' + (keywords?.join(' ') ?? '');
+            if (extendValue.toLowerCase().includes(search.toLowerCase())) {
+              return 1;
+            }
+            return 0;
+          }}
+        >
+          <CommandInput placeholder={searchPlaceholder} autoFocus />
           <CommandList>
             <CommandEmpty>{t('noResultsFound')}</CommandEmpty>
             <CommandGroup>

@@ -786,9 +786,10 @@
         "isFeatured": "Featured (shown on landing page)",
         "flyerUrl": "Flyer (image or PDF)",
         "totalSeats": "Total seats",
-        "totalSeatsHint": "Set a seat quota to track availability; leave empty for untracked. Booked seats are entered under \"Manage seats & bookings\".",
+        "totalSeatsHint": "Set total seats to record your provider quota, and track what you have left to sell using available seats.",
         "provider": "Provider (umrah travel company)",
-        "feePerSeat": "Your fee per seat"
+        "feePerSeat": "Your fee per seat",
+        "availableSeats": "Available seats"
       },
       "manageSeats": "Manage seats & bookings"
     },

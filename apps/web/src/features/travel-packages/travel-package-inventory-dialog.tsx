@@ -134,9 +134,10 @@ function DepartureInventoryPanel({ departure }: { departure: Departure }) {
     await createMutation.mutateAsync({ data: values });
   });
 
+  const departureDate = departure.flight.departureTime.split('T')[0];
   const dateRange = departure.returnDate
-    ? `${departure.departureDate} → ${departure.returnDate}`
-    : departure.departureDate;
+    ? `${departureDate} → ${departure.returnDate}`
+    : departureDate;
 
   return (
     <fieldset className="flex flex-col gap-3 rounded-md border p-3">

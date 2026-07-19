@@ -5,8 +5,11 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateSeasonDtoName } from './createSeasonDtoName';
 
 export interface CreateSeasonDto {
-  name: CreateSeasonDtoName;
+  /**
+   * @minLength 1
+   * @maxLength 50
+   */
+  name: string;
 }

@@ -3874,7 +3874,7 @@ const fxRates: FxRateSeed[] = [
 
 type RoomTypeSeed = { name: string; maxOccupancy: number };
 type SeasonSeed = {
-  name: 'standard' | 'peak' | 'ramadan' | 'hajj' | 'promo';
+  name: string;
   startDate: string;
   endDate: string;
 };
@@ -5466,7 +5466,6 @@ async function seed() {
       type: item.type,
       title: item.title,
       description: item.description,
-      flightId: anchorFlight.id,
       durationNights,
       mealPlan: item.mealPlan,
       price: item.price,
@@ -5514,11 +5513,14 @@ async function seed() {
       .insert(schema.travelPackageStay)
       .values(item.stays.map((stay) => ({ packageId, ...stay })));
     if (item.departures.length > 0) {
-      await db
-        .insert(schema.travelPackageDeparture)
-        .values(
-          item.departures.map((departure) => ({ packageId, ...departure })),
-        );
+      await db.insert(schema.travelPackageDeparture).values(
+        item.departures.map((departure) => ({
+          packageId,
+          flightId: anchorFlight.id,
+          availableSeats: departure.totalSeats ?? null,
+          ...departure,
+        })),
+      );
     }
     if (item.inclusions.length > 0) {
       await db.insert(schema.travelPackageInclusion).values(

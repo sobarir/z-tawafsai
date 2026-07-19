@@ -622,13 +622,7 @@ export const updateRoomTypeSchema = createRoomTypeSchema.partial();
 export type UpdateRoomTypeInput = z.infer<typeof updateRoomTypeSchema>;
 
 /** Global season label. The dated window that selects it lives on `season_window`. */
-export const seasonNameSchema = z.enum([
-  'standard',
-  'peak',
-  'ramadan',
-  'hajj',
-  'promo',
-]);
+export const seasonNameSchema = z.string().min(1).max(50);
 export type SeasonName = z.infer<typeof seasonNameSchema>;
 
 // Seasons are global reference data — a shared catalog of season labels. The
@@ -749,15 +743,16 @@ const travelPackageStaySummarySchema = z.object({
 
 const travelPackageDepartureSchema = z.object({
   id: ulidSchema,
-  departureDate: z.iso.date(),
+  flightId: ulidSchema,
+  flight: flightHotelPackageFlightSummarySchema,
   returnDate: z.iso.date().nullable(),
   seatsNote: z.string().nullable(),
   /** Seat quota for this departure; null = quota not tracked (unlimited). */
   totalSeats: z.number().int().nonnegative().nullable(),
+  /** The true available pool, manually synced with the provider. */
+  availableSeats: z.number().int().nonnegative().nullable(),
   /** Sum of pax across `confirmed` bookings — computed, never stored directly. */
   bookedSeats: z.number().int().nonnegative(),
-  /** `totalSeats - bookedSeats` when a quota is set; null when untracked. Aggregate only — individual booking rows (with customer PII) are served by the admin-only bookings endpoint. */
-  remainingSeats: z.number().int().nullable(),
 });
 
 const travelPackageInclusionSchema = z.object({
@@ -792,7 +787,6 @@ export const flightHotelPackageSchema = z.object({
   isFeatured: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
-  flight: flightHotelPackageFlightSummarySchema,
   stays: z.array(travelPackageStaySummarySchema),
   departures: z.array(travelPackageDepartureSchema),
   inclusions: z.array(travelPackageInclusionSchema),
@@ -810,13 +804,23 @@ const createTravelPackageStaySchema = z.object({
   nights: z.number().int().positive(),
 });
 
+const travelPackageDepartureWriteSchema = z.object({
+  id: ulidSchema,
+  flightId: ulidSchema,
+  returnDate: z.iso.date().nullable(),
+  seatsNote: z.string().nullable(),
+  totalSeats: z.number().int().nonnegative().nullable(),
+  availableSeats: z.number().int().nonnegative().nullable(),
+});
+
 const createTravelPackageDepartureSchema = z.object({
   /** Present when editing an existing departure — the write path upserts by id so booking rows keyed to it survive. Omit for a new departure. */
   id: ulidSchema.optional(),
-  departureDate: z.iso.date(),
+  flightId: ulidSchema,
   returnDate: z.iso.date().optional(),
   seatsNote: z.string().max(200).optional(),
   totalSeats: z.number().int().nonnegative().optional(),
+  availableSeats: z.number().int().nonnegative().optional(),
 });
 
 const createTravelPackageInclusionSchema = z.object({
@@ -834,7 +838,6 @@ export const createFlightHotelPackageSchema = z.object({
   type: travelPackageTypeSchema,
   title: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
-  flightId: ulidSchema,
   durationNights: z.number().int().positive(),
   mealPlan: travelPackageMealPlanSchema.optional(),
   heroImageUrl: z.string().max(2000).optional(),

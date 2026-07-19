@@ -149,6 +149,7 @@ export function TravelPackagesAdmin() {
         open={formOpen}
         onOpenChange={setFormOpen}
         title={editing ? t('editTitle') : t('createTitle')}
+        contentClassName="sm:max-w-2xl"
       >
         <TravelPackageForm
           travelPackage={editing ?? undefined}
