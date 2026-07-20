@@ -2,13 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type {
+  City,
   CreateFlightHotelPackageInput,
   FlightHotelPackage,
+  Property,
 } from '@repo/shared';
 import { createFlightHotelPackageSchema } from '@repo/shared';
 import { Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type Control, useFieldArray, useForm } from 'react-hook-form';
+import { type Control, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { CheckboxFormField } from '@/components/shared/checkbox-form-field';
 import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { DateFormField } from '@/components/shared/date-form-field';
@@ -24,6 +26,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 interface TravelPackageFormProps {
   travelPackage?: FlightHotelPackage;
   flightOptions: ComboboxOption[];
+  cityOptions: ComboboxOption[];
+  cities: City[];
+  properties: Property[];
   propertyOptions: ComboboxOption[];
   currencyOptions: ComboboxOption[];
   providerOptions: ComboboxOption[];
@@ -37,10 +42,11 @@ type PackageFormValues = CreateFlightHotelPackageInput;
 function toStayDefaults(pkg?: FlightHotelPackage): PackageFormValues['stays'] {
   return (
     pkg?.stays.map((stay) => ({
+      cityCode: stay.cityCode,
       propertyCode: stay.propertyCode,
       sequence: stay.sequence,
       nights: stay.nights,
-    })) ?? [{ propertyCode: '', sequence: 1, nights: 1 }]
+    })) ?? [{ cityCode: '', propertyCode: '', sequence: 1, nights: 1 }]
   );
 }
 
@@ -53,10 +59,13 @@ function toDepartureDefaults(
     pkg?.departures.map((departure) => ({
       id: departure.id,
       flightId: departure.flight.id,
+      departureDate: departure.departureDate,
       returnDate: departure.returnDate ?? undefined,
       seatsNote: departure.seatsNote ?? undefined,
       totalSeats: departure.totalSeats ?? undefined,
       availableSeats: departure.availableSeats ?? undefined,
+      price: departure.price ?? 0,
+      currency: departure.currency ?? 'USD',
     })) ?? []
   );
 }
@@ -97,29 +106,53 @@ function toFormDefaults(travelPackage?: FlightHotelPackage): PackageFormValues {
 // the package duration; the server rejects a mismatch.
 function StaysFieldset({
   control,
+  cityOptions,
+  cities,
+  properties,
   propertyOptions,
 }: {
   control: Control<CreateFlightHotelPackageInput>;
+  cityOptions: ComboboxOption[];
+  cities: City[];
+  properties: Property[];
   propertyOptions: ComboboxOption[];
 }) {
   const t = useTranslations('travelPackagesAdmin.travelPackages.fields');
   const tCommon = useTranslations('common');
   const stays = useFieldArray({ control, name: 'stays' });
+  const watchedStays = useWatch({ control, name: 'stays' }) || [];
 
   return (
     <>
       <p className="text-xs text-muted-foreground">{t('staysHint')}</p>
-      {stays.fields.map((field, index) => (
-        <div
-          key={field.id}
-          className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(15rem,24rem)_8rem_auto] sm:items-end"
-        >
-          <ComboboxFormField
-            control={control}
-            name={`stays.${index}.propertyCode` as const}
-            label={t('stayProperty')}
-            options={propertyOptions}
-          />
+      {stays.fields.map((field, index) => {
+        const selectedCityCode = watchedStays[index]?.cityCode;
+        const selectedCityName = cities.find(c => c.cityCode === selectedCityCode)?.name;
+        
+        let filteredPropertyOptions = propertyOptions;
+        if (selectedCityName) {
+          const matchingProperties = properties.filter(p => p.destination === selectedCityName);
+          const matchingCodes = new Set(matchingProperties.map(p => p.propertyCode));
+          filteredPropertyOptions = propertyOptions.filter(opt => matchingCodes.has(opt.value));
+        }
+
+        return (
+          <div
+            key={field.id}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-[12rem_minmax(12rem,20rem)_8rem_auto] sm:items-end"
+          >
+            <ComboboxFormField
+              control={control}
+              name={`stays.${index}.cityCode` as const}
+              label={t('stayCity', { fallback: 'City' })}
+              options={cityOptions}
+            />
+            <ComboboxFormField
+              control={control}
+              name={`stays.${index}.propertyCode` as const}
+              label={t('stayProperty')}
+              options={filteredPropertyOptions}
+            />
           <NumberFormField
             control={control}
             name={`stays.${index}.nights` as const}
@@ -136,7 +169,8 @@ function StaysFieldset({
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      ))}
+      );
+    })}
       <Button
         type="button"
         variant="outline"
@@ -144,6 +178,7 @@ function StaysFieldset({
         className="w-fit"
         onClick={() =>
           stays.append({
+            cityCode: '',
             propertyCode: '',
             sequence: stays.fields.length + 1,
             nights: 1,
@@ -218,28 +253,36 @@ function InclusionsFieldset({
 function DeparturesFieldset({
   control,
   flightOptions,
+  currencyOptions,
 }: {
   control: Control<CreateFlightHotelPackageInput>;
   flightOptions: ComboboxOption[];
+  currencyOptions: ComboboxOption[];
 }) {
   const t = useTranslations('travelPackagesAdmin.travelPackages.fields');
   const tCommon = useTranslations('common');
   const departures = useFieldArray({ control, name: 'departures' });
 
   return (
-    <fieldset className="flex flex-col gap-3 rounded-md border p-3">
-      <legend className="px-1 text-sm font-medium">{t('departures')}</legend>
+    <div className="flex flex-col gap-3">
       {departures.fields.map((field, index) => (
         <div
           key={field.id}
           className="flex flex-col gap-3 border-b border-border/50 pb-4 last:border-0 last:pb-0"
         >
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(15rem,24rem)_11rem_auto] sm:items-end">
-            <ComboboxFormField
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[200px]">
+              <ComboboxFormField
+                control={control}
+                name={`departures.${index}.flightId` as const}
+                label={t('flight')}
+                options={flightOptions}
+              />
+            </div>
+            <DateFormField
               control={control}
-              name={`departures.${index}.flightId` as const}
-              label={t('flight')}
-              options={flightOptions}
+              name={`departures.${index}.departureDate` as const}
+              label={t('departureDate')}
             />
             <DateFormField
               control={control}
@@ -256,19 +299,35 @@ function DeparturesFieldset({
               <Trash2 className="size-4" />
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[8rem_8rem_1fr] sm:items-end">
-            <NumberFormField
-              control={control}
-              name={`departures.${index}.totalSeats` as const}
-              label={t('totalSeats')}
-              optional
-            />
-            <NumberFormField
-              control={control}
-              name={`departures.${index}.availableSeats` as const}
-              label={t('availableSeats')}
-              optional
-            />
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="grid grid-cols-2 gap-3 min-w-[16rem] flex-1">
+              <NumberFormField
+                control={control}
+                name={`departures.${index}.totalSeats` as const}
+                label={t('totalSeats')}
+                optional
+              />
+              <NumberFormField
+                control={control}
+                name={`departures.${index}.availableSeats` as const}
+                label={t('availableSeats')}
+                optional
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3 min-w-[16rem] flex-1">
+              <NumberFormField
+                control={control}
+                name={`departures.${index}.price` as const}
+                label={t('price')}
+                step="any"
+              />
+              <ComboboxFormField
+                control={control}
+                name={`departures.${index}.currency` as const}
+                label={t('currency')}
+                options={currencyOptions}
+              />
+            </div>
           </div>
         </div>
       ))}
@@ -281,22 +340,28 @@ function DeparturesFieldset({
         onClick={() =>
           departures.append({
             flightId: '',
+            departureDate: '',
             returnDate: undefined,
             seatsNote: undefined,
             totalSeats: undefined,
             availableSeats: undefined,
+            price: 0,
+            currency: '',
           })
         }
       >
         <Plus className="h-4 w-4" /> {t('addDeparture')}
       </Button>
-    </fieldset>
+    </div>
   );
 }
 
 export function TravelPackageForm({
   travelPackage,
   flightOptions,
+  cityOptions,
+  cities,
+  properties,
   propertyOptions,
   currencyOptions,
   providerOptions,
@@ -350,7 +415,7 @@ export function TravelPackageForm({
             <TabsTrigger value="inclusions">{t('inclusions')}</TabsTrigger>
           </TabsList>
 
-          <div className="max-h-[60vh] overflow-y-auto px-1 pt-2">
+          <div className="max-h-[60vh] overflow-y-auto overflow-x-hidden px-1 pt-2">
             <TabsContent value="details" className="flex flex-col gap-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <ComboboxFormField
@@ -414,25 +479,11 @@ export function TravelPackageForm({
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <NumberFormField
+              <NumberFormField
                   control={form.control}
                   name="durationNights"
                   label={t('durationNights')}
                 />
-                <NumberFormField
-                  control={form.control}
-                  name="price"
-                  label={t('price')}
-                  step="any"
-                />
-                <ComboboxFormField
-                  control={form.control}
-                  name="currency"
-                  label={t('currency')}
-                  options={currencyOptions}
-                />
-              </div>
 
               <CheckboxFormField
                 control={form.control}
@@ -453,15 +504,19 @@ export function TravelPackageForm({
               <DeparturesFieldset
                 control={form.control}
                 flightOptions={flightOptions}
+                currencyOptions={currencyOptions}
               />
             </TabsContent>
 
             {/* Stays — Makkah + Madinah (and more for Umrah Plus). Nights must
                 sum to Duration; the server rejects a mismatch. */}
             <TabsContent value="stays" className="flex flex-col gap-3">
-              <StaysFieldset
-                control={form.control}
-                propertyOptions={propertyOptions}
+              <StaysFieldset 
+                control={form.control} 
+                cityOptions={cityOptions}
+                cities={cities}
+                properties={properties}
+                propertyOptions={propertyOptions} 
               />
             </TabsContent>
 
@@ -472,12 +527,14 @@ export function TravelPackageForm({
           </div>
         </Tabs>
 
-        <FormDialogActions
-          cancelLabel={tCommon('cancel')}
-          saveLabel={tCommon('save')}
-          onCancel={onCancel}
-          submitting={submitting}
-        />
+        <div className="border-t pt-4">
+          <FormDialogActions
+            cancelLabel={tCommon('cancel')}
+            saveLabel={tCommon('save')}
+            onCancel={onCancel}
+            submitting={submitting}
+          />
+        </div>
       </form>
     </Form>
   );

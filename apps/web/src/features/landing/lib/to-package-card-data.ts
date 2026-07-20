@@ -77,8 +77,8 @@ function earliestDepartureDate(
 ): string {
   const first = [...pkg.departures].sort(
     (a, b) =>
-      new Date(a.flight.departureTime).getTime() -
-      new Date(b.flight.departureTime).getTime(),
+      new Date(a.departureDate).getTime() -
+      new Date(b.departureDate).getTime(),
   )[0];
   if (!first) return '';
   try {
@@ -86,9 +86,9 @@ function earliestDepartureDate(
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-    }).format(new Date(first.flight.departureTime));
+    }).format(new Date(first.departureDate));
   } catch {
-    return first.flight.departureTime;
+    return first.departureDate;
   }
 }
 
@@ -110,8 +110,8 @@ export function toPackageCardData(
 
   const firstDeparture = [...pkg.departures].sort(
     (a, b) =>
-      new Date(a.flight.departureTime).getTime() -
-      new Date(b.flight.departureTime).getTime(),
+      new Date(a.departureDate).getTime() -
+      new Date(b.departureDate).getTime(),
   )[0];
 
   const airline = firstDeparture?.flight.isDirect

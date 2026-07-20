@@ -284,7 +284,9 @@
         "removeLeg": "移除航段",
         "price": "价格",
         "currency": "货币",
-        "currencyPlaceholder": "例如 USD"
+        "currencyPlaceholder": "例如 USD",
+        "departureDayOffset": "+ Days (Dep)",
+        "arrivalDayOffset": "+ Days (Arr)"
       },
       "status": {
         "ACTIVE": "生效",

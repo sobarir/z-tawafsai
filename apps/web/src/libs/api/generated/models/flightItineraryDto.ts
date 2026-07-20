@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { FlightItineraryDtoFlightsItem } from './flightItineraryDtoFlightsItem';
-import type { FlightItineraryDtoConnectionsItem } from './flightItineraryDtoConnectionsItem';
 
 export interface FlightItineraryDto {
   /**
@@ -14,7 +13,6 @@ export interface FlightItineraryDto {
    * @maxItems 2
    */
   flights: FlightItineraryDtoFlightsItem[];
-  connections: FlightItineraryDtoConnectionsItem[];
   /**
    * @minimum 0
    * @maximum 9007199254740991
@@ -24,10 +22,15 @@ export interface FlightItineraryDto {
   totalPrice: number;
   /** @pattern ^[A-Z]{3}$ */
   currency: string;
-  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$ */
-  departureTime: string;
-  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$ */
-  arrivalTime: string;
+  /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
+  departureTimeLocal: string;
+  /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
+  arrivalTimeLocal: string;
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  arrivalDayOffset: number;
   /**
    * @minimum 0
    * @maximum 9007199254740991

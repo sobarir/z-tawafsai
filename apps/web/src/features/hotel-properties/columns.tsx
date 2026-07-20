@@ -40,7 +40,6 @@ export function getPropertyColumns({
   onDelete,
 }: PropertyColumnsOptions): ColumnDef<Property>[] {
   return [
-    { accessorKey: 'propertyCode', header: columnLabels.propertyCode },
     { accessorKey: 'displayName', header: columnLabels.displayName },
     {
       id: 'type',
@@ -60,6 +59,13 @@ export function getPropertyColumns({
       cell: ({ row }) => {
         const { distanceMeters, distanceNote } = row.original;
         if (distanceMeters == null && !distanceNote) return '—';
+
+        if (distanceMeters != null) {
+          const noteLower = distanceNote?.toLowerCase();
+          if (noteLower === 'less than') return `< ${distanceMeters}m`;
+          if (noteLower === 'approx' || noteLower === 'approx.') return `~${distanceMeters}m`;
+        }
+
         const parts = [
           distanceMeters != null ? `${distanceMeters}m` : null,
           distanceNote,

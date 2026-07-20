@@ -1,9 +1,9 @@
 import {
   createFlightSchema,
-  flightItinerarySchema,
   flightSchema,
   searchFlightsQuerySchema,
   updateFlightSchema,
+  flightItinerarySchema,
 } from '@repo/shared';
 import { createZodDto } from 'nestjs-zod';
 

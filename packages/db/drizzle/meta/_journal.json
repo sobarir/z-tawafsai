@@ -176,6 +176,41 @@
       "when": 1784476896043,
       "tag": "0024_stale_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1784539308672,
+      "tag": "0025_equal_sugar_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1784539330006,
+      "tag": "0026_kind_mulholland_black",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1784553177923,
+      "tag": "0027_nebulous_roxanne_simpson",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1784556641063,
+      "tag": "0028_unknown_kinsey_walden",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1784560168140,
+      "tag": "0029_gifted_wild_pack",
+      "breakpoints": true
     }
   ]
 }

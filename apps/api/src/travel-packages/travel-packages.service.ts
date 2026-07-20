@@ -259,6 +259,7 @@ export class TravelPackagesService {
           const property = propertyByCode.get(stay.propertyCode);
           if (!property) return null;
           return {
+            cityCode: stay.cityCode,
             propertyCode: property.propertyCode,
             displayName: property.displayName,
             destination: property.destination,
@@ -293,14 +294,7 @@ export class TravelPackagesService {
         updatedAt: row.updatedAt.toISOString(),
         stays,
         departures: (departuresByPackage.get(row.id) ?? [])
-          .sort((a, b) => {
-            const flightA = flightById.get(a.flightId);
-            const flightB = flightById.get(b.flightId);
-            if (!flightA || !flightB) return 0;
-            return (
-              flightA.departureTime.getTime() - flightB.departureTime.getTime()
-            );
-          })
+          .sort((a, b) => a.departureDate.localeCompare(b.departureDate))
           .map((departure) => {
             const bookedSeats = bookedByDeparture.get(departure.id) ?? 0;
             const flight = flightById.get(departure.flightId);
@@ -309,6 +303,7 @@ export class TravelPackagesService {
 
             return {
               id: departure.id,
+              departureDate: departure.departureDate,
               flightId: departure.flightId,
               flight: {
                 id: flight.id,
@@ -317,8 +312,9 @@ export class TravelPackagesService {
                 flightNumber: flight.flightNumber,
                 originAirport: flight.originAirport,
                 destAirport: flight.destAirport,
-                departureTime: flight.departureTime.toISOString(),
-                arrivalTime: flight.arrivalTime.toISOString(),
+                departureTimeLocal: flight.departureTimeLocal,
+                arrivalTimeLocal: flight.arrivalTimeLocal,
+                arrivalDayOffset: flight.arrivalDayOffset,
                 isDirect: summary?.isDirect ?? true,
                 transitAirport: summary?.transitAirport ?? null,
                 transitCityName: summary?.transitCityName ?? null,
@@ -327,6 +323,8 @@ export class TravelPackagesService {
               seatsNote: departure.seatsNote,
               totalSeats: departure.totalSeats,
               availableSeats: departure.availableSeats,
+              price: departure.price,
+              currency: departure.currency,
               bookedSeats,
             };
           }),
@@ -534,10 +532,13 @@ export class TravelPackagesService {
     for (const departure of departures) {
       const values = {
         flightId: departure.flightId,
+        departureDate: departure.departureDate,
         returnDate: departure.returnDate ?? null,
         seatsNote: departure.seatsNote ?? null,
         totalSeats: departure.totalSeats ?? null,
         availableSeats: departure.availableSeats ?? null,
+        price: departure.price,
+        currency: departure.currency,
       };
       if (departure.id && existingIds.has(departure.id)) {
         await tx

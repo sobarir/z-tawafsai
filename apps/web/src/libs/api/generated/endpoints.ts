@@ -28,7 +28,6 @@ import type {
   AirlineDto,
   AirportDto,
   CityDto,
-  ConnectionResultDto,
   CreateAirlineDto,
   CreateAirportDto,
   CreateCityDto,
@@ -37,7 +36,6 @@ import type {
   CreateFlightMarketingDto,
   CreateFxRateDto,
   CreateInterlineAgreementDto,
-  CreateMctRuleDto,
   CreatePostDto,
   CreatePropertyDto,
   CreateRateRuleDto,
@@ -58,13 +56,11 @@ import type {
   InterlineResolutionDto,
   ListFlightMarketingParams,
   ListTravelPackageBookingsParams,
-  MctRuleDto,
   MeResponseDto,
   PostDto,
   PropertyDto,
   RateRuleDto,
   ResolveInterlineParams,
-  ResolveMctRuleParams,
   RoomTypeDto,
   SearchFlightsParams,
   SearchHotelsParams,
@@ -81,7 +77,6 @@ import type {
   UpdateFlightDto,
   UpdateFlightMarketingDto,
   UpdateFxRateDto,
-  UpdateMctRuleDto,
   UpdatePropertyDto,
   UpdateRateRuleDto,
   UpdateRoomTypeDto,
@@ -90,9 +85,7 @@ import type {
   UpdateTravelPackageBookingDto,
   UpdateTravelPackageDto,
   UpdateTravelProviderDto,
-  UploadResultDto,
-  ValidateConnectionChainDto,
-  ValidateConnectionDto
+  UploadResultDto
 } from './models';
 
 import { customFetch } from '../mutator';
@@ -1897,7 +1890,7 @@ export const useCreateFlight = <TError = unknown,
     }
     
 /**
- * @summary OTA-style search for direct and one-stop connecting/stopover itineraries by route and date, sorted by price
+ * @summary Search for direct flights by route and date
  */
 export const getSearchFlightsUrl = (params: SearchFlightsParams,) => {
   const normalizedParams = new URLSearchParams();
@@ -1983,7 +1976,7 @@ export function useSearchFlights<TData = Awaited<ReturnType<typeof searchFlights
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary OTA-style search for direct and one-stop connecting/stopover itineraries by route and date, sorted by price
+ * @summary Search for direct flights by route and date
  */
 
 export function useSearchFlights<TData = Awaited<ReturnType<typeof searchFlights>>, TError = unknown>(
@@ -2245,1129 +2238,6 @@ export const useDeleteFlight = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteFlightMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary Classify the connection between two consecutive flights
- */
-export const getValidateConnectionUrl = () => {
-
-
-  
-
-  return `/api/connections/validate`
-}
-
-export const validateConnection = async (validateConnectionDto: ValidateConnectionDto, options?: RequestInit): Promise<ConnectionResultDto> => {
-  
-  return customFetch<ConnectionResultDto>(getValidateConnectionUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      validateConnectionDto,)
-  }
-);}
-
-
-
-
-export const getValidateConnectionMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnection>>, TError,{data: ValidateConnectionDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof validateConnection>>, TError,{data: ValidateConnectionDto}, TContext> => {
-
-const mutationKey = ['validateConnection'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof validateConnection>>, {data: ValidateConnectionDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  validateConnection(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ValidateConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof validateConnection>>>
-    export type ValidateConnectionMutationBody = ValidateConnectionDto
-    export type ValidateConnectionMutationError = unknown
-
-    /**
- * @summary Classify the connection between two consecutive flights
- */
-export const useValidateConnection = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnection>>, TError,{data: ValidateConnectionDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof validateConnection>>,
-        TError,
-        {data: ValidateConnectionDto},
-        TContext
-      > => {
-
-      const mutationOptions = getValidateConnectionMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary Classify every consecutive connection in an itinerary
- */
-export const getValidateConnectionChainUrl = () => {
-
-
-  
-
-  return `/api/connections/validate-chain`
-}
-
-export const validateConnectionChain = async (validateConnectionChainDto: ValidateConnectionChainDto, options?: RequestInit): Promise<ConnectionResultDto[]> => {
-  
-  return customFetch<ConnectionResultDto[]>(getValidateConnectionChainUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      validateConnectionChainDto,)
-  }
-);}
-
-
-
-
-export const getValidateConnectionChainMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnectionChain>>, TError,{data: ValidateConnectionChainDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof validateConnectionChain>>, TError,{data: ValidateConnectionChainDto}, TContext> => {
-
-const mutationKey = ['validateConnectionChain'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof validateConnectionChain>>, {data: ValidateConnectionChainDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  validateConnectionChain(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ValidateConnectionChainMutationResult = NonNullable<Awaited<ReturnType<typeof validateConnectionChain>>>
-    export type ValidateConnectionChainMutationBody = ValidateConnectionChainDto
-    export type ValidateConnectionChainMutationError = unknown
-
-    /**
- * @summary Classify every consecutive connection in an itinerary
- */
-export const useValidateConnectionChain = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateConnectionChain>>, TError,{data: ValidateConnectionChainDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof validateConnectionChain>>,
-        TError,
-        {data: ValidateConnectionChainDto},
-        TContext
-      > => {
-
-      const mutationOptions = getValidateConnectionChainMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary List MCT rules
- */
-export const getListMctRulesUrl = () => {
-
-
-  
-
-  return `/api/mct-rules`
-}
-
-export const listMctRules = async ( options?: RequestInit): Promise<MctRuleDto[]> => {
-  
-  return customFetch<MctRuleDto[]>(getListMctRulesUrl(),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getListMctRulesQueryKey = () => {
-    return [
-    `/api/mct-rules`
-    ] as const;
-    }
-
-    
-export const getListMctRulesQueryOptions = <TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getListMctRulesQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMctRules>>> = ({ signal }) => listMctRules({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListMctRulesQueryResult = NonNullable<Awaited<ReturnType<typeof listMctRules>>>
-export type ListMctRulesQueryError = unknown
-
-
-export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listMctRules>>,
-          TError,
-          Awaited<ReturnType<typeof listMctRules>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listMctRules>>,
-          TError,
-          Awaited<ReturnType<typeof listMctRules>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary List MCT rules
- */
-
-export function useListMctRules<TData = Awaited<ReturnType<typeof listMctRules>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMctRules>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListMctRulesQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
- * @summary Create an MCT rule
- */
-export const getCreateMctRuleUrl = () => {
-
-
-  
-
-  return `/api/mct-rules`
-}
-
-export const createMctRule = async (createMctRuleDto: CreateMctRuleDto, options?: RequestInit): Promise<MctRuleDto> => {
-  
-  return customFetch<MctRuleDto>(getCreateMctRuleUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createMctRuleDto,)
-  }
-);}
-
-
-
-
-export const getCreateMctRuleMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMctRule>>, TError,{data: CreateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createMctRule>>, TError,{data: CreateMctRuleDto}, TContext> => {
-
-const mutationKey = ['createMctRule'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createMctRule>>, {data: CreateMctRuleDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createMctRule(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateMctRuleMutationResult = NonNullable<Awaited<ReturnType<typeof createMctRule>>>
-    export type CreateMctRuleMutationBody = CreateMctRuleDto
-    export type CreateMctRuleMutationError = unknown
-
-    /**
- * @summary Create an MCT rule
- */
-export const useCreateMctRule = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createMctRule>>, TError,{data: CreateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createMctRule>>,
-        TError,
-        {data: CreateMctRuleDto},
-        TContext
-      > => {
-
-      const mutationOptions = getCreateMctRuleMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary Resolve the most-specific matching MCT rule
- */
-export const getResolveMctRuleUrl = (params: ResolveMctRuleParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/mct-rules/resolve?${stringifiedParams}` : `/api/mct-rules/resolve`
-}
-
-export const resolveMctRule = async (params: ResolveMctRuleParams, options?: RequestInit): Promise<MctRuleDto> => {
-  
-  return customFetch<MctRuleDto>(getResolveMctRuleUrl(params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getResolveMctRuleQueryKey = (params?: ResolveMctRuleParams,) => {
-    return [
-    `/api/mct-rules/resolve`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getResolveMctRuleQueryOptions = <TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getResolveMctRuleQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveMctRule>>> = ({ signal }) => resolveMctRule(params, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ResolveMctRuleQueryResult = NonNullable<Awaited<ReturnType<typeof resolveMctRule>>>
-export type ResolveMctRuleQueryError = unknown
-
-
-export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
- params: ResolveMctRuleParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof resolveMctRule>>,
-          TError,
-          Awaited<ReturnType<typeof resolveMctRule>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
- params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof resolveMctRule>>,
-          TError,
-          Awaited<ReturnType<typeof resolveMctRule>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
- params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Resolve the most-specific matching MCT rule
- */
-
-export function useResolveMctRule<TData = Awaited<ReturnType<typeof resolveMctRule>>, TError = unknown>(
- params: ResolveMctRuleParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getResolveMctRuleQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
- * @summary Get an MCT rule
- */
-export const getGetMctRuleUrl = (id: string,) => {
-
-
-  
-
-  return `/api/mct-rules/${id}`
-}
-
-export const getMctRule = async (id: string, options?: RequestInit): Promise<MctRuleDto> => {
-  
-  return customFetch<MctRuleDto>(getGetMctRuleUrl(id),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetMctRuleQueryKey = (id?: string,) => {
-    return [
-    `/api/mct-rules/${id}`
-    ] as const;
-    }
-
-    
-export const getGetMctRuleQueryOptions = <TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetMctRuleQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMctRule>>> = ({ signal }) => getMctRule(id, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMctRuleQueryResult = NonNullable<Awaited<ReturnType<typeof getMctRule>>>
-export type GetMctRuleQueryError = unknown
-
-
-export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMctRule>>,
-          TError,
-          Awaited<ReturnType<typeof getMctRule>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMctRule>>,
-          TError,
-          Awaited<ReturnType<typeof getMctRule>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get an MCT rule
- */
-
-export function useGetMctRule<TData = Awaited<ReturnType<typeof getMctRule>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMctRule>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetMctRuleQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
- * @summary Update an MCT rule
- */
-export const getUpdateMctRuleUrl = (id: string,) => {
-
-
-  
-
-  return `/api/mct-rules/${id}`
-}
-
-export const updateMctRule = async (id: string,
-    updateMctRuleDto: UpdateMctRuleDto, options?: RequestInit): Promise<MctRuleDto> => {
-  
-  return customFetch<MctRuleDto>(getUpdateMctRuleUrl(id),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      updateMctRuleDto,)
-  }
-);}
-
-
-
-
-export const getUpdateMctRuleMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMctRule>>, TError,{id: string;data: UpdateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateMctRule>>, TError,{id: string;data: UpdateMctRuleDto}, TContext> => {
-
-const mutationKey = ['updateMctRule'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMctRule>>, {id: string;data: UpdateMctRuleDto}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  updateMctRule(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateMctRuleMutationResult = NonNullable<Awaited<ReturnType<typeof updateMctRule>>>
-    export type UpdateMctRuleMutationBody = UpdateMctRuleDto
-    export type UpdateMctRuleMutationError = unknown
-
-    /**
- * @summary Update an MCT rule
- */
-export const useUpdateMctRule = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMctRule>>, TError,{id: string;data: UpdateMctRuleDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateMctRule>>,
-        TError,
-        {id: string;data: UpdateMctRuleDto},
-        TContext
-      > => {
-
-      const mutationOptions = getUpdateMctRuleMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary Delete an MCT rule
- */
-export const getDeleteMctRuleUrl = (id: string,) => {
-
-
-  
-
-  return `/api/mct-rules/${id}`
-}
-
-export const deleteMctRule = async (id: string, options?: RequestInit): Promise<void> => {
-  
-  return customFetch<void>(getDeleteMctRuleUrl(id),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-
-
-
-
-export const getDeleteMctRuleMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMctRule>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteMctRule>>, TError,{id: string}, TContext> => {
-
-const mutationKey = ['deleteMctRule'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMctRule>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  deleteMctRule(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteMctRuleMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMctRule>>>
-    
-    export type DeleteMctRuleMutationError = unknown
-
-    /**
- * @summary Delete an MCT rule
- */
-export const useDeleteMctRule = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMctRule>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteMctRule>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-
-      const mutationOptions = getDeleteMctRuleMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary List interline agreements
- */
-export const getListInterlineAgreementsUrl = () => {
-
-
-  
-
-  return `/api/interline-agreements`
-}
-
-export const listInterlineAgreements = async ( options?: RequestInit): Promise<InterlineAgreementDto[]> => {
-  
-  return customFetch<InterlineAgreementDto[]>(getListInterlineAgreementsUrl(),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getListInterlineAgreementsQueryKey = () => {
-    return [
-    `/api/interline-agreements`
-    ] as const;
-    }
-
-    
-export const getListInterlineAgreementsQueryOptions = <TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getListInterlineAgreementsQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterlineAgreements>>> = ({ signal }) => listInterlineAgreements({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListInterlineAgreementsQueryResult = NonNullable<Awaited<ReturnType<typeof listInterlineAgreements>>>
-export type ListInterlineAgreementsQueryError = unknown
-
-
-export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listInterlineAgreements>>,
-          TError,
-          Awaited<ReturnType<typeof listInterlineAgreements>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listInterlineAgreements>>,
-          TError,
-          Awaited<ReturnType<typeof listInterlineAgreements>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary List interline agreements
- */
-
-export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getListInterlineAgreementsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
- * @summary Create an interline agreement
- */
-export const getCreateInterlineAgreementUrl = () => {
-
-
-  
-
-  return `/api/interline-agreements`
-}
-
-export const createInterlineAgreement = async (createInterlineAgreementDto: CreateInterlineAgreementDto, options?: RequestInit): Promise<InterlineAgreementDto> => {
-  
-  return customFetch<InterlineAgreementDto>(getCreateInterlineAgreementUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createInterlineAgreementDto,)
-  }
-);}
-
-
-
-
-export const getCreateInterlineAgreementMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInterlineAgreement>>, TError,{data: CreateInterlineAgreementDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createInterlineAgreement>>, TError,{data: CreateInterlineAgreementDto}, TContext> => {
-
-const mutationKey = ['createInterlineAgreement'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createInterlineAgreement>>, {data: CreateInterlineAgreementDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createInterlineAgreement(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateInterlineAgreementMutationResult = NonNullable<Awaited<ReturnType<typeof createInterlineAgreement>>>
-    export type CreateInterlineAgreementMutationBody = CreateInterlineAgreementDto
-    export type CreateInterlineAgreementMutationError = unknown
-
-    /**
- * @summary Create an interline agreement
- */
-export const useCreateInterlineAgreement = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInterlineAgreement>>, TError,{data: CreateInterlineAgreementDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createInterlineAgreement>>,
-        TError,
-        {data: CreateInterlineAgreementDto},
-        TContext
-      > => {
-
-      const mutationOptions = getCreateInterlineAgreementMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
-/**
- * @summary Resolve the directional interline gate for a carrier pair
- */
-export const getResolveInterlineUrl = (params: ResolveInterlineParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/interline-agreements/resolve?${stringifiedParams}` : `/api/interline-agreements/resolve`
-}
-
-export const resolveInterline = async (params: ResolveInterlineParams, options?: RequestInit): Promise<InterlineResolutionDto> => {
-  
-  return customFetch<InterlineResolutionDto>(getResolveInterlineUrl(params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getResolveInterlineQueryKey = (params?: ResolveInterlineParams,) => {
-    return [
-    `/api/interline-agreements/resolve`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getResolveInterlineQueryOptions = <TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getResolveInterlineQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveInterline>>> = ({ signal }) => resolveInterline(params, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ResolveInterlineQueryResult = NonNullable<Awaited<ReturnType<typeof resolveInterline>>>
-export type ResolveInterlineQueryError = unknown
-
-
-export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
- params: ResolveInterlineParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof resolveInterline>>,
-          TError,
-          Awaited<ReturnType<typeof resolveInterline>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
- params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof resolveInterline>>,
-          TError,
-          Awaited<ReturnType<typeof resolveInterline>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
- params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Resolve the directional interline gate for a carrier pair
- */
-
-export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
- params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getResolveInterlineQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
- * @summary Get an interline agreement
- */
-export const getGetInterlineAgreementUrl = (id: string,) => {
-
-
-  
-
-  return `/api/interline-agreements/${id}`
-}
-
-export const getInterlineAgreement = async (id: string, options?: RequestInit): Promise<InterlineAgreementDto> => {
-  
-  return customFetch<InterlineAgreementDto>(getGetInterlineAgreementUrl(id),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getGetInterlineAgreementQueryKey = (id?: string,) => {
-    return [
-    `/api/interline-agreements/${id}`
-    ] as const;
-    }
-
-    
-export const getGetInterlineAgreementQueryOptions = <TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetInterlineAgreementQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getInterlineAgreement>>> = ({ signal }) => getInterlineAgreement(id, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetInterlineAgreementQueryResult = NonNullable<Awaited<ReturnType<typeof getInterlineAgreement>>>
-export type GetInterlineAgreementQueryError = unknown
-
-
-export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getInterlineAgreement>>,
-          TError,
-          Awaited<ReturnType<typeof getInterlineAgreement>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getInterlineAgreement>>,
-          TError,
-          Awaited<ReturnType<typeof getInterlineAgreement>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get an interline agreement
- */
-
-export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetInterlineAgreementQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-
-/**
- * @summary Delete an interline agreement
- */
-export const getDeleteInterlineAgreementUrl = (id: string,) => {
-
-
-  
-
-  return `/api/interline-agreements/${id}`
-}
-
-export const deleteInterlineAgreement = async (id: string, options?: RequestInit): Promise<void> => {
-  
-  return customFetch<void>(getDeleteInterlineAgreementUrl(id),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-
-
-
-
-export const getDeleteInterlineAgreementMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteInterlineAgreement>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteInterlineAgreement>>, TError,{id: string}, TContext> => {
-
-const mutationKey = ['deleteInterlineAgreement'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteInterlineAgreement>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  deleteInterlineAgreement(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteInterlineAgreementMutationResult = NonNullable<Awaited<ReturnType<typeof deleteInterlineAgreement>>>
-    
-    export type DeleteInterlineAgreementMutationError = unknown
-
-    /**
- * @summary Delete an interline agreement
- */
-export const useDeleteInterlineAgreement = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteInterlineAgreement>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteInterlineAgreement>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
-
-      const mutationOptions = getDeleteInterlineAgreementMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -3901,6 +2771,459 @@ export const useDeleteFlightMarketing = <TError = unknown,
       > => {
 
       const mutationOptions = getDeleteFlightMarketingMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary List interline agreements
+ */
+export const getListInterlineAgreementsUrl = () => {
+
+
+  
+
+  return `/api/interline-agreements`
+}
+
+export const listInterlineAgreements = async ( options?: RequestInit): Promise<InterlineAgreementDto[]> => {
+  
+  return customFetch<InterlineAgreementDto[]>(getListInterlineAgreementsUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getListInterlineAgreementsQueryKey = () => {
+    return [
+    `/api/interline-agreements`
+    ] as const;
+    }
+
+    
+export const getListInterlineAgreementsQueryOptions = <TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInterlineAgreementsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterlineAgreements>>> = ({ signal }) => listInterlineAgreements({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListInterlineAgreementsQueryResult = NonNullable<Awaited<ReturnType<typeof listInterlineAgreements>>>
+export type ListInterlineAgreementsQueryError = unknown
+
+
+export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInterlineAgreements>>,
+          TError,
+          Awaited<ReturnType<typeof listInterlineAgreements>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInterlineAgreements>>,
+          TError,
+          Awaited<ReturnType<typeof listInterlineAgreements>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List interline agreements
+ */
+
+export function useListInterlineAgreements<TData = Awaited<ReturnType<typeof listInterlineAgreements>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterlineAgreements>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListInterlineAgreementsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Create an interline agreement
+ */
+export const getCreateInterlineAgreementUrl = () => {
+
+
+  
+
+  return `/api/interline-agreements`
+}
+
+export const createInterlineAgreement = async (createInterlineAgreementDto: CreateInterlineAgreementDto, options?: RequestInit): Promise<InterlineAgreementDto> => {
+  
+  return customFetch<InterlineAgreementDto>(getCreateInterlineAgreementUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createInterlineAgreementDto,)
+  }
+);}
+
+
+
+
+export const getCreateInterlineAgreementMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInterlineAgreement>>, TError,{data: CreateInterlineAgreementDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createInterlineAgreement>>, TError,{data: CreateInterlineAgreementDto}, TContext> => {
+
+const mutationKey = ['createInterlineAgreement'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createInterlineAgreement>>, {data: CreateInterlineAgreementDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createInterlineAgreement(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateInterlineAgreementMutationResult = NonNullable<Awaited<ReturnType<typeof createInterlineAgreement>>>
+    export type CreateInterlineAgreementMutationBody = CreateInterlineAgreementDto
+    export type CreateInterlineAgreementMutationError = unknown
+
+    /**
+ * @summary Create an interline agreement
+ */
+export const useCreateInterlineAgreement = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInterlineAgreement>>, TError,{data: CreateInterlineAgreementDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createInterlineAgreement>>,
+        TError,
+        {data: CreateInterlineAgreementDto},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateInterlineAgreementMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    
+/**
+ * @summary Resolve the directional interline gate for a carrier pair
+ */
+export const getResolveInterlineUrl = (params: ResolveInterlineParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/interline-agreements/resolve?${stringifiedParams}` : `/api/interline-agreements/resolve`
+}
+
+export const resolveInterline = async (params: ResolveInterlineParams, options?: RequestInit): Promise<InterlineResolutionDto> => {
+  
+  return customFetch<InterlineResolutionDto>(getResolveInterlineUrl(params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getResolveInterlineQueryKey = (params?: ResolveInterlineParams,) => {
+    return [
+    `/api/interline-agreements/resolve`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getResolveInterlineQueryOptions = <TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getResolveInterlineQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveInterline>>> = ({ signal }) => resolveInterline(params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ResolveInterlineQueryResult = NonNullable<Awaited<ReturnType<typeof resolveInterline>>>
+export type ResolveInterlineQueryError = unknown
+
+
+export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
+ params: ResolveInterlineParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof resolveInterline>>,
+          TError,
+          Awaited<ReturnType<typeof resolveInterline>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
+ params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof resolveInterline>>,
+          TError,
+          Awaited<ReturnType<typeof resolveInterline>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
+ params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Resolve the directional interline gate for a carrier pair
+ */
+
+export function useResolveInterline<TData = Awaited<ReturnType<typeof resolveInterline>>, TError = unknown>(
+ params: ResolveInterlineParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof resolveInterline>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getResolveInterlineQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Get an interline agreement
+ */
+export const getGetInterlineAgreementUrl = (id: string,) => {
+
+
+  
+
+  return `/api/interline-agreements/${id}`
+}
+
+export const getInterlineAgreement = async (id: string, options?: RequestInit): Promise<InterlineAgreementDto> => {
+  
+  return customFetch<InterlineAgreementDto>(getGetInterlineAgreementUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+
+
+
+
+
+export const getGetInterlineAgreementQueryKey = (id?: string,) => {
+    return [
+    `/api/interline-agreements/${id}`
+    ] as const;
+    }
+
+    
+export const getGetInterlineAgreementQueryOptions = <TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetInterlineAgreementQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getInterlineAgreement>>> = ({ signal }) => getInterlineAgreement(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetInterlineAgreementQueryResult = NonNullable<Awaited<ReturnType<typeof getInterlineAgreement>>>
+export type GetInterlineAgreementQueryError = unknown
+
+
+export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getInterlineAgreement>>,
+          TError,
+          Awaited<ReturnType<typeof getInterlineAgreement>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getInterlineAgreement>>,
+          TError,
+          Awaited<ReturnType<typeof getInterlineAgreement>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get an interline agreement
+ */
+
+export function useGetInterlineAgreement<TData = Awaited<ReturnType<typeof getInterlineAgreement>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getInterlineAgreement>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetInterlineAgreementQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+
+/**
+ * @summary Delete an interline agreement
+ */
+export const getDeleteInterlineAgreementUrl = (id: string,) => {
+
+
+  
+
+  return `/api/interline-agreements/${id}`
+}
+
+export const deleteInterlineAgreement = async (id: string, options?: RequestInit): Promise<void> => {
+  
+  return customFetch<void>(getDeleteInterlineAgreementUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+
+
+
+
+export const getDeleteInterlineAgreementMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteInterlineAgreement>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteInterlineAgreement>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['deleteInterlineAgreement'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteInterlineAgreement>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteInterlineAgreement(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteInterlineAgreementMutationResult = NonNullable<Awaited<ReturnType<typeof deleteInterlineAgreement>>>
+    
+    export type DeleteInterlineAgreementMutationError = unknown
+
+    /**
+ * @summary Delete an interline agreement
+ */
+export const useDeleteInterlineAgreement = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteInterlineAgreement>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteInterlineAgreement>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteInterlineAgreementMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

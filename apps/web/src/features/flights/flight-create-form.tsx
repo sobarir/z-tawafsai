@@ -6,9 +6,12 @@ import { createFlightSchema, legRoleSchema } from '@repo/shared';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
+import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -29,8 +32,6 @@ import {
 } from '@/components/ui/select';
 import { toAirlineOptions, toAirportOptions } from '@/libs/combobox-options';
 import { FlightPriceFields } from './flight-price-fields';
-import { OffsetDateTimeField } from './offset-date-time-field';
-
 interface FlightCreateFormProps {
   airports: Airport[];
   airlines: Airline[];
@@ -55,14 +56,22 @@ export function FlightCreateForm({
   const airlineOptions = toAirlineOptions(airlines);
 
   const form = useForm<CreateFlightInput>({
-    resolver: zodResolver(createFlightSchema),
+    resolver: async (data, context, options) => {
+      const processedData = { ...data };
+      if (processedData.legs && processedData.legs.length === 0) {
+        processedData.legs = undefined;
+      }
+      const resolver = zodResolver(createFlightSchema) as any;
+      return resolver(processedData, context, options);
+    },
     defaultValues: {
       operatingAirline: '',
       flightNumber: '',
       originAirport: '',
       destAirport: '',
-      departureTime: '',
-      arrivalTime: '',
+      departureTimeLocal: '',
+      arrivalTimeLocal: '',
+      arrivalDayOffset: 0,
       aircraftType: undefined,
       status: 'ACTIVE',
       price: 0,
@@ -72,7 +81,8 @@ export function FlightCreateForm({
   });
 
   const legs = useFieldArray({ control: form.control, name: 'legs' });
-  const multiLeg = form.watch('legs') !== undefined;
+  const watchedLegs = form.watch('legs') || [];
+  const multiLeg = watchedLegs.length > 0;
 
   const toggleMultiLeg = (checked: boolean) => {
     if (checked) {
@@ -81,19 +91,23 @@ export function FlightCreateForm({
           role: 'TECHNICAL_STOP',
           depAirport: '',
           arrAirport: '',
-          departureTime: '',
-          arrivalTime: '',
+          departureTimeLocal: '',
+          arrivalTimeLocal: '',
+          departureDayOffset: 0,
+          arrivalDayOffset: 0,
         },
         {
           role: 'TECHNICAL_STOP',
           depAirport: '',
           arrAirport: '',
-          departureTime: '',
-          arrivalTime: '',
+          departureTimeLocal: '',
+          arrivalTimeLocal: '',
+          departureDayOffset: 0,
+          arrivalDayOffset: 0,
         },
       ]);
     } else {
-      form.setValue('legs', undefined);
+      form.setValue('legs', []);
     }
   };
 
@@ -104,16 +118,24 @@ export function FlightCreateForm({
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+        <Tabs defaultValue="details">
+          <TabsList>
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="legs">Legs</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="details" className="mt-4 flex flex-col gap-4">
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ComboboxFormField
-            control={form.control}
+            control={form.control as any}
             name="operatingAirline"
             label={t('operatingAirline')}
             options={airlineOptions}
           />
 
           <TextFormField
-            control={form.control}
+            control={form.control as any}
             name="flightNumber"
             label={t('flightNumber')}
             placeholder={t('flightNumberPlaceholder')}
@@ -123,32 +145,29 @@ export function FlightCreateForm({
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ComboboxFormField
-            control={form.control}
+            control={form.control as any}
             name="originAirport"
             label={t('originAirport')}
             options={airportOptions}
           />
 
           <ComboboxFormField
-            control={form.control}
+            control={form.control as any}
             name="destAirport"
             label={t('destAirport')}
             options={airportOptions}
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <FormField
-            control={form.control}
-            name="departureTime"
+            control={form.control as any}
+            name="departureTimeLocal"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('departureTime')}</FormLabel>
                 <FormControl>
-                  <OffsetDateTimeField
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <Input type="time" {...field} value={field.value || ''} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -156,26 +175,29 @@ export function FlightCreateForm({
           />
 
           <FormField
-            control={form.control}
-            name="arrivalTime"
+            control={form.control as any}
+            name="arrivalTimeLocal"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('arrivalTime')}</FormLabel>
                 <FormControl>
-                  <OffsetDateTimeField
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <Input type="time" {...field} value={field.value || ''} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
+          />
+
+          <NumberFormField
+            control={form.control as any}
+            name="arrivalDayOffset"
+            label={t('arrivalDayOffset')}
           />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <TextFormField
-            control={form.control}
+            control={form.control as any}
             name="aircraftType"
             label={t('aircraftType')}
             placeholder={t('aircraftTypePlaceholder')}
@@ -184,7 +206,7 @@ export function FlightCreateForm({
           />
 
           <FormField
-            control={form.control}
+            control={form.control as any}
             name="status"
             render={({ field }) => (
               <FormItem>
@@ -211,9 +233,13 @@ export function FlightCreateForm({
           />
         </div>
 
-        <FlightPriceFields control={form.control} />
+        <FlightPriceFields control={form.control as any} />
 
-        <div className="flex items-center gap-2">
+        
+          </TabsContent>
+          
+          <TabsContent value="legs" className="mt-4 flex flex-col gap-4">
+<div className="flex items-center gap-2">
           <Checkbox
             id="multi-leg"
             checked={multiLeg}
@@ -231,8 +257,8 @@ export function FlightCreateForm({
               >
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <FormField
-                    control={form.control}
-                    name={`legs.${index}.role`}
+                    control={form.control as any}
+                    name={`legs.${index}.role` as any}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('legRole')}</FormLabel>
@@ -259,66 +285,73 @@ export function FlightCreateForm({
                   />
 
                   <ComboboxFormField
-                    control={form.control}
-                    name={`legs.${index}.depAirport`}
+                    control={form.control as any}
+                    name={`legs.${index}.depAirport` as any}
                     label={t('legDepAirport')}
                     options={airportOptions}
                   />
 
                   <ComboboxFormField
-                    control={form.control}
-                    name={`legs.${index}.arrAirport`}
+                    control={form.control as any}
+                    name={`legs.${index}.arrAirport` as any}
                     label={t('legArrAirport')}
                     options={airportOptions}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
                   <FormField
-                    control={form.control}
-                    name={`legs.${index}.departureTime`}
+                    control={form.control as any}
+                    name={`legs.${index}.departureTimeLocal` as any}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('legDeparture')}</FormLabel>
                         <FormControl>
-                          <OffsetDateTimeField
-                            value={field.value}
-                            onChange={field.onChange}
-                          />
+                          <Input type="time" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
+                  <NumberFormField
+                    control={form.control as any}
+                    name={`legs.${index}.departureDayOffset` as any}
+                    label={t('departureDayOffset')}
+                  />
+
                   <FormField
-                    control={form.control}
-                    name={`legs.${index}.arrivalTime`}
+                    control={form.control as any}
+                    name={`legs.${index}.arrivalTimeLocal` as any}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('legArrival')}</FormLabel>
                         <FormControl>
-                          <OffsetDateTimeField
-                            value={field.value}
-                            onChange={field.onChange}
-                          />
+                          <Input type="time" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  <NumberFormField
+                    control={form.control as any}
+                    name={`legs.${index}.arrivalDayOffset` as any}
+                    label={t('arrivalDayOffset')}
+                  />
                 </div>
 
-                <Button
-                  type="button"
-                  variant="outlineDestructive"
-                  size="sm"
-                  className="w-fit"
-                  disabled={legs.fields.length <= 2}
-                  onClick={() => legs.remove(index)}
-                >
-                  <Trash2Icon /> {t('removeLeg')}
-                </Button>
+                {watchedLegs.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="outlineDestructive"
+                    size="sm"
+                    className="w-fit"
+                    onClick={() => legs.remove(index)}
+                  >
+                    <Trash2Icon /> {t('removeLeg')}
+                  </Button>
+                )}
               </div>
             ))}
 
@@ -332,8 +365,10 @@ export function FlightCreateForm({
                   role: 'TECHNICAL_STOP',
                   depAirport: '',
                   arrAirport: '',
-                  departureTime: '',
-                  arrivalTime: '',
+                  departureTimeLocal: '',
+                  arrivalTimeLocal: '',
+                  departureDayOffset: 0,
+                  arrivalDayOffset: 0,
                 })
               }
             >
@@ -342,6 +377,9 @@ export function FlightCreateForm({
           </div>
         ) : null}
 
+        
+          </TabsContent>
+        </Tabs>
         <FormDialogActions
           cancelLabel={tCommon('cancel')}
           saveLabel={tCommon('save')}

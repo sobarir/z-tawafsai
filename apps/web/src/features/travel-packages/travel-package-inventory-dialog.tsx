@@ -134,7 +134,7 @@ function DepartureInventoryPanel({ departure }: { departure: Departure }) {
     await createMutation.mutateAsync({ data: values });
   });
 
-  const departureDate = departure.flight.departureTime.split('T')[0];
+  const departureDate = departure.departureDate.split('T')[0];
   const dateRange = departure.returnDate
     ? `${departureDate} → ${departure.returnDate}`
     : departureDate;

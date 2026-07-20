@@ -1,4 +1,4 @@
-import type { ConnectionResult, Flight, FlightItinerary } from '@repo/shared';
+import type { Flight, FlightItinerary } from '@repo/shared';
 import { render, screen } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
@@ -37,8 +37,9 @@ const directFlight: Flight = {
   flightNumber: '874',
   originAirport: 'CGK',
   destAirport: 'NRT',
-  departureTime: '2026-06-05T09:00:00+07:00',
-  arrivalTime: '2026-06-05T17:15:00+09:00',
+  departureTimeLocal: '09:00',
+  arrivalTimeLocal: '17:15',
+  arrivalDayOffset: 0,
   aircraftType: '77W',
   status: 'ACTIVE',
   price: 570,
@@ -51,8 +52,10 @@ const directFlight: Flight = {
       role: 'FULL',
       depAirport: 'CGK',
       arrAirport: 'NRT',
-      departureTime: '2026-06-05T09:00:00+07:00',
-      arrivalTime: '2026-06-05T17:15:00+09:00',
+      departureTimeLocal: '09:00',
+      arrivalTimeLocal: '17:15',
+      departureDayOffset: 0,
+      arrivalDayOffset: 0,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
     },
@@ -63,12 +66,12 @@ const directFlight: Flight = {
 
 const directItinerary: FlightItinerary = {
   flights: [directFlight],
-  connections: [],
   stopCount: 0,
   totalPrice: directFlight.price,
   currency: directFlight.currency,
-  departureTime: directFlight.departureTime,
-  arrivalTime: directFlight.arrivalTime,
+  departureTimeLocal: directFlight.departureTimeLocal,
+  arrivalTimeLocal: directFlight.arrivalTimeLocal,
+  arrivalDayOffset: directFlight.arrivalDayOffset,
   totalDurationMinutes: 375,
 };
 
@@ -78,8 +81,9 @@ const technicalStopFlight: Flight = {
   operatingAirline: 'NH',
   flightNumber: '10',
   destAirport: 'LHR',
-  departureTime: '2026-06-01T01:00:00+07:00',
-  arrivalTime: '2026-06-01T20:00:00+01:00',
+  departureTimeLocal: '01:00',
+  arrivalTimeLocal: '20:00',
+  arrivalDayOffset: 0,
   price: 950,
   legs: [
     {
@@ -89,8 +93,10 @@ const technicalStopFlight: Flight = {
       role: 'TECHNICAL_STOP',
       depAirport: 'CGK',
       arrAirport: 'BKK',
-      departureTime: '2026-06-01T01:00:00+07:00',
-      arrivalTime: '2026-06-01T04:15:00+07:00',
+      departureTimeLocal: '01:00',
+      arrivalTimeLocal: '09:30',
+      departureDayOffset: 0,
+      arrivalDayOffset: 0,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
     },
@@ -101,8 +107,10 @@ const technicalStopFlight: Flight = {
       role: 'TECHNICAL_STOP',
       depAirport: 'BKK',
       arrAirport: 'LHR',
-      departureTime: '2026-06-01T05:30:00+07:00',
-      arrivalTime: '2026-06-01T20:00:00+01:00',
+      departureTimeLocal: '10:30',
+      arrivalTimeLocal: '20:00',
+      departureDayOffset: 0,
+      arrivalDayOffset: 0,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
     },
@@ -111,12 +119,12 @@ const technicalStopFlight: Flight = {
 
 const technicalStopItinerary: FlightItinerary = {
   flights: [technicalStopFlight],
-  connections: [],
   stopCount: 0,
   totalPrice: technicalStopFlight.price,
   currency: technicalStopFlight.currency,
-  departureTime: technicalStopFlight.departureTime,
-  arrivalTime: technicalStopFlight.arrivalTime,
+  departureTimeLocal: technicalStopFlight.departureTimeLocal,
+  arrivalTimeLocal: technicalStopFlight.arrivalTimeLocal,
+  arrivalDayOffset: technicalStopFlight.arrivalDayOffset,
   totalDurationMinutes: 1140,
 };
 
@@ -127,8 +135,9 @@ const connectingFirstLeg: Flight = {
   flightNumber: '725',
   originAirport: 'CGK',
   destAirport: 'KUL',
-  departureTime: '2026-08-08T01:00:00Z',
-  arrivalTime: '2026-08-08T03:15:00Z',
+  departureTimeLocal: '01:00',
+  arrivalTimeLocal: '03:15',
+  arrivalDayOffset: 0,
   price: 180,
   legs: [
     {
@@ -138,8 +147,10 @@ const connectingFirstLeg: Flight = {
       role: 'FULL',
       depAirport: 'CGK',
       arrAirport: 'KUL',
-      departureTime: '2026-08-08T01:00:00Z',
-      arrivalTime: '2026-08-08T03:15:00Z',
+      departureTimeLocal: '01:00',
+      arrivalTimeLocal: '03:15',
+      departureDayOffset: 0,
+      arrivalDayOffset: 0,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
     },
@@ -153,8 +164,9 @@ const connectingSecondLeg: Flight = {
   flightNumber: '152',
   originAirport: 'KUL',
   destAirport: 'JED',
-  departureTime: '2026-08-08T06:00:00Z',
-  arrivalTime: '2026-08-08T16:30:00Z',
+  departureTimeLocal: '06:00',
+  arrivalTimeLocal: '16:30',
+  arrivalDayOffset: 0,
   price: 580,
   legs: [
     {
@@ -164,35 +176,24 @@ const connectingSecondLeg: Flight = {
       role: 'FULL',
       depAirport: 'KUL',
       arrAirport: 'JED',
-      departureTime: '2026-08-08T06:00:00Z',
-      arrivalTime: '2026-08-08T16:30:00Z',
+      departureTimeLocal: '06:00',
+      arrivalTimeLocal: '16:30',
+      departureDayOffset: 0,
+      arrivalDayOffset: 0,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
     },
   ],
 };
 
-const connectionResult: ConnectionResult = {
-  prevFlightId: 'leg-first',
-  nextFlightId: 'leg-second',
-  kind: 'connection',
-  gapMinutes: 165,
-  sameMetroInterAirport: false,
-  isInterline: false,
-  bagThroughChecked: true,
-  appliedMctRuleId: 'rule-1',
-  appliedInterlineId: null,
-  reason: 'CONNECTION',
-};
-
 const connectingItinerary: FlightItinerary = {
   flights: [connectingFirstLeg, connectingSecondLeg],
-  connections: [connectionResult],
   stopCount: 1,
   totalPrice: connectingFirstLeg.price + connectingSecondLeg.price,
   currency: 'USD',
-  departureTime: connectingFirstLeg.departureTime,
-  arrivalTime: connectingSecondLeg.arrivalTime,
+  departureTimeLocal: connectingFirstLeg.departureTimeLocal,
+  arrivalTimeLocal: connectingSecondLeg.arrivalTimeLocal,
+  arrivalDayOffset: connectingSecondLeg.arrivalDayOffset,
   totalDurationMinutes: 930,
 };
 

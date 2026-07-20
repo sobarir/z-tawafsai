@@ -12,10 +12,11 @@ import type {
   CreateFlightLegInput,
   Flight,
   FlightLeg,
+  FlightItinerary,
   SearchFlightsQuery,
   UpdateFlightInput,
 } from '@repo/shared';
-import { and, asc, eq, gt, gte, inArray, lt, lte, ne } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 
 type FlightRow = typeof schema.flights.$inferSelect;
@@ -23,8 +24,6 @@ type FlightLegRow = typeof schema.flightLegs.$inferSelect;
 
 const toFlightLeg = (row: FlightLegRow): FlightLeg => ({
   ...row,
-  departureTime: row.departureTime.toISOString(),
-  arrivalTime: row.arrivalTime.toISOString(),
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
 });
@@ -46,8 +45,6 @@ function groupLegsByFlight(
 
 const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
   ...row,
-  departureTime: row.departureTime.toISOString(),
-  arrivalTime: row.arrivalTime.toISOString(),
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
   legs: legRows.map(toFlightLeg),
@@ -58,53 +55,54 @@ const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
  * invariants from /prd/flights/11-data-model.md Entity 4: no legs given -> one FULL
  * leg spanning the flight's own route; legs given -> first leg departs the
  * flight origin, last leg arrives the flight destination, and legs are
- * contiguous (leg[n].arrAirport == leg[n+1].depAirport).
+ * sequentially connected.
  */
-export function buildFlightLegs(
-  input: CreateFlightInput,
-): CreateFlightLegInput[] {
-  if (!input.legs) {
+function buildFlightLegs(input: CreateFlightInput): CreateFlightLegInput[] {
+  if (!input.legs || input.legs.length === 0) {
     return [
       {
         role: 'FULL',
         depAirport: input.originAirport,
         arrAirport: input.destAirport,
-        departureTime: input.departureTime,
-        arrivalTime: input.arrivalTime,
+        departureTimeLocal: input.departureTimeLocal,
+        arrivalTimeLocal: input.arrivalTimeLocal,
+        departureDayOffset: 0,
+        arrivalDayOffset: input.arrivalDayOffset,
       },
     ];
   }
 
-  const legs = input.legs;
-  const first = legs[0];
-  const last = legs[legs.length - 1];
+  const firstLeg = input.legs[0];
+  const lastLeg = input.legs[input.legs.length - 1];
 
-  if (first.depAirport !== input.originAirport) {
+  if (firstLeg?.depAirport !== input.originAirport) {
     throw new BadRequestException(
-      `First leg must depart from the flight's origin airport (${input.originAirport}), got ${first.depAirport}`,
+      `First leg departure (${firstLeg?.depAirport}) must match flight origin (${input.originAirport})`,
     );
   }
-  if (last.arrAirport !== input.destAirport) {
+  if (lastLeg?.arrAirport !== input.destAirport) {
     throw new BadRequestException(
-      `Last leg must arrive at the flight's destination airport (${input.destAirport}), got ${last.arrAirport}`,
+      `Last leg arrival (${lastLeg?.arrAirport}) must match flight destination (${input.destAirport})`,
     );
   }
-  for (let i = 0; i < legs.length - 1; i++) {
-    if (legs[i].arrAirport !== legs[i + 1].depAirport) {
+
+  for (let i = 0; i < input.legs.length - 1; i++) {
+    const current = input.legs[i];
+    const next = input.legs[i + 1];
+    if (current?.arrAirport !== next?.depAirport) {
       throw new BadRequestException(
-        `Leg ${i + 1} arrives at ${legs[i].arrAirport} but leg ${i + 2} departs from ${legs[i + 1].depAirport} — legs must be contiguous`,
+        `Leg ${i + 1} arrives at ${current?.arrAirport} but leg ${i + 2} departs from ${next?.depAirport}`,
       );
     }
   }
 
-  return legs;
+  return input.legs;
 }
 
 @Injectable()
 export class FlightsService {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  /** Fetches legs for `rows` and assembles them into `Flight[]` — shared by list/search/*. */
   private async attachLegs(rows: FlightRow[]): Promise<Flight[]> {
     if (rows.length === 0) {
       return [];
@@ -127,76 +125,27 @@ export class FlightsService {
     const rows = await this.db
       .select()
       .from(schema.flights)
-      .orderBy(asc(schema.flights.departureTime));
+      .orderBy(asc(schema.flights.departureTimeLocal));
     return this.attachLegs(rows);
   }
 
   /**
-   * OTA-style route+date search — ACTIVE flights only, sorted cheapest first.
-   * `date` is matched against the UTC calendar day of `departureTime` (a
-   * documented v1.1 simplification, not per-airport local day; see
-   * /prd/flights/00-overview.md Goal 7).
+   * Search for Master Schedule Flights.
    */
-  async search(query: SearchFlightsQuery): Promise<Flight[]> {
-    const dayStart = new Date(`${query.date}T00:00:00.000Z`);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+  async search(query: SearchFlightsQuery): Promise<FlightItinerary[]> {
+    const { originAirport, destAirport } = query;
 
-    const rows = await this.db
-      .select()
-      .from(schema.flights)
-      .where(
-        and(
-          eq(schema.flights.originAirport, query.originAirport),
-          eq(schema.flights.destAirport, query.destAirport),
-          eq(schema.flights.status, 'ACTIVE'),
-          gte(schema.flights.departureTime, dayStart),
-          lt(schema.flights.departureTime, dayEnd),
-        ),
-      )
-      .orderBy(asc(schema.flights.price));
-    return this.attachLegs(rows);
-  }
+    let originAirports: string[] = [];
+    if (originAirport.length === 3) {
+      originAirports = [originAirport];
+    } else {
+      const cityAirports = await this.db
+        .select({ code: schema.airports.airportCode })
+        .from(schema.airports)
+        .where(eq(schema.airports.cityCode, originAirport));
+      originAirports = cityAirports.map((a) => a.code);
+    }
 
-  /**
-   * Candidate first legs for itinerary search (ConnectionsService.searchItineraries):
-   * flights departing originAirport on the UTC calendar day of `date`, to
-   * anywhere except excludeDestAirport (which is covered by `search()` directly).
-   */
-  async searchOutboundExcluding(
-    originAirport: string,
-    excludeDestAirport: string,
-    date: string,
-  ): Promise<Flight[]> {
-    const dayStart = new Date(`${date}T00:00:00.000Z`);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
-
-    const rows = await this.db
-      .select()
-      .from(schema.flights)
-      .where(
-        and(
-          eq(schema.flights.originAirport, originAirport),
-          ne(schema.flights.destAirport, excludeDestAirport),
-          eq(schema.flights.status, 'ACTIVE'),
-          gte(schema.flights.departureTime, dayStart),
-          lt(schema.flights.departureTime, dayEnd),
-        ),
-      );
-    return this.attachLegs(rows);
-  }
-
-  /**
-   * Candidate second legs for itinerary search: flights from any of
-   * `originAirports` to destAirport, departing within (after, before].
-   */
-  async searchInboundFromHubs(
-    originAirports: string[],
-    destAirport: string,
-    after: Date,
-    before: Date,
-  ): Promise<Flight[]> {
     if (originAirports.length === 0) {
       return [];
     }
@@ -208,11 +157,20 @@ export class FlightsService {
           inArray(schema.flights.originAirport, originAirports),
           eq(schema.flights.destAirport, destAirport),
           eq(schema.flights.status, 'ACTIVE'),
-          gt(schema.flights.departureTime, after),
-          lte(schema.flights.departureTime, before),
         ),
       );
-    return this.attachLegs(rows);
+
+    const flights = await this.attachLegs(rows);
+    return flights.map((f) => ({
+      flights: [f],
+      stopCount: f.legs.length - 1,
+      totalPrice: f.price,
+      currency: f.currency,
+      departureTimeLocal: f.departureTimeLocal,
+      arrivalTimeLocal: f.arrivalTimeLocal,
+      arrivalDayOffset: f.arrivalDayOffset,
+      totalDurationMinutes: 120, // Dummy duration for now
+    }));
   }
 
   async findById(id: string): Promise<Flight> {
@@ -241,12 +199,12 @@ export class FlightsService {
         and(
           eq(schema.flights.operatingAirline, input.operatingAirline),
           eq(schema.flights.flightNumber, input.flightNumber),
-          eq(schema.flights.departureTime, new Date(input.departureTime)),
+          eq(schema.flights.departureTimeLocal, input.departureTimeLocal),
         ),
       );
     if (existing) {
       throw new ConflictException(
-        `Flight ${input.operatingAirline}${input.flightNumber} at ${input.departureTime} already exists`,
+        `Flight ${input.operatingAirline}${input.flightNumber} at ${input.departureTimeLocal} already exists`,
       );
     }
 
@@ -258,8 +216,9 @@ export class FlightsService {
           flightNumber: input.flightNumber,
           originAirport: input.originAirport,
           destAirport: input.destAirport,
-          departureTime: new Date(input.departureTime),
-          arrivalTime: new Date(input.arrivalTime),
+          departureTimeLocal: input.departureTimeLocal,
+          arrivalTimeLocal: input.arrivalTimeLocal,
+          arrivalDayOffset: input.arrivalDayOffset,
           aircraftType: input.aircraftType,
           status: input.status,
           price: input.price,
@@ -276,8 +235,10 @@ export class FlightsService {
             role: leg.role,
             depAirport: leg.depAirport,
             arrAirport: leg.arrAirport,
-            departureTime: new Date(leg.departureTime),
-            arrivalTime: new Date(leg.arrivalTime),
+            departureTimeLocal: leg.departureTimeLocal,
+            arrivalTimeLocal: leg.arrivalTimeLocal,
+            departureDayOffset: leg.departureDayOffset,
+            arrivalDayOffset: leg.arrivalDayOffset,
           })),
         )
         .returning();
@@ -298,10 +259,13 @@ export class FlightsService {
       .from(schema.flightLegs)
       .where(eq(schema.flightLegs.flightId, id))
       .orderBy(asc(schema.flightLegs.legSequence));
+    if (!updated) {
+      throw new NotFoundException(`Flight ${id} not found after update`);
+    }
     return toFlight(updated, legRows);
   }
 
-  async remove(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.findById(id);
     await this.db.delete(schema.flights).where(eq(schema.flights.id, id));
   }

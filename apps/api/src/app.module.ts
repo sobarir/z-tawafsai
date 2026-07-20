@@ -10,7 +10,6 @@ import { auth } from './auth/auth';
 import { CitiesModule } from './cities/cities.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { loggerConfig } from './common/logger/logger.config';
-import { ConnectionsModule } from './connections/connections.module';
 import { DatabaseModule } from './database/database.module';
 import { FlightMarketingModule } from './flight-marketing/flight-marketing.module';
 import { FlightsModule } from './flights/flights.module';
@@ -23,7 +22,6 @@ import { HotelSeasonWindowsModule } from './hotel-season-windows/hotel-season-wi
 import { HotelSeasonsModule } from './hotel-seasons/hotel-seasons.module';
 import { HotelsModule } from './hotels/hotels.module';
 import { InterlineAgreementsModule } from './interline-agreements/interline-agreements.module';
-import { MctRulesModule } from './mct-rules/mct-rules.module';
 import { PostsModule } from './posts/posts.module';
 import { TravelPackagesModule } from './travel-packages/travel-packages.module';
 import { TravelProvidersModule } from './travel-providers/travel-providers.module';
@@ -46,9 +44,7 @@ import { UsersModule } from './users/users.module';
     AirlinesModule,
     FlightsModule,
     FlightMarketingModule,
-    MctRulesModule,
     InterlineAgreementsModule,
-    ConnectionsModule,
     HotelsModule,
     HotelCurrenciesModule,
     HotelFxRatesModule,

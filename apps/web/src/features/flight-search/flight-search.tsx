@@ -43,7 +43,7 @@ export function FlightSearch() {
         searching={isFetching}
       />
       <FlightSearchResults
-        results={data}
+        results={data as unknown as import('@repo/shared').FlightItinerary[]}
         isFetching={isFetching}
         isFetched={isFetched}
       />

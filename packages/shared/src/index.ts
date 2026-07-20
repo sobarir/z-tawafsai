@@ -150,12 +150,10 @@ export const flightNumberSchema = z
   .string()
   .regex(/^[0-9]{1,4}[A-Z]?$/, 'Invalid flight number');
 
-/**
- * Scheduled departure/arrival times are local to the airport and carry their
- * UTC offset (e.g. '2026-06-01T10:45:00+09:00') rather than being forced to
- * UTC — schedules are authored and read in local airport time.
- */
-export const offsetDateTimeSchema = z.iso.datetime({ offset: true });
+/** Local time string: HH:MM (e.g. '10:45'). */
+export const localTimeSchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid local time (HH:MM)');
 
 export const flightLegSchema = z.object({
   id: ulidSchema,
@@ -164,8 +162,10 @@ export const flightLegSchema = z.object({
   role: legRoleSchema,
   depAirport: airportCodeSchema,
   arrAirport: airportCodeSchema,
-  departureTime: offsetDateTimeSchema,
-  arrivalTime: offsetDateTimeSchema,
+  departureTimeLocal: localTimeSchema,
+  arrivalTimeLocal: localTimeSchema,
+  departureDayOffset: z.number().int(),
+  arrivalDayOffset: z.number().int(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -177,8 +177,9 @@ export const flightSchema = z.object({
   flightNumber: flightNumberSchema,
   originAirport: airportCodeSchema,
   destAirport: airportCodeSchema,
-  departureTime: offsetDateTimeSchema,
-  arrivalTime: offsetDateTimeSchema,
+  departureTimeLocal: localTimeSchema,
+  arrivalTimeLocal: localTimeSchema,
+  arrivalDayOffset: z.number().int(),
   aircraftType: z.string().max(10).nullable(),
   status: flightStatusSchema,
   /** Flat, admin-managed price for search display/sorting — not a fare class. */
@@ -196,8 +197,10 @@ export const createFlightLegInputSchema = z.object({
   role: legRoleSchema,
   depAirport: airportCodeSchema,
   arrAirport: airportCodeSchema,
-  departureTime: offsetDateTimeSchema,
-  arrivalTime: offsetDateTimeSchema,
+  departureTimeLocal: localTimeSchema,
+  arrivalTimeLocal: localTimeSchema,
+  departureDayOffset: z.number().int().optional().default(0),
+  arrivalDayOffset: z.number().int().optional().default(0),
 });
 export type CreateFlightLegInput = z.infer<typeof createFlightLegInputSchema>;
 
@@ -206,8 +209,9 @@ export const createFlightSchema = z.object({
   flightNumber: flightNumberSchema,
   originAirport: airportCodeSchema,
   destAirport: airportCodeSchema,
-  departureTime: offsetDateTimeSchema,
-  arrivalTime: offsetDateTimeSchema,
+  departureTimeLocal: localTimeSchema,
+  arrivalTimeLocal: localTimeSchema,
+  arrivalDayOffset: z.number().int().optional().default(0),
   aircraftType: z.string().max(10).optional(),
   status: flightStatusSchema.optional(),
   price: z.number().nonnegative(),
@@ -269,70 +273,6 @@ export type UpdateFlightMarketingInput = z.infer<
   typeof updateFlightMarketingSchema
 >;
 
-/** Domestic/international combination at the connection airport; see /prd/flights/13-mct-rules.md §A. */
-export const mctScopeSchema = z.enum(['DD', 'DI', 'ID', 'II']);
-export type MctScope = z.infer<typeof mctScopeSchema>;
-
-/** IATA terminal designator, e.g. '1', '2', 'S'. */
-export const terminalSchema = z.string().min(1).max(5);
-
-export const mctRuleSchema = z.object({
-  id: ulidSchema,
-  arrivalAirport: airportCodeSchema,
-  departureAirport: airportCodeSchema,
-  scope: mctScopeSchema,
-  arrivalAirline: airlineCodeSchema.nullable(),
-  departureAirline: airlineCodeSchema.nullable(),
-  arrivalTerminal: terminalSchema.nullable(),
-  departureTerminal: terminalSchema.nullable(),
-  mctMinutes: z.number().int().positive(),
-  maxConnectionMinutes: z.number().int().positive(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
-});
-export type MctRule = z.infer<typeof mctRuleSchema>;
-
-export const mctRuleListSchema = z.array(mctRuleSchema);
-
-export const createMctRuleSchema = z
-  .object({
-    arrivalAirport: airportCodeSchema,
-    departureAirport: airportCodeSchema,
-    scope: mctScopeSchema,
-    arrivalAirline: airlineCodeSchema.optional(),
-    departureAirline: airlineCodeSchema.optional(),
-    arrivalTerminal: terminalSchema.optional(),
-    departureTerminal: terminalSchema.optional(),
-    mctMinutes: z.number().int().positive(),
-    maxConnectionMinutes: z.number().int().positive().optional(),
-  })
-  .refine((data) => (data.maxConnectionMinutes ?? 1440) >= data.mctMinutes, {
-    message: 'maxConnectionMinutes must be >= mctMinutes',
-    path: ['maxConnectionMinutes'],
-  });
-export type CreateMctRuleInput = z.infer<typeof createMctRuleSchema>;
-
-export const updateMctRuleSchema = z.object({
-  arrivalAirline: airlineCodeSchema.optional(),
-  departureAirline: airlineCodeSchema.optional(),
-  arrivalTerminal: terminalSchema.optional(),
-  departureTerminal: terminalSchema.optional(),
-  mctMinutes: z.number().int().positive().optional(),
-  maxConnectionMinutes: z.number().int().positive().optional(),
-});
-export type UpdateMctRuleInput = z.infer<typeof updateMctRuleSchema>;
-
-/** Query for the most-specific-first resolver (/prd/flights/13-mct-rules.md §A). */
-export const resolveMctRuleQuerySchema = z.object({
-  arrivalAirport: airportCodeSchema,
-  departureAirport: airportCodeSchema,
-  scope: mctScopeSchema,
-  arrivalAirline: airlineCodeSchema.optional(),
-  departureAirline: airlineCodeSchema.optional(),
-  arrivalTerminal: terminalSchema.optional(),
-  departureTerminal: terminalSchema.optional(),
-});
-export type ResolveMctRuleQuery = z.infer<typeof resolveMctRuleQuerySchema>;
 
 /**
  * Directional carrier-pair gate: does the inbound operating carrier permit a
@@ -384,64 +324,23 @@ export const interlineResolutionSchema = z.object({
 });
 export type InterlineResolution = z.infer<typeof interlineResolutionSchema>;
 
-/** The four DERIVED gap types plus 'invalid' — never stored, always computed. See /prd/flights/01-glossary.md. */
-export const connectionKindSchema = z.enum([
-  'connection',
-  'stopover',
-  'open_jaw',
-  'transit',
-  'invalid',
-]);
-export type ConnectionKind = z.infer<typeof connectionKindSchema>;
 
-/**
- * Output of the connection-validation classifier (/prd/flights/13-mct-rules.md §B).
- * `gapMinutes` is null for open_jaw/transit, and for invalid/NO_INTERLINE
- * (the interline gate runs before gap math) and invalid/NO_INTERLINE only.
- */
-export const connectionResultSchema = z.object({
-  prevFlightId: ulidSchema,
-  nextFlightId: ulidSchema,
-  kind: connectionKindSchema,
-  gapMinutes: z.number().int().nullable(),
-  sameMetroInterAirport: z.boolean(),
-  isInterline: z.boolean(),
-  bagThroughChecked: z.boolean(),
-  appliedMctRuleId: ulidSchema.nullable(),
-  appliedInterlineId: ulidSchema.nullable(),
-  reason: z.string(),
-});
-export type ConnectionResult = z.infer<typeof connectionResultSchema>;
 
 /**
  * One OTA-style search result: a direct flight (1 leg) or a one-stop
- * itinerary (2 legs) gated by ConnectionsService.classify() — see
- * /prd/flights/CONTEXT.md Step 11. `connections` has length `flights.length - 1`.
+ * itinerary (2 legs).
  */
 export const flightItinerarySchema = z.object({
   flights: z.array(flightSchema).min(1).max(2),
-  connections: z.array(connectionResultSchema),
   stopCount: z.number().int().nonnegative(),
   totalPrice: z.number().nonnegative(),
   currency: currencyCodeSchema,
-  departureTime: offsetDateTimeSchema,
-  arrivalTime: offsetDateTimeSchema,
+  departureTimeLocal: localTimeSchema,
+  arrivalTimeLocal: localTimeSchema,
+  arrivalDayOffset: z.number().int().nonnegative(),
   totalDurationMinutes: z.number().int().nonnegative(),
 });
 export type FlightItinerary = z.infer<typeof flightItinerarySchema>;
-
-export const validateConnectionSchema = z.object({
-  prevFlightId: ulidSchema,
-  nextFlightId: ulidSchema,
-});
-export type ValidateConnectionInput = z.infer<typeof validateConnectionSchema>;
-
-export const validateConnectionChainSchema = z.object({
-  flightIds: z.array(ulidSchema).min(2),
-});
-export type ValidateConnectionChainInput = z.infer<
-  typeof validateConnectionChainSchema
->;
 
 export const sessionUserSchema = z.object({
   id: z.string(),
@@ -562,7 +461,7 @@ export const updateFxRateSchema = createFxRateSchema.partial();
 export type UpdateFxRateInput = z.infer<typeof updateFxRateSchema>;
 
 export const propertySchema = z.object({
-  propertyCode: z.string().min(1).max(50),
+  propertyCode: z.string().length(26),
   type: propertyTypeSchema,
   starRating: z.number().int().min(1).max(5).nullable(),
   address: z.string().nullable(),
@@ -582,7 +481,6 @@ export const propertySchema = z.object({
 export type Property = z.infer<typeof propertySchema>;
 
 export const createPropertySchema = z.object({
-  propertyCode: z.string().min(1).max(50),
   type: propertyTypeSchema,
   starRating: z.number().int().min(1).max(5).optional(),
   address: z.string().max(500).optional(),
@@ -598,9 +496,7 @@ export const createPropertySchema = z.object({
 });
 export type CreatePropertyInput = z.infer<typeof createPropertySchema>;
 
-export const updatePropertySchema = createPropertySchema
-  .omit({ propertyCode: true })
-  .partial();
+export const updatePropertySchema = createPropertySchema.partial();
 export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
 
 // Room types are global reference data — a shared catalog of room categories,
@@ -721,8 +617,9 @@ const flightHotelPackageFlightSummarySchema = z.object({
   flightNumber: flightNumberSchema,
   originAirport: airportCodeSchema,
   destAirport: airportCodeSchema,
-  departureTime: offsetDateTimeSchema,
-  arrivalTime: offsetDateTimeSchema,
+  departureTimeLocal: localTimeSchema,
+  arrivalTimeLocal: localTimeSchema,
+  arrivalDayOffset: z.number().int(),
   /** False when the operating flight has an internal technical stop (see /prd/flights/01-glossary.md — "transit", not a cross-flight connection). */
   isDirect: z.boolean(),
   transitAirport: airportCodeSchema.nullable(),
@@ -731,6 +628,7 @@ const flightHotelPackageFlightSummarySchema = z.object({
 
 /** One ordered city stay, enriched with the property's display details. */
 const travelPackageStaySummarySchema = z.object({
+  cityCode: cityCodeSchema,
   propertyCode: z.string(),
   displayName: z.string(),
   destination: z.string(),
@@ -745,12 +643,15 @@ const travelPackageDepartureSchema = z.object({
   id: ulidSchema,
   flightId: ulidSchema,
   flight: flightHotelPackageFlightSummarySchema,
+  departureDate: z.iso.date(),
   returnDate: z.iso.date().nullable(),
   seatsNote: z.string().nullable(),
   /** Seat quota for this departure; null = quota not tracked (unlimited). */
   totalSeats: z.number().int().nonnegative().nullable(),
   /** The true available pool, manually synced with the provider. */
   availableSeats: z.number().int().nonnegative().nullable(),
+  price: z.number().nonnegative(),
+  currency: currencyCodeSchema,
   /** Sum of pax across `confirmed` bookings — computed, never stored directly. */
   bookedSeats: z.number().int().nonnegative(),
 });
@@ -799,12 +700,14 @@ export const flightHotelPackageListSchema = z.array(flightHotelPackageSchema);
 // Write shapes: flat FK/scalar values only (no enriched summaries). Nights per
 // stay must sum to durationNights — validated server-side, not here.
 const createTravelPackageStaySchema = z.object({
+  cityCode: cityCodeSchema,
   propertyCode: z.string().min(1).max(50),
   sequence: z.number().int().positive(),
   nights: z.number().int().positive(),
 });
 
 const createTravelPackageDepartureSchema = z.object({
+  departureDate: z.iso.date(),
   /** Present when editing an existing departure — the write path upserts by id so booking rows keyed to it survive. Omit for a new departure. */
   id: ulidSchema.optional(),
   flightId: ulidSchema,
@@ -812,6 +715,8 @@ const createTravelPackageDepartureSchema = z.object({
   seatsNote: z.string().max(200).optional(),
   totalSeats: z.number().int().nonnegative().optional(),
   availableSeats: z.number().int().nonnegative().optional(),
+  price: z.number().nonnegative(),
+  currency: currencyCodeSchema,
 });
 
 const createTravelPackageInclusionSchema = z.object({

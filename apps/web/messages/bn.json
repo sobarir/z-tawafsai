@@ -284,7 +284,9 @@
         "removeLeg": "লেগ সরান",
         "price": "মূল্য",
         "currency": "মুদ্রা",
-        "currencyPlaceholder": "যেমন USD"
+        "currencyPlaceholder": "যেমন USD",
+        "departureDayOffset": "+ Days (Dep)",
+        "arrivalDayOffset": "+ Days (Arr)"
       },
       "status": {
         "ACTIVE": "সক্রিয়",

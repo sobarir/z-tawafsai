@@ -67,14 +67,14 @@ export function getFlightColumns({
       accessorFn: (flight) => `${flight.originAirport} → ${flight.destAirport}`,
     },
     {
-      accessorKey: 'departureTime',
+      accessorKey: 'departureTimeLocal',
       header: columnLabels.departureTime,
-      cell: ({ row }) => new Date(row.original.departureTime).toLocaleString(),
+      cell: ({ row }) => row.original.departureTimeLocal,
     },
     {
-      accessorKey: 'arrivalTime',
+      accessorKey: 'arrivalTimeLocal',
       header: columnLabels.arrivalTime,
-      cell: ({ row }) => new Date(row.original.arrivalTime).toLocaleString(),
+      cell: ({ row }) => row.original.arrivalTimeLocal,
     },
     {
       accessorKey: 'aircraftType',

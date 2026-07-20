@@ -11,14 +11,15 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new HotelPropertiesService(db);
 
-// A code not in prd/hotels/15-seed-data.md's property set (JED-WFH/MAD-CIN),
-// so tests never collide with seeded rows.
-const TEST_CODE = 'ZZZ-PROP';
-
 async function cleanup() {
   await db
     .delete(schema.property)
-    .where(eq(schema.property.propertyCode, TEST_CODE));
+    .where(eq(schema.property.displayName, 'Test Property'))
+    .execute();
+  await db
+    .delete(schema.property)
+    .where(eq(schema.property.displayName, 'Renamed Property'))
+    .execute();
 }
 
 describe('HotelPropertiesService', () => {
@@ -27,48 +28,29 @@ describe('HotelPropertiesService', () => {
 
   it('creates, reads, updates, and deletes a property', async () => {
     const created = await service.create({
-      propertyCode: TEST_CODE,
       type: 'hotel',
       displayName: 'Test Property',
       destination: 'Test City',
       countryCode: 'ZZ',
     });
-    expect(created.propertyCode).toBe(TEST_CODE);
+    expect(created.propertyCode).toBeDefined();
     expect(created.isActive).toBe(true);
 
-    const fetched = await service.findByCode(TEST_CODE);
+    const generatedCode = created.propertyCode;
+
+    const fetched = await service.findByCode(generatedCode);
     expect(fetched.displayName).toBe('Test Property');
 
-    const updated = await service.update(TEST_CODE, {
+    const updated = await service.update(generatedCode, {
       displayName: 'Renamed Property',
       starRating: 4,
     });
     expect(updated.displayName).toBe('Renamed Property');
     expect(updated.starRating).toBe(4);
 
-    await service.remove(TEST_CODE);
-    await expect(service.findByCode(TEST_CODE)).rejects.toThrow(
+    await service.remove(generatedCode);
+    await expect(service.findByCode(generatedCode)).rejects.toThrow(
       NotFoundException,
     );
-  });
-
-  it('rejects creating a duplicate property code', async () => {
-    await service.create({
-      propertyCode: TEST_CODE,
-      type: 'hotel',
-      displayName: 'Test Property',
-      destination: 'Test City',
-      countryCode: 'ZZ',
-    });
-
-    await expect(
-      service.create({
-        propertyCode: TEST_CODE,
-        type: 'hotel',
-        displayName: 'Duplicate Property',
-        destination: 'Test City',
-        countryCode: 'ZZ',
-      }),
-    ).rejects.toThrow(ConflictException);
   });
 });

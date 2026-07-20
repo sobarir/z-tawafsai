@@ -70,7 +70,7 @@ function TechnicalStopRoute({ flight }: { flight: Flight }) {
       {flight.legs
         .map(
           (leg) =>
-            `${leg.depAirport} ${new Date(leg.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} → ${leg.arrAirport} ${new Date(leg.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+            `${leg.depAirport} ${leg.departureTimeLocal} → ${leg.arrAirport} ${leg.arrivalTimeLocal}`,
         )
         .join('  ·  ')}
     </p>
@@ -85,12 +85,17 @@ function FlightLegSummary({ flight, t }: { flight: Flight; t: Translate }) {
         {flight.flightNumber} — {flight.originAirport} → {flight.destAirport}
       </p>
       <p className="text-sm text-muted-foreground">
-        {new Date(flight.departureTime).toLocaleString()} —{' '}
-        {new Date(flight.arrivalTime).toLocaleString()}
+        <span className="font-semibold text-foreground">
+          {flight.departureTimeLocal}
+        </span>
+        <span className="mx-2 text-muted-foreground">→</span>
+        <span className="font-semibold text-foreground">
+          {flight.arrivalTimeLocal}
+        </span>
       </p>
       <p className="text-xs text-muted-foreground">
         {t('duration')}:{' '}
-        {formatDuration(flight.departureTime, flight.arrivalTime)}
+        {formatDuration(flight.departureTimeLocal, flight.arrivalTimeLocal)}
         {flight.aircraftType
           ? ` · ${t('aircraft')}: ${flight.aircraftType}`
           : ''}
@@ -100,38 +105,6 @@ function FlightLegSummary({ flight, t }: { flight: Flight; t: Translate }) {
   );
 }
 
-function ConnectionDivider({
-  connection,
-  hubAirport,
-  layoverDuration,
-  t,
-}: {
-  connection: FlightItinerary['connections'][number];
-  hubAirport: string;
-  layoverDuration: string;
-  t: Translate;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2 border-y bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-      <Badge
-        variant={
-          connection.kind === 'stopover' ? 'warningOutline' : 'secondary'
-        }
-      >
-        {t(connection.kind === 'stopover' ? 'stopover' : 'connection')}
-      </Badge>
-      <span>
-        {t('layoverIn', { duration: layoverDuration, airport: hubAirport })}
-      </span>
-      {connection.isInterline && (
-        <Badge variant="outline">{t('interlineConnection')}</Badge>
-      )}
-      {connection.bagThroughChecked && (
-        <Badge variant="successOutline">{t('bagThroughChecked')}</Badge>
-      )}
-    </div>
-  );
-}
 
 function ItineraryCard({
   itinerary,
@@ -151,27 +124,14 @@ function ItineraryCard({
             {itinerary.flights.length > 1 && (
               <span className="text-xs text-muted-foreground">
                 {t('duration')}:{' '}
-                {formatDuration(itinerary.departureTime, itinerary.arrivalTime)}
+                {formatDuration(itinerary.flights[0]?.departureTimeLocal || '', itinerary.flights[itinerary.flights.length - 1]?.arrivalTimeLocal || '')}
               </span>
             )}
           </div>
-          {itinerary.flights.map((flight, index) => {
-            const connection = itinerary.connections[index];
-            const nextFlight = itinerary.flights[index + 1];
+          {itinerary.flights.map((flight) => {
             return (
               <div key={flight.id} className="flex flex-col gap-3">
                 <FlightLegSummary flight={flight} t={t} />
-                {connection && nextFlight && (
-                  <ConnectionDivider
-                    connection={connection}
-                    hubAirport={flight.destAirport}
-                    layoverDuration={formatDuration(
-                      flight.arrivalTime,
-                      nextFlight.departureTime,
-                    )}
-                    t={t}
-                  />
-                )}
               </div>
             );
           })}

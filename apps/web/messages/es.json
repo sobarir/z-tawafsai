@@ -284,7 +284,9 @@
         "removeLeg": "Quitar tramo",
         "price": "Precio",
         "currency": "Moneda",
-        "currencyPlaceholder": "p. ej. USD"
+        "currencyPlaceholder": "p. ej. USD",
+        "departureDayOffset": "+ Days (Dep)",
+        "arrivalDayOffset": "+ Days (Arr)"
       },
       "status": {
         "ACTIVE": "Activo",

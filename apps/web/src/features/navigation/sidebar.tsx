@@ -493,12 +493,6 @@ function buildScheduleAdminNavItems(labels: ScheduleNavLabels): NavItem[] {
       icon: SCHEDULE_NAV_ICONS.codeshare,
     },
     {
-      id: 'schedule-mct-rules',
-      label: labels.mctRules,
-      href: '/schedule/mct-rules',
-      icon: SCHEDULE_NAV_ICONS.mctRules,
-    },
-    {
       id: 'schedule-interline-agreements',
       label: labels.interlineAgreements,
       href: '/schedule/interline-agreements',

@@ -22,7 +22,7 @@ export function toAirportOptions(airports: Airport[]): ComboboxOption[] {
 export function toCityOptions(cities: City[]): ComboboxOption[] {
   return cities.map((c) => ({
     value: c.cityCode,
-    label: `${c.cityCode} — ${c.name}`,
+    label: c.name,
   }));
 }
 
@@ -30,7 +30,7 @@ export function toCityOptions(cities: City[]): ComboboxOption[] {
 export function toCityNameOptions(cities: City[]): ComboboxOption[] {
   return cities.map((c) => ({
     value: c.name,
-    label: `${c.name} (${c.cityCode})`,
+    label: c.name,
   }));
 }
 
@@ -43,15 +43,7 @@ export function toAirlineOptions(airlines: Airline[]): ComboboxOption[] {
 
 export function toFlightOptions(flights: Flight[]): ComboboxOption[] {
   return flights.map((f) => {
-    const timeStr = f.departureTime
-      ? new Date(f.departureTime).toLocaleString('en-GB', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      : 'Unknown Time';
+    const timeStr = f.departureTimeLocal || 'Unknown Time';
     return {
       value: f.id,
       label: `${f.operatingAirline}${f.flightNumber} (${f.originAirport}→${f.destAirport}) · ${timeStr}`,
@@ -69,7 +61,7 @@ export function toCurrencyOptions(currencies: Currency[]): ComboboxOption[] {
 export function toPropertyOptions(properties: Property[]): ComboboxOption[] {
   return properties.map((p) => ({
     value: p.propertyCode,
-    label: `${p.propertyCode} — ${p.displayName}`,
+    label: p.displayName,
   }));
 }
 

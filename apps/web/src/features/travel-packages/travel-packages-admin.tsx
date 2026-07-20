@@ -11,6 +11,7 @@ import {
   getListTravelPackagesQueryKey,
   useCreateTravelPackage,
   useDeleteTravelPackage,
+  useListCities,
   useListFlights,
   useListHotelCurrencies,
   useListHotelProperties,
@@ -23,6 +24,7 @@ import {
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
 import {
+  toCityOptions,
   toCurrencyOptions,
   toFlightOptions,
   toPropertyOptions,
@@ -42,10 +44,15 @@ export function TravelPackagesAdmin() {
   const { data: properties } = useListHotelProperties();
   const { data: currencies } = useListHotelCurrencies();
   const { data: providers } = useListTravelProviders();
+  const { data: cities } = useListCities();
 
   const flightOptions = useMemo(
     () => toFlightOptions(flights ?? []),
     [flights],
+  );
+  const cityOptions = useMemo(
+    () => toCityOptions(cities ?? []),
+    [cities],
   );
   const propertyOptions = useMemo(
     () => toPropertyOptions(properties ?? []),
@@ -105,6 +112,11 @@ export function TravelPackagesAdmin() {
           isActive: t('columns.isActive'),
           isFeatured: t('columns.isFeatured'),
         },
+        typeLabels: {
+          umrah: t('fields.typeUmrah'),
+          umrah_plus: t('fields.typeUmrahPlus'),
+          hajj: t('fields.typeHajj'),
+        },
         activeLabel: tCommon('yes'),
         inactiveLabel: tCommon('no'),
         actionsLabel: tAdmin('actions'),
@@ -154,6 +166,9 @@ export function TravelPackagesAdmin() {
         <TravelPackageForm
           travelPackage={editing ?? undefined}
           flightOptions={flightOptions}
+          cityOptions={cityOptions}
+          cities={cities ?? []}
+          properties={properties ?? []}
           propertyOptions={propertyOptions}
           currencyOptions={currencyOptions}
           providerOptions={providerOptions}

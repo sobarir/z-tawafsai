@@ -57,10 +57,10 @@ export function FlightLegsDialog({
                 <TableCell>{leg.depAirport}</TableCell>
                 <TableCell>{leg.arrAirport}</TableCell>
                 <TableCell>
-                  {new Date(leg.departureTime).toLocaleString()}
+                  {leg.departureTimeLocal}
                 </TableCell>
                 <TableCell>
-                  {new Date(leg.arrivalTime).toLocaleString()}
+                  {leg.arrivalTimeLocal}
                 </TableCell>
               </TableRow>
             ))}

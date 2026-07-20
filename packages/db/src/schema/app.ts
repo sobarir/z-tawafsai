@@ -121,10 +121,9 @@ export const flights = pgTable(
     destAirport: varchar('dest_airport', { length: 3 })
       .notNull()
       .references(() => airports.airportCode),
-    departureTime: timestamp('departure_time', {
-      withTimezone: true,
-    }).notNull(),
-    arrivalTime: timestamp('arrival_time', { withTimezone: true }).notNull(),
+    departureTimeLocal: varchar('departure_time_local', { length: 5 }).notNull(),
+    arrivalTimeLocal: varchar('arrival_time_local', { length: 5 }).notNull(),
+    arrivalDayOffset: integer('arrival_day_offset').notNull().default(0),
     aircraftType: varchar('aircraft_type', { length: 10 }),
     status: flightStatus('status').notNull().default('ACTIVE'),
     // Flat, admin-managed price for OTA-style search display/sorting — not a
@@ -142,20 +141,15 @@ export const flights = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex('flights_carrier_number_departure_unique').on(
+    uniqueIndex('flights_carrier_number_unique').on(
       table.operatingAirline,
       table.flightNumber,
-      table.departureTime,
     ),
     index('idx_flights_origin_dep').on(
       table.originAirport,
-      table.departureTime,
+      table.departureTimeLocal,
     ),
-    index('idx_flights_dest_arr').on(table.destAirport, table.arrivalTime),
-    check(
-      'flights_arrival_after_departure',
-      sql`${table.arrivalTime} > ${table.departureTime}`,
-    ),
+    index('idx_flights_dest_arr').on(table.destAirport, table.arrivalTimeLocal),
     check('flights_price_non_negative', sql`${table.price} >= 0`),
   ],
 );
@@ -177,10 +171,10 @@ export const flightLegs = pgTable(
     arrAirport: varchar('arr_airport', { length: 3 })
       .notNull()
       .references(() => airports.airportCode),
-    departureTime: timestamp('departure_time', {
-      withTimezone: true,
-    }).notNull(),
-    arrivalTime: timestamp('arrival_time', { withTimezone: true }).notNull(),
+    departureTimeLocal: varchar('departure_time_local', { length: 5 }).notNull(),
+    arrivalTimeLocal: varchar('arrival_time_local', { length: 5 }).notNull(),
+    departureDayOffset: integer('departure_day_offset').notNull().default(0),
+    arrivalDayOffset: integer('arrival_day_offset').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -193,10 +187,6 @@ export const flightLegs = pgTable(
     uniqueIndex('flight_legs_flight_sequence_unique').on(
       table.flightId,
       table.legSequence,
-    ),
-    check(
-      'flight_legs_arrival_after_departure',
-      sql`${table.arrivalTime} > ${table.departureTime}`,
     ),
   ],
 );
@@ -238,52 +228,6 @@ export const flightMarketing = pgTable(
   ],
 );
 
-export const mctRules = pgTable(
-  'mct_rules',
-  {
-    id: varchar('id', { length: 26 })
-      .primaryKey()
-      .$defaultFn(() => createId()),
-    arrivalAirport: varchar('arrival_airport', { length: 3 })
-      .notNull()
-      .references(() => airports.airportCode),
-    departureAirport: varchar('departure_airport', { length: 3 })
-      .notNull()
-      .references(() => airports.airportCode),
-    scope: mctScope('scope').notNull(),
-    arrivalAirline: varchar('arrival_airline', { length: 2 }).references(
-      () => airlines.airlineCode,
-    ),
-    departureAirline: varchar('departure_airline', { length: 2 }).references(
-      () => airlines.airlineCode,
-    ),
-    arrivalTerminal: varchar('arrival_terminal', { length: 5 }),
-    departureTerminal: varchar('departure_terminal', { length: 5 }),
-    mctMinutes: integer('mct_minutes').notNull(),
-    maxConnectionMinutes: integer('max_connection_minutes')
-      .notNull()
-      .default(1440),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => [
-    index('idx_mct_lookup').on(
-      table.arrivalAirport,
-      table.departureAirport,
-      table.scope,
-    ),
-    check('mct_rules_mct_minutes_positive', sql`${table.mctMinutes} > 0`),
-    check(
-      'mct_rules_max_gte_mct',
-      sql`${table.maxConnectionMinutes} >= ${table.mctMinutes}`,
-    ),
-  ],
-);
 
 export const interlineAgreements = pgTable(
   'interline_agreements',
@@ -384,12 +328,13 @@ export const fxRate = pgTable(
   ],
 );
 
-// `property_code` is a natural key (e.g. 'JED-WFH'), matching this repo's
-// convention for stable domain codes.
+// `property_code` is a ULID.
 export const property = pgTable(
   'property',
   {
-    propertyCode: text('property_code').primaryKey(),
+    propertyCode: varchar('property_code', { length: 26 })
+      .primaryKey()
+      .$defaultFn(() => createId()),
     type: propertyType('type').notNull(),
     displayName: text('display_name').notNull(),
     destination: text('destination').notNull(),
@@ -465,9 +410,9 @@ export const seasonWindow = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => createId()),
-    propertyCode: text('property_code')
+    propertyCode: varchar('property_code', { length: 26 })
       .notNull()
-      .references(() => property.propertyCode),
+      .references(() => property.propertyCode, { onUpdate: 'cascade' }),
     seasonId: text('season_id')
       .notNull()
       .references(() => season.id),
@@ -492,9 +437,9 @@ export const rateRule = pgTable(
     id: text('id')
       .primaryKey()
       .$defaultFn(() => createId()),
-    propertyCode: text('property_code')
+    propertyCode: varchar('property_code', { length: 26 })
       .notNull()
-      .references(() => property.propertyCode),
+      .references(() => property.propertyCode, { onUpdate: 'cascade' }),
     // Nullable: a season-less rate rule is the Standard (base) rate, used
     // whenever no dated season covers the stay (or a season has no matching
     // band). See prd/hotels/13-resolver-and-search.md.
@@ -616,9 +561,12 @@ export const travelPackageStay = pgTable(
     packageId: text('package_id')
       .notNull()
       .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
-    propertyCode: text('property_code')
+    cityCode: varchar('city_code', { length: 3 })
       .notNull()
-      .references(() => property.propertyCode),
+      .references(() => city.cityCode),
+    propertyCode: varchar('property_code', { length: 26 })
+      .notNull()
+      .references(() => property.propertyCode, { onUpdate: 'cascade' }),
     sequence: integer('sequence').notNull(),
     nights: integer('nights').notNull(),
   },
@@ -647,13 +595,22 @@ export const travelPackageDeparture = pgTable(
     flightId: varchar('flight_id', { length: 26 })
       .notNull()
       .references(() => flights.id),
+    departureDate: date('departure_date', { mode: 'string' }).notNull(),
     returnDate: date('return_date', { mode: 'string' }),
     seatsNote: text('seats_note'),
     totalSeats: integer('total_seats'),
     availableSeats: integer('available_seats'),
+    price: numeric('price', { precision: 10, scale: 2, mode: 'number' })
+      .notNull()
+      .default(0),
+    currency: varchar('currency', { length: 3 }).notNull().default('USD'),
   },
   (table) => [
     index('idx_travel_package_departure_package').on(table.packageId),
+    check(
+      'travel_package_departure_return_after_departure',
+      sql`${table.returnDate} IS NULL OR ${table.returnDate} >= ${table.departureDate}`,
+    ),
     check(
       'travel_package_departure_available_seats_nonneg',
       sql`${table.availableSeats} IS NULL OR ${table.availableSeats} >= 0`,
@@ -752,8 +709,6 @@ export type FlightLeg = typeof flightLegs.$inferSelect;
 export type NewFlightLeg = typeof flightLegs.$inferInsert;
 export type FlightMarketing = typeof flightMarketing.$inferSelect;
 export type NewFlightMarketing = typeof flightMarketing.$inferInsert;
-export type MctRule = typeof mctRules.$inferSelect;
-export type NewMctRule = typeof mctRules.$inferInsert;
 export type InterlineAgreement = typeof interlineAgreements.$inferSelect;
 export type NewInterlineAgreement = typeof interlineAgreements.$inferInsert;
 

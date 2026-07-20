@@ -8,11 +8,6 @@
 import type { CreatePropertyDtoType } from './createPropertyDtoType';
 
 export interface CreatePropertyDto {
-  /**
-   * @minLength 1
-   * @maxLength 50
-   */
-  propertyCode: string;
   type: CreatePropertyDtoType;
   /**
    * @minimum 1

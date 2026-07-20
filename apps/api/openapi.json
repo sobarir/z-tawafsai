@@ -636,7 +636,7 @@
             }
           }
         },
-        "summary": "OTA-style search for direct and one-stop connecting/stopover itineraries by route and date, sorted by price",
+        "summary": "Search for direct flights by route and date",
         "tags": [
           "flights"
         ]
@@ -731,462 +731,6 @@
         "summary": "Delete a flight",
         "tags": [
           "flights"
-        ]
-      }
-    },
-    "/api/connections/validate": {
-      "post": {
-        "operationId": "validateConnection",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateConnectionDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectionResultDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Classify the connection between two consecutive flights",
-        "tags": [
-          "connections"
-        ]
-      }
-    },
-    "/api/connections/validate-chain": {
-      "post": {
-        "operationId": "validateConnectionChain",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateConnectionChainDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ConnectionResultDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Classify every consecutive connection in an itinerary",
-        "tags": [
-          "connections"
-        ]
-      }
-    },
-    "/api/mct-rules": {
-      "get": {
-        "operationId": "listMctRules",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MctRuleDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "List MCT rules",
-        "tags": [
-          "mct-rules"
-        ]
-      },
-      "post": {
-        "operationId": "createMctRule",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateMctRuleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MctRuleDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create an MCT rule",
-        "tags": [
-          "mct-rules"
-        ]
-      }
-    },
-    "/api/mct-rules/resolve": {
-      "get": {
-        "operationId": "resolveMctRule",
-        "parameters": [
-          {
-            "name": "arrivalAirport",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "pattern": "^[A-Z]{3}$",
-              "type": "string"
-            }
-          },
-          {
-            "name": "departureAirport",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "pattern": "^[A-Z]{3}$",
-              "type": "string"
-            }
-          },
-          {
-            "name": "scope",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "DD",
-                "DI",
-                "ID",
-                "II"
-              ]
-            }
-          },
-          {
-            "name": "arrivalAirline",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "^[A-Z0-9]{2}$",
-              "type": "string"
-            }
-          },
-          {
-            "name": "departureAirline",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "^[A-Z0-9]{2}$",
-              "type": "string"
-            }
-          },
-          {
-            "name": "arrivalTerminal",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minLength": 1,
-              "maxLength": 5,
-              "type": "string"
-            }
-          },
-          {
-            "name": "departureTerminal",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minLength": 1,
-              "maxLength": 5,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MctRuleDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Resolve the most-specific matching MCT rule",
-        "tags": [
-          "mct-rules"
-        ]
-      }
-    },
-    "/api/mct-rules/{id}": {
-      "get": {
-        "operationId": "getMctRule",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MctRuleDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get an MCT rule",
-        "tags": [
-          "mct-rules"
-        ]
-      },
-      "patch": {
-        "operationId": "updateMctRule",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateMctRuleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MctRuleDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Update an MCT rule",
-        "tags": [
-          "mct-rules"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteMctRule",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "summary": "Delete an MCT rule",
-        "tags": [
-          "mct-rules"
-        ]
-      }
-    },
-    "/api/interline-agreements": {
-      "get": {
-        "operationId": "listInterlineAgreements",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/InterlineAgreementDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "List interline agreements",
-        "tags": [
-          "interline-agreements"
-        ]
-      },
-      "post": {
-        "operationId": "createInterlineAgreement",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateInterlineAgreementDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InterlineAgreementDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create an interline agreement",
-        "tags": [
-          "interline-agreements"
-        ]
-      }
-    },
-    "/api/interline-agreements/resolve": {
-      "get": {
-        "operationId": "resolveInterline",
-        "parameters": [
-          {
-            "name": "inboundAirline",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "pattern": "^[A-Z0-9]{2}$",
-              "type": "string"
-            }
-          },
-          {
-            "name": "outboundAirline",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "pattern": "^[A-Z0-9]{2}$",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InterlineResolutionDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Resolve the directional interline gate for a carrier pair",
-        "tags": [
-          "interline-agreements"
-        ]
-      }
-    },
-    "/api/interline-agreements/{id}": {
-      "get": {
-        "operationId": "getInterlineAgreement",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InterlineAgreementDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get an interline agreement",
-        "tags": [
-          "interline-agreements"
-        ]
-      },
-      "delete": {
-        "operationId": "deleteInterlineAgreement",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "summary": "Delete an interline agreement",
-        "tags": [
-          "interline-agreements"
         ]
       }
     },
@@ -1382,6 +926,155 @@
         "summary": "Delete a marketing flight",
         "tags": [
           "flight-marketing"
+        ]
+      }
+    },
+    "/api/interline-agreements": {
+      "get": {
+        "operationId": "listInterlineAgreements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterlineAgreementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List interline agreements",
+        "tags": [
+          "interline-agreements"
+        ]
+      },
+      "post": {
+        "operationId": "createInterlineAgreement",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInterlineAgreementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterlineAgreementDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create an interline agreement",
+        "tags": [
+          "interline-agreements"
+        ]
+      }
+    },
+    "/api/interline-agreements/resolve": {
+      "get": {
+        "operationId": "resolveInterline",
+        "parameters": [
+          {
+            "name": "inboundAirline",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Z0-9]{2}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "outboundAirline",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^[A-Z0-9]{2}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterlineResolutionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resolve the directional interline gate for a carrier pair",
+        "tags": [
+          "interline-agreements"
+        ]
+      }
+    },
+    "/api/interline-agreements/{id}": {
+      "get": {
+        "operationId": "getInterlineAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterlineAgreementDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get an interline agreement",
+        "tags": [
+          "interline-agreements"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteInterlineAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Delete an interline agreement",
+        "tags": [
+          "interline-agreements"
         ]
       }
     },
@@ -3478,15 +3171,18 @@
             "type": "string",
             "pattern": "^[A-Z]{3}$"
           },
-          "departureTime": {
+          "departureTimeLocal": {
             "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
           },
-          "arrivalTime": {
+          "arrivalTimeLocal": {
             "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "arrivalDayOffset": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
           },
           "aircraftType": {
             "type": "string",
@@ -3542,15 +3238,23 @@
                   "type": "string",
                   "pattern": "^[A-Z]{3}$"
                 },
-                "departureTime": {
+                "departureTimeLocal": {
                   "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
                 },
-                "arrivalTime": {
+                "arrivalTimeLocal": {
                   "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                },
+                "departureDayOffset": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "arrivalDayOffset": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
                 },
                 "createdAt": {
                   "type": "string",
@@ -3570,8 +3274,10 @@
                 "role",
                 "depAirport",
                 "arrAirport",
-                "departureTime",
-                "arrivalTime",
+                "departureTimeLocal",
+                "arrivalTimeLocal",
+                "departureDayOffset",
+                "arrivalDayOffset",
                 "createdAt",
                 "updatedAt"
               ]
@@ -3594,8 +3300,9 @@
           "flightNumber",
           "originAirport",
           "destAirport",
-          "departureTime",
-          "arrivalTime",
+          "departureTimeLocal",
+          "arrivalTimeLocal",
+          "arrivalDayOffset",
           "aircraftType",
           "status",
           "price",
@@ -3635,15 +3342,18 @@
                   "type": "string",
                   "pattern": "^[A-Z]{3}$"
                 },
-                "departureTime": {
+                "departureTimeLocal": {
                   "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
                 },
-                "arrivalTime": {
+                "arrivalTimeLocal": {
                   "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                },
+                "arrivalDayOffset": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
                 },
                 "aircraftType": {
                   "type": "string",
@@ -3699,15 +3409,23 @@
                         "type": "string",
                         "pattern": "^[A-Z]{3}$"
                       },
-                      "departureTime": {
+                      "departureTimeLocal": {
                         "type": "string",
-                        "format": "date-time",
-                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                        "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
                       },
-                      "arrivalTime": {
+                      "arrivalTimeLocal": {
                         "type": "string",
-                        "format": "date-time",
-                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                        "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                      },
+                      "departureDayOffset": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "arrivalDayOffset": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
                       },
                       "createdAt": {
                         "type": "string",
@@ -3727,8 +3445,10 @@
                       "role",
                       "depAirport",
                       "arrAirport",
-                      "departureTime",
-                      "arrivalTime",
+                      "departureTimeLocal",
+                      "arrivalTimeLocal",
+                      "departureDayOffset",
+                      "arrivalDayOffset",
                       "createdAt",
                       "updatedAt"
                     ]
@@ -3751,8 +3471,9 @@
                 "flightNumber",
                 "originAirport",
                 "destAirport",
-                "departureTime",
-                "arrivalTime",
+                "departureTimeLocal",
+                "arrivalTimeLocal",
+                "arrivalDayOffset",
                 "aircraftType",
                 "status",
                 "price",
@@ -3760,72 +3481,6 @@
                 "legs",
                 "createdAt",
                 "updatedAt"
-              ]
-            }
-          },
-          "connections": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "prevFlightId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-                },
-                "nextFlightId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-                },
-                "kind": {
-                  "type": "string",
-                  "enum": [
-                    "connection",
-                    "stopover",
-                    "open_jaw",
-                    "transit",
-                    "invalid"
-                  ]
-                },
-                "gapMinutes": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991,
-                  "nullable": true
-                },
-                "sameMetroInterAirport": {
-                  "type": "boolean"
-                },
-                "isInterline": {
-                  "type": "boolean"
-                },
-                "bagThroughChecked": {
-                  "type": "boolean"
-                },
-                "appliedMctRuleId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-                  "nullable": true
-                },
-                "appliedInterlineId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-                  "nullable": true
-                },
-                "reason": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "prevFlightId",
-                "nextFlightId",
-                "kind",
-                "gapMinutes",
-                "sameMetroInterAirport",
-                "isInterline",
-                "bagThroughChecked",
-                "appliedMctRuleId",
-                "appliedInterlineId",
-                "reason"
               ]
             }
           },
@@ -3842,15 +3497,18 @@
             "type": "string",
             "pattern": "^[A-Z]{3}$"
           },
-          "departureTime": {
+          "departureTimeLocal": {
             "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
           },
-          "arrivalTime": {
+          "arrivalTimeLocal": {
             "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "arrivalDayOffset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
           },
           "totalDurationMinutes": {
             "type": "integer",
@@ -3860,12 +3518,12 @@
         },
         "required": [
           "flights",
-          "connections",
           "stopCount",
           "totalPrice",
           "currency",
-          "departureTime",
-          "arrivalTime",
+          "departureTimeLocal",
+          "arrivalTimeLocal",
+          "arrivalDayOffset",
           "totalDurationMinutes"
         ]
       },
@@ -3888,15 +3546,19 @@
             "type": "string",
             "pattern": "^[A-Z]{3}$"
           },
-          "departureTime": {
+          "departureTimeLocal": {
             "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
           },
-          "arrivalTime": {
+          "arrivalTimeLocal": {
             "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "arrivalDayOffset": {
+            "default": 0,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
           },
           "aircraftType": {
             "type": "string",
@@ -3939,23 +3601,33 @@
                   "type": "string",
                   "pattern": "^[A-Z]{3}$"
                 },
-                "departureTime": {
+                "departureTimeLocal": {
                   "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
                 },
-                "arrivalTime": {
+                "arrivalTimeLocal": {
                   "type": "string",
-                  "format": "date-time",
-                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                },
+                "departureDayOffset": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "arrivalDayOffset": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
                 }
               },
               "required": [
                 "role",
                 "depAirport",
                 "arrAirport",
-                "departureTime",
-                "arrivalTime"
+                "departureTimeLocal",
+                "arrivalTimeLocal"
               ]
             }
           }
@@ -3965,8 +3637,8 @@
           "flightNumber",
           "originAirport",
           "destAirport",
-          "departureTime",
-          "arrivalTime",
+          "departureTimeLocal",
+          "arrivalTimeLocal",
           "price",
           "currency"
         ]
@@ -3996,159 +3668,27 @@
           }
         }
       },
-      "ValidateConnectionDto": {
-        "type": "object",
-        "properties": {
-          "prevFlightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "nextFlightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          }
-        },
-        "required": [
-          "prevFlightId",
-          "nextFlightId"
-        ]
-      },
-      "ConnectionResultDto": {
-        "type": "object",
-        "properties": {
-          "prevFlightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "nextFlightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "kind": {
-            "type": "string",
-            "enum": [
-              "connection",
-              "stopover",
-              "open_jaw",
-              "transit",
-              "invalid"
-            ]
-          },
-          "gapMinutes": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "nullable": true
-          },
-          "sameMetroInterAirport": {
-            "type": "boolean"
-          },
-          "isInterline": {
-            "type": "boolean"
-          },
-          "bagThroughChecked": {
-            "type": "boolean"
-          },
-          "appliedMctRuleId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-            "nullable": true
-          },
-          "appliedInterlineId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-            "nullable": true
-          },
-          "reason": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "prevFlightId",
-          "nextFlightId",
-          "kind",
-          "gapMinutes",
-          "sameMetroInterAirport",
-          "isInterline",
-          "bagThroughChecked",
-          "appliedMctRuleId",
-          "appliedInterlineId",
-          "reason"
-        ]
-      },
-      "ValidateConnectionChainDto": {
-        "type": "object",
-        "properties": {
-          "flightIds": {
-            "minItems": 2,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-            }
-          }
-        },
-        "required": [
-          "flightIds"
-        ]
-      },
-      "MctRuleDto": {
+      "FlightMarketingDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "arrivalAirport": {
+          "flightId": {
             "type": "string",
-            "pattern": "^[A-Z]{3}$"
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "departureAirport": {
+          "marketingAirline": {
             "type": "string",
-            "pattern": "^[A-Z]{3}$"
+            "pattern": "^[A-Z0-9]{2}$"
           },
-          "scope": {
+          "marketingNumber": {
             "type": "string",
-            "enum": [
-              "DD",
-              "DI",
-              "ID",
-              "II"
-            ]
+            "pattern": "^[0-9]{1,4}[A-Z]?$"
           },
-          "arrivalAirline": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{2}$",
-            "nullable": true
-          },
-          "departureAirline": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{2}$",
-            "nullable": true
-          },
-          "arrivalTerminal": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5,
-            "nullable": true
-          },
-          "departureTerminal": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5,
-            "nullable": true
-          },
-          "mctMinutes": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
-          },
-          "maxConnectionMinutes": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
+          "isOperatingCarrier": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -4163,109 +3703,48 @@
         },
         "required": [
           "id",
-          "arrivalAirport",
-          "departureAirport",
-          "scope",
-          "arrivalAirline",
-          "departureAirline",
-          "arrivalTerminal",
-          "departureTerminal",
-          "mctMinutes",
-          "maxConnectionMinutes",
+          "flightId",
+          "marketingAirline",
+          "marketingNumber",
+          "isOperatingCarrier",
           "createdAt",
           "updatedAt"
         ]
       },
-      "CreateMctRuleDto": {
+      "CreateFlightMarketingDto": {
         "type": "object",
         "properties": {
-          "arrivalAirport": {
+          "flightId": {
             "type": "string",
-            "pattern": "^[A-Z]{3}$"
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
           },
-          "departureAirport": {
-            "type": "string",
-            "pattern": "^[A-Z]{3}$"
-          },
-          "scope": {
-            "type": "string",
-            "enum": [
-              "DD",
-              "DI",
-              "ID",
-              "II"
-            ]
-          },
-          "arrivalAirline": {
+          "marketingAirline": {
             "type": "string",
             "pattern": "^[A-Z0-9]{2}$"
           },
-          "departureAirline": {
+          "marketingNumber": {
             "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
+            "pattern": "^[0-9]{1,4}[A-Z]?$"
           },
-          "arrivalTerminal": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5
-          },
-          "departureTerminal": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5
-          },
-          "mctMinutes": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
-          },
-          "maxConnectionMinutes": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
+          "isOperatingCarrier": {
+            "type": "boolean"
           }
         },
         "required": [
-          "arrivalAirport",
-          "departureAirport",
-          "scope",
-          "mctMinutes"
+          "flightId",
+          "marketingAirline",
+          "marketingNumber"
         ]
       },
-      "UpdateMctRuleDto": {
+      "UpdateFlightMarketingDto": {
         "type": "object",
         "properties": {
-          "arrivalAirline": {
+          "marketingNumber": {
             "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
+            "pattern": "^[0-9]{1,4}[A-Z]?$"
           },
-          "departureAirline": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
-          },
-          "arrivalTerminal": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5
-          },
-          "departureTerminal": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 5
-          },
-          "mctMinutes": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
-          },
-          "maxConnectionMinutes": {
-            "type": "integer",
-            "exclusiveMinimum": true,
-            "maximum": 9007199254740991,
-            "minimum": 0
+          "isOperatingCarrier": {
+            "type": "boolean"
           }
         }
       },
@@ -4351,86 +3830,6 @@
           "inboundAirline",
           "outboundAirline"
         ]
-      },
-      "FlightMarketingDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "flightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "marketingAirline": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
-          },
-          "marketingNumber": {
-            "type": "string",
-            "pattern": "^[0-9]{1,4}[A-Z]?$"
-          },
-          "isOperatingCarrier": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-          }
-        },
-        "required": [
-          "id",
-          "flightId",
-          "marketingAirline",
-          "marketingNumber",
-          "isOperatingCarrier",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "CreateFlightMarketingDto": {
-        "type": "object",
-        "properties": {
-          "flightId": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
-          },
-          "marketingAirline": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{2}$"
-          },
-          "marketingNumber": {
-            "type": "string",
-            "pattern": "^[0-9]{1,4}[A-Z]?$"
-          },
-          "isOperatingCarrier": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "flightId",
-          "marketingAirline",
-          "marketingNumber"
-        ]
-      },
-      "UpdateFlightMarketingDto": {
-        "type": "object",
-        "properties": {
-          "marketingNumber": {
-            "type": "string",
-            "pattern": "^[0-9]{1,4}[A-Z]?$"
-          },
-          "isOperatingCarrier": {
-            "type": "boolean"
-          }
-        }
       },
       "HotelSearchResponseDto": {
         "type": "object",
@@ -4744,8 +4143,8 @@
         "properties": {
           "propertyCode": {
             "type": "string",
-            "minLength": 1,
-            "maxLength": 50
+            "minLength": 26,
+            "maxLength": 26
           },
           "type": {
             "type": "string",
@@ -4831,11 +4230,6 @@
       "CreatePropertyDto": {
         "type": "object",
         "properties": {
-          "propertyCode": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 50
-          },
           "type": {
             "type": "string",
             "enum": [
@@ -4896,7 +4290,6 @@
           }
         },
         "required": [
-          "propertyCode",
           "type",
           "displayName",
           "destination",
@@ -5374,6 +4767,10 @@
             "items": {
               "type": "object",
               "properties": {
+                "cityCode": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
                 "propertyCode": {
                   "type": "string"
                 },
@@ -5413,6 +4810,7 @@
                 }
               },
               "required": [
+                "cityCode",
                 "propertyCode",
                 "displayName",
                 "destination",
@@ -5463,15 +4861,18 @@
                       "type": "string",
                       "pattern": "^[A-Z]{3}$"
                     },
-                    "departureTime": {
+                    "departureTimeLocal": {
                       "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
                     },
-                    "arrivalTime": {
+                    "arrivalTimeLocal": {
                       "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                    },
+                    "arrivalDayOffset": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "isDirect": {
                       "type": "boolean"
@@ -5493,12 +4894,18 @@
                     "flightNumber",
                     "originAirport",
                     "destAirport",
-                    "departureTime",
-                    "arrivalTime",
+                    "departureTimeLocal",
+                    "arrivalTimeLocal",
+                    "arrivalDayOffset",
                     "isDirect",
                     "transitAirport",
                     "transitCityName"
                   ]
+                },
+                "departureDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                 },
                 "returnDate": {
                   "type": "string",
@@ -5522,6 +4929,14 @@
                   "maximum": 9007199254740991,
                   "nullable": true
                 },
+                "price": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
                 "bookedSeats": {
                   "type": "integer",
                   "minimum": 0,
@@ -5532,10 +4947,13 @@
                 "id",
                 "flightId",
                 "flight",
+                "departureDate",
                 "returnDate",
                 "seatsNote",
                 "totalSeats",
                 "availableSeats",
+                "price",
+                "currency",
                 "bookedSeats"
               ]
             }
@@ -5683,6 +5101,10 @@
             "items": {
               "type": "object",
               "properties": {
+                "cityCode": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
                 "propertyCode": {
                   "type": "string",
                   "minLength": 1,
@@ -5702,6 +5124,7 @@
                 }
               },
               "required": [
+                "cityCode",
                 "propertyCode",
                 "sequence",
                 "nights"
@@ -5713,6 +5136,11 @@
             "items": {
               "type": "object",
               "properties": {
+                "departureDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
                 "id": {
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
@@ -5739,10 +5167,21 @@
                   "type": "integer",
                   "minimum": 0,
                   "maximum": 9007199254740991
+                },
+                "price": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
                 }
               },
               "required": [
-                "flightId"
+                "departureDate",
+                "flightId",
+                "price",
+                "currency"
               ]
             }
           },
@@ -5877,6 +5316,10 @@
             "items": {
               "type": "object",
               "properties": {
+                "cityCode": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
                 "propertyCode": {
                   "type": "string",
                   "minLength": 1,
@@ -5896,6 +5339,7 @@
                 }
               },
               "required": [
+                "cityCode",
                 "propertyCode",
                 "sequence",
                 "nights"
@@ -5907,6 +5351,11 @@
             "items": {
               "type": "object",
               "properties": {
+                "departureDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
                 "id": {
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
@@ -5933,10 +5382,21 @@
                   "type": "integer",
                   "minimum": 0,
                   "maximum": 9007199254740991
+                },
+                "price": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
                 }
               },
               "required": [
-                "flightId"
+                "departureDate",
+                "flightId",
+                "price",
+                "currency"
               ]
             }
           },

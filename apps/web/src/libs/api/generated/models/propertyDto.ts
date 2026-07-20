@@ -9,8 +9,8 @@ import type { PropertyDtoType } from './propertyDtoType';
 
 export interface PropertyDto {
   /**
-   * @minLength 1
-   * @maxLength 50
+   * @minLength 26
+   * @maxLength 26
    */
   propertyCode: string;
   type: PropertyDtoType;

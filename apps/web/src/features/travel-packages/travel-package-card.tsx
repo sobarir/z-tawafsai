@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/card';
 import { siteConfig } from '@/features/site/config';
 import { formatCurrency } from '@/libs/format-currency';
-import { formatDuration } from '@/libs/format-duration';
+
 import { cn } from '@/libs/utils';
 
 interface TravelPackageCardProps {
@@ -47,8 +47,8 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
 
   const firstDeparture = [...departures].sort(
     (a, b) =>
-      new Date(a.flight.departureTime).getTime() -
-      new Date(b.flight.departureTime).getTime(),
+      new Date(a.departureDate).getTime() -
+      new Date(b.departureDate).getTime(),
   )[0];
 
   let departureDateStr = '';
@@ -58,9 +58,9 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
-      }).format(new Date(firstDeparture.flight.departureTime));
+      }).format(new Date(firstDeparture.departureDate));
     } catch {
-      departureDateStr = firstDeparture.flight.departureTime;
+      departureDateStr = firstDeparture.departureDate;
     }
   }
 
@@ -222,13 +222,7 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
                 <p className="text-sm text-muted-foreground">
                   {firstDeparture.flight.originAirport} →{' '}
                   {firstDeparture.flight.destAirport} ·{' '}
-                  {formatTime(firstDeparture.flight.departureTime, locale)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDuration(
-                    firstDeparture.flight.departureTime,
-                    firstDeparture.flight.arrivalTime,
-                  )}
+                  {firstDeparture.flight.departureTimeLocal}
                 </p>
               </div>
             </div>
@@ -250,7 +244,7 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
                         : null;
                     return (
                       <Badge key={departure.id} variant="outline">
-                        {formatDate(departure.flight.departureTime, locale)}
+                        {formatDate(departure.departureDate, locale)}
                         {remainingSeats !== null
                           ? ` · ${t('seatsLeft', { count: remainingSeats })}`
                           : departure.seatsNote

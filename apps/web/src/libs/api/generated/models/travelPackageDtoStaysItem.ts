@@ -7,6 +7,8 @@
  */
 
 export type TravelPackageDtoStaysItem = {
+  /** @pattern ^[A-Z]{3}$ */
+  cityCode: string;
   propertyCode: string;
   displayName: string;
   destination: string;

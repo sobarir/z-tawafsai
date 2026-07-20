@@ -1,0 +1,2 @@
+ALTER TABLE "travel_package_departure" ADD COLUMN "price" numeric(10, 2) DEFAULT 0 NOT NULL;--> statement-breakpoint
+ALTER TABLE "travel_package_departure" ADD COLUMN "currency" varchar(3) DEFAULT 'USD' NOT NULL;

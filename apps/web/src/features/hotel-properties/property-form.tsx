@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PropertyFormProps {
   property?: Property;
@@ -50,7 +51,6 @@ export function PropertyForm({
   const form = useForm<CreatePropertyInput>({
     resolver: zodResolver(createPropertySchema),
     defaultValues: {
-      propertyCode: property?.propertyCode ?? '',
       type: property?.type ?? 'hotel',
       displayName: property?.displayName ?? '',
       destination: property?.destination ?? '',
@@ -73,132 +73,153 @@ export function PropertyForm({
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <TextFormField
-            control={form.control}
-            name="propertyCode"
-            label={t('propertyCode')}
-            placeholder={t('propertyCodePlaceholder')}
-            disabled={isEdit}
-            uppercase
-          />
-          <TextFormField
-            control={form.control}
-            name="displayName"
-            label={t('displayName')}
-            placeholder={t('displayNamePlaceholder')}
-          />
-        </div>
+        <Tabs defaultValue="details">
+          <TabsList className="w-full">
+            <TabsTrigger value="details">{t('tabDetails', { fallback: 'Details' })}</TabsTrigger>
+            <TabsTrigger value="contact">{t('tabContact', { fallback: 'Contact' })}</TabsTrigger>
+          </TabsList>
 
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('type')}</FormLabel>
-              <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {propertyTypeSchema.options.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {tPropertyType(type)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <TabsContent value="details" className="flex flex-col gap-4 pt-2">
+            <div className="grid grid-cols-1 gap-4">
+              <TextFormField
+                control={form.control}
+                name="displayName"
+                label={t('displayName')}
+                placeholder={t('displayNamePlaceholder')}
+              />
+            </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-2">
-            <ComboboxFormField
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('type')}</FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {propertyTypeSchema.options.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {tPropertyType(type)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <ComboboxFormField
+                control={form.control}
+                name="destination"
+                label={t('destination')}
+                options={cityNameOptions}
+              />
+              <TextFormField
+                control={form.control}
+                name="countryCode"
+                label={t('countryCode')}
+                placeholder={t('countryCodePlaceholder')}
+                uppercase
+              />
+            </div>
+
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[90px_90px_1fr]">
+              <FormField
+                control={form.control}
+                name="starRating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('starRating')}</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value ? String(field.value) : ''}
+                        onValueChange={(val) =>
+                          field.onChange(val ? Number(val) : undefined)
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="-" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <SelectItem key={rating} value={String(rating)}>
+                              {rating}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <NumberFormField
+                control={form.control}
+                name="distanceMeters"
+                label={t('distanceMeters')}
+                description={t('toLandmark')}
+                optional
+              />
+              <TextFormField
+                control={form.control}
+                name="distanceNote"
+                label={t('distanceNote')}
+                placeholder={t('distanceNotePlaceholder')}
+                optional
+              />
+            </div>
+
+            <TextFormField
               control={form.control}
-              name="destination"
-              label={t('destination')}
-              options={cityNameOptions}
+              name="heroImageUrl"
+              label={t('heroImageUrl')}
+              placeholder={t('heroImageUrlPlaceholder')}
+              optional
             />
-            <p className="text-xs text-muted-foreground">
-              {t('destinationHint')}
-            </p>
-          </div>
-          <TextFormField
-            control={form.control}
-            name="countryCode"
-            label={t('countryCode')}
-            placeholder={t('countryCodePlaceholder')}
-            uppercase
-          />
-        </div>
 
-        <TextFormField
-          control={form.control}
-          name="heroImageUrl"
-          label={t('heroImageUrl')}
-          placeholder={t('heroImageUrlPlaceholder')}
-          optional
-        />
+            <CheckboxFormField
+              control={form.control}
+              name="isActive"
+              label={t('isActive')}
+              id="property-is-active"
+            />
+          </TabsContent>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <NumberFormField
-            control={form.control}
-            name="starRating"
-            label={t('starRating')}
-            optional
-          />
-          <TextFormField
-            control={form.control}
-            name="address"
-            label={t('address')}
-            placeholder={t('addressPlaceholder')}
-            optional
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <NumberFormField
-            control={form.control}
-            name="distanceMeters"
-            label={t('distanceMeters')}
-            optional
-          />
-          <TextFormField
-            control={form.control}
-            name="distanceNote"
-            label={t('distanceNote')}
-            placeholder={t('distanceNotePlaceholder')}
-            optional
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <TextFormField
-            control={form.control}
-            name="contactPhone"
-            label={t('contactPhone')}
-            placeholder={t('contactPhonePlaceholder')}
-            optional
-          />
-          <TextFormField
-            control={form.control}
-            name="contactEmail"
-            label={t('contactEmail')}
-            placeholder={t('contactEmailPlaceholder')}
-            optional
-          />
-        </div>
-
-        <CheckboxFormField
-          control={form.control}
-          name="isActive"
-          label={t('isActive')}
-          id="property-is-active"
-        />
+          <TabsContent value="contact" className="flex flex-col gap-4 pt-2">
+            <TextFormField
+              control={form.control}
+              name="address"
+              label={t('address')}
+              placeholder={t('addressPlaceholder')}
+              optional
+            />
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <TextFormField
+                control={form.control}
+                name="contactPhone"
+                label={t('contactPhone')}
+                placeholder={t('contactPhonePlaceholder')}
+                optional
+              />
+              <TextFormField
+                control={form.control}
+                name="contactEmail"
+                label={t('contactEmail')}
+                placeholder={t('contactEmailPlaceholder')}
+                optional
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <FormDialogActions
           cancelLabel={tCommon('cancel')}

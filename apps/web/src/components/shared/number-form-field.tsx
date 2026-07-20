@@ -7,6 +7,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
@@ -17,6 +18,7 @@ interface NumberFormFieldProps<TFieldValues extends FieldValues> {
   step?: string;
   /** When true, an empty input becomes `undefined` instead of a required 0. */
   optional?: boolean;
+  description?: React.ReactNode;
 }
 
 export function NumberFormField<TFieldValues extends FieldValues>({
@@ -25,6 +27,7 @@ export function NumberFormField<TFieldValues extends FieldValues>({
   label,
   step,
   optional = false,
+  description,
 }: NumberFormFieldProps<TFieldValues>) {
   return (
     <FormField
@@ -47,6 +50,7 @@ export function NumberFormField<TFieldValues extends FieldValues>({
               }}
             />
           </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}

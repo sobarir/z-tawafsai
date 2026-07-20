@@ -284,7 +284,9 @@
         "removeLeg": "Retirer le tronçon",
         "price": "Prix",
         "currency": "Devise",
-        "currencyPlaceholder": "p. ex. USD"
+        "currencyPlaceholder": "p. ex. USD",
+        "departureDayOffset": "+ Days (Dep)",
+        "arrivalDayOffset": "+ Days (Arr)"
       },
       "status": {
         "ACTIVE": "Actif",

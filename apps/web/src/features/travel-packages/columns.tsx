@@ -15,6 +15,7 @@ interface TravelPackageColumnsOptions {
     isActive: string;
     isFeatured: string;
   };
+  typeLabels: Record<FlightHotelPackage['type'], string>;
   activeLabel: string;
   inactiveLabel: string;
   actionsLabel: string;
@@ -29,6 +30,7 @@ interface TravelPackageColumnsOptions {
 
 export function getTravelPackageColumns({
   columnLabels,
+  typeLabels,
   activeLabel,
   inactiveLabel,
   actionsLabel,
@@ -42,7 +44,11 @@ export function getTravelPackageColumns({
 }: TravelPackageColumnsOptions): ColumnDef<FlightHotelPackage>[] {
   return [
     { accessorKey: 'title', header: columnLabels.title },
-    { accessorKey: 'type', header: columnLabels.type },
+    {
+      id: 'type',
+      header: columnLabels.type,
+      cell: ({ row }) => typeLabels[row.original.type],
+    },
     {
       id: 'flight',
       header: columnLabels.flight,
@@ -50,7 +56,17 @@ export function getTravelPackageColumns({
         const firstDeparture = row.original.departures[0];
         if (!firstDeparture) return '-';
         const { flight } = firstDeparture;
-        return `${flight.operatingAirline}${flight.flightNumber} (${flight.originAirport}→${flight.destAirport})`;
+        return (
+          <div className="flex flex-col">
+            <span>
+              {flight.operatingAirline}
+              {flight.flightNumber}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {flight.originAirport}→{flight.destAirport}
+            </span>
+          </div>
+        );
       },
     },
     {

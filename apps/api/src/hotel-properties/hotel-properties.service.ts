@@ -54,20 +54,11 @@ export class HotelPropertiesService {
   }
 
   async create(input: CreatePropertyInput): Promise<Property> {
-    const [existing] = await this.db
-      .select({ propertyCode: schema.property.propertyCode })
-      .from(schema.property)
-      .where(eq(schema.property.propertyCode, input.propertyCode));
-    if (existing) {
-      throw new ConflictException(
-        `Property ${input.propertyCode} already exists`,
-      );
-    }
+
 
     const [row] = await this.db
       .insert(schema.property)
       .values({
-        propertyCode: input.propertyCode,
         type: input.type,
         starRating: input.starRating ?? null,
         address: input.address ?? null,

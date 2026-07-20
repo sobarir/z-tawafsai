@@ -17,7 +17,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Flight, FlightItinerary } from '@repo/shared';
-import { ConnectionsService } from '../connections/connections.service';
 import {
   CreateFlightDto,
   FlightDto,
@@ -32,7 +31,7 @@ import { FlightsService } from './flights.service';
 export class FlightsController {
   constructor(
     private readonly flights: FlightsService,
-    private readonly connections: ConnectionsService,
+    
   ) {}
 
   @Get()
@@ -45,15 +44,13 @@ export class FlightsController {
   @Get('search')
   @ApiOperation({
     operationId: 'searchFlights',
-    summary:
-      'OTA-style search for direct and one-stop connecting/stopover itineraries by route and date, sorted by price',
+    summary: 'Search for direct flights by route and date',
   })
   @ApiOkResponse({ type: [FlightItineraryDto] })
   search(
-    // Validated by the global ZodValidationPipe against searchFlightsQuerySchema
     @Query() query: SearchFlightsDto,
   ): Promise<FlightItinerary[]> {
-    return this.connections.searchItineraries(query);
+    return this.flights.search(query);
   }
 
   @Get(':id')
@@ -88,6 +85,6 @@ export class FlightsController {
   @ApiOperation({ operationId: 'deleteFlight', summary: 'Delete a flight' })
   @ApiNoContentResponse()
   remove(@Param('id') id: string): Promise<void> {
-    return this.flights.remove(id);
+    return this.flights.delete(id);
   }
 }

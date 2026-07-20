@@ -7,6 +7,8 @@
  */
 
 export type UpdateTravelPackageDtoStaysItem = {
+  /** @pattern ^[A-Z]{3}$ */
+  cityCode: string;
   /**
    * @minLength 1
    * @maxLength 50
