@@ -4906,13 +4906,18 @@ async function seed() {
           `Seed error: ${item.code} references unknown season "${season.name}"`,
         );
       }
+      // Idempotency keys on (property, dates) — the granularity the EXCLUDE
+      // constraint enforces — not the season, so a re-seed that reassigns the
+      // same window to a different season reconciles it instead of colliding.
       const [existing] = await db
-        .select({ id: schema.seasonWindow.id })
+        .select({
+          id: schema.seasonWindow.id,
+          seasonId: schema.seasonWindow.seasonId,
+        })
         .from(schema.seasonWindow)
         .where(
           and(
             eq(schema.seasonWindow.propertyCode, item.code),
-            eq(schema.seasonWindow.seasonId, seasonId),
             eq(schema.seasonWindow.startDate, season.startDate),
             eq(schema.seasonWindow.endDate, season.endDate),
           ),
@@ -4924,6 +4929,11 @@ async function seed() {
           startDate: season.startDate,
           endDate: season.endDate,
         });
+      } else if (existing.seasonId !== seasonId) {
+        await db
+          .update(schema.seasonWindow)
+          .set({ seasonId })
+          .where(eq(schema.seasonWindow.id, existing.id));
       }
     }
 
@@ -5411,6 +5421,13 @@ async function seed() {
     }
   }
 
+  // Stays FK city_code to the city master table. Property codes are ULIDs, so
+  // resolve each stay's city from its property's destination name.
+  const cityCodeByName = new Map(cities.map((c) => [c.name, c.cityCode]));
+  const cityCodeByPropertyCode = new Map(
+    properties.map((p) => [p.code, cityCodeByName.get(p.destination)]),
+  );
+
   for (const [pkgIndex, item] of travelPackageSeeds.entries()) {
     const [anchorFlight] = await db
       .select({ id: schema.flights.id })
@@ -5477,14 +5494,15 @@ async function seed() {
       .where(eq(schema.travelPackageInclusion.packageId, packageId));
 
     await db.insert(schema.travelPackageStay).values(
-      item.stays.map((stay) => ({
-        packageId,
-        cityCode:
-          stay.propertyCode.substring(0, 3) === 'MAD'
-            ? 'MED'
-            : stay.propertyCode.substring(0, 3),
-        ...stay,
-      })),
+      item.stays.map((stay) => {
+        const cityCode = cityCodeByPropertyCode.get(stay.propertyCode);
+        if (!cityCode) {
+          throw new Error(
+            `Seed error: stay property ${stay.propertyCode} has no known city`,
+          );
+        }
+        return { packageId, cityCode, ...stay };
+      }),
     );
     if (item.departures.length > 0) {
       const insertedDepartures = await db
