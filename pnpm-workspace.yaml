@@ -1,3 +1,21 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  '@parcel/watcher': true
+  '@scarf/scarf': true
+  '@sentry/cli': true
+  '@swc/core': true
+  esbuild: true
+  lefthook: true
+  sharp: true
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - '@scarf/scarf'
+  - '@sentry/cli'
+  - '@swc/core'
+  - esbuild
+  - lefthook
+  - sharp
