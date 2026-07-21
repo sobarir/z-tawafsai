@@ -1,4 +1,5 @@
 import { formatMinutes } from '@/libs/format-duration';
+import { cn } from '@/libs/utils';
 
 interface ItineraryVisualProps {
   departureTimeLocal: string;
@@ -9,6 +10,8 @@ interface ItineraryVisualProps {
   durationMins: number;
   /** Total stops along the journey (connections + technical stops). */
   stops: number;
+  /** Override the container classes (e.g. relax the datatable's min width). */
+  className?: string;
 }
 
 /**
@@ -24,12 +27,18 @@ export function ItineraryVisual({
   destAirport,
   durationMins,
   stops,
+  className,
 }: ItineraryVisualProps) {
   const stopsText =
     stops <= 0 ? 'Nonstop' : `${stops} Stop${stops > 1 ? 's' : ''}`;
 
   return (
-    <div className="flex items-center justify-between gap-4 w-full h-full py-2 min-w-[250px]">
+    <div
+      className={cn(
+        'flex items-center justify-between gap-4 w-full h-full py-2 min-w-[250px]',
+        className,
+      )}
+    >
       {/* Origin */}
       <div className="flex flex-col items-center min-w-[50px]">
         <div className="text-lg font-bold leading-none">

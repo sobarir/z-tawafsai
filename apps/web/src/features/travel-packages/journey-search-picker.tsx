@@ -166,21 +166,22 @@ export function JourneySearchPicker({
       <FormLabel>{label}</FormLabel>
 
       {selected ? (
-        <div className="flex items-center gap-3 rounded-md border border-border/60 p-2">
-          <div className="flex flex-1 flex-col gap-1">
-            <span className="font-semibold text-sm">
+        <div className="flex min-w-0 flex-col gap-1 rounded-md border border-border/60 p-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate font-semibold text-sm">
               {journeyFlightNumbers(selectedFlights)}
             </span>
-            <ItineraryVisual {...selected} />
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-7 shrink-0 px-2"
+              onClick={openDialog}
+            >
+              {t('changeJourney')}
+            </Button>
           </div>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={openDialog}
-          >
-            {t('changeJourney')}
-          </Button>
+          <ItineraryVisual {...selected} className="min-w-0" />
         </div>
       ) : (
         <Button
