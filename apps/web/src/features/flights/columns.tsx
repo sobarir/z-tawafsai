@@ -2,7 +2,11 @@
 
 import type { Flight } from '@repo/shared';
 import type { Column } from 'react-data-grid';
-import { formatMinutes } from '@/libs/format-duration';
+import { ItineraryVisual } from '@/components/shared/itinerary-visual';
+import { RowActionsCell } from '@/components/shared/row-actions-cell';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { formatCurrency } from '@/libs/format-currency';
 
 export type FlightRow = Flight & {
   airlineDisplay: string;
@@ -10,11 +14,6 @@ export type FlightRow = Flight & {
   codeshareAirlineDisplay?: string;
   codeshareFlightNumber?: string;
 };
-
-import { RowActionsCell } from '@/components/shared/row-actions-cell';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { formatCurrency } from '@/libs/format-currency';
 
 const STATUS_VARIANT: Record<
   string,
@@ -57,51 +56,16 @@ function FilterHeader({
 }
 
 function ItineraryCell({ row }: { row: FlightRow }) {
-  const isNonstop = row.legs.length <= 1;
-  const stopsText = isNonstop
-    ? 'Nonstop'
-    : `${row.legs.length - 1} Stop${row.legs.length - 1 > 1 ? 's' : ''}`;
-
   return (
-    <div className="flex items-center justify-between gap-4 w-full h-full py-2 min-w-[250px]">
-      {/* Origin */}
-      <div className="flex flex-col items-center min-w-[50px]">
-        <div className="text-lg font-bold leading-none">
-          {row.departureTimeLocal}
-        </div>
-        <div className="text-sm text-muted-foreground mt-1">
-          {row.originAirport}
-        </div>
-      </div>
-
-      {/* Connection Line */}
-      <div className="flex flex-col flex-1 items-center justify-center -mt-1">
-        <div className="text-xs text-muted-foreground mb-1">
-          {formatMinutes(row.durationMins)}
-        </div>
-        <div className="w-full flex items-center">
-          <div className="h-1.5 w-1.5 rounded-full bg-border" />
-          <div className="h-[2px] flex-1 bg-border" />
-          <div className="h-1.5 w-1.5 rounded-full bg-border" />
-        </div>
-        <div className="text-xs text-muted-foreground mt-1">{stopsText}</div>
-      </div>
-
-      {/* Destination */}
-      <div className="flex flex-col items-center min-w-[50px]">
-        <div className="text-lg font-bold leading-none flex items-start">
-          {row.arrivalTimeLocal}
-          {row.arrivalDayOffset > 0 && (
-            <sup className="text-[10px] font-bold text-orange-600 ml-0.5 mt-0.5">
-              +{row.arrivalDayOffset}
-            </sup>
-          )}
-        </div>
-        <div className="text-sm text-muted-foreground mt-1">
-          {row.destAirport}
-        </div>
-      </div>
-    </div>
+    <ItineraryVisual
+      departureTimeLocal={row.departureTimeLocal}
+      originAirport={row.originAirport}
+      arrivalTimeLocal={row.arrivalTimeLocal}
+      arrivalDayOffset={row.arrivalDayOffset}
+      destAirport={row.destAirport}
+      durationMins={row.durationMins}
+      stops={row.legs.length - 1}
+    />
   );
 }
 

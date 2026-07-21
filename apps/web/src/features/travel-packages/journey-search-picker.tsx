@@ -1,98 +1,92 @@
 'use client';
 
 import type {
+  Airport,
   CreateFlightHotelPackageInput,
   Flight,
   FlightItinerary,
 } from '@repo/shared';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+import { ItineraryVisual } from '@/components/shared/itinerary-visual';
 import { LabeledCombobox } from '@/components/shared/labeled-combobox';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { ComboboxOption } from '@/components/ui/combobox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { FormItem, FormLabel } from '@/components/ui/form';
 import { useSearchFlights } from '@/libs/api/generated/endpoints';
+import { toAirportOptions } from '@/libs/combobox-options';
 import { formatCurrency } from '@/libs/format-currency';
-import { formatMinutes } from '@/libs/format-duration';
+import {
+  buildDisplayItinerary,
+  journeyFlightNumbers,
+} from '@/libs/journey-display';
 
 type Direction = 'outboundFlightIds' | 'inboundFlightIds';
 type Departures = NonNullable<CreateFlightHotelPackageInput['departures']>;
 
-/** "GA874 · GA123", the marketing labels of a journey's flights. */
-function flightNumbers(flights: Flight[]): string {
-  return flights
-    .map((f) => `${f.operatingAirline}${f.flightNumber}`)
-    .join(' · ');
-}
-
-/** "CGK → KUL → JED", the airport chain a journey routes through. */
-function routePath(flights: Flight[]): string {
-  const first = flights[0];
-  if (!first) return '';
-  return [first.originAirport, ...flights.map((f) => f.destAirport)].join(
-    ' → ',
-  );
-}
-
-function JourneyRow({
+function JourneyResult({
   journey,
   locale,
-  t,
   onSelect,
 }: {
   journey: FlightItinerary;
   locale: string;
-  t: ReturnType<typeof useTranslations<'flightSearch'>>;
   onSelect: () => void;
 }) {
-  const stops = journey.stopCount;
+  const first = journey.flights[0];
+  const last = journey.flights[journey.flights.length - 1];
+  if (!first || !last) return null;
+
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-border/60 p-3">
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold text-sm">
-          {flightNumbers(journey.flights)}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {routePath(journey.flights)}
-        </p>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant={stops > 0 ? 'secondary' : 'outline'}>
-            {stops > 0 ? t('stopsCount', { count: stops }) : t('direct')}
-          </Badge>
-          <span>{formatMinutes(journey.totalDurationMinutes)}</span>
-        </div>
-      </div>
-      <div className="flex flex-col items-end gap-2">
+    <button
+      type="button"
+      onClick={onSelect}
+      className="flex w-full flex-col gap-1 rounded-md border border-border/60 p-3 text-left transition-colors hover:bg-accent"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-semibold text-sm">
+          {journeyFlightNumbers(journey.flights)}
+        </span>
         <span className="font-semibold text-primary">
           {formatCurrency(journey.totalPrice, journey.currency, locale)}
         </span>
-        <Button type="button" size="sm" variant="secondary" onClick={onSelect}>
-          {t('selectJourney')}
-        </Button>
       </div>
-    </div>
+      <ItineraryVisual
+        departureTimeLocal={journey.departureTimeLocal}
+        originAirport={first.originAirport}
+        arrivalTimeLocal={journey.arrivalTimeLocal}
+        arrivalDayOffset={journey.arrivalDayOffset}
+        destAirport={last.destAirport}
+        durationMins={journey.totalDurationMinutes}
+        stops={journey.stopCount}
+      />
+    </button>
   );
 }
 
-// Replaces the fixed-slot flight ComboBoxes with an OTA-style route search: the
-// user enters origin/destination airports, searches, and picks a whole journey
-// (direct or MCT-validated connection). The chosen journey's flight ids are
-// written to the departure's outbound/inbound array — the stored shape is
-// unchanged. Uses useWatch + setValue on the typed `departures` path since RHF
-// can't statically resolve runtime indices into a primitive string[].
+// Composes a departure's flights (outbound/inbound) via an OTA-style route
+// search in a popup: enter origin/destination airports, search, and pick a
+// whole journey. The chosen journey's flight ids are written to the departure's
+// array — the stored shape is unchanged. Uses useWatch + setValue on the typed
+// `departures` path since RHF can't statically resolve a runtime index into a
+// primitive string[].
 export function JourneySearchPicker({
   departureIndex,
   direction,
   label,
-  airportOptions,
+  airports,
   flights,
 }: {
   departureIndex: number;
   direction: Direction;
   label: string;
-  airportOptions: ComboboxOption[];
+  airports: Airport[];
   flights: Flight[];
 }) {
   const t = useTranslations('flightSearch');
@@ -104,13 +98,23 @@ export function JourneySearchPicker({
   const departure = departures?.[departureIndex];
   const ids = departure?.[direction] ?? [];
 
+  const airportOptions = useMemo(() => toAirportOptions(airports), [airports]);
+  const tzByAirport = useMemo(
+    () => new Map(airports.map((a) => [a.airportCode, a.timezone])),
+    [airports],
+  );
   const flightById = useMemo(
     () => new Map(flights.map((f) => [f.id, f])),
     [flights],
   );
+
   const selectedFlights = ids
     .map((id) => flightById.get(id))
     .filter((f): f is Flight => Boolean(f));
+  const selected =
+    selectedFlights.length > 0
+      ? buildDisplayItinerary(selectedFlights, tzByAirport)
+      : null;
 
   // The inbound leg defaults to the reverse of the chosen outbound route.
   const outboundIds = departure?.outboundFlightIds ?? [];
@@ -122,26 +126,27 @@ export function JourneySearchPicker({
     return { origin: last.destAirport, dest: first.originAirport };
   }, [direction, outboundIds, flightById]);
 
+  const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState('');
   const [dest, setDest] = useState('');
   const [params, setParams] = useState<{
     originAirport: string;
     destAirport: string;
   } | null>(null);
-  const [editing, setEditing] = useState(ids.length === 0);
-
-  // Pre-fill the inbound fields from the outbound route while still untouched.
-  useEffect(() => {
-    if (reverseRoute && !origin && !dest) {
-      setOrigin(reverseRoute.origin);
-      setDest(reverseRoute.dest);
-    }
-  }, [reverseRoute, origin, dest]);
 
   const { data: journeys, isFetching } = useSearchFlights(
     params ?? { originAirport: '', destAirport: '' },
     { query: { enabled: Boolean(params) } },
   );
+
+  const openDialog = () => {
+    // Pre-fill the inbound route from the outbound while the fields are untouched.
+    if (reverseRoute && !origin && !dest) {
+      setOrigin(reverseRoute.origin);
+      setDest(reverseRoute.dest);
+    }
+    setOpen(true);
+  };
 
   const selectJourney = (journey: FlightItinerary) => {
     const current = departures ?? [];
@@ -153,79 +158,91 @@ export function JourneySearchPicker({
       ...current.slice(departureIndex + 1),
     ];
     setValue('departures', updated, { shouldDirty: true });
-    setEditing(false);
+    setOpen(false);
   };
 
   return (
     <FormItem className="gap-2">
       <FormLabel>{label}</FormLabel>
 
-      {!editing && selectedFlights.length > 0 ? (
-        <div className="flex items-center justify-between gap-3 rounded-md border border-border/60 p-3">
-          <div className="flex flex-col gap-0.5">
-            <p className="font-semibold text-sm">
-              {flightNumbers(selectedFlights)}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {routePath(selectedFlights)}
-            </p>
+      {selected ? (
+        <div className="flex items-center gap-3 rounded-md border border-border/60 p-2">
+          <div className="flex flex-1 flex-col gap-1">
+            <span className="font-semibold text-sm">
+              {journeyFlightNumbers(selectedFlights)}
+            </span>
+            <ItineraryVisual {...selected} />
           </div>
           <Button
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => setEditing(true)}
+            onClick={openDialog}
           >
             {t('changeJourney')}
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-3 rounded-md border border-border/60 p-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <LabeledCombobox
-              label={t('originAirport')}
-              options={airportOptions}
-              value={origin}
-              onChange={setOrigin}
-            />
-            <LabeledCombobox
-              label={t('destAirport')}
-              options={airportOptions}
-              value={dest}
-              onChange={setDest}
-            />
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            className="w-fit"
-            disabled={!origin || !dest}
-            loading={isFetching}
-            onClick={() =>
-              setParams({ originAirport: origin, destAirport: dest })
-            }
-          >
-            {t('searchButton')}
-          </Button>
-
-          {params && !isFetching && (journeys?.length ?? 0) === 0 && (
-            <p className="text-xs text-muted-foreground">{t('noResults')}</p>
-          )}
-          {journeys && journeys.length > 0 && (
-            <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
-              {journeys.map((journey) => (
-                <JourneyRow
-                  key={journey.flights.map((f) => f.id).join('-')}
-                  journey={journey}
-                  locale={locale}
-                  t={t}
-                  onSelect={() => selectJourney(journey)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-fit"
+          onClick={openDialog}
+        >
+          {t('searchButton')}
+        </Button>
       )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{label}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <LabeledCombobox
+                label={t('originAirport')}
+                options={airportOptions}
+                value={origin}
+                onChange={setOrigin}
+              />
+              <LabeledCombobox
+                label={t('destAirport')}
+                options={airportOptions}
+                value={dest}
+                onChange={setDest}
+              />
+            </div>
+            <Button
+              type="button"
+              className="w-fit"
+              disabled={!origin || !dest}
+              loading={isFetching}
+              onClick={() =>
+                setParams({ originAirport: origin, destAirport: dest })
+              }
+            >
+              {t('searchButton')}
+            </Button>
+
+            {params && !isFetching && (journeys?.length ?? 0) === 0 && (
+              <p className="text-sm text-muted-foreground">{t('noResults')}</p>
+            )}
+            {journeys && journeys.length > 0 && (
+              <div className="flex max-h-[50vh] flex-col gap-2 overflow-y-auto">
+                {journeys.map((journey) => (
+                  <JourneyResult
+                    key={journey.flights.map((f) => f.id).join('-')}
+                    journey={journey}
+                    locale={locale}
+                    onSelect={() => selectJourney(journey)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </FormItem>
   );
 }

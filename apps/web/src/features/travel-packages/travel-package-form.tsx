@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type {
+  Airport,
   City,
   CreateFlightHotelPackageInput,
   Flight,
@@ -32,7 +33,7 @@ import { JourneySearchPicker } from './journey-search-picker';
 
 interface TravelPackageFormProps {
   travelPackage?: FlightHotelPackage;
-  airportOptions: ComboboxOption[];
+  airports: Airport[];
   flights: Flight[];
   cityOptions: ComboboxOption[];
   cities: City[];
@@ -269,12 +270,12 @@ function InclusionsFieldset({
 // field array + labels) so the main form stays within the complexity budget.
 function DeparturesFieldset({
   control,
-  airportOptions,
+  airports,
   flights,
   currencyOptions,
 }: {
   control: Control<CreateFlightHotelPackageInput>;
-  airportOptions: ComboboxOption[];
+  airports: Airport[];
   flights: Flight[];
   currencyOptions: ComboboxOption[];
 }) {
@@ -295,7 +296,7 @@ function DeparturesFieldset({
                 departureIndex={index}
                 direction="outboundFlightIds"
                 label={`${t('flight')} (Outbound)`}
-                airportOptions={airportOptions}
+                airports={airports}
                 flights={flights}
               />
             </div>
@@ -304,7 +305,7 @@ function DeparturesFieldset({
                 departureIndex={index}
                 direction="inboundFlightIds"
                 label={`${t('flight')} (Inbound)`}
-                airportOptions={airportOptions}
+                airports={airports}
                 flights={flights}
               />
             </div>
@@ -388,7 +389,7 @@ function DeparturesFieldset({
 
 export function TravelPackageForm({
   travelPackage,
-  airportOptions,
+  airports,
   flights,
   cityOptions,
   cities,
@@ -535,7 +536,7 @@ export function TravelPackageForm({
             <TabsContent value="departures" className="flex flex-col gap-4">
               <DeparturesFieldset
                 control={form.control}
-                airportOptions={airportOptions}
+                airports={airports}
                 flights={flights}
                 currencyOptions={currencyOptions}
               />

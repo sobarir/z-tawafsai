@@ -25,7 +25,6 @@ import {
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
 import {
-  toAirportOptions,
   toCityOptions,
   toCurrencyOptions,
   toPropertyOptions,
@@ -48,10 +47,6 @@ export function TravelPackagesAdmin() {
   const { data: providers } = useListTravelProviders();
   const { data: cities } = useListCities();
 
-  const airportOptions = useMemo(
-    () => toAirportOptions(airports ?? []),
-    [airports],
-  );
   const cityOptions = useMemo(() => toCityOptions(cities ?? []), [cities]);
   const propertyOptions = useMemo(
     () => toPropertyOptions(properties ?? []),
@@ -164,7 +159,7 @@ export function TravelPackagesAdmin() {
       >
         <TravelPackageForm
           travelPackage={editing ?? undefined}
-          airportOptions={airportOptions}
+          airports={airports ?? []}
           flights={flights ?? []}
           cityOptions={cityOptions}
           cities={cities ?? []}
