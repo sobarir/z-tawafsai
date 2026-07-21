@@ -3317,7 +3317,7 @@
         "properties": {
           "flights": {
             "minItems": 1,
-            "maxItems": 2,
+            "maxItems": 3,
             "type": "array",
             "items": {
               "type": "object",
@@ -4831,76 +4831,145 @@
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
-                "flightId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                "outboundFlights": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                      },
+                      "operatingAirline": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9]{2}$"
+                      },
+                      "airlineName": {
+                        "type": "string"
+                      },
+                      "flightNumber": {
+                        "type": "string",
+                        "pattern": "^[0-9]{1,4}[A-Z]?$"
+                      },
+                      "originAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "destAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "departureTimeLocal": {
+                        "type": "string",
+                        "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                      },
+                      "arrivalTimeLocal": {
+                        "type": "string",
+                        "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                      },
+                      "arrivalDayOffset": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "isDirect": {
+                        "type": "boolean"
+                      },
+                      "transitAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "nullable": true
+                      },
+                      "transitCityName": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "operatingAirline",
+                      "airlineName",
+                      "flightNumber",
+                      "originAirport",
+                      "destAirport",
+                      "departureTimeLocal",
+                      "arrivalTimeLocal",
+                      "arrivalDayOffset",
+                      "isDirect",
+                      "transitAirport",
+                      "transitCityName"
+                    ]
+                  }
                 },
-                "flight": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                "inboundFlights": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                      },
+                      "operatingAirline": {
+                        "type": "string",
+                        "pattern": "^[A-Z0-9]{2}$"
+                      },
+                      "airlineName": {
+                        "type": "string"
+                      },
+                      "flightNumber": {
+                        "type": "string",
+                        "pattern": "^[0-9]{1,4}[A-Z]?$"
+                      },
+                      "originAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "destAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      },
+                      "departureTimeLocal": {
+                        "type": "string",
+                        "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                      },
+                      "arrivalTimeLocal": {
+                        "type": "string",
+                        "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                      },
+                      "arrivalDayOffset": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "isDirect": {
+                        "type": "boolean"
+                      },
+                      "transitAirport": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "nullable": true
+                      },
+                      "transitCityName": {
+                        "type": "string",
+                        "nullable": true
+                      }
                     },
-                    "operatingAirline": {
-                      "type": "string",
-                      "pattern": "^[A-Z0-9]{2}$"
-                    },
-                    "airlineName": {
-                      "type": "string"
-                    },
-                    "flightNumber": {
-                      "type": "string",
-                      "pattern": "^[0-9]{1,4}[A-Z]?$"
-                    },
-                    "originAirport": {
-                      "type": "string",
-                      "pattern": "^[A-Z]{3}$"
-                    },
-                    "destAirport": {
-                      "type": "string",
-                      "pattern": "^[A-Z]{3}$"
-                    },
-                    "departureTimeLocal": {
-                      "type": "string",
-                      "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
-                    },
-                    "arrivalTimeLocal": {
-                      "type": "string",
-                      "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
-                    },
-                    "arrivalDayOffset": {
-                      "type": "integer",
-                      "minimum": -9007199254740991,
-                      "maximum": 9007199254740991
-                    },
-                    "isDirect": {
-                      "type": "boolean"
-                    },
-                    "transitAirport": {
-                      "type": "string",
-                      "pattern": "^[A-Z]{3}$",
-                      "nullable": true
-                    },
-                    "transitCityName": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "operatingAirline",
-                    "airlineName",
-                    "flightNumber",
-                    "originAirport",
-                    "destAirport",
-                    "departureTimeLocal",
-                    "arrivalTimeLocal",
-                    "arrivalDayOffset",
-                    "isDirect",
-                    "transitAirport",
-                    "transitCityName"
-                  ]
+                    "required": [
+                      "id",
+                      "operatingAirline",
+                      "airlineName",
+                      "flightNumber",
+                      "originAirport",
+                      "destAirport",
+                      "departureTimeLocal",
+                      "arrivalTimeLocal",
+                      "arrivalDayOffset",
+                      "isDirect",
+                      "transitAirport",
+                      "transitCityName"
+                    ]
+                  }
                 },
                 "departureDate": {
                   "type": "string",
@@ -4945,8 +5014,8 @@
               },
               "required": [
                 "id",
-                "flightId",
-                "flight",
+                "outboundFlights",
+                "inboundFlights",
                 "departureDate",
                 "returnDate",
                 "seatsNote",
@@ -5145,9 +5214,20 @@
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
-                "flightId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                "outboundFlightIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  }
+                },
+                "inboundFlightIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  }
                 },
                 "returnDate": {
                   "type": "string",
@@ -5179,7 +5259,7 @@
               },
               "required": [
                 "departureDate",
-                "flightId",
+                "outboundFlightIds",
                 "price",
                 "currency"
               ]
@@ -5360,9 +5440,20 @@
                   "type": "string",
                   "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
                 },
-                "flightId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                "outboundFlightIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  }
+                },
+                "inboundFlightIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  }
                 },
                 "returnDate": {
                   "type": "string",
@@ -5394,7 +5485,7 @@
               },
               "required": [
                 "departureDate",
-                "flightId",
+                "outboundFlightIds",
                 "price",
                 "currency"
               ]

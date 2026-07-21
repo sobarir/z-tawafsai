@@ -1,5 +1,6 @@
 import type { FlightHotelPackage } from '@repo/shared';
 import type { PackageCardData } from '@/features/landing/data/packages';
+import { getEarliestDeparture } from '@/features/travel-packages/utils';
 
 type Labels = {
   typeUmrah: string;
@@ -75,11 +76,7 @@ function earliestDepartureDate(
   pkg: FlightHotelPackage,
   locale: string,
 ): string {
-  const first = [...pkg.departures].sort(
-    (a, b) =>
-      new Date(a.departureDate).getTime() -
-      new Date(b.departureDate).getTime(),
-  )[0];
+  const first = getEarliestDeparture(pkg.departures);
   if (!first) return '';
   try {
     return new Intl.DateTimeFormat(locale, {
@@ -108,18 +105,14 @@ export function toPackageCardData(
   const makkah = pkg.stays.find((stay) => /mak/i.test(stay.destination));
   const madinah = pkg.stays.find((stay) => /mad/i.test(stay.destination));
 
-  const firstDeparture = [...pkg.departures].sort(
-    (a, b) =>
-      new Date(a.departureDate).getTime() -
-      new Date(b.departureDate).getTime(),
-  )[0];
+  const firstDeparture = getEarliestDeparture(pkg.departures);
 
-  const airline = firstDeparture?.flight.isDirect
-    ? firstDeparture.flight.airlineName
-    : `${firstDeparture?.flight.airlineName ?? ''} ${labels.transitVia(
-        firstDeparture?.flight.transitCityName ??
-          firstDeparture?.flight.transitAirport ??
-          '',
+  const firstFlight = firstDeparture?.outboundFlights[0];
+
+  const airline = firstFlight?.isDirect
+    ? firstFlight.airlineName
+    : `${firstFlight?.airlineName ?? ''} ${labels.transitVia(
+        firstFlight?.transitCityName ?? firstFlight?.transitAirport ?? '',
       )}`.trim();
 
   return {
@@ -135,7 +128,7 @@ export function toPackageCardData(
     departureDate: earliestDepartureDate(pkg, locale),
     durationValue: `${pkg.durationNights} ${labels.nightsUnit}`,
     airline,
-    direct: firstDeparture?.flight.isDirect ?? true,
+    direct: firstFlight?.isDirect ?? true,
     hotelMakkah: hotelLine(makkah, labels.emptyHotel),
     hotelMadinah: hotelLine(madinah, labels.emptyHotel),
     footNote: mealLabel(pkg.mealPlan, labels),

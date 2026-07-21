@@ -121,7 +121,9 @@ export const flights = pgTable(
     destAirport: varchar('dest_airport', { length: 3 })
       .notNull()
       .references(() => airports.airportCode),
-    departureTimeLocal: varchar('departure_time_local', { length: 5 }).notNull(),
+    departureTimeLocal: varchar('departure_time_local', {
+      length: 5,
+    }).notNull(),
     arrivalTimeLocal: varchar('arrival_time_local', { length: 5 }).notNull(),
     arrivalDayOffset: integer('arrival_day_offset').notNull().default(0),
     aircraftType: varchar('aircraft_type', { length: 10 }),
@@ -171,7 +173,9 @@ export const flightLegs = pgTable(
     arrAirport: varchar('arr_airport', { length: 3 })
       .notNull()
       .references(() => airports.airportCode),
-    departureTimeLocal: varchar('departure_time_local', { length: 5 }).notNull(),
+    departureTimeLocal: varchar('departure_time_local', {
+      length: 5,
+    }).notNull(),
     arrivalTimeLocal: varchar('arrival_time_local', { length: 5 }).notNull(),
     departureDayOffset: integer('departure_day_offset').notNull().default(0),
     arrivalDayOffset: integer('arrival_day_offset').notNull().default(0),
@@ -228,7 +232,6 @@ export const flightMarketing = pgTable(
   ],
 );
 
-
 export const interlineAgreements = pgTable(
   'interline_agreements',
   {
@@ -263,6 +266,36 @@ export const interlineAgreements = pgTable(
     ),
   ],
 );
+
+export const mctRules = pgTable('mct_rules', {
+  id: varchar('id', { length: 26 })
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  arrivalAirport: varchar('arrival_airport', { length: 3 })
+    .notNull()
+    .references(() => airports.airportCode),
+  departureAirport: varchar('departure_airport', { length: 3 })
+    .notNull()
+    .references(() => airports.airportCode),
+  scope: mctScope('scope').notNull(),
+  arrivalAirline: varchar('arrival_airline', { length: 2 }).references(
+    () => airlines.airlineCode,
+  ),
+  departureAirline: varchar('departure_airline', { length: 2 }).references(
+    () => airlines.airlineCode,
+  ),
+  arrivalTerminal: varchar('arrival_terminal', { length: 10 }),
+  departureTerminal: varchar('departure_terminal', { length: 10 }),
+  mctMinutes: integer('mct_minutes').notNull(),
+  maxConnectionMinutes: integer('max_connection_minutes'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
 
 // Hotel search domain — see /prd/hotels/11-data-model.md for the full spec.
 
@@ -480,6 +513,11 @@ export const rateRule = pgTable(
   ],
 );
 
+export const journeyDirection = pgEnum('journey_direction', [
+  'OUTBOUND',
+  'INBOUND',
+]);
+
 // An umrah travel company (operator) the agent markets packages for. Each
 // travel_package references one provider; the agent earns a per-seat commission
 // (travel_package.fee_per_seat) on every confirmed booking of that package.
@@ -592,9 +630,6 @@ export const travelPackageDeparture = pgTable(
     packageId: text('package_id')
       .notNull()
       .references(() => flightHotelPackage.id, { onDelete: 'cascade' }),
-    flightId: varchar('flight_id', { length: 26 })
-      .notNull()
-      .references(() => flights.id),
     departureDate: date('departure_date', { mode: 'string' }).notNull(),
     returnDate: date('return_date', { mode: 'string' }),
     seatsNote: text('seats_note'),
@@ -618,6 +653,36 @@ export const travelPackageDeparture = pgTable(
     check(
       'travel_package_departure_total_seats_nonneg',
       sql`${table.totalSeats} IS NULL OR ${table.totalSeats} >= 0`,
+    ),
+  ],
+);
+
+// Junction table linking a travel package departure to a Journey (list of flights)
+export const travelPackageDepartureFlight = pgTable(
+  'travel_package_departure_flight',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    departureId: text('departure_id')
+      .notNull()
+      .references(() => travelPackageDeparture.id, { onDelete: 'cascade' }),
+    flightId: varchar('flight_id', { length: 26 })
+      .notNull()
+      .references(() => flights.id),
+    direction: journeyDirection('direction').notNull(),
+    sequence: integer('sequence').notNull(),
+  },
+  (table) => [
+    index('idx_travel_package_departure_flight_dep').on(table.departureId),
+    uniqueIndex('travel_package_departure_flight_seq_unique').on(
+      table.departureId,
+      table.direction,
+      table.sequence,
+    ),
+    check(
+      'travel_package_departure_flight_seq_positive',
+      sql`${table.sequence} > 0`,
     ),
   ],
 );

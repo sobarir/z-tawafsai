@@ -63,7 +63,8 @@ export function getPropertyColumns({
         if (distanceMeters != null) {
           const noteLower = distanceNote?.toLowerCase();
           if (noteLower === 'less than') return `< ${distanceMeters}m`;
-          if (noteLower === 'approx' || noteLower === 'approx.') return `~${distanceMeters}m`;
+          if (noteLower === 'approx' || noteLower === 'approx.')
+            return `~${distanceMeters}m`;
         }
 
         const parts = [

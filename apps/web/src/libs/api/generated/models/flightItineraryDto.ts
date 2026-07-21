@@ -10,7 +10,7 @@ import type { FlightItineraryDtoFlightsItem } from './flightItineraryDtoFlightsI
 export interface FlightItineraryDto {
   /**
    * @minItems 1
-   * @maxItems 2
+   * @maxItems 3
    */
   flights: FlightItineraryDtoFlightsItem[];
   /**

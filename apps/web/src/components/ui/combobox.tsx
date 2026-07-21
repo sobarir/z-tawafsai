@@ -78,7 +78,7 @@ export function Combobox({
       >
         <Command
           filter={(value, search, keywords) => {
-            const extendValue = value + ' ' + (keywords?.join(' ') ?? '');
+            const extendValue = `${value} ${keywords?.join(' ') ?? ''}`;
             if (extendValue.toLowerCase().includes(search.toLowerCase())) {
               return 1;
             }

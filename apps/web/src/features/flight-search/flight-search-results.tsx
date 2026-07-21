@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatCurrency } from '@/libs/format-currency';
-import { formatDuration } from '@/libs/format-duration';
+import { formatMinutes } from '@/libs/format-duration';
 
 interface FlightSearchResultsProps {
   results: FlightItinerary[] | undefined;
@@ -93,18 +93,65 @@ function FlightLegSummary({ flight, t }: { flight: Flight; t: Translate }) {
           {flight.arrivalTimeLocal}
         </span>
       </p>
-      <p className="text-xs text-muted-foreground">
-        {t('duration')}:{' '}
-        {formatDuration(flight.departureTimeLocal, flight.arrivalTimeLocal)}
-        {flight.aircraftType
-          ? ` · ${t('aircraft')}: ${flight.aircraftType}`
-          : ''}
-      </p>
+      {flight.aircraftType && (
+        <p className="text-xs text-muted-foreground">
+          {t('aircraft')}: {flight.aircraftType}
+        </p>
+      )}
       <TechnicalStopRoute flight={flight} />
     </div>
   );
 }
 
+/** Local "HH:MM" to minutes past midnight. */
+function minutesOfDay(localTime: string): number {
+  const [hours = 0, minutes = 0] = localTime.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Ground time at the connecting hub. Both times share the hub's timezone, so a
+ * plain local-clock diff is exact; wrap past midnight for an overnight layover.
+ */
+function layoverMinutes(arrivalLocal: string, departureLocal: string): number {
+  const diff = minutesOfDay(departureLocal) - minutesOfDay(arrivalLocal);
+  return diff < 0 ? diff + 24 * 60 : diff;
+}
+
+// A stopover (vs a connection) is DERIVED, never stored: a ground time long
+// enough that the hub is a destination in its own right (/prd/flights/01-glossary.md).
+const STOPOVER_THRESHOLD_MINUTES = 24 * 60;
+
+function ConnectionRow({
+  fromFlight,
+  toFlight,
+  bagThroughChecked,
+  t,
+}: {
+  fromFlight: Flight;
+  toFlight: Flight;
+  bagThroughChecked: boolean;
+  t: Translate;
+}) {
+  const airport = fromFlight.destAirport;
+  const minutes = layoverMinutes(
+    fromFlight.arrivalTimeLocal,
+    toFlight.departureTimeLocal,
+  );
+  const isStopover = minutes >= STOPOVER_THRESHOLD_MINUTES;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-muted border-l-2 border-dashed pl-3 text-xs text-muted-foreground">
+      <Badge variant="outline">
+        {isStopover ? t('stopover') : t('connection')}
+      </Badge>
+      <span>
+        {t('layoverIn', { duration: formatMinutes(minutes), airport })}
+      </span>
+      {bagThroughChecked && <span>{t('bagThroughChecked')}</span>}
+    </div>
+  );
+}
 
 function ItineraryCard({
   itinerary,
@@ -115,23 +162,36 @@ function ItineraryCard({
   locale: string;
   t: Translate;
 }) {
+  // Online connection (every flight on the same operating carrier) through-checks
+  // bags; interline through-check depends on agreement data not carried here.
+  const firstAirline = itinerary.flights[0]?.operatingAirline;
+  const bagThroughChecked =
+    itinerary.flights.length > 1 &&
+    itinerary.flights.every((f) => f.operatingAirline === firstAirline);
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-1 flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <StopsBadge itinerary={itinerary} t={t} />
-            {itinerary.flights.length > 1 && (
-              <span className="text-xs text-muted-foreground">
-                {t('duration')}:{' '}
-                {formatDuration(itinerary.flights[0]?.departureTimeLocal || '', itinerary.flights[itinerary.flights.length - 1]?.arrivalTimeLocal || '')}
-              </span>
-            )}
+            <span className="text-xs text-muted-foreground">
+              {t('duration')}: {formatMinutes(itinerary.totalDurationMinutes)}
+            </span>
           </div>
-          {itinerary.flights.map((flight) => {
+          {itinerary.flights.map((flight, index) => {
+            const nextFlight = itinerary.flights[index + 1];
             return (
               <div key={flight.id} className="flex flex-col gap-3">
                 <FlightLegSummary flight={flight} t={t} />
+                {nextFlight && (
+                  <ConnectionRow
+                    fromFlight={flight}
+                    toFlight={nextFlight}
+                    bagThroughChecked={bagThroughChecked}
+                    t={t}
+                  />
+                )}
               </div>
             );
           })}

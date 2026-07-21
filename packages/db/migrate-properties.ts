@@ -1,7 +1,9 @@
 import * as dotenv from 'dotenv';
+
 dotenv.config({ path: '../../.env' });
-import { createId } from './src/id';
+
 import { createDb } from './src/client';
+import { createId } from './src/id';
 import { property } from './src/schema/app';
 
 const db = createDb(process.env.DATABASE_URL!);
@@ -19,7 +21,7 @@ async function main() {
 
     const newUlid = createId();
     await db.execute(
-      `UPDATE property SET property_code = '${newUlid}' WHERE property_code = '${p.propertyCode}'`
+      `UPDATE property SET property_code = '${newUlid}' WHERE property_code = '${p.propertyCode}'`,
     );
     migrated++;
     console.log(`Migrated ${p.propertyCode} -> ${newUlid}`);

@@ -16,6 +16,7 @@ import { siteConfig } from '@/features/site/config';
 import { formatCurrency } from '@/libs/format-currency';
 
 import { cn } from '@/libs/utils';
+import { getEarliestDeparture } from './utils';
 
 interface TravelPackageCardProps {
   item: FlightHotelPackage;
@@ -24,10 +25,6 @@ interface TravelPackageCardProps {
 
 function formatDate(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale, { dateStyle: 'medium' });
-}
-
-function formatTime(iso: string, locale: string): string {
-  return new Date(iso).toLocaleTimeString(locale, { timeStyle: 'short' });
 }
 
 export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
@@ -45,11 +42,8 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
   const maxStars =
     stays.reduce((max, stay) => Math.max(max, stay.starRating ?? 0), 0) || 5;
 
-  const firstDeparture = [...departures].sort(
-    (a, b) =>
-      new Date(a.departureDate).getTime() -
-      new Date(b.departureDate).getTime(),
-  )[0];
+  const firstDeparture = getEarliestDeparture(departures);
+  const firstFlight = firstDeparture?.outboundFlights?.[0];
 
   let departureDateStr = '';
   if (firstDeparture) {
@@ -150,14 +144,14 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         </div>
 
         {/* 2. Airline */}
-        {firstDeparture && (
+        {firstFlight && (
           <div className="flex items-start gap-2.5">
             <Plane className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
             <div>
               <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
-                {firstDeparture.flight.airlineName}
+                {firstFlight.airlineName}
               </div>
-              {firstDeparture.flight.isDirect ? (
+              {firstFlight.isDirect ? (
                 <div className="mt-0.5">
                   <Badge className="rounded-full border-transparent bg-brand-600 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-white uppercase">
                     {t('direct')}
@@ -168,10 +162,10 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
                   <Badge className="rounded-full border-transparent bg-gray-200 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-landing-ink uppercase">
                     {t('transitIn', {
                       city:
-                        firstDeparture.flight.transitCityName ??
-                        firstDeparture.flight.transitAirport ??
+                        firstFlight.transitCityName ??
+                        firstFlight.transitAirport ??
                         '',
-                      code: firstDeparture.flight.transitAirport ?? '',
+                      code: firstFlight.transitAirport ?? '',
                     })}
                   </Badge>
                 </div>
@@ -209,20 +203,21 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         {/* Extra Info Section */}
         <div className="col-span-1 flex flex-col gap-4 min-[761px]:col-span-2">
           {/* Detailed Flight info */}
-          {firstDeparture && (
+          {firstFlight && (
             <div className="flex items-start gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Plane className="h-4 w-4" />
               </span>
               <div className="flex min-w-0 flex-col gap-0.5">
                 <p className="text-sm font-medium">
-                  {firstDeparture.flight.operatingAirline}{' '}
-                  {firstDeparture.flight.flightNumber}
+                  {firstFlight.operatingAirline} {firstFlight.flightNumber}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {firstDeparture.flight.originAirport} →{' '}
-                  {firstDeparture.flight.destAirport} ·{' '}
-                  {firstDeparture.flight.departureTimeLocal}
+                  {firstFlight.originAirport} →{' '}
+                  {firstDeparture?.outboundFlights?.[
+                    firstDeparture.outboundFlights.length - 1
+                  ]?.destAirport ?? firstFlight.destAirport}{' '}
+                  · {firstFlight.departureTimeLocal}
                 </p>
               </div>
             </div>

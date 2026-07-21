@@ -46,7 +46,7 @@ export function PropertyForm({
   const t = useTranslations('catalog.properties.fields');
   const tPropertyType = useTranslations('catalog.properties.types');
   const tCommon = useTranslations('common');
-  const isEdit = !!property;
+  const _isEdit = !!property;
 
   const form = useForm<CreatePropertyInput>({
     resolver: zodResolver(createPropertySchema),
@@ -75,8 +75,12 @@ export function PropertyForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <Tabs defaultValue="details">
           <TabsList className="w-full">
-            <TabsTrigger value="details">{t('tabDetails', { fallback: 'Details' })}</TabsTrigger>
-            <TabsTrigger value="contact">{t('tabContact', { fallback: 'Contact' })}</TabsTrigger>
+            <TabsTrigger value="details">
+              {t('tabDetails', { fallback: 'Details' })}
+            </TabsTrigger>
+            <TabsTrigger value="contact">
+              {t('tabContact', { fallback: 'Contact' })}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="details" className="flex flex-col gap-4 pt-2">
@@ -97,7 +101,10 @@ export function PropertyForm({
                   <FormItem>
                     <FormLabel>{t('type')}</FormLabel>
                     <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue />
                         </SelectTrigger>
@@ -129,7 +136,6 @@ export function PropertyForm({
                 uppercase
               />
             </div>
-
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[90px_90px_1fr]">
               <FormField
@@ -201,7 +207,7 @@ export function PropertyForm({
               placeholder={t('addressPlaceholder')}
               optional
             />
-            
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <TextFormField
                 control={form.control}

@@ -1,2 +1,5 @@
 import { describe, it } from 'vitest';
-describe('Test', () => { it('works', () => {}) });
+
+describe('Test', () => {
+  it('works', () => {});
+});

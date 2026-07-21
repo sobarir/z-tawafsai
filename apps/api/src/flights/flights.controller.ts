@@ -29,10 +29,7 @@ import { FlightsService } from './flights.service';
 @ApiTags('flights')
 @Controller('flights')
 export class FlightsController {
-  constructor(
-    private readonly flights: FlightsService,
-    
-  ) {}
+  constructor(private readonly flights: FlightsService) {}
 
   @Get()
   @ApiOperation({ operationId: 'listFlights', summary: 'List flights' })
@@ -47,9 +44,7 @@ export class FlightsController {
     summary: 'Search for direct flights by route and date',
   })
   @ApiOkResponse({ type: [FlightItineraryDto] })
-  search(
-    @Query() query: SearchFlightsDto,
-  ): Promise<FlightItinerary[]> {
+  search(@Query() query: SearchFlightsDto): Promise<FlightItinerary[]> {
     return this.flights.search(query);
   }
 

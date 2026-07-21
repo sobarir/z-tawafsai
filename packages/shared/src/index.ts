@@ -273,7 +273,6 @@ export type UpdateFlightMarketingInput = z.infer<
   typeof updateFlightMarketingSchema
 >;
 
-
 /**
  * Directional carrier-pair gate: does the inbound operating carrier permit a
  * through-ticketed interline connection onto the outbound operating carrier?
@@ -324,14 +323,12 @@ export const interlineResolutionSchema = z.object({
 });
 export type InterlineResolution = z.infer<typeof interlineResolutionSchema>;
 
-
-
 /**
  * One OTA-style search result: a direct flight (1 leg) or a one-stop
  * itinerary (2 legs).
  */
 export const flightItinerarySchema = z.object({
-  flights: z.array(flightSchema).min(1).max(2),
+  flights: z.array(flightSchema).min(1).max(3),
   stopCount: z.number().int().nonnegative(),
   totalPrice: z.number().nonnegative(),
   currency: currencyCodeSchema,
@@ -641,8 +638,8 @@ const travelPackageStaySummarySchema = z.object({
 
 const travelPackageDepartureSchema = z.object({
   id: ulidSchema,
-  flightId: ulidSchema,
-  flight: flightHotelPackageFlightSummarySchema,
+  outboundFlights: z.array(flightHotelPackageFlightSummarySchema),
+  inboundFlights: z.array(flightHotelPackageFlightSummarySchema),
   departureDate: z.iso.date(),
   returnDate: z.iso.date().nullable(),
   seatsNote: z.string().nullable(),
@@ -710,7 +707,8 @@ const createTravelPackageDepartureSchema = z.object({
   departureDate: z.iso.date(),
   /** Present when editing an existing departure — the write path upserts by id so booking rows keyed to it survive. Omit for a new departure. */
   id: ulidSchema.optional(),
-  flightId: ulidSchema,
+  outboundFlightIds: z.array(ulidSchema).min(1),
+  inboundFlightIds: z.array(ulidSchema).optional(),
   returnDate: z.iso.date().optional(),
   seatsNote: z.string().max(200).optional(),
   totalSeats: z.number().int().nonnegative().optional(),

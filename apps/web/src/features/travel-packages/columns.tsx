@@ -54,8 +54,9 @@ export function getTravelPackageColumns({
       header: columnLabels.flight,
       cell: ({ row }) => {
         const firstDeparture = row.original.departures[0];
-        if (!firstDeparture) return '-';
-        const { flight } = firstDeparture;
+        if (!firstDeparture?.outboundFlights.length) return '-';
+        const flight = firstDeparture.outboundFlights[0];
+        if (!flight) return '-';
         return (
           <div className="flex flex-col">
             <span>
@@ -63,7 +64,12 @@ export function getTravelPackageColumns({
               {flight.flightNumber}
             </span>
             <span className="text-xs text-muted-foreground">
-              {flight.originAirport}→{flight.destAirport}
+              {flight.originAirport}→
+              {
+                firstDeparture.outboundFlights[
+                  firstDeparture.outboundFlights.length - 1
+                ]?.destAirport
+              }
             </span>
           </div>
         );

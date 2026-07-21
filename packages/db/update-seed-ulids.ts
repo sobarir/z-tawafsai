@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 const map = {
   'MAD-CIN': '01KY01F0Z9W0P97VMJKY3PH099',
@@ -59,7 +59,7 @@ const map = {
   'MKK-SNOODAJYAD': '01KY01F10V9J7K7JQW0YRX3G9S',
   'MKK-VIOLET': '01KY01F10WQ349VA0TF2GZK321',
   'JED-WFH': '01KY01F10WQ349VA0TF2GZK322',
-  'MKK-MAYSANMAQAM': '01KY01F10ZFEW61V51TG6BGP52'
+  'MKK-MAYSANMAQAM': '01KY01F10ZFEW61V51TG6BGP52',
 };
 
 const seedPath = path.join(process.cwd(), 'src', 'seed.ts');

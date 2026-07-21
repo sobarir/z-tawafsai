@@ -5,14 +5,14 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
-import type { TravelPackageDtoDeparturesItemFlight } from './travelPackageDtoDeparturesItemFlight';
+import type { TravelPackageDtoDeparturesItemOutboundFlightsItem } from './travelPackageDtoDeparturesItemOutboundFlightsItem';
+import type { TravelPackageDtoDeparturesItemInboundFlightsItem } from './travelPackageDtoDeparturesItemInboundFlightsItem';
 
 export type TravelPackageDtoDeparturesItem = {
   /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
   id: string;
-  /** @pattern ^[0-9A-HJKMNP-TV-Z]{26}$ */
-  flightId: string;
-  flight: TravelPackageDtoDeparturesItemFlight;
+  outboundFlights: TravelPackageDtoDeparturesItemOutboundFlightsItem[];
+  inboundFlights: TravelPackageDtoDeparturesItemInboundFlightsItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$ */
   departureDate: string;
   /**

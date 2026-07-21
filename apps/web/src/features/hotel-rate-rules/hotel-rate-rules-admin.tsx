@@ -244,7 +244,16 @@ export function HotelRateRulesAdmin() {
         />
       );
     },
-    [filteredRateRules, t, seasons, roomTypes, tCatalog, tCommon, filters],
+    [
+      filteredRateRules,
+      t,
+      seasons,
+      roomTypes,
+      tCatalog,
+      tCommon,
+      filters,
+      DetailGrid,
+    ],
   );
 
   const masterColumns = useMemo(() => {

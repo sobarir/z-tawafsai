@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { Database } from '@repo/db';
 import { schema } from '@repo/db';
 import type {
@@ -54,8 +49,6 @@ export class HotelPropertiesService {
   }
 
   async create(input: CreatePropertyInput): Promise<Property> {
-
-
     const [row] = await this.db
       .insert(schema.property)
       .values({

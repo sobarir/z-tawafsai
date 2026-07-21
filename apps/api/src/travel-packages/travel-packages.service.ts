@@ -200,7 +200,32 @@ export class TravelPackagesService {
       (departure) => departure.packageId,
     );
 
-    const flightIds = [...new Set(departureRows.map((row) => row.flightId))];
+    // Fetch junction table rows for all departures
+    const departureIds = departureRows.map((d) => d.id);
+    let departureFlightRows: (typeof schema.travelPackageDepartureFlight.$inferSelect)[] =
+      [];
+    if (departureIds.length > 0) {
+      departureFlightRows = await this.db
+        .select()
+        .from(schema.travelPackageDepartureFlight)
+        .where(
+          inArray(
+            schema.travelPackageDepartureFlight.departureId,
+            departureIds,
+          ),
+        )
+        .orderBy(asc(schema.travelPackageDepartureFlight.sequence));
+    }
+
+    // Group junction rows by departureId and direction
+    const departureFlightsByDeparture = this.groupBy(
+      departureFlightRows,
+      (df) => df.departureId,
+    );
+
+    const flightIds = [
+      ...new Set(departureFlightRows.map((row) => row.flightId)),
+    ];
     let flights: (typeof schema.flights.$inferSelect)[] = [];
     if (flightIds.length > 0) {
       flights = await this.db
@@ -297,15 +322,19 @@ export class TravelPackagesService {
           .sort((a, b) => a.departureDate.localeCompare(b.departureDate))
           .map((departure) => {
             const bookedSeats = bookedByDeparture.get(departure.id) ?? 0;
-            const flight = flightById.get(departure.flightId);
-            const summary = flightSummaryById.get(departure.flightId);
-            if (!flight) throw new Error('Flight not found for departure');
+            const junctionRows =
+              departureFlightsByDeparture.get(departure.id) ?? [];
 
-            return {
-              id: departure.id,
-              departureDate: departure.departureDate,
-              flightId: departure.flightId,
-              flight: {
+            // Build the flight objects for OUTBOUND and INBOUND
+            const outboundFlights = [];
+            const inboundFlights = [];
+
+            for (const jRow of junctionRows) {
+              const flight = flightById.get(jRow.flightId);
+              const summary = flightSummaryById.get(jRow.flightId);
+              if (!flight) continue;
+
+              const flightSummary = {
                 id: flight.id,
                 operatingAirline: flight.operatingAirline,
                 airlineName: summary?.airlineName ?? flight.operatingAirline,
@@ -318,7 +347,20 @@ export class TravelPackagesService {
                 isDirect: summary?.isDirect ?? true,
                 transitAirport: summary?.transitAirport ?? null,
                 transitCityName: summary?.transitCityName ?? null,
-              },
+              };
+
+              if (jRow.direction === 'OUTBOUND') {
+                outboundFlights.push(flightSummary);
+              } else {
+                inboundFlights.push(flightSummary);
+              }
+            }
+
+            return {
+              id: departure.id,
+              departureDate: departure.departureDate,
+              outboundFlights,
+              inboundFlights,
               returnDate: departure.returnDate,
               seatsNote: departure.seatsNote,
               totalSeats: departure.totalSeats,
@@ -531,7 +573,6 @@ export class TravelPackagesService {
 
     for (const departure of departures) {
       const values = {
-        flightId: departure.flightId,
         departureDate: departure.departureDate,
         returnDate: departure.returnDate ?? null,
         seatsNote: departure.seatsNote ?? null,
@@ -540,16 +581,53 @@ export class TravelPackagesService {
         price: departure.price,
         currency: departure.currency,
       };
+
+      let resolvedDepartureId: string;
+
       if (departure.id && existingIds.has(departure.id)) {
+        resolvedDepartureId = departure.id;
         await tx
           .update(schema.travelPackageDeparture)
           .set(values)
-          .where(eq(schema.travelPackageDeparture.id, departure.id));
-        keptIds.add(departure.id);
-      } else {
+          .where(eq(schema.travelPackageDeparture.id, resolvedDepartureId));
+        keptIds.add(resolvedDepartureId);
+
+        // Remove existing junction rows to replace them
         await tx
+          .delete(schema.travelPackageDepartureFlight)
+          .where(
+            eq(
+              schema.travelPackageDepartureFlight.departureId,
+              resolvedDepartureId,
+            ),
+          );
+      } else {
+        const [inserted] = await tx
           .insert(schema.travelPackageDeparture)
-          .values({ packageId, ...values });
+          .values({ packageId, ...values })
+          .returning({ id: schema.travelPackageDeparture.id });
+        resolvedDepartureId = inserted.id;
+      }
+
+      // Batch-insert all junction rows for this departure
+      const junctionRows = [
+        ...departure.outboundFlightIds.map((flightId, i) => ({
+          departureId: resolvedDepartureId,
+          flightId,
+          direction: 'OUTBOUND' as const,
+          sequence: i + 1,
+        })),
+        ...(departure.inboundFlightIds ?? []).map((flightId, i) => ({
+          departureId: resolvedDepartureId,
+          flightId,
+          direction: 'INBOUND' as const,
+          sequence: i + 1,
+        })),
+      ];
+      if (junctionRows.length > 0) {
+        await tx
+          .insert(schema.travelPackageDepartureFlight)
+          .values(junctionRows);
       }
     }
 

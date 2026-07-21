@@ -10,7 +10,13 @@ import type {
 import { createFlightHotelPackageSchema } from '@repo/shared';
 import { Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type Control, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import {
+  type Control,
+  useFieldArray,
+  useForm,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 import { CheckboxFormField } from '@/components/shared/checkbox-form-field';
 import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { DateFormField } from '@/components/shared/date-form-field';
@@ -19,8 +25,8 @@ import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
 import { Button } from '@/components/ui/button';
-import type { ComboboxOption } from '@/components/ui/combobox';
-import { Form } from '@/components/ui/form';
+import { Combobox, type ComboboxOption } from '@/components/ui/combobox';
+import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TravelPackageFormProps {
@@ -58,7 +64,8 @@ function toDepartureDefaults(
   return (
     pkg?.departures.map((departure) => ({
       id: departure.id,
-      flightId: departure.flight.id,
+      outboundFlightIds: departure.outboundFlights.map((f) => f.id),
+      inboundFlightIds: departure.inboundFlights.map((f) => f.id),
       departureDate: departure.departureDate,
       returnDate: departure.returnDate ?? undefined,
       seatsNote: departure.seatsNote ?? undefined,
@@ -127,13 +134,21 @@ function StaysFieldset({
       <p className="text-xs text-muted-foreground">{t('staysHint')}</p>
       {stays.fields.map((field, index) => {
         const selectedCityCode = watchedStays[index]?.cityCode;
-        const selectedCityName = cities.find(c => c.cityCode === selectedCityCode)?.name;
-        
+        const selectedCityName = cities.find(
+          (c) => c.cityCode === selectedCityCode,
+        )?.name;
+
         let filteredPropertyOptions = propertyOptions;
         if (selectedCityName) {
-          const matchingProperties = properties.filter(p => p.destination === selectedCityName);
-          const matchingCodes = new Set(matchingProperties.map(p => p.propertyCode));
-          filteredPropertyOptions = propertyOptions.filter(opt => matchingCodes.has(opt.value));
+          const matchingProperties = properties.filter(
+            (p) => p.destination === selectedCityName,
+          );
+          const matchingCodes = new Set(
+            matchingProperties.map((p) => p.propertyCode),
+          );
+          filteredPropertyOptions = propertyOptions.filter((opt) =>
+            matchingCodes.has(opt.value),
+          );
         }
 
         return (
@@ -153,24 +168,24 @@ function StaysFieldset({
               label={t('stayProperty')}
               options={filteredPropertyOptions}
             />
-          <NumberFormField
-            control={control}
-            name={`stays.${index}.nights` as const}
-            label={t('stayNights')}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={tCommon('remove')}
-            disabled={stays.fields.length <= 1}
-            onClick={() => stays.remove(index)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      );
-    })}
+            <NumberFormField
+              control={control}
+              name={`stays.${index}.nights` as const}
+              label={t('stayNights')}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={tCommon('remove')}
+              disabled={stays.fields.length <= 1}
+              onClick={() => stays.remove(index)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      })}
       <Button
         type="button"
         variant="outline"
@@ -248,6 +263,70 @@ function InclusionsFieldset({
   );
 }
 
+// Manages a string[] field (outboundFlightIds / inboundFlightIds) within a
+// departure. Renders a fixed 2-slot UI matching the 2-stop-max architecture
+// decision. Uses useWatch + setValue on the typed `departures` top-level path
+// so no type assertions are needed — RHF can't statically resolve paths with
+// runtime indices into primitive arrays, and Controller/FormField would require
+// `as any` on the name prop.
+const MAX_FLIGHT_SLOTS = 2;
+
+function DepartureFlightPicker({
+  departureIndex,
+  direction,
+  label,
+  options,
+}: {
+  departureIndex: number;
+  direction: 'outboundFlightIds' | 'inboundFlightIds';
+  label: string;
+  options: ComboboxOption[];
+}) {
+  const { setValue } = useFormContext<CreateFlightHotelPackageInput>();
+  const departures = useWatch<CreateFlightHotelPackageInput>({
+    name: 'departures',
+  }) as CreateFlightHotelPackageInput['departures'];
+  const ids = departures?.[departureIndex]?.[direction] ?? [];
+
+  const updateSlot = (slot: number, value: string) => {
+    const next = [...ids];
+    next[slot] = value;
+    // Keep the array compact — remove trailing empty slots
+    while (next.length > 0 && !next[next.length - 1]) next.pop();
+
+    const current = departures ?? [];
+    const existing = current[departureIndex];
+    if (!existing) return;
+
+    const updated: NonNullable<CreateFlightHotelPackageInput['departures']> = [
+      ...current.slice(0, departureIndex),
+      { ...existing, [direction]: next },
+      ...current.slice(departureIndex + 1),
+    ];
+    setValue('departures', updated, { shouldDirty: true });
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      {Array.from({ length: MAX_FLIGHT_SLOTS }, (_, slot) => (
+        <FormItem key={slot}>
+          <FormLabel>
+            {label} {slot + 1}
+            {slot > 0 ? ' (Optional)' : ''}
+          </FormLabel>
+          <FormControl>
+            <Combobox
+              options={options}
+              value={ids[slot] ?? ''}
+              onChange={(v) => updateSlot(slot, v)}
+            />
+          </FormControl>
+        </FormItem>
+      ))}
+    </div>
+  );
+}
+
 // Dated group departures with per-departure seat quota. Self-contained (owns its
 // field array + labels) so the main form stays within the complexity budget.
 function DeparturesFieldset({
@@ -272,10 +351,18 @@ function DeparturesFieldset({
         >
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex-1 min-w-[200px]">
-              <ComboboxFormField
-                control={control}
-                name={`departures.${index}.flightId` as const}
-                label={t('flight')}
+              <DepartureFlightPicker
+                departureIndex={index}
+                direction="outboundFlightIds"
+                label={`${t('flight')} (Outbound)`}
+                options={flightOptions}
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <DepartureFlightPicker
+                departureIndex={index}
+                direction="inboundFlightIds"
+                label={`${t('flight')} (Inbound)`}
                 options={flightOptions}
               />
             </div>
@@ -339,7 +426,8 @@ function DeparturesFieldset({
         className="w-fit"
         onClick={() =>
           departures.append({
-            flightId: '',
+            outboundFlightIds: [],
+            inboundFlightIds: [],
             departureDate: '',
             returnDate: undefined,
             seatsNote: undefined,
@@ -399,6 +487,7 @@ export function TravelPackageForm({
         ...stay,
         sequence: index + 1,
       })),
+      departures: values.departures,
     });
   });
 
@@ -480,10 +569,10 @@ export function TravelPackageForm({
               </div>
 
               <NumberFormField
-                  control={form.control}
-                  name="durationNights"
-                  label={t('durationNights')}
-                />
+                control={form.control}
+                name="durationNights"
+                label={t('durationNights')}
+              />
 
               <CheckboxFormField
                 control={form.control}
@@ -511,12 +600,12 @@ export function TravelPackageForm({
             {/* Stays — Makkah + Madinah (and more for Umrah Plus). Nights must
                 sum to Duration; the server rejects a mismatch. */}
             <TabsContent value="stays" className="flex flex-col gap-3">
-              <StaysFieldset 
-                control={form.control} 
+              <StaysFieldset
+                control={form.control}
                 cityOptions={cityOptions}
                 cities={cities}
                 properties={properties}
-                propertyOptions={propertyOptions} 
+                propertyOptions={propertyOptions}
               />
             </TabsContent>
 

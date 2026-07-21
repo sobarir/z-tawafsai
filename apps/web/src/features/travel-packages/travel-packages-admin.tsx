@@ -50,10 +50,7 @@ export function TravelPackagesAdmin() {
     () => toFlightOptions(flights ?? []),
     [flights],
   );
-  const cityOptions = useMemo(
-    () => toCityOptions(cities ?? []),
-    [cities],
-  );
+  const cityOptions = useMemo(() => toCityOptions(cities ?? []), [cities]);
   const propertyOptions = useMemo(
     () => toPropertyOptions(properties ?? []),
     [properties],

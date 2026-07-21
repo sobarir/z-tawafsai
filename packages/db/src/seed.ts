@@ -4666,17 +4666,15 @@ async function seed() {
     });
   }
 
-  
   const uniqueFlightsMap = new Map();
   for (const f of flights) {
-    const key = f.operatingAirline + '_' + f.flightNumber;
+    const key = `${f.operatingAirline}_${f.flightNumber}`;
     if (!uniqueFlightsMap.has(key)) {
       uniqueFlightsMap.set(key, f);
     }
   }
   const uniqueFlights = Array.from(uniqueFlightsMap.values());
   for (const flight of uniqueFlights) {
-
     const [row] = await db
       .insert(schema.flights)
       .values({
@@ -4690,11 +4688,7 @@ async function seed() {
         currency: flight.currency ?? 'USD',
       })
       .onConflictDoUpdate({
-        target: [
-          schema.flights.operatingAirline,
-          schema.flights.flightNumber,
-          
-        ],
+        target: [schema.flights.operatingAirline, schema.flights.flightNumber],
         set: {
           originAirport: flight.originAirport,
           destAirport: flight.destAirport,
@@ -4710,29 +4704,30 @@ async function seed() {
         role: 'FULL' as const,
         depAirport: flight.originAirport,
         arrAirport: flight.destAirport,
-        departureTimeLocal: flight.departureTimeLocal, arrivalTimeLocal: flight.arrivalTimeLocal,
+        departureTimeLocal: flight.departureTimeLocal,
+        arrivalTimeLocal: flight.arrivalTimeLocal,
       },
     ];
 
     for (const [index, leg] of legs.entries()) {
       await db
-        .insert(schema.flightLegs).values({
+        .insert(schema.flightLegs)
+        .values({
           flightId: row.id,
           legSequence: index + 1,
           role: leg.role,
           depAirport: leg.depAirport,
           arrAirport: leg.arrAirport,
-          
-        
-departureTimeLocal: leg.departureTimeLocal,
-arrivalTimeLocal: leg.arrivalTimeLocal,})
+
+          departureTimeLocal: leg.departureTimeLocal,
+          arrivalTimeLocal: leg.arrivalTimeLocal,
+        })
         .onConflictDoUpdate({
           target: [schema.flightLegs.flightId, schema.flightLegs.legSequence],
           set: {
             role: leg.role,
             depAirport: leg.depAirport,
             arrAirport: leg.arrAirport,
-            
           },
         });
     }
@@ -4765,7 +4760,12 @@ arrivalTimeLocal: leg.arrivalTimeLocal,})
   // mct_rules has no unique constraint to target with onConflictDoUpdate —
   // find the matching row by its full identity tuple (nullable fields
   // included) and update it in place, or insert if it's new.
-  
+  // For simplicity in seeding, we just clear and re-insert.
+  await db.delete(schema.mctRules);
+  if (mctRules && mctRules.length > 0) {
+    await db.insert(schema.mctRules).values(mctRules);
+  }
+
   for (const agreement of interlineAgreements) {
     await db
       .insert(schema.interlineAgreements)
@@ -5476,27 +5476,37 @@ arrivalTimeLocal: leg.arrivalTimeLocal,})
       .delete(schema.travelPackageInclusion)
       .where(eq(schema.travelPackageInclusion.packageId, packageId));
 
-    await db
-      .insert(schema.travelPackageStay)
-      .values(
-        item.stays.map((stay) => ({
-          packageId,
-          cityCode:
-            stay.propertyCode.substring(0, 3) === 'MAD'
-              ? 'MED'
-              : stay.propertyCode.substring(0, 3),
-          ...stay,
-        })),
-      );
+    await db.insert(schema.travelPackageStay).values(
+      item.stays.map((stay) => ({
+        packageId,
+        cityCode:
+          stay.propertyCode.substring(0, 3) === 'MAD'
+            ? 'MED'
+            : stay.propertyCode.substring(0, 3),
+        ...stay,
+      })),
+    );
     if (item.departures.length > 0) {
-      await db.insert(schema.travelPackageDeparture).values(
-        item.departures.map((departure) => ({
-          packageId,
-          flightId: anchorFlight.id,
-          availableSeats: departure.totalSeats ?? null,
-          ...departure,
-        })),
-      );
+      const insertedDepartures = await db
+        .insert(schema.travelPackageDeparture)
+        .values(
+          item.departures.map((departure) => ({
+            packageId,
+            availableSeats: departure.totalSeats ?? null,
+            ...departure,
+          })),
+        )
+        .returning({ id: schema.travelPackageDeparture.id });
+
+      const junctionValues = insertedDepartures.map((dep) => ({
+        departureId: dep.id,
+        flightId: anchorFlight.id,
+        direction: 'OUTBOUND' as const,
+        sequence: 1,
+      }));
+      await db
+        .insert(schema.travelPackageDepartureFlight)
+        .values(junctionValues);
     }
     if (item.inclusions.length > 0) {
       await db.insert(schema.travelPackageInclusion).values(
