@@ -233,7 +233,9 @@ export type UpdateFlightInput = z.infer<typeof updateFlightSchema>;
 export const searchFlightsQuerySchema = z.object({
   originAirport: airportCodeSchema,
   destAirport: airportCodeSchema,
-  date: z.iso.date(),
+  // Flights are schedule templates, so search is date-agnostic; the field is
+  // kept optional for callers that still scope by a display date.
+  date: z.iso.date().optional(),
 });
 export type SearchFlightsQuery = z.infer<typeof searchFlightsQuerySchema>;
 

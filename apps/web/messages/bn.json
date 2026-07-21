@@ -419,7 +419,9 @@
     "stopover": "দীর্ঘ যাত্রাবিরতি",
     "layoverIn": "{airport}-এ {duration} যাত্রাবিরতি",
     "interlineConnection": "ইন্টারলাইন সংযোগ",
-    "bagThroughChecked": "ব্যাগেজ সরাসরি চেক করা হয়েছে"
+    "bagThroughChecked": "ব্যাগেজ সরাসরি চেক করা হয়েছে",
+    "selectJourney": "নির্বাচন",
+    "changeJourney": "পরিবর্তন"
   },
   "hotelSearch": {
     "title": "থাকার জায়গা খুঁজুন",

@@ -19,6 +19,7 @@ import type {
 import { and, asc, eq, inArray } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 import { ConnectionValidatorService } from './connection-validator.service';
+import { journeyDurationMinutes } from './journey-duration';
 
 type FlightRow = typeof schema.flights.$inferSelect;
 type FlightLegRow = typeof schema.flightLegs.$inferSelect;
@@ -166,6 +167,8 @@ export class FlightsService {
         ),
       );
 
+    const tzByAirport = await this.loadAirportTimezones();
+
     const directFlights = await this.attachLegs(directRows);
     const itineraries: FlightItinerary[] = directFlights.map((f) => ({
       flights: [f],
@@ -175,7 +178,14 @@ export class FlightsService {
       departureTimeLocal: f.departureTimeLocal,
       arrivalTimeLocal: f.arrivalTimeLocal,
       arrivalDayOffset: f.arrivalDayOffset,
-      totalDurationMinutes: 120, // Dummy duration for now
+      totalDurationMinutes: journeyDurationMinutes(
+        f.originAirport,
+        f.departureTimeLocal,
+        f.destAirport,
+        f.arrivalTimeLocal,
+        f.arrivalDayOffset,
+        tzByAirport,
+      ),
     }));
 
     // In-memory Graph for 1-Stop and 2-Stop Connections
@@ -257,18 +267,24 @@ export class FlightsService {
                 prevFlight = f;
               }
 
+              const firstFlight = newPathFlights[0];
+              const lastFlight = newPathFlights[newPathFlights.length - 1];
               itineraries.push({
                 flights: newPathFlights,
                 stopCount: totalStops,
                 totalPrice,
-                currency: newPathFlights[0].currency,
-                departureTimeLocal: newPathFlights[0].departureTimeLocal,
-                arrivalTimeLocal:
-                  newPathFlights[newPathFlights.length - 1].arrivalTimeLocal,
+                currency: firstFlight.currency,
+                departureTimeLocal: firstFlight.departureTimeLocal,
+                arrivalTimeLocal: lastFlight.arrivalTimeLocal,
                 arrivalDayOffset: dayOffset,
-                totalDurationMinutes:
-                  newPathFlights.length * 120 +
-                  (newPathFlights.length - 1) * 60, // Dummy approximation
+                totalDurationMinutes: journeyDurationMinutes(
+                  firstFlight.originAirport,
+                  firstFlight.departureTimeLocal,
+                  lastFlight.destAirport,
+                  lastFlight.arrivalTimeLocal,
+                  dayOffset,
+                  tzByAirport,
+                ),
               });
             } else {
               // Enqueue for the next hop
@@ -291,6 +307,17 @@ export class FlightsService {
   private parseLocalTime(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
+  }
+
+  /** Airport code -> IANA timezone, for turning local times into instants. */
+  private async loadAirportTimezones(): Promise<Map<string, string>> {
+    const rows = await this.db
+      .select({
+        code: schema.airports.airportCode,
+        timezone: schema.airports.timezone,
+      })
+      .from(schema.airports);
+    return new Map(rows.map((r) => [r.code, r.timezone]));
   }
 
   async findById(id: string): Promise<Flight> {

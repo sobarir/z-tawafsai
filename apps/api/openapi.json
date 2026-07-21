@@ -612,7 +612,7 @@
           },
           {
             "name": "date",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "format": "date",

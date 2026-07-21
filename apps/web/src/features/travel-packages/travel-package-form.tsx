@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type {
   City,
   CreateFlightHotelPackageInput,
+  Flight,
   FlightHotelPackage,
   Property,
 } from '@repo/shared';
@@ -14,7 +15,6 @@ import {
   type Control,
   useFieldArray,
   useForm,
-  useFormContext,
   useWatch,
 } from 'react-hook-form';
 import { CheckboxFormField } from '@/components/shared/checkbox-form-field';
@@ -25,13 +25,15 @@ import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
 import { TextFormField } from '@/components/shared/text-form-field';
 import { Button } from '@/components/ui/button';
-import { Combobox, type ComboboxOption } from '@/components/ui/combobox';
-import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form';
+import type { ComboboxOption } from '@/components/ui/combobox';
+import { Form } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { JourneySearchPicker } from './journey-search-picker';
 
 interface TravelPackageFormProps {
   travelPackage?: FlightHotelPackage;
-  flightOptions: ComboboxOption[];
+  airportOptions: ComboboxOption[];
+  flights: Flight[];
   cityOptions: ComboboxOption[];
   cities: City[];
   properties: Property[];
@@ -263,79 +265,17 @@ function InclusionsFieldset({
   );
 }
 
-// Manages a string[] field (outboundFlightIds / inboundFlightIds) within a
-// departure. Renders a fixed 2-slot UI matching the 2-stop-max architecture
-// decision. Uses useWatch + setValue on the typed `departures` top-level path
-// so no type assertions are needed — RHF can't statically resolve paths with
-// runtime indices into primitive arrays, and Controller/FormField would require
-// `as any` on the name prop.
-const MAX_FLIGHT_SLOTS = 2;
-
-function DepartureFlightPicker({
-  departureIndex,
-  direction,
-  label,
-  options,
-}: {
-  departureIndex: number;
-  direction: 'outboundFlightIds' | 'inboundFlightIds';
-  label: string;
-  options: ComboboxOption[];
-}) {
-  const { setValue } = useFormContext<CreateFlightHotelPackageInput>();
-  const departures = useWatch<CreateFlightHotelPackageInput>({
-    name: 'departures',
-  }) as CreateFlightHotelPackageInput['departures'];
-  const ids = departures?.[departureIndex]?.[direction] ?? [];
-
-  const updateSlot = (slot: number, value: string) => {
-    const next = [...ids];
-    next[slot] = value;
-    // Keep the array compact — remove trailing empty slots
-    while (next.length > 0 && !next[next.length - 1]) next.pop();
-
-    const current = departures ?? [];
-    const existing = current[departureIndex];
-    if (!existing) return;
-
-    const updated: NonNullable<CreateFlightHotelPackageInput['departures']> = [
-      ...current.slice(0, departureIndex),
-      { ...existing, [direction]: next },
-      ...current.slice(departureIndex + 1),
-    ];
-    setValue('departures', updated, { shouldDirty: true });
-  };
-
-  return (
-    <div className="flex flex-col gap-2">
-      {Array.from({ length: MAX_FLIGHT_SLOTS }, (_, slot) => (
-        <FormItem key={slot}>
-          <FormLabel>
-            {label} {slot + 1}
-            {slot > 0 ? ' (Optional)' : ''}
-          </FormLabel>
-          <FormControl>
-            <Combobox
-              options={options}
-              value={ids[slot] ?? ''}
-              onChange={(v) => updateSlot(slot, v)}
-            />
-          </FormControl>
-        </FormItem>
-      ))}
-    </div>
-  );
-}
-
 // Dated group departures with per-departure seat quota. Self-contained (owns its
 // field array + labels) so the main form stays within the complexity budget.
 function DeparturesFieldset({
   control,
-  flightOptions,
+  airportOptions,
+  flights,
   currencyOptions,
 }: {
   control: Control<CreateFlightHotelPackageInput>;
-  flightOptions: ComboboxOption[];
+  airportOptions: ComboboxOption[];
+  flights: Flight[];
   currencyOptions: ComboboxOption[];
 }) {
   const t = useTranslations('travelPackagesAdmin.travelPackages.fields');
@@ -350,20 +290,22 @@ function DeparturesFieldset({
           className="flex flex-col gap-3 border-b border-border/50 pb-4 last:border-0 last:pb-0"
         >
           <div className="flex flex-wrap items-end gap-3">
-            <div className="flex-1 min-w-[200px]">
-              <DepartureFlightPicker
+            <div className="flex-1 min-w-[280px]">
+              <JourneySearchPicker
                 departureIndex={index}
                 direction="outboundFlightIds"
                 label={`${t('flight')} (Outbound)`}
-                options={flightOptions}
+                airportOptions={airportOptions}
+                flights={flights}
               />
             </div>
-            <div className="flex-1 min-w-[200px]">
-              <DepartureFlightPicker
+            <div className="flex-1 min-w-[280px]">
+              <JourneySearchPicker
                 departureIndex={index}
                 direction="inboundFlightIds"
                 label={`${t('flight')} (Inbound)`}
-                options={flightOptions}
+                airportOptions={airportOptions}
+                flights={flights}
               />
             </div>
             <DateFormField
@@ -446,7 +388,8 @@ function DeparturesFieldset({
 
 export function TravelPackageForm({
   travelPackage,
-  flightOptions,
+  airportOptions,
+  flights,
   cityOptions,
   cities,
   properties,
@@ -592,7 +535,8 @@ export function TravelPackageForm({
             <TabsContent value="departures" className="flex flex-col gap-4">
               <DeparturesFieldset
                 control={form.control}
-                flightOptions={flightOptions}
+                airportOptions={airportOptions}
+                flights={flights}
                 currencyOptions={currencyOptions}
               />
             </TabsContent>

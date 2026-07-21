@@ -419,7 +419,9 @@
     "stopover": "Escala larga",
     "layoverIn": "Escala de {duration} en {airport}",
     "interlineConnection": "Conexión interlínea",
-    "bagThroughChecked": "Equipaje facturado hasta destino"
+    "bagThroughChecked": "Equipaje facturado hasta destino",
+    "selectJourney": "Seleccionar",
+    "changeJourney": "Cambiar"
   },
   "hotelSearch": {
     "title": "Buscar alojamientos",

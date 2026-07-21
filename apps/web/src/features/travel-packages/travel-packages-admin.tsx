@@ -11,6 +11,7 @@ import {
   getListTravelPackagesQueryKey,
   useCreateTravelPackage,
   useDeleteTravelPackage,
+  useListAirports,
   useListCities,
   useListFlights,
   useListHotelCurrencies,
@@ -24,9 +25,9 @@ import {
   useCrudFeedback,
 } from '@/libs/api/use-crud-feedback';
 import {
+  toAirportOptions,
   toCityOptions,
   toCurrencyOptions,
-  toFlightOptions,
   toPropertyOptions,
   toProviderOptions,
 } from '@/libs/combobox-options';
@@ -41,14 +42,15 @@ export function TravelPackagesAdmin() {
 
   const { data: travelPackages, isLoading } = useListTravelPackages();
   const { data: flights } = useListFlights();
+  const { data: airports } = useListAirports();
   const { data: properties } = useListHotelProperties();
   const { data: currencies } = useListHotelCurrencies();
   const { data: providers } = useListTravelProviders();
   const { data: cities } = useListCities();
 
-  const flightOptions = useMemo(
-    () => toFlightOptions(flights ?? []),
-    [flights],
+  const airportOptions = useMemo(
+    () => toAirportOptions(airports ?? []),
+    [airports],
   );
   const cityOptions = useMemo(() => toCityOptions(cities ?? []), [cities]);
   const propertyOptions = useMemo(
@@ -162,7 +164,8 @@ export function TravelPackagesAdmin() {
       >
         <TravelPackageForm
           travelPackage={editing ?? undefined}
-          flightOptions={flightOptions}
+          airportOptions={airportOptions}
+          flights={flights ?? []}
           cityOptions={cityOptions}
           cities={cities ?? []}
           properties={properties ?? []}

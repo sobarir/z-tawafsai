@@ -189,7 +189,9 @@
     "stopover": "Stopover",
     "layoverIn": "{duration} layover in {airport}",
     "interlineConnection": "Interline connection",
-    "bagThroughChecked": "Bags checked through"
+    "bagThroughChecked": "Bags checked through",
+    "selectJourney": "Select",
+    "changeJourney": "Change"
   },
   "hotelSearch": {
     "title": "Search Stays",

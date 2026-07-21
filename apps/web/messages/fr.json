@@ -419,7 +419,9 @@
     "stopover": "Escale longue",
     "layoverIn": "Escale de {duration} à {airport}",
     "interlineConnection": "Correspondance interligne",
-    "bagThroughChecked": "Bagages enregistrés jusqu'à destination"
+    "bagThroughChecked": "Bagages enregistrés jusqu'à destination",
+    "selectJourney": "Sélectionner",
+    "changeJourney": "Modifier"
   },
   "hotelSearch": {
     "title": "Rechercher des hébergements",

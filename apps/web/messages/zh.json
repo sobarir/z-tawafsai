@@ -419,7 +419,9 @@
     "stopover": "长时间停留",
     "layoverIn": "在{airport}停留{duration}",
     "interlineConnection": "跨航司联程",
-    "bagThroughChecked": "行李直挂"
+    "bagThroughChecked": "行李直挂",
+    "selectJourney": "选择",
+    "changeJourney": "更改"
   },
   "hotelSearch": {
     "title": "搜索酒店",

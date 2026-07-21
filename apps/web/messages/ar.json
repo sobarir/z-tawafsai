@@ -419,7 +419,9 @@
     "stopover": "توقف طويل",
     "layoverIn": "توقف لمدة {duration} في {airport}",
     "interlineConnection": "اتصال بين شركات الطيران",
-    "bagThroughChecked": "تسجيل الأمتعة حتى الوجهة النهائية"
+    "bagThroughChecked": "تسجيل الأمتعة حتى الوجهة النهائية",
+    "selectJourney": "اختيار",
+    "changeJourney": "تغيير"
   },
   "hotelSearch": {
     "title": "البحث عن أماكن الإقامة",
