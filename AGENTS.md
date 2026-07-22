@@ -60,11 +60,12 @@ The mechanical layer is enforced (Biome, `pnpm check:dupes` DRY gate, complexity
 - Implement what the task needs, not what it might need (YAGNI) — speculative flexibility is unread code that still has to be maintained.
 - One responsibility per function — a service method that queries, maps, and formats belongs split; Biome's cognitive-complexity warning (>15) marks where.
 - Prefer early returns over nested conditionals, pure functions over stateful helpers — both shrink the surface a reviewer (human or agent) must hold in mind.
+- Fix errors and warnings at their source — make every `pnpm typecheck` error and every `pnpm lint` / Biome warning go away by correcting the code, never by silencing it with `biome-ignore`, `as any`, `@ts-ignore`, or a disable comment. Suppress only when a real fix is impossible, and then leave a comment naming the reason — a hidden warning masks the next real bug.
 
 ## Definition of done
 
 1. `pnpm typecheck` — clean.
-2. `pnpm lint` — zero errors; do not add new warnings.
+2. `pnpm lint` — zero errors and no new warnings; fix them at the source, do not suppress (see Coding principles).
 3. `pnpm test` — for the affected app.
 4. Contract changed? `pnpm generate:api` ran and its output is committed — CI fails on drift.
 5. Schema changed? Migration from `pnpm db:generate` is committed.
