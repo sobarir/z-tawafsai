@@ -3646,6 +3646,28 @@
       "UpdateFlightDto": {
         "type": "object",
         "properties": {
+          "originAirport": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "destAirport": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "departureTimeLocal": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "arrivalTimeLocal": {
+            "type": "string",
+            "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          },
+          "arrivalDayOffset": {
+            "default": 0,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
           "aircraftType": {
             "type": "string",
             "maxLength": 10
@@ -3665,8 +3687,67 @@
           "currency": {
             "type": "string",
             "pattern": "^[A-Z]{3}$"
+          },
+          "legs": {
+            "minItems": 2,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "FULL",
+                    "TECHNICAL_STOP"
+                  ]
+                },
+                "depAirport": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "arrAirport": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$"
+                },
+                "departureTimeLocal": {
+                  "type": "string",
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                },
+                "arrivalTimeLocal": {
+                  "type": "string",
+                  "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$"
+                },
+                "departureDayOffset": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "arrivalDayOffset": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "role",
+                "depAirport",
+                "arrAirport",
+                "departureTimeLocal",
+                "arrivalTimeLocal"
+              ]
+            }
           }
-        }
+        },
+        "required": [
+          "originAirport",
+          "destAirport",
+          "departureTimeLocal",
+          "arrivalTimeLocal",
+          "price",
+          "currency"
+        ]
       },
       "FlightMarketingDto": {
         "type": "object",

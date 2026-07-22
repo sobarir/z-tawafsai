@@ -94,6 +94,8 @@ export * from './updateAirportDto';
 export * from './updateCityDto';
 export * from './updateCurrencyDto';
 export * from './updateFlightDto';
+export * from './updateFlightDtoLegsItem';
+export * from './updateFlightDtoLegsItemRole';
 export * from './updateFlightDtoStatus';
 export * from './updateFlightMarketingDto';
 export * from './updateFxRateDto';

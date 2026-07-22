@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Airline, Airport, CreateFlightInput } from '@repo/shared';
+import type { Airline, Airport, CreateFlightInput, Flight } from '@repo/shared';
 import { createFlightSchema, legRoleSchema } from '@repo/shared';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -33,21 +33,75 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toAirlineOptions, toAirportOptions } from '@/libs/combobox-options';
 import { FlightPriceFields } from './flight-price-fields';
 
-interface FlightCreateFormProps {
+/** Blank form state for the create flow. */
+export const emptyFlightFormValues: CreateFlightInput = {
+  operatingAirline: '',
+  flightNumber: '',
+  originAirport: '',
+  destAirport: '',
+  departureTimeLocal: '',
+  arrivalTimeLocal: '',
+  arrivalDayOffset: 0,
+  aircraftType: undefined,
+  status: 'ACTIVE',
+  price: 0,
+  currency: 'USD',
+  legs: undefined,
+};
+
+/**
+ * Turn an existing flight into editable form values. A single-leg flight keeps
+ * `legs` undefined (the multi-leg editor stays collapsed and the server
+ * re-derives the one FULL leg); a technical-stop flight seeds the leg editor.
+ */
+export function flightToFormValues(flight: Flight): CreateFlightInput {
+  const isMultiLeg = flight.legs.length > 1;
+  return {
+    operatingAirline: flight.operatingAirline,
+    flightNumber: flight.flightNumber,
+    originAirport: flight.originAirport,
+    destAirport: flight.destAirport,
+    departureTimeLocal: flight.departureTimeLocal,
+    arrivalTimeLocal: flight.arrivalTimeLocal,
+    arrivalDayOffset: flight.arrivalDayOffset,
+    aircraftType: flight.aircraftType ?? undefined,
+    status: flight.status,
+    price: flight.price,
+    currency: flight.currency,
+    legs: isMultiLeg
+      ? flight.legs.map((leg) => ({
+          role: leg.role,
+          depAirport: leg.depAirport,
+          arrAirport: leg.arrAirport,
+          departureTimeLocal: leg.departureTimeLocal,
+          arrivalTimeLocal: leg.arrivalTimeLocal,
+          departureDayOffset: leg.departureDayOffset,
+          arrivalDayOffset: leg.arrivalDayOffset,
+        }))
+      : undefined,
+  };
+}
+
+interface FlightFormProps {
   airports: Airport[];
   airlines: Airline[];
+  /** `edit` locks the identity keys (operating airline + flight number). */
+  mode: 'create' | 'edit';
+  defaultValues: CreateFlightInput;
   onSubmit: (values: CreateFlightInput) => Promise<void>;
   onCancel: () => void;
   submitting: boolean;
 }
 
-export function FlightCreateForm({
+export function FlightForm({
   airports,
   airlines,
+  mode,
+  defaultValues,
   onSubmit,
   onCancel,
   submitting,
-}: FlightCreateFormProps) {
+}: FlightFormProps) {
   const t = useTranslations('schedule.flights.fields');
   const tStatus = useTranslations('schedule.flights.status');
   const tLegRole = useTranslations('schedule.flights.legRole');
@@ -55,6 +109,7 @@ export function FlightCreateForm({
 
   const airportOptions = toAirportOptions(airports);
   const airlineOptions = toAirlineOptions(airlines);
+  const identityLocked = mode === 'edit';
 
   const form = useForm<CreateFlightInput>({
     resolver: async (data, context, options) => {
@@ -62,23 +117,11 @@ export function FlightCreateForm({
       if (processedData.legs && processedData.legs.length === 0) {
         processedData.legs = undefined;
       }
+      // biome-ignore lint/suspicious/noExplicitAny: RHF resolver generic mismatch with the Zod schema
       const resolver = zodResolver(createFlightSchema) as any;
       return resolver(processedData, context, options);
     },
-    defaultValues: {
-      operatingAirline: '',
-      flightNumber: '',
-      originAirport: '',
-      destAirport: '',
-      departureTimeLocal: '',
-      arrivalTimeLocal: '',
-      arrivalDayOffset: 0,
-      aircraftType: undefined,
-      status: 'ACTIVE',
-      price: 0,
-      currency: 'USD',
-      legs: undefined,
-    },
+    defaultValues,
   });
 
   const legs = useFieldArray({ control: form.control, name: 'legs' });
@@ -128,23 +171,28 @@ export function FlightCreateForm({
           <TabsContent value="details" className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ComboboxFormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="operatingAirline"
                 label={t('operatingAirline')}
                 options={airlineOptions}
+                disabled={identityLocked}
               />
 
               <TextFormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="flightNumber"
                 label={t('flightNumber')}
                 placeholder={t('flightNumberPlaceholder')}
                 uppercase
+                disabled={identityLocked}
               />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ComboboxFormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="originAirport"
                 label={t('originAirport')}
@@ -152,6 +200,7 @@ export function FlightCreateForm({
               />
 
               <ComboboxFormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="destAirport"
                 label={t('destAirport')}
@@ -161,6 +210,7 @@ export function FlightCreateForm({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <FormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="departureTimeLocal"
                 render={({ field }) => (
@@ -175,6 +225,7 @@ export function FlightCreateForm({
               />
 
               <FormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="arrivalTimeLocal"
                 render={({ field }) => (
@@ -189,6 +240,7 @@ export function FlightCreateForm({
               />
 
               <NumberFormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="arrivalDayOffset"
                 label={t('arrivalDayOffset')}
@@ -197,6 +249,7 @@ export function FlightCreateForm({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <TextFormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="aircraftType"
                 label={t('aircraftType')}
@@ -206,6 +259,7 @@ export function FlightCreateForm({
               />
 
               <FormField
+                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                 control={form.control as any}
                 name="status"
                 render={({ field }) => (
@@ -233,6 +287,7 @@ export function FlightCreateForm({
               />
             </div>
 
+            {/* biome-ignore lint/suspicious/noExplicitAny: shared field control generic */}
             <FlightPriceFields control={form.control as any} />
           </TabsContent>
 
@@ -255,7 +310,9 @@ export function FlightCreateForm({
                   >
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       <FormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.role` as any}
                         render={({ field }) => (
                           <FormItem>
@@ -283,14 +340,18 @@ export function FlightCreateForm({
                       />
 
                       <ComboboxFormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.depAirport` as any}
                         label={t('legDepAirport')}
                         options={airportOptions}
                       />
 
                       <ComboboxFormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.arrAirport` as any}
                         label={t('legArrAirport')}
                         options={airportOptions}
@@ -299,7 +360,9 @@ export function FlightCreateForm({
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
                       <FormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.departureTimeLocal` as any}
                         render={({ field }) => (
                           <FormItem>
@@ -317,13 +380,17 @@ export function FlightCreateForm({
                       />
 
                       <NumberFormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.departureDayOffset` as any}
                         label={t('departureDayOffset')}
                       />
 
                       <FormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.arrivalTimeLocal` as any}
                         render={({ field }) => (
                           <FormItem>
@@ -341,7 +408,9 @@ export function FlightCreateForm({
                       />
 
                       <NumberFormField
+                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
                         control={form.control as any}
+                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
                         name={`legs.${index}.arrivalDayOffset` as any}
                         label={t('arrivalDayOffset')}
                       />

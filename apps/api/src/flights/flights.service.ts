@@ -59,7 +59,18 @@ const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
  * flight origin, last leg arrives the flight destination, and legs are
  * sequentially connected.
  */
-function buildFlightLegs(input: CreateFlightInput): CreateFlightLegInput[] {
+/** The header fields buildFlightLegs reads — satisfied by both create and update inputs. */
+type FlightLegSource = Pick<
+  CreateFlightInput,
+  | 'originAirport'
+  | 'destAirport'
+  | 'departureTimeLocal'
+  | 'arrivalTimeLocal'
+  | 'arrivalDayOffset'
+  | 'legs'
+>;
+
+function buildFlightLegs(input: FlightLegSource): CreateFlightLegInput[] {
   if (!input.legs || input.legs.length === 0) {
     return [
       {
@@ -396,20 +407,56 @@ export class FlightsService {
 
   async update(id: string, input: UpdateFlightInput): Promise<Flight> {
     await this.findById(id);
-    const [updated] = await this.db
-      .update(schema.flights)
-      .set(input)
-      .where(eq(schema.flights.id, id))
-      .returning();
-    const legRows = await this.db
-      .select()
-      .from(schema.flightLegs)
-      .where(eq(schema.flightLegs.flightId, id))
-      .orderBy(asc(schema.flightLegs.legSequence));
-    if (!updated) {
-      throw new NotFoundException(`Flight ${id} not found after update`);
-    }
-    return toFlight(updated, legRows);
+    // Rebuild the legs from the incoming schedule, enforcing the same
+    // origin/dest/contiguity invariants as create. The operating airline and
+    // flight number are immutable identity keys (not in UpdateFlightInput), so
+    // uniqueness cannot be violated by an edit.
+    const legs = buildFlightLegs(input);
+
+    return this.db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(schema.flights)
+        .set({
+          originAirport: input.originAirport,
+          destAirport: input.destAirport,
+          departureTimeLocal: input.departureTimeLocal,
+          arrivalTimeLocal: input.arrivalTimeLocal,
+          arrivalDayOffset: input.arrivalDayOffset,
+          aircraftType: input.aircraftType ?? null,
+          status: input.status,
+          price: input.price,
+          currency: input.currency,
+        })
+        .where(eq(schema.flights.id, id))
+        .returning();
+      if (!updated) {
+        throw new NotFoundException(`Flight ${id} not found after update`);
+      }
+
+      // The flight owns its legs — replace them wholesale so a single-leg flight
+      // can gain a technical stop (or lose one) in one edit.
+      await tx
+        .delete(schema.flightLegs)
+        .where(eq(schema.flightLegs.flightId, id));
+      const legRows = await tx
+        .insert(schema.flightLegs)
+        .values(
+          legs.map((leg, index) => ({
+            flightId: id,
+            legSequence: index + 1,
+            role: leg.role,
+            depAirport: leg.depAirport,
+            arrAirport: leg.arrAirport,
+            departureTimeLocal: leg.departureTimeLocal,
+            arrivalTimeLocal: leg.arrivalTimeLocal,
+            departureDayOffset: leg.departureDayOffset,
+            arrivalDayOffset: leg.arrivalDayOffset,
+          })),
+        )
+        .returning();
+
+      return toFlight(updated, legRows);
+    });
   }
 
   async delete(id: string): Promise<void> {

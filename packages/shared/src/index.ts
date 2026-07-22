@@ -221,11 +221,15 @@ export const createFlightSchema = z.object({
 });
 export type CreateFlightInput = z.infer<typeof createFlightSchema>;
 
-export const updateFlightSchema = z.object({
-  aircraftType: z.string().max(10).optional(),
-  status: flightStatusSchema.optional(),
-  price: z.number().nonnegative().optional(),
-  currency: currencyCodeSchema.optional(),
+/**
+ * Update accepts the full editable schedule — route, times, day offset, legs,
+ * and attributes — everything except the immutable identity keys (operating
+ * airline + flight number), which are fixed at creation. Like create, omitting
+ * `legs` re-derives a single FULL leg from the header times.
+ */
+export const updateFlightSchema = createFlightSchema.omit({
+  operatingAirline: true,
+  flightNumber: true,
 });
 export type UpdateFlightInput = z.infer<typeof updateFlightSchema>;
 

@@ -5,14 +5,14 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
-import type { UpdateFlightDtoStatus } from './updateFlightDtoStatus';
-import type { UpdateFlightDtoLegsItem } from './updateFlightDtoLegsItem';
+import type { UpdateFlightDtoLegsItemRole } from './updateFlightDtoLegsItemRole';
 
-export interface UpdateFlightDto {
+export type UpdateFlightDtoLegsItem = {
+  role: UpdateFlightDtoLegsItemRole;
   /** @pattern ^[A-Z]{3}$ */
-  originAirport: string;
+  depAirport: string;
   /** @pattern ^[A-Z]{3}$ */
-  destAirport: string;
+  arrAirport: string;
   /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
   departureTimeLocal: string;
   /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
@@ -21,14 +21,10 @@ export interface UpdateFlightDto {
    * @minimum -9007199254740991
    * @maximum 9007199254740991
    */
+  departureDayOffset?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
   arrivalDayOffset?: number;
-  /** @maxLength 10 */
-  aircraftType?: string;
-  status?: UpdateFlightDtoStatus;
-  /** @minimum 0 */
-  price: number;
-  /** @pattern ^[A-Z]{3}$ */
-  currency: string;
-  /** @minItems 2 */
-  legs?: UpdateFlightDtoLegsItem[];
-}
+};

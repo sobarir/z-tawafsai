@@ -51,8 +51,11 @@ function getOffsetMinutes(timeZone: string): number {
   }
 }
 
-import { FlightCreateForm } from './flight-create-form';
-import { FlightEditForm } from './flight-edit-form';
+import {
+  emptyFlightFormValues,
+  FlightForm,
+  flightToFormValues,
+} from './flight-form';
 import { FlightLegsDialog } from './flight-legs-dialog';
 
 export function FlightsAdmin() {
@@ -293,9 +296,11 @@ export function FlightsAdmin() {
         title={t('createTitle')}
         contentClassName="sm:max-w-2xl"
       >
-        <FlightCreateForm
+        <FlightForm
+          mode="create"
           airports={airports ?? []}
           airlines={airlines ?? []}
+          defaultValues={emptyFlightFormValues}
           submitting={createMutation.isPending}
           onCancel={() => setCreateOpen(false)}
           onSubmit={async (values) => {
@@ -308,17 +313,22 @@ export function FlightsAdmin() {
         open={!!editing}
         onOpenChange={(open) => !open && setEditing(null)}
         title={t('editTitle')}
-        contentClassName="sm:max-w-md"
+        contentClassName="sm:max-w-2xl"
       >
         {editing ? (
-          <FlightEditForm
-            flight={editing}
+          <FlightForm
+            mode="edit"
+            airports={airports ?? []}
+            airlines={airlines ?? []}
+            defaultValues={flightToFormValues(editing)}
             submitting={updateMutation.isPending}
             onCancel={() => setEditing(null)}
             onSubmit={async (values) => {
+              // Identity keys are immutable; the update contract omits them.
+              const { operatingAirline, flightNumber, ...data } = values;
               await updateMutation.mutateAsync({
                 id: editing.id,
-                data: values,
+                data,
               });
             }}
           />
