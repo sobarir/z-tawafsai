@@ -5,7 +5,7 @@ import type { Airline, Airport, CreateFlightInput, Flight } from '@repo/shared';
 import { createFlightSchema, legRoleSchema } from '@repo/shared';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 import { ComboboxFormField } from '@/components/shared/combobox-form-field';
 import { FormDialogActions } from '@/components/shared/form-dialog-actions';
 import { NumberFormField } from '@/components/shared/number-form-field';
@@ -112,15 +112,10 @@ export function FlightForm({
   const identityLocked = mode === 'edit';
 
   const form = useForm<CreateFlightInput>({
-    resolver: async (data, context, options) => {
-      const processedData = { ...data };
-      if (processedData.legs && processedData.legs.length === 0) {
-        processedData.legs = undefined;
-      }
-      // biome-ignore lint/suspicious/noExplicitAny: RHF resolver generic mismatch with the Zod schema
-      const resolver = zodResolver(createFlightSchema) as any;
-      return resolver(processedData, context, options);
-    },
+    // zodResolver infers the schema's *input* type (arrivalDayOffset optional,
+    // legs pre-.min(2)), which doesn't unify with useForm's *output* CreateFlightInput.
+    // Assert the concrete resolver type — sound at runtime, and typed (not `any`).
+    resolver: zodResolver(createFlightSchema) as Resolver<CreateFlightInput>,
     defaultValues,
   });
 
@@ -151,7 +146,9 @@ export function FlightForm({
         },
       ]);
     } else {
-      form.setValue('legs', []);
+      // undefined (not []) so the schema's `.min(2)` never sees an empty array
+      // and a single-leg flight round-trips to the server as "no legs given".
+      form.setValue('legs', undefined);
     }
   };
 
@@ -171,8 +168,7 @@ export function FlightForm({
           <TabsContent value="details" className="mt-4 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ComboboxFormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="operatingAirline"
                 label={t('operatingAirline')}
                 options={airlineOptions}
@@ -180,8 +176,7 @@ export function FlightForm({
               />
 
               <TextFormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="flightNumber"
                 label={t('flightNumber')}
                 placeholder={t('flightNumberPlaceholder')}
@@ -192,16 +187,14 @@ export function FlightForm({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ComboboxFormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="originAirport"
                 label={t('originAirport')}
                 options={airportOptions}
               />
 
               <ComboboxFormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="destAirport"
                 label={t('destAirport')}
                 options={airportOptions}
@@ -210,8 +203,7 @@ export function FlightForm({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <FormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="departureTimeLocal"
                 render={({ field }) => (
                   <FormItem>
@@ -225,8 +217,7 @@ export function FlightForm({
               />
 
               <FormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="arrivalTimeLocal"
                 render={({ field }) => (
                   <FormItem>
@@ -240,8 +231,7 @@ export function FlightForm({
               />
 
               <NumberFormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="arrivalDayOffset"
                 label={t('arrivalDayOffset')}
               />
@@ -249,8 +239,7 @@ export function FlightForm({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <TextFormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="aircraftType"
                 label={t('aircraftType')}
                 placeholder={t('aircraftTypePlaceholder')}
@@ -259,8 +248,7 @@ export function FlightForm({
               />
 
               <FormField
-                // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                control={form.control as any}
+                control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
@@ -287,8 +275,7 @@ export function FlightForm({
               />
             </div>
 
-            {/* biome-ignore lint/suspicious/noExplicitAny: shared field control generic */}
-            <FlightPriceFields control={form.control as any} />
+            <FlightPriceFields control={form.control} />
           </TabsContent>
 
           <TabsContent value="legs" className="mt-4 flex flex-col gap-4">
@@ -310,10 +297,8 @@ export function FlightForm({
                   >
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       <FormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.role` as any}
+                        control={form.control}
+                        name={`legs.${index}.role`}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t('legRole')}</FormLabel>
@@ -340,19 +325,15 @@ export function FlightForm({
                       />
 
                       <ComboboxFormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.depAirport` as any}
+                        control={form.control}
+                        name={`legs.${index}.depAirport`}
                         label={t('legDepAirport')}
                         options={airportOptions}
                       />
 
                       <ComboboxFormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.arrAirport` as any}
+                        control={form.control}
+                        name={`legs.${index}.arrAirport`}
                         label={t('legArrAirport')}
                         options={airportOptions}
                       />
@@ -360,10 +341,8 @@ export function FlightForm({
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
                       <FormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.departureTimeLocal` as any}
+                        control={form.control}
+                        name={`legs.${index}.departureTimeLocal`}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t('legDeparture')}</FormLabel>
@@ -380,18 +359,14 @@ export function FlightForm({
                       />
 
                       <NumberFormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.departureDayOffset` as any}
+                        control={form.control}
+                        name={`legs.${index}.departureDayOffset`}
                         label={t('departureDayOffset')}
                       />
 
                       <FormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.arrivalTimeLocal` as any}
+                        control={form.control}
+                        name={`legs.${index}.arrivalTimeLocal`}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t('legArrival')}</FormLabel>
@@ -408,10 +383,8 @@ export function FlightForm({
                       />
 
                       <NumberFormField
-                        // biome-ignore lint/suspicious/noExplicitAny: shared field control generic
-                        control={form.control as any}
-                        // biome-ignore lint/suspicious/noExplicitAny: RHF field-array path
-                        name={`legs.${index}.arrivalDayOffset` as any}
+                        control={form.control}
+                        name={`legs.${index}.arrivalDayOffset`}
                         label={t('arrivalDayOffset')}
                       />
                     </div>
