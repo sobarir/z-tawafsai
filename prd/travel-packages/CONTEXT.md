@@ -5,6 +5,33 @@
 
 ## Current step
 
+**2026-07-21 — flight moved to departure level + inbound/outbound journeys composed from OTA route
+search.** The 1:1 `travel_package.flight_id` link was replaced by a per-departure, multi-flight
+model. Each **departure** now carries two ordered **journeys** — an **outbound** and an **inbound** —
+where a journey is a sequence of one or more flights (a connection, not just a single leg):
+
+- **`travel_package_departure_flight`** junction table (migration `0030`) links a departure to a
+  `flight` with a `direction` (`journey_direction` enum: outbound | inbound) and a positive
+  `sequence`. Unique on `(departureId, direction, sequence)`; `ON DELETE cascade` from the departure.
+  The old single `flight_id` column on the package is gone — a package no longer has one flight; each
+  of its departures composes its own outbound + inbound journeys.
+- **Composed via OTA route search, not a flight-id combobox.** The admin composes each journey through
+  a **journey-search picker** (`journey-search-picker.tsx`) — a popover that runs the existing OTA
+  route search and shows datatable-style results with an `itinerary-visual` per row. Picking a result
+  fills the journey; a *Change* button re-opens the picker.
+- **Journey duration** is computed timezone-correctly by `apps/api/src/flights/journey-duration.ts`
+  (schedule search is date-agnostic, so a fixed reference instant resolves zone offsets — exact for
+  the DST-free corridors this serves, ≤1h off near a DST boundary elsewhere).
+- **Connection validity** is checked by a new `connection-validator.service.ts` in the flights domain
+  (MCT / max-connection window), reusing the flight domain's connection rules rather than duplicating
+  them here.
+- Departure response gains `outboundFlights` / `inboundFlights` (ordered flight arrays); the package
+  form and card render journeys instead of a single flight. Migration `acb3c36` backfilled the
+  missing junction-table migration; `44f2be1` made the seed idempotent for this path.
+
+Follow-up polish committed same day: journey search moved into a popup with datatable-style results
+(`7e3cf3b`) and a *Change*-button overflow fix (`8641584`).
+
 **2026-07-19 — provider (agent partner) + per-seat commission + earnings report.** The app owner is
 a **marketing agent** reselling packages from multiple umrah travel companies. Added:
 
@@ -67,10 +94,13 @@ Earlier history: the domain + City were originally built and committed in a sing
   `totalSeats` quota and back-office `travel_package_booking` records, with server-side overbooking
   rejection. It remains **back-office only** — no public self-service booking; the public CTA is a
   WhatsApp deep link and staff enter the booking. `seatsNote` survives as a display override.
-- **A package has one Flight + one-or-more ordered Property stays** (reversed 2026-07-18 from the
-  original "exactly one Property"). Stays live in `travel_package_stay` (Makkah + Madinah, plus a
-  third city for umrah_plus); stay nights must sum to `durationNights` (enforced in the service).
-  Multi-flight bundling is still out of scope — `flightId` stays 1:1.
+- **Flights live at the departure level as ordered inbound/outbound journeys** (reversed 2026-07-21
+  from the earlier "one Flight per package, `flightId` 1:1"). Each departure composes an outbound and
+  an inbound journey, each a sequence of one or more flights, via `travel_package_departure_flight`
+  (see the 2026-07-21 Current step). The package no longer has a `flight_id` column.
+- **A package has one-or-more ordered Property stays** (reversed 2026-07-18 from the original
+  "exactly one Property"). Stays live in `travel_package_stay` (Makkah + Madinah, plus a third city
+  for umrah_plus); stay nights must sum to `durationNights` (enforced in the service).
 - **Public list is anonymous-readable** (`@AllowAnonymous()` on the `GET` routes) — the only
   anonymous-readable surface added by either the hotels or travel-packages domains so far; hotels
   search stays gated behind auth (see `/prd/hotels/CONTEXT.md`).
@@ -105,14 +135,15 @@ Earlier history: the domain + City were originally built and committed in a sing
 
 See `20-steps.md` — all 9 retroactively-logged steps are complete and committed.
 
-## Entity table (3 top-level entities: 8 tables — plus dependencies on Flight/Property from other domains)
+## Entity table (3 top-level entities: 9 tables — plus dependencies on Flight/Property from other domains)
 
 | # | Entity | Table | Key | Admin CRUD | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 1 | City | `city` | city code (natural key) | `reference/cities` | Cross-domain reference data; also consumed by flights (`airports.city_code`) and hotels (destination combobox). |
-| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | References one Flight + one-or-more Property stays + one Provider. `flyerUrl` (uploaded), `feePerSeat` (agent commission). Public list at `/packages`. |
+| 2 | Travel Package | `travel_package` (Drizzle: `flightHotelPackage`) | ULID | `travel-packages/admin` | One-or-more Property stays + one Provider; flights now live per-departure (no `flight_id`). `flyerUrl` (uploaded), `feePerSeat` (agent commission). Public list at `/packages`. |
 | 2a | — Stay | `travel_package_stay` | ULID | (via package form) | Ordered city stay → `property`. Nights sum to `durationNights`. |
-| 2b | — Departure | `travel_package_departure` | ULID | (via package form) | Dated group departure; `totalSeats` quota (nullable), `seatsNote` display override. Upserted by id. |
+| 2b | — Departure | `travel_package_departure` | ULID | (via package form) | Dated group departure; `totalSeats` quota (nullable), `seatsNote` display override. Upserted by id. Composes outbound + inbound journeys via 2f. |
+| 2f | — Departure flight | `travel_package_departure_flight` | ULID | (via package form / journey picker) | Junction departure → `flight` with `direction` (outbound/inbound) + `sequence`; an ordered journey. Cascade from departure. |
 | 2c | — Inclusion | `travel_package_inclusion` | ULID | (via package form) | Included/excluded line item. |
 | 2d | — Itinerary day | `travel_package_itinerary_day` | ULID | (not yet in UI) | Day-by-day program. |
 | 2e | — Booking | `travel_package_booking` | ULID | `travel-package-bookings` (admin-only) | Back-office reservation vs a departure; confirmed pax consume the quota. |
