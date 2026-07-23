@@ -1620,10 +1620,11 @@ async function seed() {
       });
   }
 
-  // Physical flights, each with its single FULL leg and operating-carrier
-  // marketing row. Idempotent: upsert the flight by (operating_airline,
-  // flight_number), then rewrite its leg + marketing rows — both key off the
-  // flight's generated ULID, so a plain re-insert would duplicate them.
+  // Physical flights with their operating-carrier marketing row. Every seeded
+  // flight is nonstop, so none gets a `flight_legs` row — legs describe technical
+  // stops only. Idempotent: upsert the flight by (operating_airline,
+  // flight_number), then rewrite its marketing row — it keys off the flight's
+  // generated ULID, so a plain re-insert would duplicate it.
   for (const flight of flightSeeds) {
     const flightValues = {
       operatingAirline: flight.operatingAirline,
@@ -1646,20 +1647,10 @@ async function seed() {
       })
       .returning({ id: schema.flights.id });
 
+    // Clear legs in case this flight was seeded before legs became stop-only.
     await db
       .delete(schema.flightLegs)
       .where(eq(schema.flightLegs.flightId, row.id));
-    await db.insert(schema.flightLegs).values({
-      flightId: row.id,
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: flight.originAirport,
-      arrAirport: flight.destAirport,
-      departureTimeLocal: flight.departureTimeLocal,
-      arrivalTimeLocal: flight.arrivalTimeLocal,
-      departureDayOffset: 0,
-      arrivalDayOffset: flight.arrivalDayOffset,
-    });
 
     await db
       .delete(schema.flightMarketing)

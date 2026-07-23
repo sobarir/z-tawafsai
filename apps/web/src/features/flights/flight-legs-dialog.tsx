@@ -29,13 +29,47 @@ function parseTimeToMinutes(timeStr: string, dayOffset: number) {
   return dayOffset * 24 * 60 + hours * 60 + minutes;
 }
 
+/** One row of the dialog's table — a stored leg, or the derived nonstop row. */
+type DisplayLeg = Pick<
+  Flight['legs'][number],
+  | 'id'
+  | 'legSequence'
+  | 'depAirport'
+  | 'arrAirport'
+  | 'departureTimeLocal'
+  | 'arrivalTimeLocal'
+  | 'departureDayOffset'
+  | 'arrivalDayOffset'
+>;
+
+/**
+ * A nonstop flight stores no legs — its single hop is the flight itself. Derive
+ * that row for display rather than storing it, so the dialog reads the same for
+ * every flight without a copy of the header sitting in the database.
+ */
+function toDisplayLegs(flight: Flight): DisplayLeg[] {
+  if (flight.legs.length > 0) return flight.legs;
+  return [
+    {
+      id: flight.id,
+      legSequence: 1,
+      depAirport: flight.originAirport,
+      arrAirport: flight.destAirport,
+      departureTimeLocal: flight.departureTimeLocal,
+      arrivalTimeLocal: flight.arrivalTimeLocal,
+      departureDayOffset: 0,
+      arrivalDayOffset: flight.arrivalDayOffset,
+    },
+  ];
+}
+
 export function FlightLegsDialog({
   flight,
   onOpenChange,
 }: FlightLegsDialogProps) {
   const t = useTranslations('schedule.flights');
   const tFields = useTranslations('schedule.flights.fields');
-  const tLegRole = useTranslations('schedule.flights.legRole');
+  const displayLegs = flight ? toDisplayLegs(flight) : [];
 
   return (
     <Dialog open={!!flight} onOpenChange={onOpenChange}>
@@ -49,7 +83,6 @@ export function FlightLegsDialog({
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
-              <TableHead>{tFields('legRole')}</TableHead>
               <TableHead>{tFields('legDepAirport')}</TableHead>
               <TableHead>{tFields('legArrAirport')}</TableHead>
               <TableHead>{tFields('legDeparture')}</TableHead>
@@ -57,8 +90,8 @@ export function FlightLegsDialog({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {flight?.legs.map((leg, index) => {
-              const prevLeg = index > 0 ? flight.legs[index - 1] : null;
+            {displayLegs.map((leg, index) => {
+              const prevLeg = index > 0 ? displayLegs[index - 1] : null;
               let transitRow = null;
 
               if (prevLeg && prevLeg.arrAirport === leg.depAirport) {
@@ -76,7 +109,7 @@ export function FlightLegsDialog({
                   transitRow = (
                     <TableRow key={`transit-${leg.id}`} className="bg-muted/30">
                       <TableCell
-                        colSpan={6}
+                        colSpan={5}
                         className="text-center text-xs text-muted-foreground py-1.5"
                       >
                         Transit in {leg.depAirport}:{' '}
@@ -92,7 +125,6 @@ export function FlightLegsDialog({
                   {transitRow}
                   <TableRow>
                     <TableCell>{leg.legSequence}</TableCell>
-                    <TableCell>{tLegRole(leg.role)}</TableCell>
                     <TableCell>{leg.depAirport}</TableCell>
                     <TableCell>{leg.arrAirport}</TableCell>
                     <TableCell>
@@ -122,7 +154,7 @@ export function FlightLegsDialog({
           </TableBody>
         </Table>
         <p className="text-sm text-muted-foreground">
-          {t('legsSummary', { count: flight?.legs.length ?? 0 })}
+          {t('legsSummary', { count: displayLegs.length })}
         </p>
       </DialogContent>
     </Dialog>

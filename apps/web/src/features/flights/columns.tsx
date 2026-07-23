@@ -64,7 +64,7 @@ function ItineraryCell({ row }: { row: FlightRow }) {
       arrivalDayOffset={row.arrivalDayOffset}
       destAirport={row.destAirport}
       durationMins={row.durationMins}
-      stops={row.legs.length - 1}
+      stops={Math.max(row.legs.length - 1, 0)}
     />
   );
 }

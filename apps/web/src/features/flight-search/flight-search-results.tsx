@@ -19,15 +19,6 @@ interface FlightSearchResultsProps {
 // the message catalog grows (TS2589).
 type Translate = ReturnType<typeof useTranslations<'flightSearch'>>;
 
-/** Every touchdown in the itinerary: technical stops within a flight, plus connecting hubs between flights. */
-function totalStops(itinerary: FlightItinerary): number {
-  const technicalStops = itinerary.flights.reduce(
-    (sum, flight) => sum + Math.max(flight.legs.length - 1, 0),
-    0,
-  );
-  return itinerary.stopCount + technicalStops;
-}
-
 function viaAirports(itinerary: FlightItinerary): string[] {
   const airports: string[] = [];
   itinerary.flights.forEach((flight, index) => {
@@ -48,7 +39,10 @@ function StopsBadge({
   itinerary: FlightItinerary;
   t: Translate;
 }) {
-  const stops = totalStops(itinerary);
+  // `stopCount` is already every touchdown in the itinerary — the API sums the
+  // technical stops inside each flight and adds one per connection between
+  // them. Re-deriving technical stops from `legs` here counted them twice.
+  const stops = itinerary.stopCount;
 
   if (stops <= 0) {
     return <Badge variant="outline">{t('direct')}</Badge>;

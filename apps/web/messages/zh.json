@@ -275,7 +275,6 @@
         "aircraftTypePlaceholder": "例如 B738",
         "status": "状态",
         "multiLeg": "技术经停（多航段）",
-        "legRole": "角色",
         "legDepAirport": "航段出发机场",
         "legArrAirport": "航段到达机场",
         "legDeparture": "航段起飞时间",
@@ -292,10 +291,6 @@
         "ACTIVE": "生效",
         "SUSPENDED": "暂停",
         "SEASONAL": "季节性"
-      },
-      "legRole": {
-        "FULL": "完整航段",
-        "TECHNICAL_STOP": "技术经停"
       },
       "legsSummary": "{count} 个航段"
     },

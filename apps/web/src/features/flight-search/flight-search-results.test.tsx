@@ -44,22 +44,8 @@ const directFlight: Flight = {
   status: 'ACTIVE',
   price: 570,
   currency: 'USD',
-  legs: [
-    {
-      id: '01ARZ3NDEKTSV4RRFFQ69G5FAW',
-      flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAV',
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: 'CGK',
-      arrAirport: 'NRT',
-      departureTimeLocal: '09:00',
-      arrivalTimeLocal: '17:15',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  // Nonstop: legs describe technical stops only, so there are none.
+  legs: [],
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -90,7 +76,6 @@ const technicalStopFlight: Flight = {
       id: 'leg-1',
       flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAX',
       legSequence: 1,
-      role: 'TECHNICAL_STOP',
       depAirport: 'CGK',
       arrAirport: 'BKK',
       departureTimeLocal: '01:00',
@@ -104,7 +89,6 @@ const technicalStopFlight: Flight = {
       id: 'leg-2',
       flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAX',
       legSequence: 2,
-      role: 'TECHNICAL_STOP',
       depAirport: 'BKK',
       arrAirport: 'LHR',
       departureTimeLocal: '10:30',
@@ -119,7 +103,9 @@ const technicalStopFlight: Flight = {
 
 const technicalStopItinerary: FlightItinerary = {
   flights: [technicalStopFlight],
-  stopCount: 0,
+  // The API counts the technical stop itself, so a 2-leg flight reports 1 —
+  // this fixture previously said 0 and relied on the view double counting it.
+  stopCount: 1,
   totalPrice: technicalStopFlight.price,
   currency: technicalStopFlight.currency,
   departureTimeLocal: technicalStopFlight.departureTimeLocal,
@@ -139,22 +125,7 @@ const connectingFirstLeg: Flight = {
   arrivalTimeLocal: '03:15',
   arrivalDayOffset: 0,
   price: 180,
-  legs: [
-    {
-      id: 'leg-first-1',
-      flightId: 'leg-first',
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: 'CGK',
-      arrAirport: 'KUL',
-      departureTimeLocal: '01:00',
-      arrivalTimeLocal: '03:15',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  legs: [],
 };
 
 const connectingSecondLeg: Flight = {
@@ -168,22 +139,7 @@ const connectingSecondLeg: Flight = {
   arrivalTimeLocal: '16:30',
   arrivalDayOffset: 0,
   price: 580,
-  legs: [
-    {
-      id: 'leg-second-1',
-      flightId: 'leg-second',
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: 'KUL',
-      arrAirport: 'JED',
-      departureTimeLocal: '06:00',
-      arrivalTimeLocal: '16:30',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  legs: [],
 };
 
 const connectingItinerary: FlightItinerary = {
