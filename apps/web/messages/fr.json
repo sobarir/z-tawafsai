@@ -416,7 +416,9 @@
     "interlineConnection": "Correspondance interligne",
     "bagThroughChecked": "Bagages enregistrés jusqu'à destination",
     "selectJourney": "Sélectionner",
-    "changeJourney": "Modifier"
+    "changeJourney": "Modifier",
+    "technicalStop": "Escale technique",
+    "groundTimeIn": "{duration} au sol à {airport}"
   },
   "hotelSearch": {
     "title": "Rechercher des hébergements",

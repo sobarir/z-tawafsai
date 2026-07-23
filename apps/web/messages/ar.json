@@ -416,7 +416,9 @@
     "interlineConnection": "اتصال بين شركات الطيران",
     "bagThroughChecked": "تسجيل الأمتعة حتى الوجهة النهائية",
     "selectJourney": "اختيار",
-    "changeJourney": "تغيير"
+    "changeJourney": "تغيير",
+    "technicalStop": "توقف فني",
+    "groundTimeIn": "{duration} على الأرض في {airport}"
   },
   "hotelSearch": {
     "title": "البحث عن أماكن الإقامة",

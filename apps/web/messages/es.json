@@ -416,7 +416,9 @@
     "interlineConnection": "Conexión interlínea",
     "bagThroughChecked": "Equipaje facturado hasta destino",
     "selectJourney": "Seleccionar",
-    "changeJourney": "Cambiar"
+    "changeJourney": "Cambiar",
+    "technicalStop": "Escala técnica",
+    "groundTimeIn": "{duration} en tierra en {airport}"
   },
   "hotelSearch": {
     "title": "Buscar alojamientos",

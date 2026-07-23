@@ -191,7 +191,9 @@
     "interlineConnection": "Interline connection",
     "bagThroughChecked": "Bags checked through",
     "selectJourney": "Select",
-    "changeJourney": "Change"
+    "changeJourney": "Change",
+    "technicalStop": "Technical stop",
+    "groundTimeIn": "{duration} on the ground in {airport}"
   },
   "hotelSearch": {
     "title": "Search Stays",

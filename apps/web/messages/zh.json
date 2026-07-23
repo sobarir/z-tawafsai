@@ -416,7 +416,9 @@
     "interlineConnection": "跨航司联程",
     "bagThroughChecked": "行李直挂",
     "selectJourney": "选择",
-    "changeJourney": "更改"
+    "changeJourney": "更改",
+    "technicalStop": "技术经停",
+    "groundTimeIn": "在 {airport} 地面停留 {duration}"
   },
   "hotelSearch": {
     "title": "搜索酒店",
