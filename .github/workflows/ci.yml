@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
 
 concurrency:
@@ -62,6 +62,13 @@ jobs:
 
       - name: Push DB schema (test database)
         run: pnpm db:push
+
+      # The API specs are integration tests against a real Postgres: they assert on seeded
+      # reference data (airports, airlines, cities, currencies, properties) and pick their own
+      # codes to avoid colliding with it. A schema-only database fails them. The seed is
+      # idempotent, so this is safe to re-run.
+      - name: Seed reference data (test database)
+        run: pnpm db:seed
 
       - name: Test
         run: pnpm test
