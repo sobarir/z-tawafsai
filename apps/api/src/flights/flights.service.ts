@@ -53,11 +53,12 @@ const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
 });
 
 /**
- * Derives the ordered legs to insert for a new flight, enforcing the
- * flight-leg invariants: no legs given -> one FULL
- * leg spanning the flight's own route; legs given -> first leg departs the
- * flight origin, last leg arrives the flight destination, and legs are
- * sequentially connected.
+ * Derives the ordered legs to insert for a flight, enforcing the flight-leg
+ * invariants: no legs given -> none stored, because a nonstop flight's route
+ * and times already live on the flight row and a leg spanning it would be a
+ * stored copy of derived data; legs given -> first leg departs the flight
+ * origin, last leg arrives the flight destination, and legs are sequentially
+ * connected.
  */
 /** The header fields buildFlightLegs reads — satisfied by both create and update inputs. */
 type FlightLegSource = Pick<
@@ -70,19 +71,11 @@ type FlightLegSource = Pick<
   | 'legs'
 >;
 
-function buildFlightLegs(input: FlightLegSource): CreateFlightLegInput[] {
+export function buildFlightLegs(
+  input: FlightLegSource,
+): CreateFlightLegInput[] {
   if (!input.legs || input.legs.length === 0) {
-    return [
-      {
-        role: 'FULL',
-        depAirport: input.originAirport,
-        arrAirport: input.destAirport,
-        departureTimeLocal: input.departureTimeLocal,
-        arrivalTimeLocal: input.arrivalTimeLocal,
-        departureDayOffset: 0,
-        arrivalDayOffset: input.arrivalDayOffset,
-      },
-    ];
+    return [];
   }
 
   const firstLeg = input.legs[0];
@@ -183,7 +176,9 @@ export class FlightsService {
     const directFlights = await this.attachLegs(directRows);
     const itineraries: FlightItinerary[] = directFlights.map((f) => ({
       flights: [f],
-      stopCount: f.legs.length - 1,
+      // Nonstop flights carry no legs; a technical stop adds one touchdown per
+      // leg beyond the first.
+      stopCount: Math.max(f.legs.length - 1, 0),
       totalPrice: f.price,
       currency: f.currency,
       departureTimeLocal: f.departureTimeLocal,
@@ -263,7 +258,7 @@ export class FlightsService {
 
               for (const f of newPathFlights) {
                 totalPrice += f.price;
-                totalStops += f.legs.length - 1;
+                totalStops += Math.max(f.legs.length - 1, 0);
                 dayOffset += f.arrivalDayOffset;
 
                 if (prevFlight) {
@@ -384,22 +379,24 @@ export class FlightsService {
         })
         .returning();
 
-      const legRows = await tx
-        .insert(schema.flightLegs)
-        .values(
-          legs.map((leg, index) => ({
-            flightId: flight.id,
-            legSequence: index + 1,
-            role: leg.role,
-            depAirport: leg.depAirport,
-            arrAirport: leg.arrAirport,
-            departureTimeLocal: leg.departureTimeLocal,
-            arrivalTimeLocal: leg.arrivalTimeLocal,
-            departureDayOffset: leg.departureDayOffset,
-            arrivalDayOffset: leg.arrivalDayOffset,
-          })),
-        )
-        .returning();
+      // A nonstop flight stores no legs, and Drizzle rejects an empty insert.
+      const legRows = legs.length
+        ? await tx
+            .insert(schema.flightLegs)
+            .values(
+              legs.map((leg, index) => ({
+                flightId: flight.id,
+                legSequence: index + 1,
+                depAirport: leg.depAirport,
+                arrAirport: leg.arrAirport,
+                departureTimeLocal: leg.departureTimeLocal,
+                arrivalTimeLocal: leg.arrivalTimeLocal,
+                departureDayOffset: leg.departureDayOffset,
+                arrivalDayOffset: leg.arrivalDayOffset,
+              })),
+            )
+            .returning()
+        : [];
 
       return toFlight(flight, legRows);
     });
@@ -433,27 +430,29 @@ export class FlightsService {
         throw new NotFoundException(`Flight ${id} not found after update`);
       }
 
-      // The flight owns its legs — replace them wholesale so a single-leg flight
-      // can gain a technical stop (or lose one) in one edit.
+      // The flight owns its legs — replace them wholesale so a nonstop flight
+      // can gain a technical stop (or lose one) in one edit. Dropping to nonstop
+      // leaves no rows behind, and Drizzle rejects an empty insert.
       await tx
         .delete(schema.flightLegs)
         .where(eq(schema.flightLegs.flightId, id));
-      const legRows = await tx
-        .insert(schema.flightLegs)
-        .values(
-          legs.map((leg, index) => ({
-            flightId: id,
-            legSequence: index + 1,
-            role: leg.role,
-            depAirport: leg.depAirport,
-            arrAirport: leg.arrAirport,
-            departureTimeLocal: leg.departureTimeLocal,
-            arrivalTimeLocal: leg.arrivalTimeLocal,
-            departureDayOffset: leg.departureDayOffset,
-            arrivalDayOffset: leg.arrivalDayOffset,
-          })),
-        )
-        .returning();
+      const legRows = legs.length
+        ? await tx
+            .insert(schema.flightLegs)
+            .values(
+              legs.map((leg, index) => ({
+                flightId: id,
+                legSequence: index + 1,
+                depAirport: leg.depAirport,
+                arrAirport: leg.arrAirport,
+                departureTimeLocal: leg.departureTimeLocal,
+                arrivalTimeLocal: leg.arrivalTimeLocal,
+                departureDayOffset: leg.departureDayOffset,
+                arrivalDayOffset: leg.arrivalDayOffset,
+              })),
+            )
+            .returning()
+        : [];
 
       return toFlight(updated, legRows);
     });

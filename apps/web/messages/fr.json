@@ -275,7 +275,6 @@
         "aircraftTypePlaceholder": "p. ex. B738",
         "status": "Statut",
         "multiLeg": "Escale technique (plusieurs tronçons)",
-        "legRole": "Rôle",
         "legDepAirport": "Départ du tronçon",
         "legArrAirport": "Arrivée du tronçon",
         "legDeparture": "Heure de départ du tronçon",
@@ -292,10 +291,6 @@
         "ACTIVE": "Actif",
         "SUSPENDED": "Suspendu",
         "SEASONAL": "Saisonnier"
-      },
-      "legRole": {
-        "FULL": "Complet",
-        "TECHNICAL_STOP": "Escale technique"
       },
       "legsSummary": "{count, plural, one {# tronçon} other {# tronçons}}"
     },
@@ -421,7 +416,9 @@
     "interlineConnection": "Correspondance interligne",
     "bagThroughChecked": "Bagages enregistrés jusqu'à destination",
     "selectJourney": "Sélectionner",
-    "changeJourney": "Modifier"
+    "changeJourney": "Modifier",
+    "technicalStop": "Escale technique",
+    "groundTimeIn": "{duration} au sol à {airport}"
   },
   "hotelSearch": {
     "title": "Rechercher des hébergements",

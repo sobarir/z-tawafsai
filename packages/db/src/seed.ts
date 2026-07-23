@@ -531,6 +531,19 @@ type FlightSeed = {
   arrivalTimeLocal: string;
   arrivalDayOffset: number;
   price: number;
+  /**
+   * Only for a technical stop. Omit for a nonstop flight — legs describe stops,
+   * not journeys, so a nonstop stores none. First leg must depart the flight's
+   * origin, last must arrive its destination, and each must connect to the next.
+   */
+  legs?: {
+    depAirport: string;
+    arrAirport: string;
+    departureTimeLocal: string;
+    arrivalTimeLocal: string;
+    departureDayOffset: number;
+    arrivalDayOffset: number;
+  }[];
 };
 
 const flightSeeds: FlightSeed[] = [
@@ -576,6 +589,40 @@ const flightSeeds: FlightSeed[] = [
     arrivalTimeLocal: '04:00',
     arrivalDayOffset: 1,
     price: 640,
+  },
+  // The one technical-stop flight in the seed. A narrowbody charter cannot make
+  // CGK->JED nonstop, so it refuels at BOM: one flight number, one booking, and
+  // BOM is NOT sellable — that is what makes it a technical stop rather than a
+  // connection. Without this row `flight_legs` is empty in a seeded database and
+  // every technical-stop code path ships untested; a stop-count double count
+  // survived unnoticed for exactly that reason.
+  {
+    operatingAirline: 'JT',
+    flightNumber: '112',
+    originAirport: 'CGK',
+    destAirport: 'JED',
+    departureTimeLocal: '21:00',
+    arrivalTimeLocal: '05:00',
+    arrivalDayOffset: 1,
+    price: 610,
+    legs: [
+      {
+        depAirport: 'CGK',
+        arrAirport: 'BOM',
+        departureTimeLocal: '21:00',
+        arrivalTimeLocal: '01:30',
+        departureDayOffset: 0,
+        arrivalDayOffset: 1,
+      },
+      {
+        depAirport: 'BOM',
+        arrAirport: 'JED',
+        departureTimeLocal: '02:30',
+        arrivalTimeLocal: '05:00',
+        departureDayOffset: 1,
+        arrivalDayOffset: 1,
+      },
+    ],
   },
 
   // Transit itineraries (dossier section 2) — leg 1 CGK->hub, leg 2 hub->JED.
@@ -1620,8 +1667,9 @@ async function seed() {
       });
   }
 
-  // Physical flights, each with its single FULL leg and operating-carrier
-  // marketing row. Idempotent: upsert the flight by (operating_airline,
+  // Physical flights with their operating-carrier marketing row. Only a flight
+  // with a technical stop gets `flight_legs` rows — legs describe stops, not
+  // journeys. Idempotent: upsert the flight by (operating_airline,
   // flight_number), then rewrite its leg + marketing rows — both key off the
   // flight's generated ULID, so a plain re-insert would duplicate them.
   for (const flight of flightSeeds) {
@@ -1646,20 +1694,20 @@ async function seed() {
       })
       .returning({ id: schema.flights.id });
 
+    // Rewrite legs from scratch: clears any left by an earlier seed run (or by
+    // a schema where every flight carried one) before re-inserting.
     await db
       .delete(schema.flightLegs)
       .where(eq(schema.flightLegs.flightId, row.id));
-    await db.insert(schema.flightLegs).values({
-      flightId: row.id,
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: flight.originAirport,
-      arrAirport: flight.destAirport,
-      departureTimeLocal: flight.departureTimeLocal,
-      arrivalTimeLocal: flight.arrivalTimeLocal,
-      departureDayOffset: 0,
-      arrivalDayOffset: flight.arrivalDayOffset,
-    });
+    if (flight.legs?.length) {
+      await db.insert(schema.flightLegs).values(
+        flight.legs.map((leg, index) => ({
+          flightId: row.id,
+          legSequence: index + 1,
+          ...leg,
+        })),
+      );
+    }
 
     await db
       .delete(schema.flightMarketing)

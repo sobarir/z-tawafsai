@@ -19,15 +19,6 @@ interface FlightSearchResultsProps {
 // the message catalog grows (TS2589).
 type Translate = ReturnType<typeof useTranslations<'flightSearch'>>;
 
-/** Every touchdown in the itinerary: technical stops within a flight, plus connecting hubs between flights. */
-function totalStops(itinerary: FlightItinerary): number {
-  const technicalStops = itinerary.flights.reduce(
-    (sum, flight) => sum + Math.max(flight.legs.length - 1, 0),
-    0,
-  );
-  return itinerary.stopCount + technicalStops;
-}
-
 function viaAirports(itinerary: FlightItinerary): string[] {
   const airports: string[] = [];
   itinerary.flights.forEach((flight, index) => {
@@ -48,7 +39,10 @@ function StopsBadge({
   itinerary: FlightItinerary;
   t: Translate;
 }) {
-  const stops = totalStops(itinerary);
+  // `stopCount` is already every touchdown in the itinerary — the API sums the
+  // technical stops inside each flight and adds one per connection between
+  // them. Re-deriving technical stops from `legs` here counted them twice.
+  const stops = itinerary.stopCount;
 
   if (stops <= 0) {
     return <Badge variant="outline">{t('direct')}</Badge>;
@@ -62,18 +56,66 @@ function StopsBadge({
   );
 }
 
-function TechnicalStopRoute({ flight }: { flight: Flight }) {
+/**
+ * Ground time at each technical stop. Unlike a connection, legs carry explicit
+ * day offsets, so this is exact arithmetic rather than a wrapped clock diff.
+ */
+function technicalStops(
+  flight: Flight,
+): { airport: string; minutes: number }[] {
+  const stops: { airport: string; minutes: number }[] = [];
+  for (let i = 0; i < flight.legs.length - 1; i++) {
+    const arriving = flight.legs[i];
+    const departing = flight.legs[i + 1];
+    if (!arriving || !departing) continue;
+    const arrivedAt =
+      arriving.arrivalDayOffset * MINUTES_PER_DAY +
+      minutesOfDay(arriving.arrivalTimeLocal);
+    const departsAt =
+      departing.departureDayOffset * MINUTES_PER_DAY +
+      minutesOfDay(departing.departureTimeLocal);
+    stops.push({
+      airport: arriving.arrAirport,
+      minutes: departsAt - arrivedAt,
+    });
+  }
+  return stops;
+}
+
+/**
+ * The stop detail for a technical stop. Deliberately NOT a ConnectionRow: the
+ * passenger keeps one flight number and normally stays onboard, so there is no
+ * connection to make and no bags to re-check. It still needs its own row —
+ * a "1 stop" badge with no ground time tells the traveller nothing.
+ */
+function TechnicalStopRoute({ flight, t }: { flight: Flight; t: Translate }) {
   if (flight.legs.length <= 1) return null;
 
   return (
-    <p className="text-xs text-muted-foreground">
-      {flight.legs
-        .map(
-          (leg) =>
-            `${leg.depAirport} ${leg.departureTimeLocal} → ${leg.arrAirport} ${leg.arrivalTimeLocal}`,
-        )
-        .join('  ·  ')}
-    </p>
+    <div className="flex flex-col gap-1">
+      <p className="text-xs text-muted-foreground">
+        {flight.legs
+          .map(
+            (leg) =>
+              `${leg.depAirport} ${leg.departureTimeLocal} → ${leg.arrAirport} ${leg.arrivalTimeLocal}`,
+          )
+          .join('  ·  ')}
+      </p>
+      {technicalStops(flight).map((stop) => (
+        <div
+          key={stop.airport}
+          className="flex flex-wrap items-center gap-2 border-muted border-l-2 border-dashed pl-3 text-xs text-muted-foreground"
+        >
+          <Badge variant="outline">{t('technicalStop')}</Badge>
+          <span>
+            {t('groundTimeIn', {
+              duration: formatMinutes(stop.minutes),
+              airport: stop.airport,
+            })}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -98,10 +140,12 @@ function FlightLegSummary({ flight, t }: { flight: Flight; t: Translate }) {
           {t('aircraft')}: {flight.aircraftType}
         </p>
       )}
-      <TechnicalStopRoute flight={flight} />
+      <TechnicalStopRoute flight={flight} t={t} />
     </div>
   );
 }
+
+const MINUTES_PER_DAY = 24 * 60;
 
 /** Local "HH:MM" to minutes past midnight. */
 function minutesOfDay(localTime: string): number {

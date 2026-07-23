@@ -5,10 +5,8 @@
  * NestJS + Fastify backend. Auth is served by Better Auth at /api/auth/* (not part of this spec).
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateFlightDtoLegsItemRole } from './createFlightDtoLegsItemRole';
 
 export type CreateFlightDtoLegsItem = {
-  role: CreateFlightDtoLegsItemRole;
   /** @pattern ^[A-Z]{3}$ */
   depAirport: string;
   /** @pattern ^[A-Z]{3}$ */

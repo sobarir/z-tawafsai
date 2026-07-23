@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Airline, Airport, CreateFlightInput, Flight } from '@repo/shared';
-import { createFlightSchema, legRoleSchema } from '@repo/shared';
+import { createFlightSchema } from '@repo/shared';
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
@@ -50,12 +50,12 @@ export const emptyFlightFormValues: CreateFlightInput = {
 };
 
 /**
- * Turn an existing flight into editable form values. A single-leg flight keeps
- * `legs` undefined (the multi-leg editor stays collapsed and the server
- * re-derives the one FULL leg); a technical-stop flight seeds the leg editor.
+ * Turn an existing flight into editable form values. A nonstop flight keeps
+ * `legs` undefined (the multi-leg editor stays collapsed and the server stores
+ * no legs); a technical-stop flight seeds the leg editor.
  */
 export function flightToFormValues(flight: Flight): CreateFlightInput {
-  const isMultiLeg = flight.legs.length > 1;
+  const isMultiLeg = flight.legs.length > 0;
   return {
     operatingAirline: flight.operatingAirline,
     flightNumber: flight.flightNumber,
@@ -70,7 +70,6 @@ export function flightToFormValues(flight: Flight): CreateFlightInput {
     currency: flight.currency,
     legs: isMultiLeg
       ? flight.legs.map((leg) => ({
-          role: leg.role,
           depAirport: leg.depAirport,
           arrAirport: leg.arrAirport,
           departureTimeLocal: leg.departureTimeLocal,
@@ -104,7 +103,6 @@ export function FlightForm({
 }: FlightFormProps) {
   const t = useTranslations('schedule.flights.fields');
   const tStatus = useTranslations('schedule.flights.status');
-  const tLegRole = useTranslations('schedule.flights.legRole');
   const tCommon = useTranslations('common');
 
   const airportOptions = toAirportOptions(airports);
@@ -127,7 +125,6 @@ export function FlightForm({
     if (checked) {
       form.setValue('legs', [
         {
-          role: 'TECHNICAL_STOP',
           depAirport: '',
           arrAirport: '',
           departureTimeLocal: '',
@@ -136,7 +133,6 @@ export function FlightForm({
           arrivalDayOffset: 0,
         },
         {
-          role: 'TECHNICAL_STOP',
           depAirport: '',
           arrAirport: '',
           departureTimeLocal: '',
@@ -295,35 +291,7 @@ export function FlightForm({
                     key={legField.id}
                     className="flex flex-col gap-3 border-b pb-3 last:border-b-0 last:pb-0"
                   >
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                      <FormField
-                        control={form.control}
-                        name={`legs.${index}.role`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('legRole')}</FormLabel>
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {legRoleSchema.options.map((role) => (
-                                  <SelectItem key={role} value={role}>
-                                    {tLegRole(role)}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <ComboboxFormField
                         control={form.control}
                         name={`legs.${index}.depAirport`}
@@ -410,7 +378,6 @@ export function FlightForm({
                   className="w-fit"
                   onClick={() =>
                     legs.append({
-                      role: 'TECHNICAL_STOP',
                       depAirport: '',
                       arrAirport: '',
                       departureTimeLocal: '',

@@ -141,10 +141,6 @@ export type UpdateAirlineInput = z.infer<typeof updateAirlineSchema>;
 export const flightStatusSchema = z.enum(['ACTIVE', 'SUSPENDED', 'SEASONAL']);
 export type FlightStatus = z.infer<typeof flightStatusSchema>;
 
-/** Whether a leg is the flight's whole journey (FULL) or an internal technical stop. */
-export const legRoleSchema = z.enum(['FULL', 'TECHNICAL_STOP']);
-export type LegRole = z.infer<typeof legRoleSchema>;
-
 /** IATA flight number: 1-4 digits with an optional trailing letter (e.g. '10', '874'). */
 export const flightNumberSchema = z
   .string()
@@ -155,11 +151,15 @@ export const localTimeSchema = z
   .string()
   .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid local time (HH:MM)');
 
+/**
+ * One physical hop of a flight. Legs exist ONLY to describe a technical stop —
+ * a nonstop flight has no leg rows, and its route/times live on the flight
+ * itself. A leg per flight would be a stored copy of derived data.
+ */
 export const flightLegSchema = z.object({
   id: ulidSchema,
   flightId: ulidSchema,
   legSequence: z.number().int().min(1),
-  role: legRoleSchema,
   depAirport: airportCodeSchema,
   arrAirport: airportCodeSchema,
   departureTimeLocal: localTimeSchema,
@@ -194,7 +194,6 @@ export type Flight = z.infer<typeof flightSchema>;
 export const flightListSchema = z.array(flightSchema);
 
 export const createFlightLegInputSchema = z.object({
-  role: legRoleSchema,
   depAirport: airportCodeSchema,
   arrAirport: airportCodeSchema,
   departureTimeLocal: localTimeSchema,
@@ -216,7 +215,7 @@ export const createFlightSchema = z.object({
   status: flightStatusSchema.optional(),
   price: z.number().nonnegative(),
   currency: currencyCodeSchema,
-  /** Omit for a single-leg flight (auto-creates one FULL leg). Provide >=2 for a technical stop. */
+  /** Omit for a nonstop flight (no leg rows). Provide >=2 only for a technical stop. */
   legs: z.array(createFlightLegInputSchema).min(2).optional(),
 });
 export type CreateFlightInput = z.infer<typeof createFlightSchema>;
@@ -225,7 +224,7 @@ export type CreateFlightInput = z.infer<typeof createFlightSchema>;
  * Update accepts the full editable schedule — route, times, day offset, legs,
  * and attributes — everything except the immutable identity keys (operating
  * airline + flight number), which are fixed at creation. Like create, omitting
- * `legs` re-derives a single FULL leg from the header times.
+ * `legs` means nonstop and clears any existing leg rows.
  */
 export const updateFlightSchema = createFlightSchema.omit({
   operatingAirline: true,

@@ -275,7 +275,6 @@
         "aircraftTypePlaceholder": "例如 B738",
         "status": "状态",
         "multiLeg": "技术经停（多航段）",
-        "legRole": "角色",
         "legDepAirport": "航段出发机场",
         "legArrAirport": "航段到达机场",
         "legDeparture": "航段起飞时间",
@@ -292,10 +291,6 @@
         "ACTIVE": "生效",
         "SUSPENDED": "暂停",
         "SEASONAL": "季节性"
-      },
-      "legRole": {
-        "FULL": "完整航段",
-        "TECHNICAL_STOP": "技术经停"
       },
       "legsSummary": "{count} 个航段"
     },
@@ -421,7 +416,9 @@
     "interlineConnection": "跨航司联程",
     "bagThroughChecked": "行李直挂",
     "selectJourney": "选择",
-    "changeJourney": "更改"
+    "changeJourney": "更改",
+    "technicalStop": "技术经停",
+    "groundTimeIn": "在 {airport} 地面停留 {duration}"
   },
   "hotelSearch": {
     "title": "搜索酒店",

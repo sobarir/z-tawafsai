@@ -191,7 +191,9 @@
     "interlineConnection": "Interline connection",
     "bagThroughChecked": "Bags checked through",
     "selectJourney": "Select",
-    "changeJourney": "Change"
+    "changeJourney": "Change",
+    "technicalStop": "Technical stop",
+    "groundTimeIn": "{duration} on the ground in {airport}"
   },
   "hotelSearch": {
     "title": "Search Stays",
@@ -571,7 +573,6 @@
         "currencyPlaceholder": "e.g. USD",
         "status": "Status",
         "multiLeg": "Technical stop (multiple legs)",
-        "legRole": "Role",
         "legDepAirport": "Leg departure",
         "legArrAirport": "Leg arrival",
         "legDeparture": "Leg departure time",
@@ -585,10 +586,6 @@
         "ACTIVE": "Active",
         "SUSPENDED": "Suspended",
         "SEASONAL": "Seasonal"
-      },
-      "legRole": {
-        "FULL": "Full",
-        "TECHNICAL_STOP": "Technical stop"
       },
       "legsSummary": "{count, plural, one {# leg} other {# legs}}"
     },

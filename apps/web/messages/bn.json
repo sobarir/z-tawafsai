@@ -275,7 +275,6 @@
         "aircraftTypePlaceholder": "যেমন B738",
         "status": "অবস্থা",
         "multiLeg": "কারিগরি স্টপ (একাধিক লেগ)",
-        "legRole": "ভূমিকা",
         "legDepAirport": "লেগ ছাড়ার স্থান",
         "legArrAirport": "লেগ পৌঁছানোর স্থান",
         "legDeparture": "লেগ ছাড়ার সময়",
@@ -292,10 +291,6 @@
         "ACTIVE": "সক্রিয়",
         "SUSPENDED": "স্থগিত",
         "SEASONAL": "ঋতুভিত্তিক"
-      },
-      "legRole": {
-        "FULL": "সম্পূর্ণ",
-        "TECHNICAL_STOP": "কারিগরি স্টপ"
       },
       "legsSummary": "{count}টি লেগ"
     },
@@ -421,7 +416,9 @@
     "interlineConnection": "ইন্টারলাইন সংযোগ",
     "bagThroughChecked": "ব্যাগেজ সরাসরি চেক করা হয়েছে",
     "selectJourney": "নির্বাচন",
-    "changeJourney": "পরিবর্তন"
+    "changeJourney": "পরিবর্তন",
+    "technicalStop": "কারিগরি বিরতি",
+    "groundTimeIn": "{airport}-এ {duration} ভূমিতে"
   },
   "hotelSearch": {
     "title": "থাকার জায়গা খুঁজুন",

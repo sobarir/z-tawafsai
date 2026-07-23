@@ -275,7 +275,6 @@
         "aircraftTypePlaceholder": "p. ej. B738",
         "status": "Estado",
         "multiLeg": "Escala técnica (varios tramos)",
-        "legRole": "Función",
         "legDepAirport": "Salida del tramo",
         "legArrAirport": "Llegada del tramo",
         "legDeparture": "Hora de salida del tramo",
@@ -292,10 +291,6 @@
         "ACTIVE": "Activo",
         "SUSPENDED": "Suspendido",
         "SEASONAL": "Estacional"
-      },
-      "legRole": {
-        "FULL": "Completo",
-        "TECHNICAL_STOP": "Escala técnica"
       },
       "legsSummary": "{count, plural, one {# tramo} other {# tramos}}"
     },
@@ -421,7 +416,9 @@
     "interlineConnection": "Conexión interlínea",
     "bagThroughChecked": "Equipaje facturado hasta destino",
     "selectJourney": "Seleccionar",
-    "changeJourney": "Cambiar"
+    "changeJourney": "Cambiar",
+    "technicalStop": "Escala técnica",
+    "groundTimeIn": "{duration} en tierra en {airport}"
   },
   "hotelSearch": {
     "title": "Buscar alojamientos",

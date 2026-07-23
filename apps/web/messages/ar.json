@@ -275,7 +275,6 @@
         "aircraftTypePlaceholder": "مثال: B738",
         "status": "الحالة",
         "multiLeg": "توقف فني (عدة مراحل)",
-        "legRole": "الدور",
         "legDepAirport": "مغادرة المرحلة",
         "legArrAirport": "وصول المرحلة",
         "legDeparture": "وقت مغادرة المرحلة",
@@ -292,10 +291,6 @@
         "ACTIVE": "نشط",
         "SUSPENDED": "موقوف",
         "SEASONAL": "موسمي"
-      },
-      "legRole": {
-        "FULL": "كامل",
-        "TECHNICAL_STOP": "توقف فني"
       },
       "legsSummary": "{count} مرحلة"
     },
@@ -421,7 +416,9 @@
     "interlineConnection": "اتصال بين شركات الطيران",
     "bagThroughChecked": "تسجيل الأمتعة حتى الوجهة النهائية",
     "selectJourney": "اختيار",
-    "changeJourney": "تغيير"
+    "changeJourney": "تغيير",
+    "technicalStop": "توقف فني",
+    "groundTimeIn": "{duration} على الأرض في {airport}"
   },
   "hotelSearch": {
     "title": "البحث عن أماكن الإقامة",

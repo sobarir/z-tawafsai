@@ -21,6 +21,8 @@ const messages = {
     layoverIn: '{duration} layover in {airport}',
     interlineConnection: 'Interline connection',
     bagThroughChecked: 'Bags checked through',
+    technicalStop: 'Technical stop',
+    groundTimeIn: '{duration} on the ground in {airport}',
   },
 };
 
@@ -44,22 +46,8 @@ const directFlight: Flight = {
   status: 'ACTIVE',
   price: 570,
   currency: 'USD',
-  legs: [
-    {
-      id: '01ARZ3NDEKTSV4RRFFQ69G5FAW',
-      flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAV',
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: 'CGK',
-      arrAirport: 'NRT',
-      departureTimeLocal: '09:00',
-      arrivalTimeLocal: '17:15',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  // Nonstop: legs describe technical stops only, so there are none.
+  legs: [],
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -75,6 +63,31 @@ const directItinerary: FlightItinerary = {
   totalDurationMinutes: 375,
 };
 
+/** CGK -> BKK -> LHR under one flight number: BKK is a technical stop. */
+const toBangkok: Flight['legs'][number] = {
+  id: 'leg-1',
+  flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAX',
+  legSequence: 1,
+  depAirport: 'CGK',
+  arrAirport: 'BKK',
+  departureTimeLocal: '01:00',
+  arrivalTimeLocal: '09:30',
+  departureDayOffset: 0,
+  arrivalDayOffset: 0,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+};
+
+const toLondon: Flight['legs'][number] = {
+  ...toBangkok,
+  id: 'leg-2',
+  legSequence: 2,
+  depAirport: 'BKK',
+  arrAirport: 'LHR',
+  departureTimeLocal: '10:30',
+  arrivalTimeLocal: '20:00',
+};
+
 const technicalStopFlight: Flight = {
   ...directFlight,
   id: '01ARZ3NDEKTSV4RRFFQ69G5FAX',
@@ -85,41 +98,14 @@ const technicalStopFlight: Flight = {
   arrivalTimeLocal: '20:00',
   arrivalDayOffset: 0,
   price: 950,
-  legs: [
-    {
-      id: 'leg-1',
-      flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAX',
-      legSequence: 1,
-      role: 'TECHNICAL_STOP',
-      depAirport: 'CGK',
-      arrAirport: 'BKK',
-      departureTimeLocal: '01:00',
-      arrivalTimeLocal: '09:30',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-    {
-      id: 'leg-2',
-      flightId: '01ARZ3NDEKTSV4RRFFQ69G5FAX',
-      legSequence: 2,
-      role: 'TECHNICAL_STOP',
-      depAirport: 'BKK',
-      arrAirport: 'LHR',
-      departureTimeLocal: '10:30',
-      arrivalTimeLocal: '20:00',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  legs: [toBangkok, toLondon],
 };
 
 const technicalStopItinerary: FlightItinerary = {
   flights: [technicalStopFlight],
-  stopCount: 0,
+  // The API counts the technical stop itself, so a 2-leg flight reports 1 —
+  // this fixture previously said 0 and relied on the view double counting it.
+  stopCount: 1,
   totalPrice: technicalStopFlight.price,
   currency: technicalStopFlight.currency,
   departureTimeLocal: technicalStopFlight.departureTimeLocal,
@@ -139,22 +125,7 @@ const connectingFirstLeg: Flight = {
   arrivalTimeLocal: '03:15',
   arrivalDayOffset: 0,
   price: 180,
-  legs: [
-    {
-      id: 'leg-first-1',
-      flightId: 'leg-first',
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: 'CGK',
-      arrAirport: 'KUL',
-      departureTimeLocal: '01:00',
-      arrivalTimeLocal: '03:15',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  legs: [],
 };
 
 const connectingSecondLeg: Flight = {
@@ -168,22 +139,7 @@ const connectingSecondLeg: Flight = {
   arrivalTimeLocal: '16:30',
   arrivalDayOffset: 0,
   price: 580,
-  legs: [
-    {
-      id: 'leg-second-1',
-      flightId: 'leg-second',
-      legSequence: 1,
-      role: 'FULL',
-      depAirport: 'KUL',
-      arrAirport: 'JED',
-      departureTimeLocal: '06:00',
-      arrivalTimeLocal: '16:30',
-      departureDayOffset: 0,
-      arrivalDayOffset: 0,
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    },
-  ],
+  legs: [],
 };
 
 const connectingItinerary: FlightItinerary = {
@@ -245,6 +201,59 @@ describe('FlightSearchResults', () => {
     );
     expect(screen.getByText(/1 stop/)).toBeInTheDocument();
     expect(screen.getByText(/via BKK/)).toBeInTheDocument();
+  });
+
+  it('shows ground time at a technical stop, but never a connection badge', () => {
+    renderResults(
+      <FlightSearchResults
+        results={[technicalStopItinerary]}
+        isFetching={false}
+        isFetched={true}
+      />,
+    );
+    // BKK arrival 09:30 -> departure 10:30 on the same day.
+    expect(screen.getByText('Technical stop')).toBeInTheDocument();
+    expect(screen.getByText(/1h 0m on the ground in BKK/)).toBeInTheDocument();
+    // The passenger keeps one flight number and stays onboard — nothing to
+    // connect to and no bags to re-check.
+    expect(screen.queryByText('Connection')).not.toBeInTheDocument();
+    expect(screen.queryByText(/layover in/)).not.toBeInTheDocument();
+  });
+
+  it('measures ground time across a day boundary using the legs day offsets', () => {
+    // Arrives 23:30, departs 00:30 the next day: one hour, not minus 23.
+    const overnight: FlightItinerary = {
+      ...technicalStopItinerary,
+      flights: [
+        {
+          ...technicalStopFlight,
+          legs: [
+            { ...toBangkok, arrivalTimeLocal: '23:30', arrivalDayOffset: 0 },
+            { ...toLondon, departureTimeLocal: '00:30', departureDayOffset: 1 },
+          ],
+        },
+      ],
+    };
+    renderResults(
+      <FlightSearchResults
+        results={[overnight]}
+        isFetching={false}
+        isFetched={true}
+      />,
+    );
+    expect(screen.getByText(/1h 0m on the ground in BKK/)).toBeInTheDocument();
+  });
+
+  it('shows no technical-stop detail for a nonstop flight', () => {
+    renderResults(
+      <FlightSearchResults
+        results={[directItinerary]}
+        isFetching={false}
+        isFetched={true}
+      />,
+    );
+    expect(screen.queryByText('Technical stop')).not.toBeInTheDocument();
+    expect(screen.queryByText(/on the ground in/)).not.toBeInTheDocument();
   });
 
   it('renders a one-stop connecting itinerary with both legs, the connection badge, and the combined price', () => {

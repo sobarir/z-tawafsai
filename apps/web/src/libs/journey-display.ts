@@ -71,7 +71,8 @@ export function buildDisplayItinerary(
   let arrivalDayOffset = 0;
   let prev: Flight | null = null;
   for (const flight of flights) {
-    stops += flight.legs.length - 1;
+    // A nonstop flight has no legs; only a technical stop contributes here.
+    stops += Math.max(flight.legs.length - 1, 0);
     arrivalDayOffset += flight.arrivalDayOffset;
     if (
       prev &&

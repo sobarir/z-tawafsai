@@ -3223,13 +3223,6 @@
                   "minimum": 1,
                   "maximum": 9007199254740991
                 },
-                "role": {
-                  "type": "string",
-                  "enum": [
-                    "FULL",
-                    "TECHNICAL_STOP"
-                  ]
-                },
                 "depAirport": {
                   "type": "string",
                   "pattern": "^[A-Z]{3}$"
@@ -3271,7 +3264,6 @@
                 "id",
                 "flightId",
                 "legSequence",
-                "role",
                 "depAirport",
                 "arrAirport",
                 "departureTimeLocal",
@@ -3394,13 +3386,6 @@
                         "minimum": 1,
                         "maximum": 9007199254740991
                       },
-                      "role": {
-                        "type": "string",
-                        "enum": [
-                          "FULL",
-                          "TECHNICAL_STOP"
-                        ]
-                      },
                       "depAirport": {
                         "type": "string",
                         "pattern": "^[A-Z]{3}$"
@@ -3442,7 +3427,6 @@
                       "id",
                       "flightId",
                       "legSequence",
-                      "role",
                       "depAirport",
                       "arrAirport",
                       "departureTimeLocal",
@@ -3586,13 +3570,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "role": {
-                  "type": "string",
-                  "enum": [
-                    "FULL",
-                    "TECHNICAL_STOP"
-                  ]
-                },
                 "depAirport": {
                   "type": "string",
                   "pattern": "^[A-Z]{3}$"
@@ -3623,7 +3600,6 @@
                 }
               },
               "required": [
-                "role",
                 "depAirport",
                 "arrAirport",
                 "departureTimeLocal",
@@ -3694,13 +3670,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "role": {
-                  "type": "string",
-                  "enum": [
-                    "FULL",
-                    "TECHNICAL_STOP"
-                  ]
-                },
                 "depAirport": {
                   "type": "string",
                   "pattern": "^[A-Z]{3}$"
@@ -3731,7 +3700,6 @@
                 }
               },
               "required": [
-                "role",
                 "depAirport",
                 "arrAirport",
                 "departureTimeLocal",

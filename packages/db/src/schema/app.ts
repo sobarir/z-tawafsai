@@ -43,7 +43,6 @@ export const post = pgTable('post', {
 // Flight schedule & inventory domain.
 
 export const mctScope = pgEnum('mct_scope', ['DD', 'DI', 'ID', 'II']);
-export const legRole = pgEnum('leg_role', ['FULL', 'TECHNICAL_STOP']);
 export const flightStatus = pgEnum('flight_status', [
   'ACTIVE',
   'SUSPENDED',
@@ -156,6 +155,9 @@ export const flights = pgTable(
   ],
 );
 
+// A leg row exists ONLY to describe a technical stop. A nonstop flight has zero
+// leg rows: its route and times already live on `flights`, so a leg per flight
+// would be a stored copy of derived data that drifts when the flight is edited.
 export const flightLegs = pgTable(
   'flight_legs',
   {
@@ -166,7 +168,6 @@ export const flightLegs = pgTable(
       .notNull()
       .references(() => flights.id, { onDelete: 'cascade' }),
     legSequence: integer('leg_sequence').notNull(),
-    role: legRole('role').notNull(),
     depAirport: varchar('dep_airport', { length: 3 })
       .notNull()
       .references(() => airports.airportCode),
