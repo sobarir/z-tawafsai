@@ -71,6 +71,29 @@
 pnpm check:backbone && pnpm check:instructions`.
 **Commit:** `chore({{domain}}): consistency sweep + docs`
 
+## Step 9 — Retire the PRD
+
+**Opening:** the domain is built and green. Move what outlives the doc into the code, then delete
+the folder — a PRD that keeps sitting next to a shipping domain drifts from it with every fix, and
+agents keep reading it as if it were current.
+
+**Review checklist:**
+- [ ] every scenario in `14-scenarios.md` exists as a test that runs in `pnpm test` — the hard
+      gate, since an unimplemented scenario was never actually verified.
+- [ ] conventions that generalize beyond this domain moved into the scoped `AGENTS.md`.
+- [ ] decisions that read as bugs (a value deliberately unlike its spec, a workaround) commented
+      at the line that implements them, naming the test that fails if someone "corrects" it.
+- [ ] `00-overview.md`'s non-goals copied into a `// Scope: … Not in scope: …` block atop
+      `apps/api/src/{{domain}}/{{domain}}.module.ts` — source cannot otherwise tell "ruled out"
+      from "not built yet", and the next session builds what this PRD rejected.
+- [ ] nothing in `apps/`/`packages/` still links to `prd/{{domain}}/` — those become dead links.
+
+**Gate:** full suite green after the moves; `grep -r "prd/{{domain}}" apps packages` is empty.
+**Commit:** `docs({{domain}}): retire the PRD — conventions and non-goals moved into the code`
+
+Then run `/remove-prd {{domain}}`. Deleting loses nothing recoverable: `git log --diff-filter=D --
+prd/{{domain}}/` finds it and `git show <sha>^:prd/{{domain}}/CONTEXT.md` brings any file back.
+
 ## Per-step exit ritual
 
 1. Run the step's gate. A red gate means the step is not done — do not move on.
@@ -82,3 +105,7 @@ pnpm check:backbone && pnpm check:instructions`.
 All steps committed, S1–S{{n}} green, sweep clean, `CONTEXT.md` checklist fully ticked, and the
 root `AGENTS.md` definition-of-done list satisfied (`typecheck`, `lint`, `test`, generated API
 output committed, migration committed, `backbone.yml` updated).
+
+Then Step 9: this folder is gone and the domain is off `prd/README.md`'s table. The domain is not
+done while its PRD is still being maintained — that is a second source of truth, and the code is
+the one that keeps moving.

@@ -7,6 +7,13 @@ fresh improvisation each time.
 `_template` is deliberately underscore-prefixed so it sorts first and never reads as a real
 domain. It is listed in `backbone.yml` under `prd.template`, not under `prd.domains`.
 
+**A PRD here is scaffolding with a defined end.** It is authoritative while the domain is being
+built, and retired the moment it ships — its last build step (`20-steps.md` Step 9) moves the
+surviving knowledge into the code and deletes the folder. Plan for that from the first line:
+anything that must outlive the build belongs in a test, a scoped `AGENTS.md`, or a comment at the
+line it explains. Real testing, migrations, and later features will diverge from any spec, and the
+code is what tracks them.
+
 ## How an agent uses this
 
 When the user says *"create a new feature `<X>` based on the PRD template"*:
@@ -36,11 +43,11 @@ When the user says *"create a new feature `<X>` based on the PRD template"*:
 | `13-logic.md` | if there is a non-trivial algorithm or API surface | The core computation and the endpoint contract. Rename it to what it actually is (`13-<the-algorithm>.md`). |
 | `14-scenarios.md` | if the domain has testable behavior | Numbered golden scenarios (S1…Sn) + a coverage matrix. These are the oracle. |
 | `15-seed-data.md` | if the domain needs demo data | Exact, idempotent seed fixtures the scenarios assert against. |
-| `20-steps.md` | **always** | Ordered build sessions: opening prompt → review checklist → gate → commit. |
+| `20-steps.md` | **always** | Ordered build sessions: opening prompt → review checklist → gate → commit. Its last step retires this folder. |
 | `30-frontend.md` | if the domain has UI | Routes, component tree, display rules, a11y floor. |
 | `31-design.md` | only if the UI deviates from the app's design system | Palette/type/layout direction. **Confirm the deviation with the user first.** |
 | `32-frontend-steps.md` | if the domain has UI | Ordered frontend sessions (F1…Fn), same ritual as `20`. |
-| `CONTEXT.md` | **always** | Living state: current step, confirmed decisions, entity table, open questions, progress checklist. Read first, updated last, every session. |
+| `CONTEXT.md` | **always** | Living state: current step, confirmed decisions, entity table, open questions, progress checklist. Read first, updated last, every session — and disposable once the domain ships. |
 
 Numbering is a grouping convention, not a sequence: `0x` = framing, `1x` = model & behavior,
 `2x` = backend build order, `3x` = frontend. Leave gaps — a later `12-` or `16-` doc slots in

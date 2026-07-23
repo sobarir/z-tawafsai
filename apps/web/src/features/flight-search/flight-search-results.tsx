@@ -119,7 +119,7 @@ function layoverMinutes(arrivalLocal: string, departureLocal: string): number {
 }
 
 // A stopover (vs a connection) is DERIVED, never stored: a ground time long
-// enough that the hub is a destination in its own right (/prd/flights/01-glossary.md).
+// enough that the hub is a destination in its own right.
 const STOPOVER_THRESHOLD_MINUTES = 24 * 60;
 
 function ConnectionRow({

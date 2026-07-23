@@ -33,6 +33,9 @@ flowchart TD
 
 `operationId` is mandatory — it becomes the generated frontend hook's name; without it Orval invents one and renames break the web app. The global `ZodValidationPipe` validates every `@Body/@Query/@Param` DTO automatically — do not call `schema.parse` manually.
 
+- Declare literal routes above parametric ones in the same controller (`@Get('search')` before `@Get(':id')`) — Nest matches in declaration order, so a leading `:id` swallows the literal path and answers it with a lookup failure for an id that was never one.
+- Mark POST endpoints that compute rather than create with `@HttpCode(200)` — Nest defaults POST to 201, which tells the client a resource was created when validation/resolution endpoints create nothing.
+
 ## Auth
 
 - Global AuthGuard (from `@thallesp/nestjs-better-auth`): every route requires a session; opt out per route with `@AllowAnonymous()` or `@OptionalAuth()`.

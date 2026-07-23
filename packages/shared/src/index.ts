@@ -245,8 +245,7 @@ export type SearchFlightsQuery = z.infer<typeof searchFlightsQuerySchema>;
 
 /**
  * A sellable/displayable identity mapped onto an operating flight
- * (`flights`). Codeshare = many marketing rows -> one operating flight; see
- * /prd/flights/01-glossary.md.
+ * (`flights`). Codeshare = many marketing rows -> one operating flight.
  */
 export const flightMarketingSchema = z.object({
   id: ulidSchema,
@@ -282,7 +281,8 @@ export type UpdateFlightMarketingInput = z.infer<
 /**
  * Directional carrier-pair gate: does the inbound operating carrier permit a
  * through-ticketed interline connection onto the outbound operating carrier?
- * See /prd/flights/01-glossary.md (codeshare vs interline) and /prd/flights/13-mct-rules.md §A2.
+ * Distinct from codeshare: codeshare is one flight's many marketing identities;
+ * interline is permission to connect two carriers' flights under one ticket.
  */
 export const interlineAgreementSchema = z.object({
   id: ulidSchema,
@@ -310,7 +310,7 @@ export type CreateInterlineAgreementInput = z.infer<
   typeof createInterlineAgreementSchema
 >;
 
-/** Query for the directional interline resolver (/prd/flights/13-mct-rules.md §A2). */
+/** Query for the directional interline resolver. */
 export const resolveInterlineQuerySchema = z.object({
   inboundAirline: airlineCodeSchema,
   outboundAirline: airlineCodeSchema,
@@ -318,8 +318,8 @@ export const resolveInterlineQuerySchema = z.object({
 export type ResolveInterlineQuery = z.infer<typeof resolveInterlineQuerySchema>;
 
 /**
- * Result of the interline resolver — same shape the Step 8 classifier
- * consumes directly (`InterlineResolution` in /prd/flights/13-mct-rules.md §B).
+ * Result of the interline resolver — the shape `ConnectionsService.classify()`
+ * consumes directly.
  */
 export const interlineResolutionSchema = z.object({
   online: z.boolean(),
@@ -623,7 +623,7 @@ const flightHotelPackageFlightSummarySchema = z.object({
   departureTimeLocal: localTimeSchema,
   arrivalTimeLocal: localTimeSchema,
   arrivalDayOffset: z.number().int(),
-  /** False when the operating flight has an internal technical stop (see /prd/flights/01-glossary.md — "transit", not a cross-flight connection). */
+  /** False when the operating flight has an internal technical stop — that is a "transit", not a cross-flight connection. */
   isDirect: z.boolean(),
   transitAirport: airportCodeSchema.nullable(),
   transitCityName: z.string().nullable(),

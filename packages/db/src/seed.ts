@@ -105,8 +105,7 @@ const airports: (typeof schema.airports.$inferInsert)[] = [
     timezone: 'America/New_York',
   },
   {
-    // Not in prd/flights/15-seed-data.md's airport table, but required as the
-    // technical-stop airport for NH 10's route (prd/flights/14-scenarios.md S7).
+    // Technical-stop airport for NH 10's multi-leg route.
     airportCode: 'BKK',
     icaoCode: 'VTBS',
     name: 'Suvarnabhumi Airport',
@@ -115,8 +114,7 @@ const airports: (typeof schema.airports.$inferInsert)[] = [
     timezone: 'Asia/Bangkok',
   },
   {
-    // Not in prd/flights/15-seed-data.md's airport table, but required as KL 800's
-    // destination for the interline scenario (prd/flights/14-scenarios.md S16).
+    // KL 800's destination — the cross-carrier interline scenario.
     airportCode: 'AMS',
     icaoCode: 'EHAM',
     name: 'Amsterdam Airport Schiphol',
@@ -125,7 +123,7 @@ const airports: (typeof schema.airports.$inferInsert)[] = [
     timezone: 'Europe/Amsterdam',
   },
   // CGK<->JED/MED realistic search-data airports (Jeddah/Madinah corridor + 9
-  // transit hubs, prd/flights/15-seed-data.md v1.2). SIN and DOH above are reused.
+  // transit hubs). SIN and DOH above are reused.
   {
     airportCode: 'JED',
     icaoCode: 'OEJN',
@@ -258,7 +256,7 @@ const airlines: (typeof schema.airlines.$inferInsert)[] = [
     name: 'Singapore Airlines',
     countryCode: 'SG',
   },
-  // CGK<->JED/MED realistic search-data airlines (prd/flights/15-seed-data.md v1.2).
+  // CGK<->JED/MED realistic search-data airlines.
   // GA, SQ, QR above are reused.
   { airlineCode: 'SV', icaoCode: 'SVA', name: 'Saudia', countryCode: 'SA' },
   {
@@ -332,7 +330,7 @@ type MctRuleSeed = {
   maxConnectionMinutes?: number;
 };
 
-// Minimum viable rule set from prd/flights/13-mct-rules.md, plus the S11 pair (the
+// Minimum viable rule set, plus the carrier-specific override pair (the
 // NRT/NRT II default below + the NH-specific row that must outrank it).
 const mctRules: MctRuleSeed[] = [
   {
@@ -372,10 +370,11 @@ const mctRules: MctRuleSeed[] = [
     mctMinutes: 300,
   },
   {
-    // maxConnectionMinutes=1440, NOT the 2880 ("max 48h") suggested by
-    // 13-mct-rules.md's seed table / 15-seed-data.md: S3's 2730-min gap
-    // must classify as 'stopover', which only holds if max=1440. The
-    // scenario doc is the acceptance oracle; it wins over the seed-table note.
+    // maxConnectionMinutes=1440 is deliberate, NOT the 2880 ("max 48h") the
+    // original spec's seed table suggested: the DOH stopover scenario's
+    // 2730-min gap must classify as 'stopover', which only holds at 1440.
+    // The golden scenario was the acceptance oracle and won over that note —
+    // covered by connections.service.spec.ts, so changing this fails a test.
     arrivalAirport: 'DOH',
     departureAirport: 'DOH',
     scope: 'II',
@@ -399,7 +398,7 @@ const mctRules: MctRuleSeed[] = [
     scope: 'DI',
     mctMinutes: 240,
   },
-  // --- CGK<->JED/MED hub junctions (prd/flights/15-seed-data.md v1.2). SIN/SIN
+  // --- CGK<->JED/MED hub junctions. SIN/SIN
   // and DOH/DOH above already cover those hubs. ---
   {
     arrivalAirport: 'KUL',
@@ -476,7 +475,7 @@ const interlineAgreements: InterlineAgreementSeed[] = [
   { inboundAirline: 'SQ', outboundAirline: 'GA', bagThroughChecked: true },
   { inboundAirline: 'GA', outboundAirline: 'QR', bagThroughChecked: true },
   { inboundAirline: 'NH', outboundAirline: 'KL', bagThroughChecked: false },
-  // --- CGK<->JED/MED hub junctions (prd/flights/15-seed-data.md v1.2).
+  // --- CGK<->JED/MED hub junctions.
   // Same-operating-carrier junctions (KUL/MH, DXB/EK, AUH/EY, DOH/QR, CAI/MS,
   // MCT/WY) need no row here — online connections bypass this lookup. Reverse
   // rows (e.g. SV->TR) are deliberately omitted: this batch adds no return
@@ -499,7 +498,7 @@ const interlineAgreements: InterlineAgreementSeed[] = [
   { inboundAirline: 'AK', outboundAirline: 'D7', bagThroughChecked: true },
 ];
 
-// --- CGK -> JED physical flights (prd/flights/11-data-model.md) ---------------
+// --- CGK -> JED physical flights -------------------------------------------
 // Sourced from the Jakarta (CGK) -> Jeddah (JED) route dossier: 3 direct
 // carriers plus 10 one-stop itineraries via 8 hubs. Each PHYSICAL flight is one
 // row here; a transit itinerary is TWO rows that FlightsService.search() chains
@@ -520,7 +519,7 @@ const interlineAgreements: InterlineAgreementSeed[] = [
 // - HU 702/7913 (Haikou, ~28h layover) is seeded but does not chain into a clean
 //   itinerary: search's gap math is clock-only and cannot represent a >24h
 //   layover — a known limitation, not specific to this data.
-// Prices are illustrative USD, tier/distance-banded per prd/flights/15-seed-data.md
+// Prices are illustrative USD, tier/distance-banded
 // (direct headline highest; LCC feeders lowest).
 
 type FlightSeed = {

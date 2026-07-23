@@ -54,7 +54,7 @@ const toFlight = (row: FlightRow, legRows: FlightLegRow[]): Flight => ({
 
 /**
  * Derives the ordered legs to insert for a new flight, enforcing the
- * invariants from /prd/flights/11-data-model.md Entity 4: no legs given -> one FULL
+ * flight-leg invariants: no legs given -> one FULL
  * leg spanning the flight's own route; legs given -> first leg departs the
  * flight origin, last leg arrives the flight destination, and legs are
  * sequentially connected.

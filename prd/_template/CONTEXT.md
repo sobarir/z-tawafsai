@@ -1,7 +1,10 @@
 # CONTEXT.md — living state
 
 > Update this at the end of every session. It is the memory between sessions so decisions are
-> not re-litigated.
+> not re-litigated. It is also **disposable at handoff**: it records how the domain was built,
+> and it retires with the rest of this folder at Step 9. Anything here that must govern the code
+> afterwards belongs in a test, a scoped `AGENTS.md`, or a comment at the line it explains —
+> a build log kept alive past its build only drifts from the code it claims to describe.
 
 > TEMPLATE: the single most important file in the folder — the one every session in this domain
 > reads first and writes last. Rules that keep it useful:

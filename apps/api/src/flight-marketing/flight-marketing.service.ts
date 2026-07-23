@@ -139,7 +139,7 @@ export class FlightMarketingService {
 
   /**
    * The row where is_operating_carrier=true must carry the flight's own
-   * operating airline (/prd/flights/11-data-model.md Entity 5), and at most one such
+   * operating airline, and at most one such
    * row may exist per flight (backed by the DB partial unique index).
    */
   private async assertOperatingCarrierInvariant(

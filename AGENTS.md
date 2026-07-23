@@ -2,7 +2,7 @@
 
 pnpm + Turborepo monorepo. Next.js frontend, NestJS (Fastify) backend, Postgres via Drizzle, Better Auth. API contracts flow Zod → OpenAPI → Orval.
 
-> One PRD per domain under `/prd/<domain>/`. Read `/prd/README.md` first, then the active domain's `CONTEXT.md`, every session.
+> One PRD per domain under `/prd/<domain>/`. Read `/prd/README.md` first, then the active domain's `CONTEXT.md`, every session. That index is the mode switch: a domain listed there is **under construction** and its PRD is authoritative — follow it. A domain not listed has **shipped**; its PRD was retired on purpose and the code, its comments, and its tests are the source of truth. An empty table means every domain has shipped, not that documentation is missing.
 
 ## Initialization
 

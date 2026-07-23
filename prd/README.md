@@ -9,9 +9,14 @@ ask before picking one.
 
 ## Domains
 
-_None yet._ Add a row here for each domain as it is created — keep it to one line, and keep the
-Status column honest (in progress / complete / superseded), since this table is what tells a new
-session which domains exist at all.
+This table lists the domains **under construction**, not every domain the app has. A PRD is a
+starting point with a defined end: once the domain ships, its folder is retired (see *Retiring a
+shipped domain* below) and it disappears from here. So a domain listed here has an authoritative
+PRD to follow; a domain that is implemented but absent is finished, and its code — with its
+comments and tests — is the source of truth. An empty table means everything has shipped.
+
+Add a row when a domain's PRD lands; remove it when the domain retires. Keep it to one line, and
+keep the Status column honest (in progress / blocked / ready to retire).
 
 | Domain | Folder | Status | Start here |
 | --- | --- | --- | --- |
@@ -39,7 +44,27 @@ What the command does, and what to do by hand without it:
 Never mix two domains' docs in one folder, and never let one domain's `CONTEXT.md` track another
 domain's state — that's exactly the confusion this structure exists to avoid.
 
-## Removing a domain
+## Retiring a shipped domain
+
+Retirement is the last step of every PRD, not an afterthought — it is the final step in the
+domain's own `20-steps.md`. Before the folder goes, four things move out of it:
+
+1. **Golden scenarios → tests.** Every scenario exists as a spec that runs in `pnpm test`. This is
+   the hard gate: executable specs cannot drift, and a scenario that never became a test was never
+   verified in the first place.
+2. **Conventions that generalize → the scoped `AGENTS.md`** for the app they govern.
+3. **Decisions that look like bugs → a comment at the line that implements them**, with the reason
+   and, where one exists, the test that fails if someone "corrects" it.
+4. **Non-goals → a `// Scope: … Not in scope: …` block** atop the domain's API module. Nothing in
+   source distinguishes "deliberately absent" from "not built yet", so without this a later
+   session reads the gap as a to-do and starts building what the PRD ruled out.
+
+Then run `/remove-prd <domain>`. Nothing is lost by deleting: `git log --diff-filter=D --
+prd/<domain>/` finds the removal and `git show <sha>^:prd/<domain>/CONTEXT.md` restores any file.
+The point is to take a document that stops matching reality out of the reading path — the harm in
+a stale PRD is that agents keep believing it, not that it exists.
+
+## Removing a domain that was never built
 
 Run `/remove-prd <domain>` (or follow `.claude/commands/remove-prd.md` manually). It
 retires the domain's **documentation only**: `prd/<domain>/`, its `backbone.yml` entry, and its
