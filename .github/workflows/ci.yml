@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
 
 concurrency:
@@ -60,8 +60,19 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Push DB schema (test database)
-        run: pnpm db:push
+      # `db:migrate`, not `db:push`: push builds the database from schema.ts alone, and some
+      # constraints exist only in hand-written SQL because Drizzle has no builder API for them
+      # (the season-window EXCLUDE, 0021). Pushing silently omits those, and the specs asserting
+      # on them fail. Migrations are in sync with schema.ts, so this produces the same tables.
+      - name: Migrate DB schema (test database)
+        run: pnpm db:migrate
+
+      # The API specs are integration tests against a real Postgres: they assert on seeded
+      # reference data (airports, airlines, cities, currencies, properties) and pick their own
+      # codes to avoid colliding with it. A schema-only database fails them. The seed is
+      # idempotent, so this is safe to re-run.
+      - name: Seed reference data (test database)
+        run: pnpm db:seed
 
       - name: Test
         run: pnpm test
