@@ -1,10 +1,10 @@
 /**
- * Hotel prices are integer minor units (prd/hotels/11-data-model.md) — unlike
- * flights' decimal `numeric(10,2)` price column, so `@/libs/format-currency`
- * (which expects an already-major-unit amount) does not apply here. The
- * currency's minor-unit count is domain-seeded data (prd/hotels/15-seed-data.md)
- * rather than always matching Intl's built-in ISO-4217 table (e.g. IDR is
- * seeded with 0 decimals here) — never assume /100.
+ * Hotel prices are integer minor units — unlike flights' decimal
+ * `numeric(10,2)` price column, so `@/libs/format-currency` (which expects an
+ * already-major-unit amount) does not apply here. The currency's minor-unit
+ * count is seeded data (the `currency` table, packages/db/src/seed.ts) rather
+ * than always matching Intl's built-in ISO-4217 table (e.g. IDR is seeded with
+ * 0 decimals here) — never assume /100.
  */
 const MINOR_UNITS: Record<string, number> = { USD: 2, SAR: 2, IDR: 0 };
 const DEFAULT_MINOR_UNIT = 2;

@@ -20,7 +20,8 @@ keep the Status column honest (in progress / blocked / ready to retire).
 
 | Domain | Folder | Status | Start here |
 | --- | --- | --- | --- |
-| — | — | — | — |
+| Travel Packages | `prd/travel-packages/` | in progress — shipped end to end; open: itinerary editor unbuilt, `destination` still free text (no FK to `city`), non-`en` locales hold English placeholders, uploads are single-server local disk | [`CONTEXT.md`](travel-packages/CONTEXT.md) |
+| Landing | `prd/landing/` | in progress — design approved at v3 and implemented; open: placeholder business data, article pages not built | [`CONTEXT.md`](landing/CONTEXT.md) |
 
 ## Adding a new domain
 

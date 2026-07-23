@@ -1,6 +1,10 @@
 /**
- * Money & FX helpers — see /prd/hotels/13-resolver-and-search.md. Pure
- * functions, no DB access, unit-tested directly.
+ * Money & FX helpers. Pure functions, no DB access, unit-tested directly.
+ *
+ * FX is DISPLAY-SIDE ONLY — every rate_rule stores its own native currency and
+ * that is what is persisted; conversion happens at read time and is never
+ * written back. Only one direction per currency pair is stored, so the inverse
+ * is derived by dividing (see applyFx below).
  */
 
 export type Money = { amount: number; currency: string };

@@ -116,7 +116,9 @@ export class HotelsService {
 
     // Room type selection: the hint if given and it matches one of this
     // property's room types, else try every room type and keep the
-    // cheapest qualifying one — see prd/hotels/13-resolver-and-search.md.
+    // cheapest qualifying one. `roomType` is a preference hint, not a filter:
+    // an unmatched hint falls back to all room types rather than returning
+    // nothing, so a stale hint in a URL never empties the results.
     const hinted = query.roomType
       ? roomTypes.filter((rt) => rt.name === query.roomType)
       : [];

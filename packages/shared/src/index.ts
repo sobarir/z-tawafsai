@@ -362,9 +362,11 @@ export const meResponseSchema = z.object({
 export type MeResponse = z.infer<typeof meResponseSchema>;
 
 /**
- * Hotel search domain — see /prd/hotels/11-data-model.md and
- * /prd/hotels/13-resolver-and-search.md. Money is always integer minor units
- * + an ISO currency code — never a bare number, never a float.
+ * Hotel search domain. Money is always integer minor units + an ISO currency
+ * code — never a bare number, never a float. This is intentionally stricter
+ * than the flights domain's `numeric(10,2)` price column: hotels convert
+ * between currencies, and decimal/float rounding drift that a single-currency
+ * domain never notices compounds across an FX conversion.
  */
 export const moneySchema = z.object({
   amount: z.number().int(),
@@ -445,7 +447,11 @@ export const fxRateSchema = z.object({
   id: ulidSchema,
   baseCurrency: currencyCodeSchema,
   quoteCurrency: currencyCodeSchema,
-  /** rate x 1_000_000 (parts per million) — see /prd/hotels/13-resolver-and-search.md. */
+  /**
+   * rate x 1_000_000 (parts per million) — an integer so the rate itself never
+   * introduces float drift. It multiplies MAJOR units, not minor ones; see
+   * applyFx() in apps/api/src/hotels/money.ts for the de-scale/re-scale step.
+   */
   ratePpm: z.number().int().positive(),
   asOf: z.iso.datetime(),
 });

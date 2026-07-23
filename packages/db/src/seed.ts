@@ -827,7 +827,12 @@ const flightSeeds: FlightSeed[] = [
   },
 ];
 
-// Hotel search domain — see /prd/hotels/15-seed-data.md for the full spec.
+// Hotel search domain. Two sources feed `property`: the two original
+// hand-authored demo hotels (JED-WFH, MAD-CIN) below, and the 56 Nusuk-approved
+// Makkah/Madinah hotels further down. Every seeded property must carry season
+// coverage spanning the seeded flight date range — a property whose windows all
+// expire mid-range simply vanishes from search for later dates, which reads as
+// a search bug rather than missing seed data.
 
 const currencies: (typeof schema.currency.$inferInsert)[] = [
   { code: 'USD', minorUnit: 2, symbol: '$', name: 'US Dollar' },
@@ -842,8 +847,10 @@ type FxRateSeed = {
   ratePpm: number;
 };
 
-// Inverse pairs (e.g. IDR->SAR) are resolved by the FX helper at query time,
-// never stored — see prd/hotels/13-resolver-and-search.md.
+// Only one direction per pair is stored. Inverse pairs (e.g. IDR->SAR) are
+// resolved by dividing at query time in applyFx() (apps/api/src/hotels/money.ts),
+// so adding the reverse row here would be redundant — and a `(base, quote)`
+// unique constraint will not catch it, since the reverse is a distinct pair.
 const fxRates: FxRateSeed[] = [
   { baseCurrency: 'SAR', quoteCurrency: 'IDR', ratePpm: 4_350_000_000 },
   { baseCurrency: 'USD', quoteCurrency: 'IDR', ratePpm: 16_300_000_000 },
@@ -883,7 +890,10 @@ type PropertySeed = {
   rateRules: RateRuleSeed[];
 };
 
-// L1/L3 exactly as specified in prd/hotels/15-seed-data.md.
+// The two original hand-authored demo properties. Unlike the Nusuk hotels
+// below, these carry a real multi-season split (standard + peak) and are what
+// the golden scenarios in apps/api/src/hotels/hotels.service.spec.ts price
+// against — change their rates or windows and those specs move with them.
 const properties: PropertySeed[] = [
   {
     code: '01KY01F10WQ349VA0TF2GZK322',
@@ -967,8 +977,9 @@ const properties: PropertySeed[] = [
 ];
 
 /**
- * Nusuk-approved Makkah/Madinah hotels (prd/hotel_list.md, 2026-07-18). The
- * source only gives one price point per hotel ("Quad Occupancy per night",
+ * Nusuk-approved Makkah/Madinah hotels (from a user-supplied directory,
+ * 2026-07-18). The source only gives one price point per hotel ("Quad
+ * Occupancy per night",
  * a USD range) plus a distance-to-landmark string and a single contact
  * value (phone or email) — everything below is derived from that:
  * - amount: the high end of the USD range, converted to IDR at the same
@@ -976,8 +987,8 @@ const properties: PropertySeed[] = [
  *   currency (not USD + live conversion).
  * - room types: the source only supports Quad pricing, so Double (55%) and
  *   Triple (80%) are synthesized off the Quad amount, tiling occupancy
- *   1-4 with no gaps (1-2 / 3-3 / 4-4) — user-confirmed approach, see
- *   prd/hotels/CONTEXT.md.
+ *   1-4 with no gaps (1-2 / 3-3 / 4-4). These two prices are DERIVED, not
+ *   sourced — user-confirmed, so do not treat them as real quoted rates.
  * - season: a single full-year 'standard' window — the source gives one
  *   flat rate with no seasonal breakdown.
  * Two hotels with no usable price ("Varies"/"N/A" throughout) are omitted:

@@ -12,7 +12,7 @@ const db = createDb(databaseUrl);
 const service = new HotelFxRatesService(db);
 
 // SAR->USD: seeded fx_rate rows only cover SAR->IDR, USD->IDR, USD->SAR
-// (prd/hotels/15-seed-data.md) — this reverse pair is free for tests to own.
+// (packages/db/src/seed.ts) — this reverse pair is free for tests to own.
 // USD/SAR themselves are seeded reference currencies, safe to reuse (like
 // airports/airlines in mct-rules/interline-agreements specs).
 const BASE = 'SAR';

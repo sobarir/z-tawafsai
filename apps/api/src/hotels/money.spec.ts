@@ -7,7 +7,8 @@ const currencies = [
   { code: 'IDR', minorUnit: 0 },
 ];
 
-// Matches prd/hotels/15-seed-data.md exactly.
+// Mirrors the `fxRates` seed in packages/db/src/seed.ts exactly — keep the two
+// in step, or these unit expectations stop describing real conversions.
 const fxRates = [
   { baseCurrency: 'SAR', quoteCurrency: 'IDR', ratePpm: 4_350_000_000 },
   { baseCurrency: 'USD', quoteCurrency: 'IDR', ratePpm: 16_300_000_000 },

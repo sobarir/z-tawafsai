@@ -3,8 +3,10 @@ import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Cross-entity invariants from prd/hotels/11-data-model.md that aren't
- * FK-expressible in Postgres — asserted here instead, against the live seed.
+ * Cross-entity invariants that aren't FK-expressible in Postgres — asserted
+ * here instead, against the live seed: the global room_type catalog is
+ * non-empty, every property is priceable (>=1 rate_rule), and occupancy bands
+ * for a given (property, season, room_type) neither overlap nor leave gaps.
  */
 
 const databaseUrl = process.env.DATABASE_URL;
