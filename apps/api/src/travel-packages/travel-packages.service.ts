@@ -96,7 +96,7 @@ export class TravelPackagesService {
   }
 
   // A technical stop is an internal stop within one operating flight — a
-  // "transit", not a cross-flight connection (see /prd/flights/01-glossary.md).
+  // "transit", not a cross-flight connection.
   private groupTransitAirports(
     legs: (typeof schema.flightLegs.$inferSelect)[],
   ): Map<string, string> {

@@ -86,7 +86,7 @@ export class InterlineAgreementsService {
   /**
    * operationId: resolveInterline. Same operating carrier -> online, no
    * lookup. Otherwise a directional (inbound, outbound) lookup; absence is a
-   * valid result (not permitted), not a 404 — see /prd/flights/13-mct-rules.md §A2.
+   * valid result (not permitted), not a 404.
    */
   async resolveInterline(
     inboundAirline: string,

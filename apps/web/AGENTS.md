@@ -35,6 +35,7 @@ The mutator (`src/libs/api/mutator.ts`) already sends the session cookie and nor
 - Client components: `authClient` from `@/features/auth/lib/auth-client` — `signIn`, `signUp`, `signOut`, `useSession`.
 - Server components/actions: `getCurrentUser()` from `@/features/auth/server/get-current-user` — validates the cookie against the API.
 - RBAC: `user.role` comes from the DB via the session; gate UI with `requireUser`/`requirePermission` and the `@admin`/`@user` parallel routes.
+- The `(protected)` layout picks which parallel slot it renders purely from the viewer's `dashboard.view:*` permission, not from which slot happens to have a matching page — so a page meant for every role must exist under **both** `@admin/` and `@user/`, or the other role silently gets the blank `default.tsx` with no error anywhere.
 - Never decode cookies or query the database here — the API is the only session authority; a local shortcut desyncs from bans/expiry.
 
 ## Conventions
