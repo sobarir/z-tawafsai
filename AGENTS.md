@@ -74,27 +74,25 @@ The mechanical layer is enforced (Biome, `pnpm check:dupes` DRY gate, complexity
 
 ## What this is
 
-A multi-domain platform — `/prd/README.md` indexes every domain. The flagship, complete domain is
-a **flight schedule & inventory service**, not a booking engine (no fares/PNRs/seats/ticketing
-beyond the v1.1 flat-price search exception), own-metal codeshare only, no GDS/NDC in v1. Scope,
-non-goals, live status: `/prd/flights/00-overview.md` and `/prd/flights/CONTEXT.md`.
+A multi-domain platform. `/prd/README.md` indexes every domain and is the only place that knows
+which exist; each domain owns its scope, non-goals, and live status in its own
+`prd/<domain>/00-overview.md` and `prd/<domain>/CONTEXT.md`. Read those two before touching a
+domain — never infer a domain's boundaries from its code, since the non-goals are precisely what
+the code does not contain. New domain: start from `prd/_template/`.
 
 ## Database conventions (STRICT — enforced in review, repo-wide across all domains)
 
-Domain-entity IDs (airport_code, airline_code) are natural keys — `varchar(3)`/`varchar(2)`, the
-real IATA code, no surrogate id. Every other ID is a ULID via `createId()` — never UUID, never
-auto-increment, keeps keys time-sortable. All timestamps are `timestamp({ withTimezone: true })`
-— a naive local time breaks cross-timezone gap math (e.g. NRT 17:00 → LAX 10:00 same day). Flight
-entity/column reference: `/prd/flights/11-data-model.md`.
+An entity the outside world already assigns a standard code to (an ISO or industry code) uses that
+code as its natural key — a fixed-width `varchar`, no surrogate id. Every other ID is a ULID via
+`createId()` — never UUID, never auto-increment, keeps keys time-sortable. All timestamps are
+`timestamp({ withTimezone: true })` — a naive local time breaks every cross-timezone calculation,
+and the breakage appears only for users in other zones. A value computed from other columns is
+derived on read, never stored — a cached copy drifts from its inputs, and nothing fails loudly
+when it does. Per-domain entity and column reference: `prd/<domain>/11-data-model.md`.
 
-## Flight-domain vocabulary and golden rules
+## Domain vocabulary
 
-Exact terms (Journey/Segment/Leg, Operating vs Marketing flight, MCT, Interline, connection vs
-stopover vs transit vs open-jaw) and the full connection-type decision logic:
-`/prd/flights/01-glossary.md`. Other domains define their own vocabulary in their own
-`prd/<domain>/` glossary. The two rules most often collapsed by mistake here:
-
-1. **Marketing vs operating is the spine of the model** — never collapse them; operations, gates,
-   and reports key off operating; anything sellable or displayed keys off marketing.
-2. **Connection type is DERIVED, never stored** — no `connection_type` column; it's always
-   computed from city match + time gap + journey boundaries.
+Each domain defines its own terms in its own `prd/<domain>/01-glossary.md`, along with the
+decision logic behind them. Read it before naming anything in that domain — never reuse a term
+across domains on the assumption it means the same thing, and never collapse two terms a glossary
+deliberately separates; that separation is usually load-bearing for the whole model.
