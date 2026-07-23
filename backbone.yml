@@ -35,10 +35,13 @@ agents:
 prd:
   index: prd/README.md               # domain list + how to add a new one
   template: prd/_template/           # blank skeleton for a new domain — copy, never implement
-  # domains: one entry per prd/<domain>/ folder, added when the domain's PRD lands.
-  # None exist yet. Re-add the `domains:` key with its first entry, and keep this map in step
-  # with prd/README.md's Domains table — check:backbone fails on a path that stops resolving.
-  domains: {}
+  # One entry per prd/<domain>/ folder — domains still UNDER CONSTRUCTION only. A domain that
+  # ships is retired (its folder deleted) and its row removed here; code becomes the source of
+  # truth. Keep this map in step with prd/README.md's Domains table — check:backbone fails on a
+  # path that stops resolving. Retired so far: flights, hotels.
+  domains:
+    travel-packages: prd/travel-packages/  # umrah packages: multi-city stays, dated departures with seat quota + inbound/outbound journeys, inclusions, flyer upload, provider + per-seat agent commission, back-office bookings, earnings report, public listing at /packages
+    landing: prd/landing/                  # TawafSai marketing landing page — apps/web only, static data; open: real business data + article pages
 
 structure:
   apps:
