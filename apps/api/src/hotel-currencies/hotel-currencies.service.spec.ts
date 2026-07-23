@@ -11,7 +11,8 @@ if (!databaseUrl) {
 const db = createDb(databaseUrl);
 const service = new HotelCurrenciesService(db);
 
-// A code not in prd/hotels/15-seed-data.md's currency set (USD/SAR/IDR), so tests never collide with seeded rows.
+// A code outside the seeded currency set (USD/SAR/IDR in packages/db/src/seed.ts),
+// so tests never collide with seeded rows.
 const TEST_CODE = 'ZZZ';
 
 async function cleanup() {

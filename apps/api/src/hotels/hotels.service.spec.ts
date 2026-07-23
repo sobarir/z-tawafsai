@@ -22,16 +22,19 @@ const baseQuery: HotelSearchQuery = {
 };
 
 /**
- * Golden scenarios from prd/hotels/14-scenarios.md, run against the real
- * seeded Postgres (prd/hotels/15-seed-data.md: JED-WFH property/SAR,
- * MAD-CIN property/SAR). The package-only scenarios (formerly S3, S8, S11,
- * S12) were removed along with the hotel-domain `package` concept — see
- * prd/hotels/CONTEXT.md.
+ * Golden scenarios for the hotel search domain, run against the real seeded
+ * Postgres (JED-WFH property/SAR, MAD-CIN property/SAR — the two hand-authored
+ * demo hotels in packages/db/src/seed.ts). These are the executable spec for
+ * this domain: they cover season selection, occupancy banding, nightly x
+ * nights, FX conversion, and the Standard-rate fallback. The numbering is
+ * non-contiguous because the package-only scenarios (formerly S3, S8, S11,
+ * S12) were removed with the hotel-domain `package` concept — the gaps are
+ * deliberate, not missing tests.
  *
  * S7's FX-inverse case is exercised with SAR->USD (inverse of the seeded
- * USD->SAR rate) rather than the PRD's illustrative IDR->SAR wording — the
- * seed only stores SAR->IDR, USD->IDR, and USD->SAR directly, so SAR->USD is
- * the pair that actually forces the inverse code path with this fixture set.
+ * USD->SAR rate) — the seed only stores SAR->IDR, USD->IDR, and USD->SAR
+ * directly, so SAR->USD is the pair that actually forces the inverse code path
+ * with this fixture set.
  */
 describe('HotelsService.search — golden scenarios', () => {
   it('S1 — property, standard season, 2 guests, native currency: perNight x nights, no FX', async () => {
@@ -154,6 +157,9 @@ describe('HotelsService.search — golden scenarios', () => {
     // 2027-02 is outside every seeded Madinah dated season. Under the
     // "Standard = no season" model, the season-less base rate applies, so the
     // Madinah properties are priced (previously this was NO_SEASON → omitted).
+    // The date must stay past 2027-01-01: the Nusuk Madinah hotels carry
+    // full-year windows ending there, so any earlier date lands inside a dated
+    // season and stops exercising the fallback this scenario exists to prove.
     const res = await hotels.search({
       ...baseQuery,
       destination: 'Madinah',

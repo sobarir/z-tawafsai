@@ -15,7 +15,7 @@ const service = new HotelRateRulesService(db);
 // hotels.service.spec.ts's golden scenarios depend on. Seasons and room types
 // are global reference data now: reference a seeded season read-only and create
 // a uniquely-named global room type. USD is seeded reference data
-// (prd/hotels/15-seed-data.md), safe to reuse as an FK.
+// (packages/db/src/seed.ts), safe to reuse as an FK.
 const CURRENCY = 'USD';
 const FIXTURE_CODE = 'ZZZ-RATERULE';
 const FIXTURE_ROOM_TYPE = 'ZZZ RateRule Room';

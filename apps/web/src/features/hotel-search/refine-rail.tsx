@@ -31,7 +31,15 @@ interface RefineRailProps {
  * keystroke). Price bounds are buffered locally and commit on blur — like the
  * search form, committing per-keystroke would re-render this component from
  * fresh searchParams mid-type. Bounds are in the display currency's minor
- * units, matching the API contract (prd/hotels/13-resolver-and-search.md).
+ * units, matching the API contract (`minPrice`/`maxPrice` in
+ * hotelSearchQuerySchema) — they filter the CONVERTED display price, not the
+ * rate rule's native amount.
+ *
+ * On narrow viewports this rail stacks above the results in a single column
+ * rather than becoming a bottom sheet. That is a deliberate scope
+ * simplification, verified at 360px with no horizontal overflow — the bottom
+ * sheet was designed but never built, so treat it as a feature request, not a
+ * responsive bug.
  */
 export function RefineRail({ value, onChange }: RefineRailProps) {
   const t = useTranslations('hotelSearch');

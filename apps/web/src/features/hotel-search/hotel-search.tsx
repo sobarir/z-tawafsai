@@ -61,8 +61,12 @@ export function HotelSearch({ initialState }: HotelSearchProps) {
     if (error) handleError(error);
   }, [error, handleError]);
 
-  // The URL is the state (prd/hotels/30-frontend.md) — every field change
-  // navigates, so refresh/back-button/sharing all preserve the search.
+  // The URL is the state — every field change navigates, so
+  // refresh/back-button/sharing all preserve the search. Note that "every field
+  // change" means every *committed* change: the search form and refine rail
+  // buffer input locally and commit on Search-click or blur. Committing per
+  // keystroke re-renders the Server Component mid-type and clobbers in-progress
+  // input — that was a real bug, not a hypothetical.
   const applyState = (next: HotelSearchState) => {
     router.replace(`${pathname}?${toSearchParams(next).toString()}`, {
       scroll: false,

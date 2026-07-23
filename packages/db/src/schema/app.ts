@@ -298,7 +298,16 @@ export const mctRules = pgTable('mct_rules', {
     .notNull(),
 });
 
-// Hotel search domain — see /prd/hotels/11-data-model.md for the full spec.
+// Hotel search domain — a lodging catalog with nightly price resolution.
+// Seven tables: currency, fx_rate, property (natural key — the spine),
+// room_type, season, season_window, rate_rule.
+//
+// Two shapes here are deliberate and easy to misread:
+//   - `room_type` and `season` are GLOBAL reference catalogs, not per-property.
+//     The per-property dated window that selects a season is `season_window`.
+//   - All money is integer minor units + an ISO currency code, never a float
+//     and never a numeric column. FX is display-side conversion only; each
+//     rate_rule stores its own native currency.
 
 export const propertyType = pgEnum('property_type', [
   'hotel',
@@ -401,7 +410,7 @@ export const property = pgTable(
 
 // Reference/master data — a global catalog of room categories, not tied to any
 // property. `max_occupancy` is the category default; rate rules carry their own
-// occupancy band. See prd/hotels/11-data-model.md.
+// occupancy band.
 export const roomType = pgTable(
   'room_type',
   {
@@ -474,9 +483,15 @@ export const rateRule = pgTable(
     propertyCode: varchar('property_code', { length: 26 })
       .notNull()
       .references(() => property.propertyCode, { onUpdate: 'cascade' }),
-    // Nullable: a season-less rate rule is the Standard (base) rate, used
-    // whenever no dated season covers the stay (or a season has no matching
-    // band). See prd/hotels/13-resolver-and-search.md.
+    // Nullable BY DESIGN — do not "fix" this to notNull. A season-less rate
+    // rule *is* the Standard (base) rate: `season_name = 'standard'` was
+    // retired as a dated season, so Standard is now the absence of a season
+    // rather than a row. Resolution: a stay date selects the property's
+    // covering `season_window` -> its global season -> the matching rate_rule;
+    // when no window covers the stay, or the matched season has no band for
+    // the occupancy, the null-season (Standard) band applies. There is
+    // deliberately no NO_SEASON outcome — see resolvePrice() in
+    // apps/api/src/hotels/resolver.ts and scenario S9 in hotels.service.spec.ts.
     seasonId: text('season_id').references(() => season.id),
     roomTypeId: text('room_type_id')
       .notNull()

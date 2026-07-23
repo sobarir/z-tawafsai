@@ -32,6 +32,9 @@ This package is consumed as built output — dependents see stale types until it
 - Primary keys: `text('id').primaryKey().$defaultFn(() => createId())` — ULIDs, always.
 - User ownership: `text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' })` — orphaned rows leak data after account deletion.
 - Timestamps: `timestamp('created_at').defaultNow().notNull()`; `updatedAt` with `$onUpdate(() => new Date())`.
+- Money in a multi-currency table: store an `integer` of **minor units** plus a `char(3)` ISO currency code, never `numeric`/`real`. Flights' single-currency `numeric(10,2)` is fine precisely because it never converts; once FX enters, decimal rounding drift compounds per conversion. Each row keeps its own native currency and conversion is display-side only — never write a converted amount back.
+- FX rates are integers too: store `rate x 1_000_000` (parts per million) and one direction per pair. The inverse is derived by dividing at read time — seeding both directions invites the two to disagree, and a `(base, quote)` unique constraint will not catch it because the reverse is a distinct pair.
+- A nullable FK that encodes a *default case* (e.g. `rate_rule.season_id` null = the base rate) needs `.nullsNotDistinct()` on any unique index covering it — Postgres treats NULLs as distinct by default, so duplicate "default" rows slip through an otherwise-correct constraint.
 
 ## Boundaries
 
