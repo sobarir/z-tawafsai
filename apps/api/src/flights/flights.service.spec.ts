@@ -1,6 +1,9 @@
-import { BadRequestException } from '@nestjs/common';
-import { describe, expect, it } from 'vitest';
-import { buildFlightLegs } from './flights.service';
+import { BadRequestException, ConflictException } from '@nestjs/common';
+import { createDb, schema } from '@repo/db';
+import { and, eq } from 'drizzle-orm';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { ConnectionValidatorService } from './connection-validator.service';
+import { buildFlightLegs, FlightsService } from './flights.service';
 
 /** CGK 01:00 -> LHR 20:00, the shape both create and update pass in. */
 const header = {
@@ -64,5 +67,56 @@ describe('buildFlightLegs', () => {
     expect(() => buildFlightLegs({ ...header, legs })).toThrow(
       BadRequestException,
     );
+  });
+});
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not set');
+}
+const db = createDb(databaseUrl);
+const service = new FlightsService(db, new ConnectionValidatorService(db));
+
+// A carrier + number the seed data never uses, so tests never collide with
+// seeded rows.
+const TEST_AIRLINE = 'EK';
+const TEST_NUMBER = '9911';
+
+const testFlight = {
+  operatingAirline: TEST_AIRLINE,
+  flightNumber: TEST_NUMBER,
+  originAirport: 'DXB',
+  destAirport: 'JED',
+  departureTimeLocal: '08:30',
+  arrivalTimeLocal: '10:45',
+  arrivalDayOffset: 0,
+  price: 500,
+  currency: 'USD',
+};
+
+async function cleanup() {
+  await db
+    .delete(schema.flights)
+    .where(
+      and(
+        eq(schema.flights.operatingAirline, TEST_AIRLINE),
+        eq(schema.flights.flightNumber, TEST_NUMBER),
+      ),
+    );
+}
+
+describe('FlightsService.create', () => {
+  beforeEach(cleanup);
+  afterAll(cleanup);
+
+  // The unique index is (operating_airline, flight_number) with no time column,
+  // so a second row at a different departure time is still a duplicate. The
+  // conflict must surface as a 409, not as a raw unique violation from Postgres.
+  it('rejects a duplicate carrier + flight number at a different departure time', async () => {
+    await service.create(testFlight);
+
+    await expect(
+      service.create({ ...testFlight, departureTimeLocal: '19:15' }),
+    ).rejects.toThrow(ConflictException);
   });
 });
