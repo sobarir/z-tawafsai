@@ -5,7 +5,8 @@
 const DURATION_REFERENCE = new Date('2025-06-15T12:00:00Z');
 const MINUTES_PER_DAY = 24 * 60;
 
-function parseLocalTime(time: string): number {
+/** Minutes past local midnight for an HH:MM wall-clock time. */
+export function parseLocalTime(time: string): number {
   const [hours = 0, minutes = 0] = time.split(':').map(Number);
   return hours * 60 + minutes;
 }

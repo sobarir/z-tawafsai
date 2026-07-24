@@ -19,7 +19,7 @@ import type {
 import { and, asc, eq, inArray } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module';
 import { ConnectionValidatorService } from './connection-validator.service';
-import { journeyDurationMinutes } from './journey-duration';
+import { journeyDurationMinutes, parseLocalTime } from './journey-duration';
 
 type FlightRow = typeof schema.flights.$inferSelect;
 type FlightLegRow = typeof schema.flightLegs.$inferSelect;
@@ -105,6 +105,121 @@ export function buildFlightLegs(
   return input.legs;
 }
 
+/** A partially built connection: the flights taken so far and where they end. */
+type ConnectionPath = { flights: Flight[]; currentAirport: string };
+
+/** Longest itinerary the connection search will assemble — 3 segments / 2 stops. */
+const MAX_SEGMENTS = 3;
+
+/** The flights boardable at each airport, keyed by the airport they depart. */
+function buildAdjacencyList(flights: Flight[]): Map<string, Flight[]> {
+  const adjacency = new Map<string, Flight[]>();
+  for (const flight of flights) {
+    const existing = adjacency.get(flight.originAirport);
+    if (existing) {
+      existing.push(flight);
+    } else {
+      adjacency.set(flight.originAirport, [flight]);
+    }
+  }
+  return adjacency;
+}
+
+/** First hops out of the origin metro that are not already direct flights. */
+function seedConnectionPaths(
+  originAirports: string[],
+  destAirport: string,
+  adjacency: Map<string, Flight[]>,
+): ConnectionPath[] {
+  const seeds: ConnectionPath[] = [];
+  for (const origin of originAirports) {
+    for (const flight of adjacency.get(origin) ?? []) {
+      if (flight.destAirport === destAirport) continue;
+      seeds.push({ flights: [flight], currentAirport: flight.destAirport });
+    }
+  }
+  return seeds;
+}
+
+/** One flight sold on its own. */
+function toDirectItinerary(
+  flight: Flight,
+  tzByAirport: Map<string, string>,
+): FlightItinerary {
+  return {
+    flights: [flight],
+    // Nonstop flights carry no legs; a technical stop adds one touchdown per
+    // leg beyond the first.
+    stopCount: Math.max(flight.legs.length - 1, 0),
+    totalPrice: flight.price,
+    currency: flight.currency,
+    departureTimeLocal: flight.departureTimeLocal,
+    arrivalTimeLocal: flight.arrivalTimeLocal,
+    arrivalDayOffset: flight.arrivalDayOffset,
+    totalDurationMinutes: journeyDurationMinutes(
+      flight.originAirport,
+      flight.departureTimeLocal,
+      flight.destAirport,
+      flight.arrivalTimeLocal,
+      flight.arrivalDayOffset,
+      tzByAirport,
+    ),
+  };
+}
+
+/**
+ * Folds a chain of flights into one sellable itinerary. Each connection counts
+ * as a stop on top of the flights' own technical stops, and a transfer whose
+ * next departure reads earlier on the clock than the previous arrival has
+ * crossed midnight — the only way a dateless schedule can express that.
+ */
+function toConnectingItinerary(
+  flights: Flight[],
+  tzByAirport: Map<string, string>,
+): FlightItinerary {
+  let totalPrice = 0;
+  let stopCount = 0;
+  let arrivalDayOffset = 0;
+  let prevFlight: Flight | null = null;
+
+  for (const flight of flights) {
+    totalPrice += flight.price;
+    stopCount += Math.max(flight.legs.length - 1, 0);
+    arrivalDayOffset += flight.arrivalDayOffset;
+
+    if (prevFlight) {
+      stopCount += 1;
+      if (
+        parseLocalTime(flight.departureTimeLocal) <
+        parseLocalTime(prevFlight.arrivalTimeLocal)
+      ) {
+        arrivalDayOffset += 1;
+      }
+    }
+    prevFlight = flight;
+  }
+
+  const firstFlight = flights[0];
+  const lastFlight = flights[flights.length - 1];
+  return {
+    flights,
+    stopCount,
+    totalPrice,
+    currency: firstFlight.currency,
+    departureTimeLocal: firstFlight.departureTimeLocal,
+    arrivalTimeLocal: lastFlight.arrivalTimeLocal,
+    arrivalDayOffset,
+    totalDurationMinutes: journeyDurationMinutes(
+      firstFlight.originAirport,
+      firstFlight.departureTimeLocal,
+      lastFlight.destAirport,
+      lastFlight.arrivalTimeLocal,
+      arrivalDayOffset,
+      tzByAirport,
+    ),
+  };
+}
+
 @Injectable()
 export class FlightsService {
   constructor(
@@ -139,27 +254,19 @@ export class FlightsService {
   }
 
   /**
-   * Search for Master Schedule Flights.
+   * Search for Master Schedule Flights: every direct flight on the route, plus
+   * every valid connection of up to MAX_SEGMENTS segments.
    */
   async search(query: SearchFlightsQuery): Promise<FlightItinerary[]> {
     const { originAirport, destAirport } = query;
 
-    let originAirports: string[] = [];
-    if (originAirport.length === 3) {
-      originAirports = [originAirport];
-    } else {
-      const cityAirports = await this.db
-        .select({ code: schema.airports.airportCode })
-        .from(schema.airports)
-        .where(eq(schema.airports.cityCode, originAirport));
-      originAirports = cityAirports.map((a) => a.code);
-    }
-
+    const originAirports = await this.resolveOriginAirports(originAirport);
     if (originAirports.length === 0) {
       return [];
     }
 
-    // Direct flights
+    const tzByAirport = await this.loadAirportTimezones();
+
     const directRows = await this.db
       .select()
       .from(schema.flights)
@@ -170,149 +277,123 @@ export class FlightsService {
           eq(schema.flights.status, 'ACTIVE'),
         ),
       );
-
-    const tzByAirport = await this.loadAirportTimezones();
-
     const directFlights = await this.attachLegs(directRows);
-    const itineraries: FlightItinerary[] = directFlights.map((f) => ({
-      flights: [f],
-      // Nonstop flights carry no legs; a technical stop adds one touchdown per
-      // leg beyond the first.
-      stopCount: Math.max(f.legs.length - 1, 0),
-      totalPrice: f.price,
-      currency: f.currency,
-      departureTimeLocal: f.departureTimeLocal,
-      arrivalTimeLocal: f.arrivalTimeLocal,
-      arrivalDayOffset: f.arrivalDayOffset,
-      totalDurationMinutes: journeyDurationMinutes(
-        f.originAirport,
-        f.departureTimeLocal,
-        f.destAirport,
-        f.arrivalTimeLocal,
-        f.arrivalDayOffset,
-        tzByAirport,
-      ),
-    }));
 
-    // In-memory Graph for 1-Stop and 2-Stop Connections
-    const allActiveRows = await this.db
+    const connecting = await this.findConnectingItineraries(
+      originAirports,
+      destAirport,
+      tzByAirport,
+    );
+
+    return [
+      ...directFlights.map((f) => toDirectItinerary(f, tzByAirport)),
+      ...connecting,
+    ];
+  }
+
+  /** The airports a search origin covers — itself, or every airport in the city. */
+  private async resolveOriginAirports(
+    originAirport: string,
+  ): Promise<string[]> {
+    if (originAirport.length === 3) {
+      return [originAirport];
+    }
+    const cityAirports = await this.db
+      .select({ code: schema.airports.airportCode })
+      .from(schema.airports)
+      .where(eq(schema.airports.cityCode, originAirport));
+    return cityAirports.map((a) => a.code);
+  }
+
+  /**
+   * Breadth-first walk of the active-flight graph. Each round extends every
+   * surviving path by one hop; a path that reaches the destination becomes an
+   * itinerary, anything else is carried into the next round until the segment
+   * ceiling is hit.
+   */
+  private async findConnectingItineraries(
+    originAirports: string[],
+    destAirport: string,
+    tzByAirport: Map<string, string>,
+  ): Promise<FlightItinerary[]> {
+    const activeRows = await this.db
       .select()
       .from(schema.flights)
       .where(eq(schema.flights.status, 'ACTIVE'));
+    const adjacency = buildAdjacencyList(await this.attachLegs(activeRows));
 
-    const allActiveFlights = await this.attachLegs(allActiveRows);
+    let queue = seedConnectionPaths(originAirports, destAirport, adjacency);
+    const itineraries: FlightItinerary[] = [];
 
-    // Build adjacency list by originAirport
-    const adjacencyList = new Map<string, Flight[]>();
-    for (const f of allActiveFlights) {
-      if (!adjacencyList.has(f.originAirport)) {
-        adjacencyList.set(f.originAirport, []);
+    for (let segments = 2; segments <= MAX_SEGMENTS; segments++) {
+      const { arrived, pending } = await this.advanceRound(
+        queue,
+        adjacency,
+        originAirports,
+        destAirport,
+      );
+
+      for (const path of arrived) {
+        itineraries.push(toConnectingItinerary(path.flights, tzByAirport));
       }
-      adjacencyList.get(f.originAirport)?.push(f);
-    }
 
-    type Path = { flights: Flight[]; currentAirport: string };
-
-    // Initialize queue with all valid first hops
-    let queue: Path[] = [];
-    for (const origin of originAirports) {
-      const initialFlights = adjacencyList.get(origin) || [];
-      for (const f of initialFlights) {
-        // Skip direct flights (already handled)
-        if (f.destAirport === destAirport) continue;
-        queue.push({ flights: [f], currentAirport: f.destAirport });
-      }
-    }
-
-    // BFS Traversal (up to 3 segments / 2 stops)
-    const MAX_DEPTH = 3;
-
-    for (let depth = 2; depth <= MAX_DEPTH; depth++) {
-      const nextQueue: Path[] = [];
-
-      for (const path of queue) {
-        const lastFlight = path.flights[path.flights.length - 1];
-
-        // Find all outgoing flights from the current node
-        const outgoing = adjacencyList.get(path.currentAirport) || [];
-
-        for (const nextFlight of outgoing) {
-          // Avoid cyclic routing back to origin
-          if (originAirports.includes(nextFlight.destAirport)) continue;
-
-          // Validate the connection edge
-          const isValid = await this.connectionValidator.validateConnection(
-            lastFlight,
-            nextFlight,
-          );
-          if (isValid) {
-            const newPathFlights = [...path.flights, nextFlight];
-
-            // Did we reach the final destination?
-            if (nextFlight.destAirport === destAirport) {
-              // Assemble the Journey details
-              let totalPrice = 0;
-              let totalStops = 0;
-              let dayOffset = 0;
-              let prevFlight: Flight | null = null;
-
-              for (const f of newPathFlights) {
-                totalPrice += f.price;
-                totalStops += Math.max(f.legs.length - 1, 0);
-                dayOffset += f.arrivalDayOffset;
-
-                if (prevFlight) {
-                  totalStops += 1; // The connection itself counts as a stop
-                  if (
-                    this.parseLocalTime(f.departureTimeLocal) <
-                    this.parseLocalTime(prevFlight.arrivalTimeLocal)
-                  ) {
-                    dayOffset += 1; // Crossed midnight during transfer
-                  }
-                }
-                prevFlight = f;
-              }
-
-              const firstFlight = newPathFlights[0];
-              const lastFlight = newPathFlights[newPathFlights.length - 1];
-              itineraries.push({
-                flights: newPathFlights,
-                stopCount: totalStops,
-                totalPrice,
-                currency: firstFlight.currency,
-                departureTimeLocal: firstFlight.departureTimeLocal,
-                arrivalTimeLocal: lastFlight.arrivalTimeLocal,
-                arrivalDayOffset: dayOffset,
-                totalDurationMinutes: journeyDurationMinutes(
-                  firstFlight.originAirport,
-                  firstFlight.departureTimeLocal,
-                  lastFlight.destAirport,
-                  lastFlight.arrivalTimeLocal,
-                  dayOffset,
-                  tzByAirport,
-                ),
-              });
-            } else {
-              // Enqueue for the next hop
-              if (depth < MAX_DEPTH) {
-                nextQueue.push({
-                  flights: newPathFlights,
-                  currentAirport: nextFlight.destAirport,
-                });
-              }
-            }
-          }
-        }
-      }
-      queue = nextQueue;
+      // The final round has nowhere to carry surviving paths forward to.
+      queue = segments < MAX_SEGMENTS ? pending : [];
     }
 
     return itineraries;
   }
 
-  private parseLocalTime(time: string): number {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
+  /** One BFS round: paths that reached the destination, and those still in flight. */
+  private async advanceRound(
+    queue: ConnectionPath[],
+    adjacency: Map<string, Flight[]>,
+    originAirports: string[],
+    destAirport: string,
+  ): Promise<{ arrived: ConnectionPath[]; pending: ConnectionPath[] }> {
+    const arrived: ConnectionPath[] = [];
+    const pending: ConnectionPath[] = [];
+
+    for (const path of queue) {
+      const extensions = await this.extendPath(path, adjacency, originAirports);
+
+      for (const extended of extensions) {
+        if (extended.currentAirport === destAirport) {
+          arrived.push(extended);
+        } else {
+          pending.push(extended);
+        }
+      }
+    }
+
+    return { arrived, pending };
+  }
+
+  /** Every legal one-hop extension of a path, skipping routes back to the origin. */
+  private async extendPath(
+    path: ConnectionPath,
+    adjacency: Map<string, Flight[]>,
+    originAirports: string[],
+  ): Promise<ConnectionPath[]> {
+    const lastFlight = path.flights[path.flights.length - 1];
+    const extended: ConnectionPath[] = [];
+
+    for (const nextFlight of adjacency.get(path.currentAirport) ?? []) {
+      if (originAirports.includes(nextFlight.destAirport)) continue;
+
+      const isValid = await this.connectionValidator.validateConnection(
+        lastFlight,
+        nextFlight,
+      );
+      if (!isValid) continue;
+
+      extended.push({
+        flights: [...path.flights, nextFlight],
+        currentAirport: nextFlight.destAirport,
+      });
+    }
+
+    return extended;
   }
 
   /** Airport code -> IANA timezone, for turning local times into instants. */
