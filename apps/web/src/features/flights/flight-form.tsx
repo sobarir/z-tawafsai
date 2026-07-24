@@ -174,6 +174,10 @@ export function FlightForm({
     await onSubmit(values);
   });
 
+  // The legs array's own errors (as opposed to a single leg field's) belong to
+  // no input, so without this they would block Save with nothing on screen.
+  const legsError = form.formState.errors.legs?.message;
+
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
@@ -305,6 +309,10 @@ export function FlightForm({
               />
               <Label htmlFor="multi-leg">{t('multiLeg')}</Label>
             </div>
+
+            {legsError ? (
+              <p className="text-sm text-destructive">{legsError}</p>
+            ) : null}
 
             {multiLeg ? (
               <div className="flex flex-col gap-4 rounded-md border p-3">

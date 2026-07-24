@@ -543,7 +543,7 @@
     },
     "flights": {
       "title": "Flights",
-      "description": "Manage operating flights and their legs. Legs are set at creation and cannot be edited afterward.",
+      "description": "Manage operating flights and their legs, including any technical-stop legs.",
       "createTitle": "Create flight",
       "editTitle": "Edit flight",
       "viewLegs": "View legs",
