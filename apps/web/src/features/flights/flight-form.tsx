@@ -81,6 +81,31 @@ export function flightToFormValues(flight: Flight): CreateFlightInput {
   };
 }
 
+// zodResolver infers the schema's *input* type (arrivalDayOffset optional,
+// legs pre-.min(2)), which doesn't unify with useForm's *output* CreateFlightInput.
+// Assert the concrete resolver type — sound at runtime, and typed (not `any`).
+const schemaResolver = zodResolver(
+  createFlightSchema,
+) as Resolver<CreateFlightInput>;
+
+/**
+ * `useFieldArray` materializes an undefined `legs` default as `[]`, which the
+ * contract's `.min(2)` rejects at the `legs` root — a path no `FormMessage` is
+ * bound to, so a nonstop flight failed to save with nothing shown on screen.
+ * Drop the empty array before validation: "no legs given" is what nonstop means
+ * here, and it is what the API stores (see `buildFlightLegs`).
+ */
+const flightFormResolver: Resolver<CreateFlightInput> = (
+  values,
+  context,
+  options,
+) =>
+  schemaResolver(
+    values.legs?.length ? values : { ...values, legs: undefined },
+    context,
+    options,
+  );
+
 interface FlightFormProps {
   airports: Airport[];
   airlines: Airline[];
@@ -110,10 +135,7 @@ export function FlightForm({
   const identityLocked = mode === 'edit';
 
   const form = useForm<CreateFlightInput>({
-    // zodResolver infers the schema's *input* type (arrivalDayOffset optional,
-    // legs pre-.min(2)), which doesn't unify with useForm's *output* CreateFlightInput.
-    // Assert the concrete resolver type — sound at runtime, and typed (not `any`).
-    resolver: zodResolver(createFlightSchema) as Resolver<CreateFlightInput>,
+    resolver: flightFormResolver,
     defaultValues,
   });
 
