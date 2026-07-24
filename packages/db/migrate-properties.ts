@@ -6,7 +6,12 @@ import { createDb } from './src/client';
 import { createId } from './src/id';
 import { property } from './src/schema/app';
 
-const db = createDb(process.env.DATABASE_URL!);
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not set');
+}
+
+const db = createDb(databaseUrl);
 
 async function main() {
   const properties = await db.select().from(property);

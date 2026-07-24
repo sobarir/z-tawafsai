@@ -23,6 +23,13 @@ export type DetailRow = {
 
 export type GridRow = MasterRow | DetailRow;
 
+/**
+ * The row the detail grid renders: a rate rule plus the resolved season name it
+ * is grouped by. `season` is derived for display only — the stored value is
+ * `seasonId`.
+ */
+export type SeasonedRateRule = RateRule & { season: string };
+
 export interface DetailFilters {
   season: string;
   roomType: string;
@@ -165,7 +172,7 @@ export function getDetailColumns({
   onCreate,
   filters,
   onFilterChange,
-}: DetailColumnsOptions): Column<RateRule>[] {
+}: DetailColumnsOptions): Column<SeasonedRateRule>[] {
   const seasonName = (seasonId: string | null): string =>
     seasonId
       ? (seasons.find((s) => s.id === seasonId)?.name ?? seasonId)

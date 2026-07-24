@@ -1,6 +1,6 @@
 'use client';
 
-import type { Flight } from '@repo/shared';
+import type { Airline, Flight, FlightMarketing } from '@repo/shared';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { type SortColumn, TreeDataGrid } from 'react-data-grid';
@@ -58,6 +58,104 @@ import {
 } from './flight-form';
 import { FlightLegsDialog } from './flight-legs-dialog';
 
+/**
+ * Elapsed minutes between departure and arrival, with both local times pulled
+ * back to UTC through their airport's offset — a flight that lands "earlier"
+ * than it departs is crossing zones, not travelling backwards.
+ */
+function flightDurationMinutes(
+  flight: Flight,
+  tzOffsets: Map<string, number>,
+): number {
+  const depOffset = tzOffsets.get(flight.originAirport) ?? 0;
+  const arrOffset = tzOffsets.get(flight.destAirport) ?? 0;
+
+  const [depH = 0, depM = 0] = flight.departureTimeLocal.split(':').map(Number);
+  const [arrH = 0, arrM = 0] = flight.arrivalTimeLocal.split(':').map(Number);
+
+  const depUtcMins = depH * 60 + depM - depOffset;
+  const arrUtcMins =
+    flight.arrivalDayOffset * 24 * 60 + arrH * 60 + arrM - arrOffset;
+
+  return arrUtcMins - depUtcMins;
+}
+
+/** The first marketing identity mapped onto this flight by another carrier. */
+function resolveCodeshare(
+  flightId: string,
+  marketings: FlightMarketing[] | undefined,
+  airlines: Airline[],
+): Pick<FlightRow, 'codeshareAirlineDisplay' | 'codeshareFlightNumber'> {
+  const marketing = marketings?.find(
+    (m) => m.flightId === flightId && !m.isOperatingCarrier,
+  );
+  if (!marketing) return {};
+
+  const airline = airlines.find(
+    (a) => a.airlineCode === marketing.marketingAirline,
+  );
+  return {
+    codeshareAirlineDisplay: airline
+      ? `${marketing.marketingAirline} - ${airline.name}`
+      : marketing.marketingAirline,
+    codeshareFlightNumber: marketing.marketingNumber,
+  };
+}
+
+/**
+ * Every filter box is a case-insensitive substring match. The itinerary box is
+ * the exception: it matches any of the route's four display fields, so typing
+ * an airport or a time both narrow the same column.
+ */
+function matchesFilters(
+  row: FlightRow,
+  filters: FlightFilters,
+  labels: { price: string; status: string },
+): boolean {
+  const itinerary = filters.itinerary.toLowerCase();
+  const itineraryMatches =
+    !itinerary ||
+    row.originAirport.toLowerCase().includes(itinerary) ||
+    row.destAirport.toLowerCase().includes(itinerary) ||
+    row.departureTimeLocal.toLowerCase().includes(itinerary) ||
+    row.arrivalTimeLocal.toLowerCase().includes(itinerary);
+
+  return (
+    itineraryMatches &&
+    row.airlineDisplay
+      .toLowerCase()
+      .includes(filters.operatingAirline.toLowerCase()) &&
+    row.flightNumber
+      .toLowerCase()
+      .includes(filters.flightNumber.toLowerCase()) &&
+    labels.price.includes(filters.price.toLowerCase()) &&
+    labels.status.includes(filters.status.toLowerCase())
+  );
+}
+
+/** Column-specific ordering; unsortable columns keep the incoming order. */
+function compareFlightRows(
+  a: FlightRow,
+  b: FlightRow,
+  columnKey: string,
+): number {
+  if (columnKey === 'airlineDisplay')
+    return a.airlineDisplay.localeCompare(b.airlineDisplay);
+  if (columnKey === 'flightNumber')
+    return a.flightNumber.localeCompare(b.flightNumber);
+  if (columnKey === 'price') return a.price - b.price;
+  if (columnKey === 'status') return a.status.localeCompare(b.status);
+  if (columnKey === 'itinerary') {
+    const byDeparture = a.departureTimeLocal.localeCompare(
+      b.departureTimeLocal,
+    );
+    return byDeparture !== 0
+      ? byDeparture
+      : a.arrivalTimeLocal.localeCompare(b.arrivalTimeLocal);
+  }
+  return 0;
+}
+
 export function FlightsAdmin() {
   const t = useTranslations('schedule.flights');
   const tStatus = useTranslations('schedule.flights.status');
@@ -112,83 +210,30 @@ export function FlightsAdmin() {
   const gridRows = useMemo(() => {
     if (!flights || !airports || !airlines) return [];
 
-    const tzOffsets = new Map<string, number>();
-    for (const airport of airports) {
-      tzOffsets.set(airport.airportCode, getOffsetMinutes(airport.timezone));
-    }
+    const tzOffsets = new Map(
+      airports.map((a) => [a.airportCode, getOffsetMinutes(a.timezone)]),
+    );
 
-    return flights.reduce((acc, f) => {
+    const rows: FlightRow[] = flights.map((f) => {
       const airline = airlines.find(
         (a) => a.airlineCode === f.operatingAirline,
       );
-      const airlineDisplay = airline
-        ? `${f.operatingAirline} - ${airline.name}`
-        : f.operatingAirline;
+      return {
+        ...f,
+        airlineDisplay: airline
+          ? `${f.operatingAirline} - ${airline.name}`
+          : f.operatingAirline,
+        durationMins: flightDurationMinutes(f, tzOffsets),
+        ...resolveCodeshare(f.id, marketings, airlines),
+      };
+    });
 
-      const statusLabel = tStatus(f.status).toLowerCase();
-      const price = formatCurrency(f.price, f.currency, locale).toLowerCase();
-
-      const itineraryQuery = filters.itinerary.toLowerCase();
-      const itineraryMatches =
-        !itineraryQuery ||
-        f.originAirport.toLowerCase().includes(itineraryQuery) ||
-        f.destAirport.toLowerCase().includes(itineraryQuery) ||
-        f.departureTimeLocal.toLowerCase().includes(itineraryQuery) ||
-        f.arrivalTimeLocal.toLowerCase().includes(itineraryQuery);
-
-      if (
-        airlineDisplay
-          .toLowerCase()
-          .includes(filters.operatingAirline.toLowerCase()) &&
-        f.flightNumber
-          .toLowerCase()
-          .includes(filters.flightNumber.toLowerCase()) &&
-        itineraryMatches &&
-        price.includes(filters.price.toLowerCase()) &&
-        statusLabel.includes(filters.status.toLowerCase())
-      ) {
-        const depOffset = tzOffsets.get(f.originAirport) ?? 0;
-        const arrOffset = tzOffsets.get(f.destAirport) ?? 0;
-
-        const [depH = 0, depM = 0] = f.departureTimeLocal
-          .split(':')
-          .map(Number);
-        const depUtcMins = depH * 60 + depM - depOffset;
-
-        const [arrH = 0, arrM = 0] = f.arrivalTimeLocal.split(':').map(Number);
-        const arrUtcMins =
-          f.arrivalDayOffset * 24 * 60 + arrH * 60 + arrM - arrOffset;
-
-        const durationMins = arrUtcMins - depUtcMins;
-
-        // Codeshare mapping
-        const flightMarketings =
-          marketings?.filter(
-            (m) => m.flightId === f.id && !m.isOperatingCarrier,
-          ) || [];
-        const firstMarketing = flightMarketings[0];
-        let codeshareAirlineDisplay: string | undefined;
-        let codeshareFlightNumber: string | undefined;
-        if (firstMarketing) {
-          const codeshareAirline = airlines.find(
-            (a) => a.airlineCode === firstMarketing.marketingAirline,
-          );
-          codeshareAirlineDisplay = codeshareAirline
-            ? `${firstMarketing.marketingAirline} - ${codeshareAirline.name}`
-            : firstMarketing.marketingAirline;
-          codeshareFlightNumber = firstMarketing.marketingNumber;
-        }
-
-        acc.push({
-          ...f,
-          airlineDisplay,
-          durationMins,
-          codeshareAirlineDisplay,
-          codeshareFlightNumber,
-        });
-      }
-      return acc;
-    }, [] as FlightRow[]);
+    return rows.filter((row) =>
+      matchesFilters(row, filters, {
+        price: formatCurrency(row.price, row.currency, locale).toLowerCase(),
+        status: tStatus(row.status).toLowerCase(),
+      }),
+    );
   }, [flights, filters, tStatus, locale, airlines, airports, marketings]);
 
   const sortedGridRows = useMemo(() => {
@@ -196,27 +241,9 @@ export function FlightsAdmin() {
 
     return [...gridRows].sort((a, b) => {
       for (const sort of sortColumns) {
-        const compResult = () => {
-          if (sort.columnKey === 'airlineDisplay')
-            return a.airlineDisplay.localeCompare(b.airlineDisplay);
-          if (sort.columnKey === 'flightNumber')
-            return a.flightNumber.localeCompare(b.flightNumber);
-          if (sort.columnKey === 'itinerary') {
-            const depComp = a.departureTimeLocal.localeCompare(
-              b.departureTimeLocal,
-            );
-            if (depComp !== 0) return depComp;
-            return a.arrivalTimeLocal.localeCompare(b.arrivalTimeLocal);
-          }
-          if (sort.columnKey === 'price') return a.price - b.price;
-          if (sort.columnKey === 'status')
-            return a.status.localeCompare(b.status);
-          return 0;
-        };
-
-        const res = compResult();
-        if (res !== 0) {
-          return sort.direction === 'ASC' ? res : -res;
+        const result = compareFlightRows(a, b, sort.columnKey);
+        if (result !== 0) {
+          return sort.direction === 'ASC' ? result : -result;
         }
       }
       return 0;
@@ -273,9 +300,9 @@ export function FlightsAdmin() {
           rowKeyGetter={(row) => row.id}
           groupBy={['airlineDisplay']}
           rowGrouper={(rows, columnKey) => {
-            const groups: Record<string, any[]> = {};
+            const groups: Record<string, FlightRow[]> = {};
             for (const row of rows) {
-              const key = String(row[columnKey as keyof typeof row] ?? '');
+              const key = String(row[columnKey as keyof FlightRow] ?? '');
               groups[key] ??= [];
               groups[key].push(row);
             }

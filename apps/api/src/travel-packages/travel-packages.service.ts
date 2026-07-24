@@ -46,6 +46,63 @@ function buildBookingPatch(
   return patch;
 }
 
+type FlightRow = typeof schema.flights.$inferSelect;
+type DepartureFlightRow =
+  typeof schema.travelPackageDepartureFlight.$inferSelect;
+
+/** The flight as a departure presents it — schedule fields plus resolved airline and transit. */
+function toDepartureFlightSummary(
+  flight: FlightRow,
+  summary: FlightSummaryDetail | undefined,
+) {
+  return {
+    id: flight.id,
+    operatingAirline: flight.operatingAirline,
+    airlineName: summary?.airlineName ?? flight.operatingAirline,
+    flightNumber: flight.flightNumber,
+    originAirport: flight.originAirport,
+    destAirport: flight.destAirport,
+    departureTimeLocal: flight.departureTimeLocal,
+    arrivalTimeLocal: flight.arrivalTimeLocal,
+    arrivalDayOffset: flight.arrivalDayOffset,
+    isDirect: summary?.isDirect ?? true,
+    transitAirport: summary?.transitAirport ?? null,
+    transitCityName: summary?.transitCityName ?? null,
+  };
+}
+
+/**
+ * Splits a departure's junction rows into its two journeys. Rows are already
+ * ordered by sequence, so each side keeps its leg order; a junction row whose
+ * flight has since been deleted is skipped rather than faked.
+ */
+function splitDepartureFlights(
+  junctionRows: DepartureFlightRow[],
+  flightById: Map<string, FlightRow>,
+  flightSummaryById: Map<string, FlightSummaryDetail>,
+) {
+  const outboundFlights: ReturnType<typeof toDepartureFlightSummary>[] = [];
+  const inboundFlights: ReturnType<typeof toDepartureFlightSummary>[] = [];
+
+  for (const junctionRow of junctionRows) {
+    const flight = flightById.get(junctionRow.flightId);
+    if (!flight) continue;
+
+    const summary = toDepartureFlightSummary(
+      flight,
+      flightSummaryById.get(junctionRow.flightId),
+    );
+
+    if (junctionRow.direction === 'OUTBOUND') {
+      outboundFlights.push(summary);
+    } else {
+      inboundFlights.push(summary);
+    }
+  }
+
+  return { outboundFlights, inboundFlights };
+}
+
 @Injectable()
 export class TravelPackagesService {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
@@ -321,40 +378,11 @@ export class TravelPackagesService {
         departures: (departuresByPackage.get(row.id) ?? [])
           .sort((a, b) => a.departureDate.localeCompare(b.departureDate))
           .map((departure) => {
-            const bookedSeats = bookedByDeparture.get(departure.id) ?? 0;
-            const junctionRows =
-              departureFlightsByDeparture.get(departure.id) ?? [];
-
-            // Build the flight objects for OUTBOUND and INBOUND
-            const outboundFlights = [];
-            const inboundFlights = [];
-
-            for (const jRow of junctionRows) {
-              const flight = flightById.get(jRow.flightId);
-              const summary = flightSummaryById.get(jRow.flightId);
-              if (!flight) continue;
-
-              const flightSummary = {
-                id: flight.id,
-                operatingAirline: flight.operatingAirline,
-                airlineName: summary?.airlineName ?? flight.operatingAirline,
-                flightNumber: flight.flightNumber,
-                originAirport: flight.originAirport,
-                destAirport: flight.destAirport,
-                departureTimeLocal: flight.departureTimeLocal,
-                arrivalTimeLocal: flight.arrivalTimeLocal,
-                arrivalDayOffset: flight.arrivalDayOffset,
-                isDirect: summary?.isDirect ?? true,
-                transitAirport: summary?.transitAirport ?? null,
-                transitCityName: summary?.transitCityName ?? null,
-              };
-
-              if (jRow.direction === 'OUTBOUND') {
-                outboundFlights.push(flightSummary);
-              } else {
-                inboundFlights.push(flightSummary);
-              }
-            }
+            const { outboundFlights, inboundFlights } = splitDepartureFlights(
+              departureFlightsByDeparture.get(departure.id) ?? [],
+              flightById,
+              flightSummaryById,
+            );
 
             return {
               id: departure.id,
@@ -367,7 +395,7 @@ export class TravelPackagesService {
               availableSeats: departure.availableSeats,
               price: departure.price,
               currency: departure.currency,
-              bookedSeats,
+              bookedSeats: bookedByDeparture.get(departure.id) ?? 0,
             };
           }),
         inclusions: (inclusionsByPackage.get(row.id) ?? []).map(
@@ -718,6 +746,56 @@ export class TravelPackagesService {
 
   // Locks the departure row and rejects `pax` if it would exceed the quota.
   // Also 404s a missing departure. A null quota means untracked (no cap).
+  /**
+   * Keeps a departure's seat counter in step with a booking edit. Only a
+   * `confirmed` booking holds seats, so the delta is the difference against
+   * whatever this row was already holding: leaving `confirmed` returns all of
+   * them, and any increase is re-checked against capacity first.
+   */
+  private async syncDepartureSeats(
+    tx: Tx,
+    existing: typeof schema.travelPackageBooking.$inferSelect,
+    input: UpdateTravelPackageBookingInput,
+  ): Promise<void> {
+    const nextStatus = input.status ?? existing.status;
+    const heldSeats = existing.status === 'confirmed' ? existing.pax : 0;
+
+    if (nextStatus !== 'confirmed') {
+      await this.adjustAvailableSeats(tx, existing.departureId, heldSeats);
+      return;
+    }
+
+    const nextPax = input.pax ?? existing.pax;
+    const diff = nextPax - heldSeats;
+    if (diff > 0) {
+      await this.assertDepartureCapacity(tx, existing.departureId, diff);
+    }
+    await this.adjustAvailableSeats(tx, existing.departureId, -diff);
+  }
+
+  /**
+   * Moves a departure's remaining-seat counter by `delta`. A departure with a
+   * null `availableSeats` sells without a quota, so there is no counter to move.
+   */
+  private async adjustAvailableSeats(
+    tx: Tx,
+    departureId: string,
+    delta: number,
+  ): Promise<void> {
+    if (delta === 0) return;
+    await tx
+      .update(schema.travelPackageDeparture)
+      .set({
+        availableSeats: sql`${schema.travelPackageDeparture.availableSeats} + ${delta}`,
+      })
+      .where(
+        and(
+          eq(schema.travelPackageDeparture.id, departureId),
+          isNotNull(schema.travelPackageDeparture.availableSeats),
+        ),
+      );
+  }
+
   private async assertDepartureCapacity(
     tx: Tx,
     departureId: string,
@@ -805,46 +883,7 @@ export class TravelPackagesService {
         throw new NotFoundException(`Booking ${id} not found`);
       }
 
-      const nextStatus = input.status ?? existing.status;
-      const nextPax = input.pax ?? existing.pax;
-      // Re-check capacity only when the result is a confirmed booking, excluding
-      // this row's own seats from the count.
-      if (nextStatus === 'confirmed') {
-        let diff = nextPax;
-        if (existing.status === 'confirmed') {
-          diff = nextPax - existing.pax;
-        }
-        if (diff > 0) {
-          await this.assertDepartureCapacity(tx, existing.departureId, diff);
-        }
-
-        if (diff !== 0) {
-          await tx
-            .update(schema.travelPackageDeparture)
-            .set({
-              availableSeats: sql`${schema.travelPackageDeparture.availableSeats} - ${diff}`,
-            })
-            .where(
-              and(
-                eq(schema.travelPackageDeparture.id, existing.departureId),
-                isNotNull(schema.travelPackageDeparture.availableSeats),
-              ),
-            );
-        }
-      } else if (existing.status === 'confirmed') {
-        // Status changed from confirmed to something else (e.g., cancelled)
-        await tx
-          .update(schema.travelPackageDeparture)
-          .set({
-            availableSeats: sql`${schema.travelPackageDeparture.availableSeats} + ${existing.pax}`,
-          })
-          .where(
-            and(
-              eq(schema.travelPackageDeparture.id, existing.departureId),
-              isNotNull(schema.travelPackageDeparture.availableSeats),
-            ),
-          );
-      }
+      await this.syncDepartureSeats(tx, existing, input);
 
       const patch = buildBookingPatch(input);
       if (Object.keys(patch).length > 0) {
