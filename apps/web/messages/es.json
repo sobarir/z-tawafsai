@@ -248,7 +248,7 @@
     },
     "flights": {
       "title": "Vuelos",
-      "description": "Administra los vuelos operados y sus tramos. Los tramos se definen al crear el vuelo y no se pueden editar después.",
+      "description": "Administra los vuelos operados y sus tramos, incluidos los tramos de escala técnica.",
       "createTitle": "Crear vuelo",
       "editTitle": "Editar vuelo",
       "viewLegs": "Ver tramos",

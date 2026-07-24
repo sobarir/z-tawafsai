@@ -81,6 +81,32 @@ export function flightToFormValues(flight: Flight): CreateFlightInput {
   };
 }
 
+// zodResolver infers the schema's *input* type (arrivalDayOffset optional,
+// legs pre-.min(2)), which doesn't unify with useForm's *output*
+// CreateFlightInput. Assert the concrete resolver type — sound at runtime,
+// and typed (not `any`).
+const schemaResolver = zodResolver(
+  createFlightSchema,
+) as Resolver<CreateFlightInput>;
+
+/**
+ * `useFieldArray` materialises `legs` as `[]` even while the multi-leg editor
+ * is off, and the schema's `.min(2)` then rejects it — invisibly, because an
+ * array-root error has no field of its own to render into, so Save just did
+ * nothing. Empty means nonstop here (same as the unchecked toggle), so strip
+ * it back to `undefined` before the schema sees it.
+ */
+const flightResolver: Resolver<CreateFlightInput> = (
+  values,
+  context,
+  options,
+) =>
+  schemaResolver(
+    { ...values, legs: values.legs?.length ? values.legs : undefined },
+    context,
+    options,
+  );
+
 interface FlightFormProps {
   airports: Airport[];
   airlines: Airline[];
@@ -110,10 +136,7 @@ export function FlightForm({
   const identityLocked = mode === 'edit';
 
   const form = useForm<CreateFlightInput>({
-    // zodResolver infers the schema's *input* type (arrivalDayOffset optional,
-    // legs pre-.min(2)), which doesn't unify with useForm's *output* CreateFlightInput.
-    // Assert the concrete resolver type — sound at runtime, and typed (not `any`).
-    resolver: zodResolver(createFlightSchema) as Resolver<CreateFlightInput>,
+    resolver: flightResolver,
     defaultValues,
   });
 
@@ -151,6 +174,10 @@ export function FlightForm({
   const handleSubmit = form.handleSubmit(async (values) => {
     await onSubmit(values);
   });
+
+  // The legs array's own errors (as opposed to a single leg field's) belong to
+  // no input, so without this they would block Save with nothing on screen.
+  const legsError = form.formState.errors.legs?.message;
 
   return (
     <Form {...form}>
@@ -283,6 +310,10 @@ export function FlightForm({
               />
               <Label htmlFor="multi-leg">{t('multiLeg')}</Label>
             </div>
+
+            {legsError ? (
+              <p className="text-sm text-destructive">{legsError}</p>
+            ) : null}
 
             {multiLeg ? (
               <div className="flex flex-col gap-4 rounded-md border p-3">

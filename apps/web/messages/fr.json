@@ -248,7 +248,7 @@
     },
     "flights": {
       "title": "Vols",
-      "description": "Gérez les vols exploités et leurs tronçons. Les tronçons sont définis à la création et ne peuvent plus être modifiés ensuite.",
+      "description": "Gérez les vols exploités et leurs tronçons, y compris les tronçons d'escale technique.",
       "createTitle": "Créer un vol",
       "editTitle": "Modifier le vol",
       "viewLegs": "Voir les tronçons",

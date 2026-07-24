@@ -248,7 +248,7 @@
     },
     "flights": {
       "title": "航班",
-      "description": "管理承运航班及其航段。航段在创建时设定，创建后无法编辑。",
+      "description": "管理承运航班及其航段，包括技术经停航段。",
       "createTitle": "新建航班",
       "editTitle": "编辑航班",
       "viewLegs": "查看航段",
