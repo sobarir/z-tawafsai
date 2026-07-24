@@ -1,9 +1,9 @@
 'use client';
 
-import type { RateRule } from '@repo/shared';
+import type { RateRule, Season } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useState } from 'react';
-import { DataGrid, TreeDataGrid } from 'react-data-grid';
+import { type Column, DataGrid, TreeDataGrid } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import { EntityDeleteConfirm } from '@/components/shared/entity-delete-confirm';
 import { EntityFormDialog } from '@/components/shared/entity-form-dialog';
@@ -28,8 +28,68 @@ import {
   type GridRow,
   getDetailColumns,
   getMasterColumns,
+  type SeasonedRateRule,
 } from './columns';
 import { RateRuleForm } from './rate-rule-form';
+
+/**
+ * One property's rate rules, grouped by season. Declared at module scope on
+ * purpose: a component defined inside `HotelRateRulesAdmin` is a brand-new type
+ * on every render, so React remounts the grid and its expanded-group state is
+ * lost on each keystroke in a filter.
+ */
+function DetailGrid({
+  propertyCode,
+  filteredRateRules,
+  detailCols,
+  seasons,
+  standardSeasonLabel,
+}: {
+  propertyCode: string;
+  filteredRateRules: RateRule[];
+  detailCols: Column<SeasonedRateRule>[];
+  seasons: Season[];
+  standardSeasonLabel: string;
+}) {
+  const propertyRules = useMemo<SeasonedRateRule[]>(() => {
+    return filteredRateRules
+      .filter((r) => r.propertyCode === propertyCode)
+      .map((r) => ({
+        ...r,
+        season: r.seasonId
+          ? (seasons.find((s) => s.id === r.seasonId)?.name ?? r.seasonId)
+          : standardSeasonLabel,
+      }));
+  }, [filteredRateRules, propertyCode, seasons, standardSeasonLabel]);
+
+  const [expandedGroupIds, setExpandedGroupIds] = useState<
+    ReadonlySet<unknown>
+  >(() => new Set(propertyRules.map((r) => r.season)));
+
+  return (
+    <div className="border bg-background shadow-sm rounded-md overflow-hidden h-full flex flex-col">
+      <TreeDataGrid
+        columns={detailCols}
+        rows={propertyRules}
+        rowKeyGetter={(row) => row.id}
+        groupBy={['season']}
+        rowGrouper={(rows, columnKey) => {
+          const groups: Record<string, SeasonedRateRule[]> = {};
+          for (const row of rows) {
+            const key = String(row[columnKey as keyof SeasonedRateRule]);
+            groups[key] ??= [];
+            groups[key].push(row);
+          }
+          return groups;
+        }}
+        expandedGroupIds={expandedGroupIds}
+        onExpandedGroupIdsChange={setExpandedGroupIds}
+        className="rdg-light h-full"
+        headerRowHeight={64}
+      />
+    </div>
+  );
+}
 
 export function HotelRateRulesAdmin() {
   const t = useTranslations('catalog.rateRules');
@@ -151,59 +211,6 @@ export function HotelRateRulesAdmin() {
     });
   }, []);
 
-  function DetailGrid({
-    propertyCode,
-    filteredRateRules,
-    detailCols,
-    seasons,
-    standardSeasonLabel,
-  }: {
-    propertyCode: string;
-    filteredRateRules: RateRule[];
-    detailCols: any[];
-    seasons: any[];
-    standardSeasonLabel: string;
-  }) {
-    const propertyRules = useMemo(() => {
-      return filteredRateRules
-        .filter((r) => r.propertyCode === propertyCode)
-        .map((r) => ({
-          ...r,
-          season: r.seasonId
-            ? (seasons?.find((s) => s.id === r.seasonId)?.name ?? r.seasonId)
-            : standardSeasonLabel,
-        }));
-    }, [filteredRateRules, propertyCode, seasons, standardSeasonLabel]);
-
-    const [expandedGroupIds, setExpandedGroupIds] = useState<
-      ReadonlySet<unknown>
-    >(() => new Set(propertyRules.map((r) => r.season)));
-
-    return (
-      <div className="border bg-background shadow-sm rounded-md overflow-hidden h-full flex flex-col">
-        <TreeDataGrid
-          columns={detailCols}
-          rows={propertyRules}
-          rowKeyGetter={(row) => row.id}
-          groupBy={['season']}
-          rowGrouper={(rows, columnKey) => {
-            const groups: Record<string, any[]> = {};
-            for (const row of rows) {
-              const key = String((row as any)[columnKey]);
-              groups[key] ??= [];
-              groups[key].push(row);
-            }
-            return groups;
-          }}
-          expandedGroupIds={expandedGroupIds}
-          onExpandedGroupIdsChange={setExpandedGroupIds}
-          className="rdg-light h-full"
-          headerRowHeight={64}
-        />
-      </div>
-    );
-  }
-
   const renderDetail = useCallback(
     (propertyCode: string) => {
       const detailCols = getDetailColumns({
@@ -244,16 +251,7 @@ export function HotelRateRulesAdmin() {
         />
       );
     },
-    [
-      filteredRateRules,
-      t,
-      seasons,
-      roomTypes,
-      tCatalog,
-      tCommon,
-      filters,
-      DetailGrid,
-    ],
+    [filteredRateRules, t, seasons, roomTypes, tCatalog, tCommon, filters],
   );
 
   const masterColumns = useMemo(() => {
