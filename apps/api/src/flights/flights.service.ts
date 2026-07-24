@@ -426,6 +426,11 @@ export class FlightsService {
   async create(input: CreateFlightInput): Promise<Flight> {
     const legs = buildFlightLegs(input);
 
+    // Must match `flights_carrier_number_unique` exactly: flights are dateless
+    // schedule templates, so a carrier's flight number identifies one flight
+    // whatever time it departs. Narrowing this check by departure time let a
+    // duplicate past it and into a raw Postgres unique violation — a 500 where
+    // the caller should get this 409.
     const [existing] = await this.db
       .select({ id: schema.flights.id })
       .from(schema.flights)
@@ -433,12 +438,11 @@ export class FlightsService {
         and(
           eq(schema.flights.operatingAirline, input.operatingAirline),
           eq(schema.flights.flightNumber, input.flightNumber),
-          eq(schema.flights.departureTimeLocal, input.departureTimeLocal),
         ),
       );
     if (existing) {
       throw new ConflictException(
-        `Flight ${input.operatingAirline}${input.flightNumber} at ${input.departureTimeLocal} already exists`,
+        `Flight ${input.operatingAirline}${input.flightNumber} already exists`,
       );
     }
 

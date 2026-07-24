@@ -1,18 +1,18 @@
-import type { Airline, Airport, Flight } from '@repo/shared';
+import type { Airline, Airport, CreateFlightInput } from '@repo/shared';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import type { ReactElement } from 'react';
-import { describe, expect, it, vi } from 'vitest';
-import {
-  emptyFlightFormValues,
-  FlightForm,
-  flightToFormValues,
-} from './flight-form';
+import { describe, expect, it, type Mock, vi } from 'vitest';
+import { FlightForm } from './flight-form';
 
 const messages = {
-  common: { cancel: 'Cancel', save: 'Save', loading: 'Loading...' },
+  common: { cancel: 'Cancel', save: 'Save' },
   schedule: {
     flights: {
+      status: {
+        ACTIVE: 'Active',
+        SUSPENDED: 'Suspended',
+        SEASONAL: 'Seasonal',
+      },
       fields: {
         operatingAirline: 'Operating airline',
         flightNumber: 'Flight number',
@@ -37,19 +37,27 @@ const messages = {
         departureDayOffset: '+ Days (Dep)',
         arrivalDayOffset: '+ Days (Arr)',
       },
-      status: {
-        ACTIVE: 'Active',
-        SUSPENDED: 'Suspended',
-        SEASONAL: 'Seasonal',
-      },
     },
   },
 };
 
+const airports: Airport[] = ['DXB', 'JED', 'RUH'].map((code) => ({
+  airportCode: code,
+  icaoCode: null,
+  name: `${code} Airport`,
+  cityCode: code,
+  countryCode: 'AE',
+  timezone: 'Asia/Dubai',
+  latitude: null,
+  longitude: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+}));
+
 const airlines: Airline[] = [
   {
     airlineCode: 'EK',
-    icaoCode: 'UAE',
+    icaoCode: null,
     name: 'Emirates',
     countryCode: 'AE',
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -57,127 +65,49 @@ const airlines: Airline[] = [
   },
 ];
 
-const airport = (airportCode: string, name: string): Airport => ({
-  airportCode,
-  icaoCode: null,
-  name,
-  cityCode: 'XXX',
-  countryCode: 'ID',
-  timezone: 'UTC',
-  latitude: null,
-  longitude: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-});
-
-const airports: Airport[] = [
-  airport('CGK', 'Soekarno-Hatta International'),
-  airport('DXB', 'Dubai International Airport'),
-];
-
-/** A nonstop flight: no leg rows, route and times on the flight itself. */
-const nonstopFlight: Flight = {
-  id: '01KY5CRPBR6G3RQW7QCWNPEYC7',
+/** A complete nonstop flight — `legs` omitted, as the contract expects. */
+const nonstopValues: CreateFlightInput = {
   operatingAirline: 'EK',
-  flightNumber: '357',
-  originAirport: 'CGK',
-  destAirport: 'DXB',
-  departureTimeLocal: '17:55',
-  arrivalTimeLocal: '22:55',
+  flightNumber: '9911',
+  originAirport: 'DXB',
+  destAirport: 'JED',
+  departureTimeLocal: '08:30',
+  arrivalTimeLocal: '10:45',
   arrivalDayOffset: 0,
-  aircraftType: null,
+  aircraftType: undefined,
   status: 'ACTIVE',
-  price: 340,
+  price: 500,
   currency: 'USD',
-  legs: [],
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
+  legs: undefined,
 };
 
-const renderForm = (ui: ReactElement) =>
+type SubmitMock = Mock<(values: CreateFlightInput) => Promise<void>>;
+
+const renderForm = (
+  onSubmit: SubmitMock,
+  defaultValues: CreateFlightInput = nonstopValues,
+) =>
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      {ui}
-    </NextIntlClientProvider>,
-  );
-
-describe('FlightForm', () => {
-  // Regression: `useFieldArray` materialises `legs` as `[]` even while the
-  // multi-leg editor is off, and the schema's `.min(2)` rejected it — with no
-  // field to render the array-root error into, Save silently did nothing.
-  it('submits a nonstop edit with no legs', async () => {
-    const onSubmit = vi.fn().mockResolvedValue(undefined);
-    renderForm(
-      <FlightForm
-        mode="edit"
-        airports={airports}
-        airlines={airlines}
-        defaultValues={flightToFormValues(nonstopFlight)}
-        onSubmit={onSubmit}
-        onCancel={vi.fn()}
-        submitting={false}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-
-    await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledWith(
-        expect.objectContaining({
-          operatingAirline: 'EK',
-          flightNumber: '357',
-          originAirport: 'CGK',
-          destAirport: 'DXB',
-          price: 340,
-          legs: undefined,
-        }),
-      );
-    });
-  });
-
-  it('submits a newly created nonstop flight', async () => {
-    const onSubmit = vi.fn().mockResolvedValue(undefined);
-    renderForm(
       <FlightForm
         mode="create"
         airports={airports}
         airlines={airlines}
-        defaultValues={emptyFlightFormValues}
-        onSubmit={onSubmit}
-        onCancel={vi.fn()}
+        defaultValues={defaultValues}
         submitting={false}
-      />,
-    );
+        onCancel={vi.fn()}
+        onSubmit={onSubmit}
+      />
+    </NextIntlClientProvider>,
+  );
 
-    const [airline, origin, dest] = screen.getAllByRole('combobox');
-    fireEvent.click(airline as HTMLElement);
-    fireEvent.click(screen.getByRole('option', { name: 'EK — Emirates' }));
-    fireEvent.click(origin as HTMLElement);
-    fireEvent.click(
-      screen.getByRole('option', {
-        name: 'CGK — Soekarno-Hatta International',
-      }),
-    );
-    fireEvent.click(dest as HTMLElement);
-    fireEvent.click(
-      screen.getByRole('option', { name: 'DXB — Dubai International Airport' }),
-    );
-
-    fireEvent.change(screen.getByPlaceholderText('e.g. 874'), {
-      target: { value: '357' },
-    });
-    fireEvent.change(screen.getByLabelText('Departure time'), {
-      target: { value: '17:55' },
-    });
-    fireEvent.change(screen.getByLabelText('Arrival time'), {
-      target: { value: '22:55' },
-    });
-    fireEvent.change(screen.getByLabelText('Price'), {
-      target: { value: '340' },
-    });
-    fireEvent.change(screen.getByPlaceholderText('e.g. USD'), {
-      target: { value: 'usd' },
-    });
+describe('FlightForm', () => {
+  // Regression: useFieldArray materializes the undefined `legs` default as `[]`,
+  // which the contract's `.min(2)` rejected at the `legs` root — a path with no
+  // FormMessage, so Save silently did nothing on every nonstop flight.
+  it('submits a nonstop flight with no legs', async () => {
+    const onSubmit: SubmitMock = vi.fn().mockResolvedValue(undefined);
+    renderForm(onSubmit);
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -185,16 +115,42 @@ describe('FlightForm', () => {
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
           operatingAirline: 'EK',
-          flightNumber: '357',
-          originAirport: 'CGK',
-          destAirport: 'DXB',
-          departureTimeLocal: '17:55',
-          arrivalTimeLocal: '22:55',
-          price: 340,
-          currency: 'USD',
-          legs: undefined,
+          flightNumber: '9911',
+          originAirport: 'DXB',
+          destAirport: 'JED',
         }),
       );
     });
+    expect(onSubmit.mock.calls[0]?.[0].legs).toBeUndefined();
+  });
+
+  it('keeps the legs of a technical-stop flight', async () => {
+    const onSubmit: SubmitMock = vi.fn().mockResolvedValue(undefined);
+    renderForm(onSubmit, {
+      ...nonstopValues,
+      legs: [
+        {
+          depAirport: 'DXB',
+          arrAirport: 'RUH',
+          departureTimeLocal: '08:30',
+          arrivalTimeLocal: '09:30',
+          departureDayOffset: 0,
+          arrivalDayOffset: 0,
+        },
+        {
+          depAirport: 'RUH',
+          arrAirport: 'JED',
+          departureTimeLocal: '10:00',
+          arrivalTimeLocal: '10:45',
+          departureDayOffset: 0,
+          arrivalDayOffset: 0,
+        },
+      ],
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    expect(onSubmit.mock.calls[0]?.[0].legs).toHaveLength(2);
   });
 });
