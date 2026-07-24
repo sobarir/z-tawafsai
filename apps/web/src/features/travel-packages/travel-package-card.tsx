@@ -23,8 +23,139 @@ interface TravelPackageCardProps {
   locale: string;
 }
 
+type PackageStay = FlightHotelPackage['stays'][number];
+type PackageDeparture = FlightHotelPackage['departures'][number];
+type PackageInclusion = FlightHotelPackage['inclusions'][number];
+type PackageFlight = PackageDeparture['outboundFlights'][number];
+
 function formatDate(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale, { dateStyle: 'medium' });
+}
+
+/** Headline departure date; falls back to the raw value if the locale is unusable. */
+function formatDepartureDate(iso: string, locale: string): string {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+/** Distance to the haram, carrying the stay's own qualifier. */
+function distanceLabel(stay: PackageStay): string | null {
+  if (stay.distanceMeters == null) return null;
+  if (stay.distanceNote === 'Less than') return `< ${stay.distanceMeters}m`;
+  if (stay.distanceNote === 'Approx.') return `± ${stay.distanceMeters}m`;
+  return `${stay.distanceMeters}m`;
+}
+
+/** Seats still sellable, or null when the departure carries no quota. */
+function remainingSeats(departure: PackageDeparture): number | null {
+  return departure.availableSeats !== null
+    ? departure.availableSeats - departure.bookedSeats
+    : null;
+}
+
+function AirlineSummary({ flight }: { flight: PackageFlight }) {
+  const t = useTranslations('travelPackages');
+
+  return (
+    <div className="flex items-start gap-2.5">
+      <Plane className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
+      <div>
+        <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
+          {flight.airlineName}
+        </div>
+        <div className="mt-0.5">
+          {flight.isDirect ? (
+            <Badge className="rounded-full border-transparent bg-brand-600 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-white uppercase">
+              {t('direct')}
+            </Badge>
+          ) : (
+            <Badge className="rounded-full border-transparent bg-gray-200 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-landing-ink uppercase">
+              {t('transitIn', {
+                city: flight.transitCityName ?? flight.transitAirport ?? '',
+                code: flight.transitAirport ?? '',
+              })}
+            </Badge>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StayItem({ stay }: { stay: PackageStay }) {
+  const distance = distanceLabel(stay);
+
+  return (
+    <div className="flex items-start gap-2.5">
+      <Building2 className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
+      <div>
+        <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
+          {stay.displayName}
+        </div>
+        {distance && (
+          <div className="text-[.76rem] leading-snug text-landing-muted">
+            {distance}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DepartureBadges({
+  departures,
+  locale,
+}: {
+  departures: PackageDeparture[];
+  locale: string;
+}) {
+  const t = useTranslations('travelPackages');
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {departures.map((departure) => {
+        const remaining = remainingSeats(departure);
+        const note =
+          remaining !== null
+            ? t('seatsLeft', { count: remaining })
+            : departure.seatsNote;
+
+        return (
+          <Badge key={departure.id} variant="outline">
+            {formatDate(departure.departureDate, locale)}
+            {note ? ` · ${note}` : ''}
+          </Badge>
+        );
+      })}
+    </div>
+  );
+}
+
+function InclusionList({ inclusions }: { inclusions: PackageInclusion[] }) {
+  return (
+    <ul className="flex flex-col gap-1">
+      {inclusions.map((inclusion) => (
+        <li
+          key={`${inclusion.kind}-${inclusion.label}`}
+          className="flex items-center gap-2 text-sm text-muted-foreground"
+        >
+          {inclusion.kind === 'included' ? (
+            <Check className="h-4 w-4 shrink-0 text-primary" />
+          ) : (
+            <X className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+          )}
+          <span>{inclusion.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
@@ -45,18 +176,9 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
   const firstDeparture = getEarliestDeparture(departures);
   const firstFlight = firstDeparture?.outboundFlights?.[0];
 
-  let departureDateStr = '';
-  if (firstDeparture) {
-    try {
-      departureDateStr = new Intl.DateTimeFormat(locale, {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }).format(new Date(firstDeparture.departureDate));
-    } catch {
-      departureDateStr = firstDeparture.departureDate;
-    }
-  }
+  const departureDateStr = firstDeparture
+    ? formatDepartureDate(firstDeparture.departureDate, locale)
+    : '';
 
   const badgeVariant = item.type === 'umrah' ? 'default' : 'gold';
 
@@ -144,55 +266,11 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
         </div>
 
         {/* 2. Airline */}
-        {firstFlight && (
-          <div className="flex items-start gap-2.5">
-            <Plane className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
-            <div>
-              <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
-                {firstFlight.airlineName}
-              </div>
-              {firstFlight.isDirect ? (
-                <div className="mt-0.5">
-                  <Badge className="rounded-full border-transparent bg-brand-600 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-white uppercase">
-                    {t('direct')}
-                  </Badge>
-                </div>
-              ) : (
-                <div className="mt-0.5">
-                  <Badge className="rounded-full border-transparent bg-gray-200 px-1.5 py-px text-[.6rem] font-bold tracking-[.04em] text-landing-ink uppercase">
-                    {t('transitIn', {
-                      city:
-                        firstFlight.transitCityName ??
-                        firstFlight.transitAirport ??
-                        '',
-                      code: firstFlight.transitAirport ?? '',
-                    })}
-                  </Badge>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        {firstFlight && <AirlineSummary flight={firstFlight} />}
 
         {/* 3+. Hotels */}
         {stays.map((stay) => (
-          <div key={stay.propertyCode} className="flex items-start gap-2.5">
-            <Building2 className="mt-0.5 size-[19px] shrink-0 text-brand-600" />
-            <div>
-              <div className="text-[.88rem] font-semibold leading-snug text-landing-ink">
-                {stay.displayName}
-              </div>
-              {stay.distanceMeters != null && (
-                <div className="text-[.76rem] leading-snug text-landing-muted">
-                  {stay.distanceNote === 'Less than'
-                    ? `< ${stay.distanceMeters}m`
-                    : stay.distanceNote === 'Approx.'
-                      ? `± ${stay.distanceMeters}m`
-                      : `${stay.distanceMeters}m`}
-                </div>
-              )}
-            </div>
-          </div>
+          <StayItem key={stay.propertyCode} stay={stay} />
         ))}
 
         {/* Divider for extra info */}
@@ -231,46 +309,13 @@ export function TravelPackageCard({ item, locale }: TravelPackageCardProps) {
               </span>
               <div className="flex min-w-0 flex-col gap-1">
                 <p className="text-sm font-medium">{t('departures')}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {departures.map((departure) => {
-                    const remainingSeats =
-                      departure.availableSeats !== null
-                        ? departure.availableSeats - departure.bookedSeats
-                        : null;
-                    return (
-                      <Badge key={departure.id} variant="outline">
-                        {formatDate(departure.departureDate, locale)}
-                        {remainingSeats !== null
-                          ? ` · ${t('seatsLeft', { count: remainingSeats })}`
-                          : departure.seatsNote
-                            ? ` · ${departure.seatsNote}`
-                            : ''}
-                      </Badge>
-                    );
-                  })}
-                </div>
+                <DepartureBadges departures={departures} locale={locale} />
               </div>
             </div>
           )}
 
           {/* Inclusions */}
-          {inclusions.length > 0 && (
-            <ul className="flex flex-col gap-1">
-              {inclusions.map((inclusion) => (
-                <li
-                  key={`${inclusion.kind}-${inclusion.label}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                  {inclusion.kind === 'included' ? (
-                    <Check className="h-4 w-4 shrink-0 text-primary" />
-                  ) : (
-                    <X className="h-4 w-4 shrink-0 text-muted-foreground/70" />
-                  )}
-                  <span>{inclusion.label}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          {inclusions.length > 0 && <InclusionList inclusions={inclusions} />}
         </div>
       </CardContent>
 
